@@ -20,11 +20,41 @@ export const createModelView = () => {
   // const grid = new OBC.SimpleGrid(components);
   const grid = new CustomGrid(components, new THREE.Color("#FF0000")); // Red color
 
-  const boxMaterial = new THREE.MeshStandardMaterial({ color: "#6528D7" });
-  const boxGeometry = new THREE.BoxGeometry(3, 3, 3);
-  const cube = new THREE.Mesh(boxGeometry, boxMaterial);
+  // Add some elements to the scene
+
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshStandardMaterial({ color: "purple" });
+  const cube = new THREE.Mesh(geometry, material);
   cube.position.set(0, 1.5, 0);
   scene.add(cube);
+
+  const planeGeometry = new THREE.PlaneGeometry(10, 10);
+  const planeMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffff00,
+    side: THREE.DoubleSide,
+  }); // add visible: false to remove from visibility
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  scene.add(plane);
+
+  //   components.meshes.push(cube);
+  components.meshes.push(plane);
+
+  const dimensions = new OBC.AreaMeasurement(components);
+  dimensions.enabled = true;
+  dimensions.snapDistance = 1;
+
+  container.ondblclick = () => dimensions.create();
+  container.oncontextmenu = () => dimensions.endCreation();
+
+  const directionalLight = new THREE.DirectionalLight();
+  directionalLight.position.set(5, 10, 3);
+  directionalLight.intensity = 0.5;
+  scene.add(directionalLight);
+
+  const ambientLight = new THREE.AmbientLight();
+  ambientLight.intensity = 0.5;
+  scene.add(ambientLight);
 
   const shadows = new OBC.ShadowDropper(components);
   shadows.shadowExtraScaleFactor = 15;
@@ -32,31 +62,13 @@ export const createModelView = () => {
   shadows.shadowOffset = 0.1;
   shadows.renderShadow([cube], "example");
 
-  components.scene.setup();
-
-  // Assuming you have an array of points representing the 2D shape
-  let points = [
-    [0, 0],
-    [1, 0],
-    [1, 1],
-    [0, 1],
-  ];
-
-  // Convert the 2D shape to a 3D shape
-  let geometry = new THREE.ExtrudeGeometry(new THREE.Shape(points), {
-    depth: 10, // Depth of the extrusion
-    bevelEnabled: false,
-  });
-
-  let material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  let mesh = new THREE.Mesh(geometry, material);
-
-  scene.add(mesh);
-
-  //   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
+  components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 };
 
 class CustomGrid extends OBC.SimpleGrid {
+  size2: number | undefined;
+  size1: number | undefined;
+  color: THREE.ColorRepresentation | undefined;
   constructor(
     components: OBC.Components,
     color?: THREE.Color,
