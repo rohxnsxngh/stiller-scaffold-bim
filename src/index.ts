@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
 import { createSimple2DScene } from "./utilities/simple2Dscene";
+import { ShapeUtils } from "three";
 
-let intersects, components;
+let intersects, components: OBC.Components;
 
 export const createModelView = () => {
   const container = document.getElementById("model");
@@ -37,10 +38,10 @@ export const createModelView = () => {
 
   // Add some elements to the scene
 
-  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshStandardMaterial({ color: "purple" });
   const cube = new THREE.Mesh(geometry, material);
-  cube.position.set(0, 1.5, 0);
+  cube.position.set(0, 0.5, 0);
   // scene.add(cube);
 
   const planeGeometry = new THREE.PlaneGeometry(100, 100);
@@ -68,15 +69,15 @@ export const createModelView = () => {
 
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
-  let intersects;
+  let intersects: any;
 
   window.addEventListener("mousemove", function (e) {
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
     mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
     intersects = raycaster.intersectObjects(scene.children);
-    intersects.forEach(function (intersect) {
-      if ((intersect.object.name = "ground")) {
+    intersects.forEach(function (intersect: any) {
+      if (intersect.object.name === "ground") {
         const highlightPos = new THREE.Vector3()
           .copy(intersect.point)
           .floor()
@@ -85,6 +86,95 @@ export const createModelView = () => {
       }
     });
   });
+
+  let points: THREE.Vector3[] = [];
+
+  window.addEventListener("mousedown", function (e) {
+    intersects.forEach(function (intersect: any) {
+      if (intersect.object.name === "ground") {
+        if (points.length < 5) {
+          points.push(
+            new THREE.Vector3(
+              highlightMesh.position.x,
+              0,
+              highlightMesh.position.z
+            )
+          );
+          console.log(points);
+          const cubeClone = cube.clone();
+          cubeClone.position.set(
+            highlightMesh.position.x,
+            0.5,
+            highlightMesh.position.z
+          );
+          cubeClone.name = "cubeClone";
+          scene.add(cubeClone);
+
+          // Create line segments
+          const geometry = new THREE.BufferGeometry().setFromPoints(points);
+          const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+          const line = new THREE.Line(geometry, material);
+          scene.add(line);
+        } else {
+
+          // Create rectangle
+          let shape = new THREE.Shape();
+          shape.moveTo(points[0].x, points[0].y);
+          shape.lineTo(points[1].x, points[1].y);
+          shape.lineTo(points[2].x, points[2].y);
+          shape.lineTo(points[3].x, points[3].y);
+          shape.lineTo(points[0].x, points[0].y);
+
+          const width = Math.abs(points[1].x - points[0].y);
+          const length = Math.abs(points[3].y - points[2].y);
+
+          console.log("width", width);
+          console.log("length", length);
+
+          // Create plane
+          // const geometryPlaneAdded = new THREE.Mesh(
+          //   new THREE.PlaneGeometry(width, length),
+          //   new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })
+          // );
+          // geometryPlaneAdded.rotateX(-Math.PI / 2);
+          // geometryPlaneAdded.position.set(width / 2, 0, length / 2)
+          // scene.add(geometryPlaneAdded)
+
+          // Reset points
+          points = [];
+        }
+      }
+    });
+  });
+
+  // window.addEventListener("mousedown", function (e) {
+  //   if (points.length < 4) {
+  //     points.push(new THREE.Vector2(e.clientX, e.clientY));
+  //     console.log(points)
+  //   } else {
+  //     // Create rectangle
+  //     let shape = new THREE.Shape();
+  //     shape.moveTo(points[0].x, points[0].y);
+  //     shape.lineTo(points[1].x, points[1].y);
+  //     shape.lineTo(points[2].x, points[2].y);
+  //     shape.lineTo(points[3].x, points[3].y);
+  //     shape.lineTo(points[0].x, points[0].y);
+
+  //     // Extrude rectangle
+  //     let extrudeSettings = {
+  //       depth: 10,
+  //       bevelEnabled: false,
+  //     };
+  //     let geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  //     let material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  //     let mesh = new THREE.Mesh(geometry, material);
+
+  //     scene.add(mesh);
+
+  //     // Reset points
+  //     points = [];
+  //   }
+  // });
 
   console.log(components);
 
@@ -96,7 +186,6 @@ export const createModelView = () => {
   shadows.shadowOffset = 0.1;
   // shadows.renderShadow([cube], "example");
   shadows.renderShadow([cube], "example2");
-
 
   //   const frustum = new THREE.Frustum();
 
@@ -110,7 +199,6 @@ export const createModelView = () => {
 
   //   container.ondblclick = () => dimensions.create();
   //   container.oncontextmenu = () => dimensions.endCreation();
-
 
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 
