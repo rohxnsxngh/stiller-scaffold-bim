@@ -1,15 +1,24 @@
 import * as OBC from "openbim-components";
+import * as THREE from "three";
 import { Vector2 } from "three";
 
 let drawingShape = false;
 let shapeVertices: Vector2[] | undefined = [];
 export const createSimple2DScene = (
   components: OBC.Components,
-  cube: THREE.Mesh
+  plane: THREE.Mesh
 ) => {
   const simple2dScene = new OBC.Simple2DScene(components);
+  console.log(simple2dScene)
   const scene2d = simple2dScene.get();
-  scene2d.add(cube);
+  scene2d.add(plane);
+  const directionalLight2 = new THREE.DirectionalLight();
+  directionalLight2.position.set(5, 10, 3);
+  directionalLight2.intensity = 0.5;
+  scene2d.add(directionalLight2);
+  const ambientLight2 = new THREE.AmbientLight();
+  ambientLight2.intensity = 0.5;
+  scene2d.add(ambientLight2);
   const canvasUI = simple2dScene.uiElement.get("container");
   const canvas = canvasUI.domElement as HTMLCanvasElement;
   window.ondblclick = () => {
@@ -33,8 +42,8 @@ export const createSimple2DScene = (
     const { width, height } = mainWindow.containerSize;
     simple2dScene.setSize(height, width);
   });
-  mainWindow.domElement.style.width = "60rem";
-  mainWindow.domElement.style.height = "60rem";
+  mainWindow.domElement.style.width = "20rem";
+  mainWindow.domElement.style.height = "20rem";
   mainWindow.onVisible.add(() => {
     if (mainWindow.visible) {
       simple2dScene.grid.regenerate();
@@ -50,35 +59,20 @@ export const createSimple2DScene = (
   components.ui.addToolbar(mainToolbar);
   mainToolbar.addChild(mainButton);
 
-  console.log(mainWindow)
+  // console.log(mainWindow);
+  const raycaster = new THREE.Raycaster()
 
-  canvas.addEventListener("mousedown", (event) => {
-    drawingShape = true;
-    shapeVertices = [];
-  });
+  canvas.addEventListener("click", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
 
-  canvas.addEventListener("mousemove", (event) => {
-    if (drawingShape) {
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      console.log(x, y)
-    //   shapeVertices.push(new THREE.Vector2(x, y));
-    }
-  });
+    // Create a 2D vector representing the mouse position
+    const mousePosition = new THREE.Vector2(x, y);
+    
+    raycaster.setFromCamera(mousePosition, simple2dScene.camera)
+    const intersects = raycaster.intersectObject(plane)
+    console.log(intersects)
 
-//   canvas.addEventListener("mouseup", (event) => {
-//     if (drawingShape) {
-//       drawingShape = false;
-//       // Create a shape with the collected vertices
-//       const shape = new THREE.Shape(shapeVertices);
-//       // Create a geometry from the shape
-//       const geometry = new THREE.ShapeBufferGeometry(shape);
-//       // Create a mesh from the geometry
-//       const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-//       const mesh = new THREE.Mesh(geometry, material);
-//       // Add the mesh to the scene
-//       scene.add(mesh);
-//     }
-//   });
+});
 };
