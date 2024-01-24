@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
+import { createSimple2DScene } from "./utilities/simple2Dscene";
 
 export const createModelView = () => {
   const container = document.getElementById("model");
@@ -37,15 +38,21 @@ export const createModelView = () => {
   plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   scene.add(plane);
 
-  //   components.meshes.push(cube);
+  components.meshes.push(cube);
   components.meshes.push(plane);
 
-  const dimensions = new OBC.AreaMeasurement(components);
-  dimensions.enabled = true;
-  dimensions.snapDistance = 1;
+  //   const frustum = new THREE.Frustum();
 
-  container.ondblclick = () => dimensions.create();
-  container.oncontextmenu = () => dimensions.endCreation();
+  //////////////////////
+  // createSimple2DScene(components, cube);
+  //////////////////////
+
+  //   const dimensions = new OBC.AreaMeasurement(components);
+  //   dimensions.enabled = true;
+  //   dimensions.snapDistance = 1;
+
+  //   container.ondblclick = () => dimensions.create();
+  //   container.oncontextmenu = () => dimensions.endCreation();
 
   const directionalLight = new THREE.DirectionalLight();
   directionalLight.position.set(5, 10, 3);
@@ -89,3 +96,12 @@ class CustomGrid extends OBC.SimpleGrid {
     return grid;
   }
 }
+
+// function onWindowResize() {
+//   camera.aspect = window.innerWidth / window.innerHeight;
+//   camera.updateProjectionMatrix();
+
+//   renderer.setSize(window.innerWidth, window.innerHeight);
+
+//   render();
+// }
