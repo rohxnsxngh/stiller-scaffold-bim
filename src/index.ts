@@ -116,29 +116,46 @@ export const createModelView = () => {
           const line = new THREE.Line(geometry, material);
           scene.add(line);
         } else {
-
           // Create rectangle
           let shape = new THREE.Shape();
-          shape.moveTo(points[0].x, points[0].y);
-          shape.lineTo(points[1].x, points[1].y);
-          shape.lineTo(points[2].x, points[2].y);
-          shape.lineTo(points[3].x, points[3].y);
-          shape.lineTo(points[0].x, points[0].y);
+          shape.moveTo(points[0].x, points[0].z);
+          shape.lineTo(points[1].x, points[1].z);
+          shape.lineTo(points[2].x, points[2].z);
+          shape.lineTo(points[3].x, points[3].z);
+          if (points[4].x != points[0].x || points[4].z != points[0].z) {
+            console.error("must complete the shape");
+          }
+          shape.lineTo(points[4].x, points[4].y);
 
-          const width = Math.abs(points[1].x - points[0].y);
-          const length = Math.abs(points[3].y - points[2].y);
+          let width: number, length: number;
 
-          console.log("width", width);
-          console.log("length", length);
+          if (Math.abs(points[1].x - points[0].x) == 0) {
+            width = Math.abs(points[1].z - points[0].z);
+            length = Math.abs(points[2].x - points[1].x);
 
-          // Create plane
-          // const geometryPlaneAdded = new THREE.Mesh(
-          //   new THREE.PlaneGeometry(width, length),
-          //   new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })
-          // );
-          // geometryPlaneAdded.rotateX(-Math.PI / 2);
-          // geometryPlaneAdded.position.set(width / 2, 0, length / 2)
-          // scene.add(geometryPlaneAdded)
+            // Create plane
+            const geometryPlaneAdded = new THREE.Mesh(
+              new THREE.PlaneGeometry(length + 1, width + 1),
+              new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })
+            );
+            geometryPlaneAdded.rotateX(-Math.PI / 2);
+            geometryPlaneAdded.position.set(points[0].x + (length / 2), 0,points[0].z + (width / 2));
+            scene.add(geometryPlaneAdded);
+          } else {
+            width = Math.abs(points[1].x - points[0].x);
+            length = Math.abs(points[2].z - points[1].z);
+
+            // Create plane
+            const geometryPlaneAdded = new THREE.Mesh(
+              new THREE.PlaneGeometry(width + 1, length + 1),
+              new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })
+            );
+            geometryPlaneAdded.rotateX(-Math.PI / 2);
+            geometryPlaneAdded.position.set(points[0].x + (width / 2), 0,points[0].z + (length / 2));
+            scene.add(geometryPlaneAdded);
+          }
+
+          console.log("width", width, "length", length);
 
           // Reset points
           points = [];
@@ -146,35 +163,6 @@ export const createModelView = () => {
       }
     });
   });
-
-  // window.addEventListener("mousedown", function (e) {
-  //   if (points.length < 4) {
-  //     points.push(new THREE.Vector2(e.clientX, e.clientY));
-  //     console.log(points)
-  //   } else {
-  //     // Create rectangle
-  //     let shape = new THREE.Shape();
-  //     shape.moveTo(points[0].x, points[0].y);
-  //     shape.lineTo(points[1].x, points[1].y);
-  //     shape.lineTo(points[2].x, points[2].y);
-  //     shape.lineTo(points[3].x, points[3].y);
-  //     shape.lineTo(points[0].x, points[0].y);
-
-  //     // Extrude rectangle
-  //     let extrudeSettings = {
-  //       depth: 10,
-  //       bevelEnabled: false,
-  //     };
-  //     let geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  //     let material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  //     let mesh = new THREE.Mesh(geometry, material);
-
-  //     scene.add(mesh);
-
-  //     // Reset points
-  //     points = [];
-  //   }
-  // });
 
   console.log(components);
 
@@ -187,18 +175,18 @@ export const createModelView = () => {
   // shadows.renderShadow([cube], "example");
   shadows.renderShadow([cube], "example2");
 
-  //   const frustum = new THREE.Frustum();
+  const mainToolbar = new OBC.Toolbar(components);
+  mainToolbar.name = "Main toolbar";
+  components.ui.addToolbar(mainToolbar);
 
-  //////////////////////
-  // createSimple2DScene(components, cube);
-  //////////////////////
-
-  //   const dimensions = new OBC.AreaMeasurement(components);
-  //   dimensions.enabled = true;
-  //   dimensions.snapDistance = 1;
-
-  //   container.ondblclick = () => dimensions.create();
-  //   container.oncontextmenu = () => dimensions.endCreation();
+  const alertButton = new OBC.Button(components);
+  alertButton.materialIcon = "info";
+  alertButton.tooltip = "Information";
+  alertButton.id = "alert-button";
+  mainToolbar.addChild(alertButton);
+  alertButton.onClick.add(() => {
+    alert("I've been clicked!");
+  });
 
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 
