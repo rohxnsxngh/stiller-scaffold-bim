@@ -2,13 +2,15 @@ import * as THREE from "three";
 import * as OBC from "openbim-components";
 import { createSimple2DScene } from "./utilities/simple2Dscene";
 
+let intersects, components, plane;
+
 export const createModelView = () => {
   const container = document.getElementById("model");
   if (!container) {
     throw new Error("Container element not found");
   }
 
-  const components = new OBC.Components();
+  components = new OBC.Components();
   components.scene = new OBC.SimpleScene(components);
   components.renderer = new OBC.SimpleRenderer(components, container);
   components.camera = new OBC.SimpleCamera(components);
@@ -34,9 +36,13 @@ export const createModelView = () => {
     color: 0xffff00,
     side: THREE.DoubleSide,
   }); // add visible: false to remove from visibility
-  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   scene.add(plane);
+
+  console.log(components);
+
+  //   console.log(components.camera.activeCamera)
 
   components.meshes.push(cube);
   components.meshes.push(plane);
@@ -44,7 +50,7 @@ export const createModelView = () => {
   //   const frustum = new THREE.Frustum();
 
   //////////////////////
-  // createSimple2DScene(components, cube);
+  //   createSimple2DScene(components, cube);
   //////////////////////
 
   //   const dimensions = new OBC.AreaMeasurement(components);
@@ -70,6 +76,15 @@ export const createModelView = () => {
   shadows.renderShadow([cube], "example");
 
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // console.log(components._scene);
+    // components._renderer.render(components._scene, components._camera);
+  }
+
+  animate();
 };
 
 class CustomGrid extends OBC.SimpleGrid {
@@ -96,6 +111,17 @@ class CustomGrid extends OBC.SimpleGrid {
     return grid;
   }
 }
+
+// window.onmousemove = () => {
+//   const result = components.raycaster.castRay(plane);
+//   console.log(result)
+// };
+
+// function onMouseMove(event) {
+//     // calculate mouse position in normalized device coordinates (-1 to +1) for both components
+//     mousePosition.x = (event.clientX / window.innerWidth) * 2 - 1;
+//     mousePosition.y = -(event.clientY / window.innerHeight) * 2 + 1;
+// }
 
 // function onWindowResize() {
 //   camera.aspect = window.innerWidth / window.innerHeight;

@@ -1,5 +1,8 @@
 import * as OBC from "openbim-components";
+import { Vector2 } from "three";
 
+let drawingShape = false;
+let shapeVertices: Vector2[] | undefined = [];
 export const createSimple2DScene = (
   components: OBC.Components,
   cube: THREE.Mesh
@@ -47,8 +50,35 @@ export const createSimple2DScene = (
   components.ui.addToolbar(mainToolbar);
   mainToolbar.addChild(mainButton);
 
-  canvas.addEventListener("click", (event) => {
-    console.log("hello");
+  console.log(mainWindow)
 
+  canvas.addEventListener("mousedown", (event) => {
+    drawingShape = true;
+    shapeVertices = [];
   });
+
+  canvas.addEventListener("mousemove", (event) => {
+    if (drawingShape) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      console.log(x, y)
+    //   shapeVertices.push(new THREE.Vector2(x, y));
+    }
+  });
+
+//   canvas.addEventListener("mouseup", (event) => {
+//     if (drawingShape) {
+//       drawingShape = false;
+//       // Create a shape with the collected vertices
+//       const shape = new THREE.Shape(shapeVertices);
+//       // Create a geometry from the shape
+//       const geometry = new THREE.ShapeBufferGeometry(shape);
+//       // Create a mesh from the geometry
+//       const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+//       const mesh = new THREE.Mesh(geometry, material);
+//       // Add the mesh to the scene
+//       scene.add(mesh);
+//     }
+//   });
 };
