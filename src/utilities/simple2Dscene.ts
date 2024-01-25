@@ -2,8 +2,13 @@ import * as OBC from "openbim-components";
 import * as THREE from "three";
 import { Vector2 } from "three";
 
+export let drawingInProgress = false;
+
+export const setDrawingInProgress = (value: boolean) => {
+  drawingInProgress = value;
+};
+
 let drawingShape = false;
-let shapeVertices: Vector2[] | undefined = [];
 export const createSimple2DScene = (
   components: OBC.Components,
   plane: THREE.Mesh
@@ -59,20 +64,39 @@ export const createSimple2DScene = (
   components.ui.addToolbar(mainToolbar);
   mainToolbar.addChild(mainButton);
 
-  // console.log(mainWindow);
-  const raycaster = new THREE.Raycaster()
+  const alertButton = new OBC.Button(components);
+  alertButton.materialIcon = "info";
+  alertButton.tooltip = "Information";
+  alertButton.id = "alert-button";
+  mainToolbar.addChild(alertButton);
+  alertButton.onClick.add(() => {
+    alert("I've been clicked!");
+  });
 
-  canvas.addEventListener("click", (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+  const drawingButton = new OBC.Button(components);
+  drawingButton.materialIcon = "draw";
+  drawingButton.tooltip = "Draw Blueprint";
+  drawingButton.id = "drawing-button";
+  mainToolbar.addChild(drawingButton);
+  drawingButton.onClick.add(() => {
+    setDrawingInProgress(true)
+    console.log("drawing")
+  });
 
-    // Create a 2D vector representing the mouse position
-    const mousePosition = new THREE.Vector2(x, y);
-    
-    raycaster.setFromCamera(mousePosition, simple2dScene.camera)
-    const intersects = raycaster.intersectObject(plane)
-    console.log(intersects)
+  const extrusionButton = new OBC.Button(components);
+  extrusionButton.materialIcon = "view_in_ar";
+  extrusionButton.tooltip = "Extrude Shape";
+  extrusionButton.id = "extrusion-button";
+  mainToolbar.addChild(extrusionButton);
+  extrusionButton.onClick.add(() => {
+    setDrawingInProgress(false)
+    console.log("extrusion")
+  });
+  extrusionButton.domElement.addEventListener("mouseover", () => {
+    console.log("hovering over the extrusion button")
+    setDrawingInProgress(false)
+  }) 
 
-});
+  return drawingShape
 };
+
