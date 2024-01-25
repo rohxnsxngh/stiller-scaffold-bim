@@ -1,7 +1,5 @@
 <template>
   <div id="model"></div>
-  <div id="container"></div>
-  <input id="coordinatesInput" type="text" placeholder="Enter coordinates">
 </template>
 
 <script setup lang="ts">

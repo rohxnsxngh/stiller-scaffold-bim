@@ -1,6 +1,5 @@
 import * as OBC from "openbim-components";
 import * as THREE from "three";
-import { Vector2 } from "three";
 
 export let drawingInProgress = false;
 
@@ -14,7 +13,7 @@ export const createSimple2DScene = (
   plane: THREE.Mesh
 ) => {
   const simple2dScene = new OBC.Simple2DScene(components);
-  console.log(simple2dScene)
+  console.log(simple2dScene);
   const scene2d = simple2dScene.get();
   scene2d.add(plane);
   const directionalLight2 = new THREE.DirectionalLight();
@@ -25,7 +24,7 @@ export const createSimple2DScene = (
   ambientLight2.intensity = 0.5;
   scene2d.add(ambientLight2);
   const canvasUI = simple2dScene.uiElement.get("container");
-  const canvas = canvasUI.domElement as HTMLCanvasElement;
+  canvasUI.domElement as HTMLCanvasElement;
   window.ondblclick = () => {
     simple2dScene.scaleY += 0.1;
   };
@@ -36,6 +35,7 @@ export const createSimple2DScene = (
   mainWindow.domElement.style.height = "20rem";
   mainWindow.addChild(simple2dScene.uiElement.get("container"));
   mainWindow.onResized.add(() => simple2dScene.grid.regenerate());
+  // @ts-ignore
   components.renderer.onAfterUpdate.add(() => {
     if (mainWindow.visible) {
       simple2dScene.update();
@@ -61,6 +61,7 @@ export const createSimple2DScene = (
     mainWindow.visible = !mainWindow.visible;
   });
   const mainToolbar = new OBC.Toolbar(components);
+  // mainToolbar.position = 'top'
   components.ui.addToolbar(mainToolbar);
   mainToolbar.addChild(mainButton);
 
@@ -79,8 +80,8 @@ export const createSimple2DScene = (
   drawingButton.id = "drawing-button";
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
-    setDrawingInProgress(true)
-    console.log("drawing")
+    setDrawingInProgress(true);
+    console.log("drawing");
   });
 
   const extrusionButton = new OBC.Button(components);
@@ -89,14 +90,13 @@ export const createSimple2DScene = (
   extrusionButton.id = "extrusion-button";
   mainToolbar.addChild(extrusionButton);
   extrusionButton.onClick.add(() => {
-    setDrawingInProgress(false)
-    console.log("extrusion")
+    setDrawingInProgress(false);
+    console.log("extrusion");
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
-    console.log("hovering over the extrusion button")
-    setDrawingInProgress(false)
-  }) 
+    console.log("hovering over the extrusion button");
+    setDrawingInProgress(false);
+  });
 
-  return drawingShape
+  return drawingShape;
 };
-
