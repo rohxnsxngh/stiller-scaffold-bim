@@ -81,16 +81,19 @@ export const createModelView = () => {
       raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
       intersects = raycaster.intersectObjects(scene.children);
       intersects.forEach(function (intersect: any) {
-        if (intersect.object.name === "ground") {
-          const highlightPos = new THREE.Vector3()
-            .copy(intersect.point)
-            .floor()
-            .addScalar(0.5);
-          highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
-        }
         switch (intersect.object.name) {
-          case 'extrusion':
-            console.error("hello extrusion")
+          case "ground":
+            const highlightPos = new THREE.Vector3()
+              .copy(intersect.point)
+              .floor()
+              .addScalar(0.5);
+            highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
+            break;
+          case "extrusion":
+            console.error("extrusion raycasting");
+            break;
+          case "blueprint":
+            console.error("blueprint raycasting")
             break;
         }
         // if (intersect.object.name === "extrusions")
@@ -238,5 +241,5 @@ function createExtrusionFromBlueprint(blueprintPoints, scene) {
   meshExtrude.name = "extrusion";
   scene.add(meshExtrude);
 
-  console.log(meshExtrude)
+  console.log(meshExtrude);
 }
