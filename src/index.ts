@@ -88,7 +88,20 @@ export const createModelView = () => {
             .addScalar(0.5);
           highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
         }
+        switch (intersect.object.name) {
+          case 'extrusion':
+            console.error("hello extrusion")
+            break;
+        }
+        // if (intersect.object.name === "extrusions")
       });
+      // if (intersects.length > 0) {
+      //   switch (intersect.object.name) {
+      //     case 'extrusion':
+      //       console.error("hello extrusion")
+      //       break;
+      //   }
+      // }
     }
   });
 
@@ -172,7 +185,7 @@ export const createModelView = () => {
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name === "blueprint") {
         // scene.remove(child);
-        console.log(child.userData);
+        console.log(child);
         createExtrusionFromBlueprint(child.userData, scene);
       }
     });
@@ -205,7 +218,7 @@ function createExtrusionFromBlueprint(blueprintPoints, scene) {
   shape.lineTo(blueprintPoints[0].x, blueprintPoints[0].z); // close the shape
   // createExtrusionFromBlueprint(shape)
   const extrudeSettings = {
-    amount: 20,
+    depth: -12,
     bevelEnabled: false, // You can enable beveling if needed
   };
 
@@ -221,7 +234,9 @@ function createExtrusionFromBlueprint(blueprintPoints, scene) {
   // Create the mesh with the extruded geometry
   const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
   meshExtrude.rotateX(Math.PI / 2);
-  meshExtrude.position.y = 1;
+  // meshExtrude.position.y = 1;
   meshExtrude.name = "extrusion";
   scene.add(meshExtrude);
+
+  console.log(meshExtrude)
 }

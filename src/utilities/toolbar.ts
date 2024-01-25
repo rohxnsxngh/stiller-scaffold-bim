@@ -60,9 +60,16 @@ export const createSimple2DScene = (
     mainWindow.visible = !mainWindow.visible;
   });
   const mainToolbar = new OBC.Toolbar(components);
-  // mainToolbar.position = 'top'
   components.ui.addToolbar(mainToolbar);
   mainToolbar.addChild(mainButton);
+
+  const sideToolBar = new OBC.Toolbar(components);
+  sideToolBar.position = "right";
+  components.ui.addToolbar(sideToolBar);
+  sideToolBar.addChild(mainButton);
+  sideToolBar.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
+  });
 
   const alertButton = new OBC.Button(components);
   alertButton.materialIcon = "info";
@@ -88,7 +95,7 @@ export const createSimple2DScene = (
   blueprintButton.materialIcon = "view_in_ar";
   blueprintButton.tooltip = "Blueprint Shape";
   blueprintButton.id = "blueprint-button";
-  mainToolbar.addChild(blueprintButton);
+  sideToolBar.addChild(blueprintButton);
   blueprintButton.onClick.add(() => {
     setDrawingInProgress(false);
   });
@@ -101,7 +108,7 @@ export const createSimple2DScene = (
   extrusionButton.materialIcon = "expand";
   extrusionButton.tooltip = "Extrude Shape";
   extrusionButton.id = "extrusion-button";
-  mainToolbar.addChild(extrusionButton);
+  sideToolBar.addChild(extrusionButton);
   extrusionButton.onClick.add(() => {
     setDrawingInProgress(false);
   });
