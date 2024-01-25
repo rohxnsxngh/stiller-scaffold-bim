@@ -7,7 +7,6 @@ export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
 };
 
-let drawingShape = false;
 export const createSimple2DScene = (
   components: OBC.Components,
   plane: THREE.Mesh
@@ -74,6 +73,7 @@ export const createSimple2DScene = (
     alert("I've been clicked!");
   });
 
+  // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
   drawingButton.materialIcon = "draw";
   drawingButton.tooltip = "Draw Blueprint";
@@ -81,22 +81,33 @@ export const createSimple2DScene = (
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
     setDrawingInProgress(true);
-    console.log("drawing");
   });
 
+  //Solidify Blueprint
+  const blueprintButton = new OBC.Button(components);
+  blueprintButton.materialIcon = "view_in_ar";
+  blueprintButton.tooltip = "Blueprint Shape";
+  blueprintButton.id = "blueprint-button";
+  mainToolbar.addChild(blueprintButton);
+  blueprintButton.onClick.add(() => {
+    setDrawingInProgress(false);
+  });
+  blueprintButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+
+  // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
-  extrusionButton.materialIcon = "view_in_ar";
+  extrusionButton.materialIcon = "expand";
   extrusionButton.tooltip = "Extrude Shape";
   extrusionButton.id = "extrusion-button";
   mainToolbar.addChild(extrusionButton);
   extrusionButton.onClick.add(() => {
     setDrawingInProgress(false);
-    console.log("extrusion");
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
-    console.log("hovering over the extrusion button");
     setDrawingInProgress(false);
   });
 
-  return drawingShape;
+  return extrusionButton;
 };

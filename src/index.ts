@@ -1,9 +1,6 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
-import {
-  createSimple2DScene,
-  drawingInProgress,
-} from "./utilities/toolbar";
+import { createSimple2DScene, drawingInProgress } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
 // import { TransformControls } from "three/addons/controls/TransformControls.js";
@@ -29,7 +26,7 @@ export const createModelView = () => {
   const scene = components.scene.get();
 
   // Lighting
-  createLighting(scene)
+  createLighting(scene);
 
   // Grid
   new CustomGrid(components, new THREE.Color("#FF0000")); // Red color
@@ -64,7 +61,7 @@ export const createModelView = () => {
   components.meshes.push(plane);
   components.meshes.push(highlightMesh);
 
-  createSimple2DScene(components, cube);
+  const extrudeButton = createSimple2DScene(components, cube);
 
   const drawingButton = document.querySelector("#drawing-button");
   drawingButton?.addEventListener("click", () => {
@@ -156,7 +153,11 @@ export const createModelView = () => {
           });
           const meshShape = new THREE.Mesh(geometryShape, materialShape);
           meshShape.rotateX(Math.PI / 2);
+          meshShape.name = "blueprint";
+          meshShape.userData = points;
           scene.add(meshShape);
+
+          // createExtrusionFromBlueprint(shape, scene)
         }
 
         //Empty Points
@@ -165,6 +166,17 @@ export const createModelView = () => {
     } else {
       console.log("you must complete the polygon to extrude it");
     }
+  });
+
+  extrudeButton.domElement.addEventListener("mousedown", () => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "blueprint") {
+        // scene.remove(child);
+        console.log(child.userData);
+        createExtrusionFromBlueprint(child.userData, scene);
+      }
+    });
+    // createExtrusionFromBlueprint(shape, scene)
   });
 
   const shadows = new OBC.ShadowDropper(components);
@@ -178,8 +190,38 @@ export const createModelView = () => {
 
   function animate() {
     requestAnimationFrame(animate);
-
   }
 
   animate();
 };
+
+function createExtrusionFromBlueprint(blueprintPoints, scene) {
+  console.log("extrude");
+  let shape = new THREE.Shape();
+  shape.moveTo(blueprintPoints[0].x, blueprintPoints[0].z);
+  for (let i = 1; i < blueprintPoints.length; i++) {
+    shape.lineTo(blueprintPoints[i].x, blueprintPoints[i].z);
+  }
+  shape.lineTo(blueprintPoints[0].x, blueprintPoints[0].z); // close the shape
+  // createExtrusionFromBlueprint(shape)
+  const extrudeSettings = {
+    amount: 20,
+    bevelEnabled: false, // You can enable beveling if needed
+  };
+
+  // Create extruded geometry
+  const geometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+  // Material for the extruded mesh
+  const materialExtrude = new THREE.MeshBasicMaterial({
+    color: 0xff0000,
+    side: THREE.DoubleSide,
+  });
+
+  // Create the mesh with the extruded geometry
+  const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
+  meshExtrude.rotateX(Math.PI / 2);
+  meshExtrude.position.y = 1;
+  meshExtrude.name = "extrusion";
+  scene.add(meshExtrude);
+}
