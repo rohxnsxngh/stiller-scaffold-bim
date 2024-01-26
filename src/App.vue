@@ -1,21 +1,27 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useNavbarStore } from './store/index'
+const store = useNavbarStore()
+</script>
 
 <template>
-  <div>
-    <Navbar />
+ <div>
+    <Navbar v-if="store.showNavbar"/>
+    <!-- <Drawer v-if="!store.showNavbar"/> -->
     <router-view />
-  </div>
+ </div>
 </template>
 
-<script>
+<script lang="ts">
 import Navbar from "./components/Navbar.vue";
+import Drawer from "./components/Drawer.vue";
 
 export default {
-  components: {
+ components: {
     Navbar,
-  },
-  data() {
+    Drawer,
+ },
+ data() {
     return {};
-  },
+ },
 };
 </script>

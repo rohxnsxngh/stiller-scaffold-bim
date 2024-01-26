@@ -3,6 +3,7 @@ import HomePage from "../views/HomePage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import SignInPage from "../views/SignInPage.vue";
 import ModelPage from "../views/ModelPage.vue";
+import { useNavbarStore } from '../store/index'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -35,5 +36,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/model') {
+     useNavbarStore().toggleNavbar();
+  }
+  next();
+ })
 
 export default router;

@@ -19,6 +19,5 @@ onMounted(() => {
   padding: 0;
   top: 0;
   position: fixed;
-  overflow: hidden;
 }
 </style>
