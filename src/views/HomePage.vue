@@ -1,5 +1,5 @@
 <template>
-    <div>Hello</div>
+    <div class="bg-red-600">Hello</div>
 </template>
 
 <script setup lang="ts">
