@@ -3,11 +3,14 @@ import * as OBC from "openbim-components";
 import { createSimple2DScene, drawingInProgress } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
+import {
+  CSS2DObject,
+  CSS2DRenderer,
+} from "three/examples/jsm/renderers/CSS2DRenderer.js";
 // import { TransformControls } from "three/addons/controls/TransformControls.js";
 // import { ShapeUtils } from "three";
 
 let intersects: any, components: OBC.Components;
-let drawingButtonBool = false;
 
 export const createModelView = () => {
   const container = document.getElementById("model");
@@ -40,7 +43,7 @@ export const createModelView = () => {
 
   const planeGeometry = new THREE.PlaneGeometry(100, 100);
   const planeMaterial = new THREE.MeshStandardMaterial({
-    color: "purple",
+    color: "white",
     side: THREE.DoubleSide,
     visible: false,
   }); // add visible: false to remove from visibility
@@ -63,14 +66,21 @@ export const createModelView = () => {
 
   const extrudeButton = createSimple2DScene(components, cube);
 
-  const drawingButton = document.querySelector("#drawing-button");
-  drawingButton?.addEventListener("click", () => {
-    console.log("hello hello hello");
-    drawingButtonBool = !drawingButtonBool;
-  });
-
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
+
+  const labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = "absolute";
+  labelRenderer.domElement.style.top = "0px";
+  document.body.appendChild(labelRenderer.domElement);
+
+  const p = document.createElement("p");
+  p.textContent = "";
+  p.className = "tooltip hide";
+  p.style.backgroundColor = "black";
+  const cPointLabel = new CSS2DObject(p);
+  scene.add(cPointLabel);
 
   window.addEventListener("mousemove", function (e) {
     if (drawingInProgress) {
@@ -90,10 +100,29 @@ export const createModelView = () => {
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
             break;
           case "extrusion":
-            console.error("extrusion raycasting");
+            console.log("extrusion raycasting");
+            const ExtrudePos = new THREE.Vector3()
+            .copy(intersect.point)
+            p.className = "tooltip show";
+            cPointLabel.position.set(
+              ExtrudePos.x,
+              0,
+              ExtrudePos.z
+            );
+            p.textContent = "Extrusion";
             break;
           case "blueprint":
-            console.error("blueprint raycasting")
+            console.log("blueprint raycasting", intersect.object);
+            const BlueprintPos = new THREE.Vector3()
+            .copy(intersect.point)
+            p.className = "tooltip show";
+            p.className = "tooltip show";
+            cPointLabel.position.set(
+              BlueprintPos.x,
+              0,
+              BlueprintPos.y
+            );
+            p.textContent = "Blueprint";
             break;
         }
         // if (intersect.object.name === "extrusions")
@@ -105,6 +134,8 @@ export const createModelView = () => {
       //       break;
       //   }
       // }
+    } else {
+      p.className = "tooltip hide";
     }
   });
 
