@@ -211,7 +211,7 @@ export const createModelView = () => {
   animate();
 };
 
-function createExtrusionFromBlueprint(blueprintPoints, scene) {
+function createExtrusionFromBlueprint(blueprintPoints: any, scene: any) {
   console.log("extrude");
   let shape = new THREE.Shape();
   shape.moveTo(blueprintPoints[0].x, blueprintPoints[0].z);
