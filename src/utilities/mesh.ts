@@ -27,7 +27,7 @@ export function createShapeIsOutlined(
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
       const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
       const line = new THREE.Line(geometry, material);
-      line.name = "line"
+      line.name = "line";
       scene.add(line);
     }
   });
@@ -65,7 +65,7 @@ export function createBlueprintFromShapeOutline(
       });
       const meshShape = new THREE.Mesh(geometryShape, materialShape);
       meshShape.rotateX(Math.PI / 2);
-    //   meshShape.position.y = 0.2
+      //   meshShape.position.y = 0.2
       meshShape.name = "blueprint";
       meshShape.userData = shape;
       scene.add(meshShape);
@@ -73,32 +73,33 @@ export function createBlueprintFromShapeOutline(
 
     //Empty Points
     points = [];
+
+    return points
   }
 }
 
 export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
-    console.log("extrude");
-    let shape = blueprintShape;
-    const extrudeSettings = {
-      depth: -12,
-      bevelEnabled: false, // You can enable beveling if needed
-    };
-  
-    // Create extruded geometry
-    const geometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  
-    // Material for the extruded mesh
-    const materialExtrude = new THREE.MeshBasicMaterial({
-      color: 0xff0000,
-      side: THREE.DoubleSide,
-    });
-  
-    // Create the mesh with the extruded geometry
-    const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
-    meshExtrude.rotateX(Math.PI / 2);
-    // meshExtrude.position.y = 1;
-    meshExtrude.name = "extrusion";
-    scene.add(meshExtrude);
-  
-    console.log(meshExtrude);
-  }
+  console.log("extrude")
+  let shape = blueprintShape;
+  const extrudeSettings = {
+    depth: -12,
+    bevelEnabled: false, // You can enable beveling if needed
+  };
+
+  // Create extruded geometry
+  const geometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+  // Material for the extruded mesh
+  const materialExtrude = new THREE.MeshBasicMaterial({
+    color: 0xff0000,
+    side: THREE.DoubleSide,
+  });
+
+  // Create the mesh with the extruded geometry
+  const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
+  meshExtrude.rotateX(Math.PI / 2);
+  // meshExtrude.position.y = 1;
+  meshExtrude.name = "extrusion";
+  scene.add(meshExtrude);
+  console.log(scene)
+}

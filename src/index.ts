@@ -88,7 +88,7 @@ export const createModelView = async () => {
   }
   const label = new CSS2DObject(labelPanel);
   label.position.set(0, 0, 0);
-  console.log("label", label)
+  console.log("label", label);
   scene.add(label);
 
   window.addEventListener("mousemove", function (e) {
@@ -133,7 +133,7 @@ export const createModelView = async () => {
     }
     if (!drawingInProgress && points.length > 1) {
       // create extrusion from the blueprint after it has been created
-      createBlueprintFromShapeOutline(points, scene);
+      points = createBlueprintFromShapeOutline(points, scene);
     }
   });
 
@@ -147,11 +147,21 @@ export const createModelView = async () => {
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   extrudeButton.domElement.addEventListener("mousedown", () => {
+    let blueprintShape: any;
+    let extrusionExists = false;
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name === "blueprint") {
-        createExtrusionFromBlueprint(child.userData, scene);
+        blueprintShape = child.userData;
+      }
+      if (child instanceof THREE.Mesh && child.name === "extrusion") {
+        if ((child.userData = blueprintShape)) {
+          extrusionExists = true;
+        }
       }
     });
+    if (!extrusionExists) {
+      createExtrusionFromBlueprint(blueprintShape, scene);
+    }
   });
 
   const shadows = new OBC.ShadowDropper(components);
