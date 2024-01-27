@@ -1,5 +1,6 @@
 <template>
   <div id="model" v-if="showDrawer"></div>
+  <Label />
 </template>
 
 <script setup lang="ts">
@@ -11,13 +12,26 @@ let showDrawer = ref(true);
 
 const menuButton = document.getElementById("menu-button");
 menuButton?.addEventListener("click", () => {
-  console.log("menu button clicked")
+  console.log("menu button clicked");
   showDrawer.value = !showDrawer.value;
 });
 
 onMounted(() => {
   createModelView();
 });
+</script>
+
+<script lang="ts">
+import Label from "../components/Label.vue";
+
+export default {
+  components: {
+    Label,
+  },
+  data() {
+    return {};
+  },
+};
 </script>
 
 <style scoped>

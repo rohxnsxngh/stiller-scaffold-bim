@@ -80,6 +80,19 @@ export const createSimple2DScene = (
     alert("I've been clicked!");
   });
 
+  const deleteButton = new OBC.Button(components);
+  deleteButton.materialIcon = "delete";
+  deleteButton.tooltip = "Information";
+  deleteButton.id = "delete-button";
+  mainToolbar.addChild(deleteButton);
+  deleteButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+  });
+  deleteButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
   drawingButton.materialIcon = "draw";
@@ -87,6 +100,7 @@ export const createSimple2DScene = (
   drawingButton.id = "drawing-button";
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
     setDrawingInProgress(true);
   });
 
@@ -97,6 +111,7 @@ export const createSimple2DScene = (
   blueprintButton.id = "blueprint-button";
   sideToolBar.addChild(blueprintButton);
   blueprintButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
     setDrawingInProgress(false);
   });
   blueprintButton.domElement.addEventListener("mouseover", () => {
@@ -110,6 +125,7 @@ export const createSimple2DScene = (
   extrusionButton.id = "extrusion-button";
   sideToolBar.addChild(extrusionButton);
   extrusionButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
     setDrawingInProgress(false);
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
@@ -120,9 +136,10 @@ export const createSimple2DScene = (
   drawerToolBar.position = "right";
   components.ui.addToolbar(drawerToolBar);
   drawerToolBar.domElement.style.position = "absolute";
-  drawerToolBar.domElement.style.top = "20px";
+  drawerToolBar.domElement.style.top = "40px";
   drawerToolBar.domElement.style.right = "10px";
   drawerToolBar.domElement.addEventListener("mouseleave", () => {
+    document.body.style.cursor = "auto";
     setDrawingInProgress(true);
   });
 
@@ -183,5 +200,5 @@ export const createSimple2DScene = (
     window.location.href = '/home'
   });
 ////////////////////////////////////////////////
-  return extrusionButton;
+  return [extrusionButton, deleteButton];
 };

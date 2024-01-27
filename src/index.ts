@@ -1,5 +1,10 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
+import {
+  createShapeIsOutlined,
+  createBlueprintFromShapeOutline,
+  createExtrusionFromBlueprint,
+} from "./utilities/mesh";
 import { createSimple2DScene, drawingInProgress } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
@@ -12,7 +17,7 @@ import {
 
 let intersects: any, components: OBC.Components;
 
-export const createModelView = () => {
+export const createModelView = async () => {
   const container = document.getElementById("model");
   if (!container) {
     throw new Error("Container element not found");
@@ -41,13 +46,15 @@ export const createModelView = () => {
   cube.position.set(0, 0.5, 0);
   // scene.add(cube);
 
+  // Base plane: need to change the size of the plane to be bigger
   const planeGeometry = new THREE.PlaneGeometry(100, 100);
   const planeMaterial = new THREE.MeshStandardMaterial({
-    color: "white",
+    color: "red",
     side: THREE.DoubleSide,
     visible: false,
   }); // add visible: false to remove from visibility
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  // plane.position.set(0, 0 ,0)
   plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   plane.name = "ground";
   scene.add(plane);
@@ -64,23 +71,25 @@ export const createModelView = () => {
   components.meshes.push(plane);
   components.meshes.push(highlightMesh);
 
-  const extrudeButton = createSimple2DScene(components, cube);
+  const [extrudeButton, deleteButton] = createSimple2DScene(components, cube);
 
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
 
-  const labelRenderer = new CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth, window.innerHeight);
-  labelRenderer.domElement.style.position = "absolute";
-  labelRenderer.domElement.style.top = "0px";
-  document.body.appendChild(labelRenderer.domElement);
+  const cssRenderer = new CSS2DRenderer();
+  cssRenderer.setSize(window.innerWidth, window.innerHeight);
+  cssRenderer.domElement.style.position = "fixed";
+  cssRenderer.domElement.style.top = "0";
+  document.body.appendChild(cssRenderer.domElement);
 
-  const p = document.createElement("p");
-  p.textContent = "";
-  p.className = "tooltip hide";
-  p.style.backgroundColor = "black";
-  const cPointLabel = new CSS2DObject(p);
-  scene.add(cPointLabel);
+  const labelPanel = document.getElementById("label");
+  if (!labelPanel) {
+    throw new Error("Label panel not found");
+  }
+  const label = new CSS2DObject(labelPanel);
+  label.position.set(0, 0, 0);
+  console.log("label", label)
+  scene.add(label);
 
   window.addEventListener("mousemove", function (e) {
     if (drawingInProgress) {
@@ -98,44 +107,20 @@ export const createModelView = () => {
               .floor()
               .addScalar(0.5);
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
+            label.position.set(highlightPos.x, 0, highlightPos.z);
             break;
           case "extrusion":
             console.log("extrusion raycasting");
-            const ExtrudePos = new THREE.Vector3()
-            .copy(intersect.point)
-            p.className = "tooltip show";
-            cPointLabel.position.set(
-              ExtrudePos.x,
-              0,
-              ExtrudePos.z
-            );
-            p.textContent = "Extrusion";
+            const ExtrudePos = new THREE.Vector3().copy(intersect.point);
+            label.position.set(ExtrudePos.x, 0, ExtrudePos.z);
             break;
           case "blueprint":
-            console.log("blueprint raycasting", intersect.object);
-            const BlueprintPos = new THREE.Vector3()
-            .copy(intersect.point)
-            p.className = "tooltip show";
-            p.className = "tooltip show";
-            cPointLabel.position.set(
-              BlueprintPos.x,
-              0,
-              BlueprintPos.y
-            );
-            p.textContent = "Blueprint";
+            console.log("blueprint raycasting");
+            const BlueprintPos = new THREE.Vector3().copy(intersect.point);
+            label.position.set(BlueprintPos.x, 0, BlueprintPos.z);
             break;
         }
-        // if (intersect.object.name === "extrusions")
       });
-      // if (intersects.length > 0) {
-      //   switch (intersect.object.name) {
-      //     case 'extrusion':
-      //       console.error("hello extrusion")
-      //       break;
-      //   }
-      // }
-    } else {
-      p.className = "tooltip hide";
     }
   });
 
@@ -143,87 +128,30 @@ export const createModelView = () => {
 
   window.addEventListener("mousedown", function () {
     if (drawingInProgress) {
-      intersects.forEach(function (intersect: any) {
-        if (intersect.object.name === "ground") {
-          points.push(
-            new THREE.Vector3(
-              highlightMesh.position.x,
-              0,
-              highlightMesh.position.z
-            )
-          );
-          console.log(points);
-          const cubeClone = cube.clone();
-          cubeClone.position.set(
-            highlightMesh.position.x,
-            0.5,
-            highlightMesh.position.z
-          );
-          cubeClone.name = "cubeClone";
-          scene.add(cubeClone);
-
-          // Create line segments
-          const geometry = new THREE.BufferGeometry().setFromPoints(points);
-          const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-          const line = new THREE.Line(geometry, material);
-          scene.add(line);
-        }
-      });
+      // create blueprint on screen after the shape has been outlined by the user
+      createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
     if (!drawingInProgress && points.length > 1) {
-      console.log("ready for extrusions");
-
-      if (
-        points[0].x === points[points.length - 1].x &&
-        points[0].z === points[points.length - 1].z
-      ) {
-        scene.traverse((child) => {
-          if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-            scene.remove(child);
-          }
-        });
-
-        // Create shape
-        if (points.length >= 3) {
-          let shape = new THREE.Shape();
-          shape.moveTo(points[0].x, points[0].z);
-          for (let i = 1; i < points.length; i++) {
-            shape.lineTo(points[i].x, points[i].z);
-          }
-          shape.lineTo(points[0].x, points[0].z); // close the shape
-
-          // Create mesh from shape
-          const geometryShape = new THREE.ShapeGeometry(shape);
-          const materialShape = new THREE.MeshBasicMaterial({
-            color: 0xff0000,
-            side: THREE.DoubleSide,
-          });
-          const meshShape = new THREE.Mesh(geometryShape, materialShape);
-          meshShape.rotateX(Math.PI / 2);
-          meshShape.name = "blueprint";
-          meshShape.userData = points;
-          scene.add(meshShape);
-
-          // createExtrusionFromBlueprint(shape, scene)
-        }
-
-        //Empty Points
-        points = [];
-      }
-    } else {
-      console.log("you must complete the polygon to extrude it");
+      // create extrusion from the blueprint after it has been created
+      createBlueprintFromShapeOutline(points, scene);
     }
   });
 
+  deleteButton.domElement.addEventListener("mousedown", () => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+        scene.remove(child);
+      }
+    });
+  });
+
+  // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   extrudeButton.domElement.addEventListener("mousedown", () => {
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name === "blueprint") {
-        // scene.remove(child);
-        console.log(child);
         createExtrusionFromBlueprint(child.userData, scene);
       }
     });
-    // createExtrusionFromBlueprint(shape, scene)
   });
 
   const shadows = new OBC.ShadowDropper(components);
@@ -241,36 +169,3 @@ export const createModelView = () => {
 
   animate();
 };
-
-function createExtrusionFromBlueprint(blueprintPoints: any, scene: any) {
-  console.log("extrude");
-  let shape = new THREE.Shape();
-  shape.moveTo(blueprintPoints[0].x, blueprintPoints[0].z);
-  for (let i = 1; i < blueprintPoints.length; i++) {
-    shape.lineTo(blueprintPoints[i].x, blueprintPoints[i].z);
-  }
-  shape.lineTo(blueprintPoints[0].x, blueprintPoints[0].z); // close the shape
-  // createExtrusionFromBlueprint(shape)
-  const extrudeSettings = {
-    depth: -12,
-    bevelEnabled: false, // You can enable beveling if needed
-  };
-
-  // Create extruded geometry
-  const geometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
-  // Material for the extruded mesh
-  const materialExtrude = new THREE.MeshBasicMaterial({
-    color: 0xff0000,
-    side: THREE.DoubleSide,
-  });
-
-  // Create the mesh with the extruded geometry
-  const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
-  meshExtrude.rotateX(Math.PI / 2);
-  // meshExtrude.position.y = 1;
-  meshExtrude.name = "extrusion";
-  scene.add(meshExtrude);
-
-  console.log(meshExtrude);
-}
