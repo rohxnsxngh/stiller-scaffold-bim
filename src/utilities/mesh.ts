@@ -13,7 +13,6 @@ export function createShapeIsOutlined(
       points.push(
         new THREE.Vector3(highlightMesh.position.x, 0, highlightMesh.position.z)
       );
-      console.log(points);
       const cubeClone = cube.clone();
       cubeClone.position.set(
         highlightMesh.position.x,
