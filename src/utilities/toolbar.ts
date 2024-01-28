@@ -206,5 +206,5 @@ export const createSimple2DScene = (
     window.location.href = '/home'
   });
 ////////////////////////////////////////////////
-  return [extrusionButton, topViewButton];
+  return [extrusionButton, blueprintButton];
 };

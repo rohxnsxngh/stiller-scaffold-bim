@@ -5,7 +5,11 @@ import {
   createBlueprintFromShapeOutline,
   createExtrusionFromBlueprint,
 } from "./utilities/mesh";
-import { createSimple2DScene, drawingInProgress } from "./utilities/toolbar";
+import {
+  createSimple2DScene,
+  drawingInProgress,
+  setDrawingInProgress,
+} from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
 import {
@@ -71,34 +75,48 @@ export const createModelView = async () => {
   components.meshes.push(plane);
   components.meshes.push(highlightMesh);
 
-  const [extrudeButton, topViewButton] = createSimple2DScene(components, cube);
+  const [extrudeButton, blueprintButton] = createSimple2DScene(
+    components,
+    cube
+  );
 
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
 
-  // const cssRenderer = new CSS2DRenderer();
-  // cssRenderer.setSize(window.innerWidth, window.innerHeight);
-  // cssRenderer.domElement.style.position = "fixed";
-  // cssRenderer.domElement.style.top = "0";
-  // document.body.appendChild(cssRenderer.domElement);
+  const cssRenderer = new CSS2DRenderer();
+  cssRenderer.setSize(window.innerWidth, window.innerHeight);
+  cssRenderer.domElement.style.position = "fixed";
+  cssRenderer.domElement.style.top = "0";
+  document.body.appendChild(cssRenderer.domElement);
 
-  // const labelPanel = document.getElementById("label");
-  // if (!labelPanel) {
-  //   throw new Error("Label panel not found");
-  // }
+  const labelPanel = document.getElementById("label");
+  if (!labelPanel) {
+    throw new Error("Label panel not found");
+  }
   // labelPanel.style.visibility = "hidden";
-  // const label = new CSS2DObject(labelPanel);
-  // label.position.set(0, 0, 0);
-  // console.log("label", label);
-  // scene.add(label);
+  const label = new CSS2DObject(labelPanel);
+  label.position.set(0, 0, 0);
+  console.log("label", label);
+  scene.add(label);
 
-  // const labelButton = document.addEventListener("mousedown", () => {
-  //   const newMeasurement = labelPanel.textContent;
-  //   console.log(newMeasurement);
-  // });
+  labelPanel.addEventListener("mouseenter", () => {
+    setDrawingInProgress(false);
+  });
+  labelPanel.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
+  });
+
+  const labelButton = document.getElementById("label-enter");
+  if (!labelButton) {
+    throw new Error("Label Enter Button not found");
+  }
+  labelButton.addEventListener("mousedown", () => {
+    const newMeasurement = labelPanel.textContent;
+    console.log(newMeasurement);
+  });
 
   // Set pointer-events to none initially
-  // labelPanel.style.pointerEvents = "none";
+  labelPanel.style.pointerEvents = "none";
 
   window.addEventListener("mousemove", function (e) {
     if (drawingInProgress) {
@@ -139,7 +157,15 @@ export const createModelView = async () => {
             // labelPanel.style.pointerEvents = "auto";
             break;
           case "line":
-            console.log("line")
+            const length = intersect.object.userData.length;
+            const LinePos = new THREE.Vector3().copy(intersect.point);
+            labelPanel.style.visibility = "visible";
+            let pTag = labelPanel.querySelector("p");
+            if (pTag !== null) {
+              pTag.textContent = `${length} m.`;
+            }
+            label.position.set(LinePos.x, 0, LinePos.z);
+            labelPanel.style.pointerEvents = "auto";
             break;
         }
       });
@@ -150,19 +176,18 @@ export const createModelView = async () => {
 
   let points: THREE.Vector3[] = [];
 
-  window.addEventListener("mousedown", function () {
+  document.addEventListener("mousedown", () => {
     if (drawingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
+  });
+
+  blueprintButton.domElement.addEventListener("mousedown", function () {
     if (!drawingInProgress && points.length > 1) {
       // create extrusion from the blueprint after it has been created
       points = createBlueprintFromShapeOutline(points, scene);
     }
-  });
-
-  topViewButton.domElement.addEventListener("mousedown", () => {
-
   });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData

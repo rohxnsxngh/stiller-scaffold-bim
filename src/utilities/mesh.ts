@@ -27,8 +27,12 @@ export function createShapeIsOutlined(
       const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
       const line = new THREE.Line(geometry, material);
       line.name = "line";
-      const length = measureLineLength(points);
-      line.userData = { length: length };
+      const [length, lastPoint, firstPoint] = measureLineLength(points);
+      line.userData = {
+        length: length,
+        first_point: firstPoint,
+        last_point: lastPoint,
+      };
       scene.add(line);
     }
   });
@@ -39,28 +43,15 @@ function measureLineLength(points: any) {
   const secondToLastIndex = points.length - 2;
   if (points.length > 1) {
     let length;
-    // check if the length spans the x direction
-    if (points[lastIndex].x - points[secondToLastIndex].x === 0) {
-      length = Math.abs(points[lastIndex].z - points[secondToLastIndex].z);
-    }
+    // use pythagorean theorem to calculate distance
+    const xLeg = Math.abs(points[lastIndex].x - points[secondToLastIndex].x);
+    const zLeg = Math.abs(points[lastIndex].z - points[secondToLastIndex].z);
+    const hypotenuse = Math.sqrt(Math.pow(xLeg, 2) + Math.pow(zLeg, 2));
+    length = hypotenuse;
 
-    // check if the length spans the z direction
-    if (points[lastIndex].z - points[secondToLastIndex].z === 0) {
-      length = Math.abs(points[lastIndex].x - points[secondToLastIndex].x);
-    }
-
-    // if it spans both direction it is triangle: use pythagorean theorem
-    if (
-      points[lastIndex].x - points[secondToLastIndex].x !== 0 &&
-      points[lastIndex].z - points[secondToLastIndex].z !== 0
-    ) {
-      const xLeg = Math.abs(points[lastIndex].x - points[secondToLastIndex].x);
-      const zLeg = Math.abs(points[lastIndex].z - points[secondToLastIndex].z);
-      const hypotenuse = Math.sqrt(Math.pow(xLeg, 2) + Math.pow(zLeg, 2));
-      length = hypotenuse;
-    }
-
-    return length;
+    return [length, points[lastIndex], points[secondToLastIndex]];
+  } else {
+    return [0, null, null];
   }
 }
 
