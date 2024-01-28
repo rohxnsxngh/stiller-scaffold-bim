@@ -1,6 +1,7 @@
 import * as OBC from "openbim-components";
 import * as THREE from "three";
-
+import { gsap } from "gsap";
+import { cameraPerspectiveView, cameraTopView } from "./camera";
 export let drawingInProgress = false;
 
 export const setDrawingInProgress = (value: boolean) => {
@@ -80,17 +81,21 @@ export const createSimple2DScene = (
     alert("I've been clicked!");
   });
 
-  const deleteButton = new OBC.Button(components);
-  deleteButton.materialIcon = "delete";
-  deleteButton.tooltip = "Information";
-  deleteButton.id = "delete-button";
-  mainToolbar.addChild(deleteButton);
-  deleteButton.onClick.add(() => {
+  const topViewButton = new OBC.Button(components);
+  topViewButton.materialIcon = "crop_free";
+  topViewButton.tooltip = "Top View";
+  topViewButton.id = "delete-button";
+  mainToolbar.addChild(topViewButton);
+  topViewButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
+    cameraTopView(gsap, components.camera)
     setDrawingInProgress(false);
   });
-  deleteButton.domElement.addEventListener("mouseover", () => {
+  topViewButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+  });
+  topViewButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
   });
 
   // Start Drawing Blueprint
@@ -101,6 +106,7 @@ export const createSimple2DScene = (
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
     document.body.style.cursor = "auto";
+    cameraPerspectiveView(gsap, components.camera)
     setDrawingInProgress(true);
   });
 
@@ -200,5 +206,5 @@ export const createSimple2DScene = (
     window.location.href = '/home'
   });
 ////////////////////////////////////////////////
-  return [extrusionButton, deleteButton];
+  return [extrusionButton, topViewButton];
 };

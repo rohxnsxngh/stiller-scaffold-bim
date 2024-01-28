@@ -71,34 +71,34 @@ export const createModelView = async () => {
   components.meshes.push(plane);
   components.meshes.push(highlightMesh);
 
-  const [extrudeButton, deleteButton] = createSimple2DScene(components, cube);
+  const [extrudeButton, topViewButton] = createSimple2DScene(components, cube);
 
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
 
-  const cssRenderer = new CSS2DRenderer();
-  cssRenderer.setSize(window.innerWidth, window.innerHeight);
-  cssRenderer.domElement.style.position = "fixed";
-  cssRenderer.domElement.style.top = "0";
-  document.body.appendChild(cssRenderer.domElement);
+  // const cssRenderer = new CSS2DRenderer();
+  // cssRenderer.setSize(window.innerWidth, window.innerHeight);
+  // cssRenderer.domElement.style.position = "fixed";
+  // cssRenderer.domElement.style.top = "0";
+  // document.body.appendChild(cssRenderer.domElement);
 
-  const labelPanel = document.getElementById("label");
-  if (!labelPanel) {
-    throw new Error("Label panel not found");
-  }
-  labelPanel.style.visibility = "hidden";
-  const label = new CSS2DObject(labelPanel);
-  label.position.set(0, 0, 0);
-  console.log("label", label);
-  scene.add(label);
+  // const labelPanel = document.getElementById("label");
+  // if (!labelPanel) {
+  //   throw new Error("Label panel not found");
+  // }
+  // labelPanel.style.visibility = "hidden";
+  // const label = new CSS2DObject(labelPanel);
+  // label.position.set(0, 0, 0);
+  // console.log("label", label);
+  // scene.add(label);
 
-  const labelButton = document.addEventListener("mousedown", () => {
-    const newMeasurement = labelPanel.textContent;
-    console.log(newMeasurement);
-  });
+  // const labelButton = document.addEventListener("mousedown", () => {
+  //   const newMeasurement = labelPanel.textContent;
+  //   console.log(newMeasurement);
+  // });
 
   // Set pointer-events to none initially
-  labelPanel.style.pointerEvents = "none";
+  // labelPanel.style.pointerEvents = "none";
 
   window.addEventListener("mousemove", function (e) {
     if (drawingInProgress) {
@@ -119,24 +119,27 @@ export const createModelView = async () => {
             break;
           case "extrusion":
             console.log("extrusion raycasting");
-            const ExtrudePos = new THREE.Vector3().copy(intersect.point);
-            // console.log(intersect.object)
-            // console.log(intersect.object.geometry.parameters.options.depth)
-            const depth =
-              intersect.object.geometry.parameters.options.depth * -1;
-            labelPanel.style.visibility = "visible";
-            let pTag = labelPanel.querySelector('p');
-            pTag.textContent = `${depth} m.`;
-            label.position.set(ExtrudePos.x, 0, ExtrudePos.z);
-            labelPanel.style.pointerEvents = "auto";
+            // const ExtrudePos = new THREE.Vector3().copy(intersect.point);
+            // const depth =
+            //   intersect.object.geometry.parameters.options.depth * -1;
+            // labelPanel.style.visibility = "visible";
+            // let pTag = labelPanel.querySelector("p");
+            // if (pTag !== null) {
+            //   pTag.textContent = `${depth} m.`;
+            // }
+            // label.position.set(ExtrudePos.x, 0, ExtrudePos.z);
+            // labelPanel.style.pointerEvents = "auto";
             break;
           case "blueprint":
-            console.log("blueprint raycasting");
-            const BlueprintPos = new THREE.Vector3().copy(intersect.point);
-            labelPanel.style.visibility = "visible";
-            labelPanel.textContent = "Blueprint";
-            label.position.set(BlueprintPos.x, 0, BlueprintPos.z);
-            labelPanel.style.pointerEvents = "auto";
+            // console.log("blueprint raycasting");
+            // const BlueprintPos = new THREE.Vector3().copy(intersect.point);
+            // labelPanel.style.visibility = "visible";
+            // labelPanel.textContent = "Blueprint";
+            // label.position.set(BlueprintPos.x, 0, BlueprintPos.z);
+            // labelPanel.style.pointerEvents = "auto";
+            break;
+          case "line":
+            console.log("line")
             break;
         }
       });
@@ -158,12 +161,8 @@ export const createModelView = async () => {
     }
   });
 
-  deleteButton.domElement.addEventListener("mousedown", () => {
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        scene.remove(child);
-      }
-    });
+  topViewButton.domElement.addEventListener("mousedown", () => {
+
   });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
