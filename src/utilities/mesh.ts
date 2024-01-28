@@ -74,12 +74,11 @@ export function createBlueprintFromShapeOutline(
     //Empty Points
     points = [];
 
-    return points
+    return points;
   }
 }
 
 export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
-  console.log("extrude")
   let shape = blueprintShape;
   const extrudeSettings = {
     depth: -12,
@@ -98,8 +97,8 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   // Create the mesh with the extruded geometry
   const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
   meshExtrude.rotateX(Math.PI / 2);
+  meshExtrude.userData = shape;
   // meshExtrude.position.y = 1;
   meshExtrude.name = "extrusion";
   scene.add(meshExtrude);
-  console.log(scene)
 }

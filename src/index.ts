@@ -76,20 +76,20 @@ export const createModelView = async () => {
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
 
-  const cssRenderer = new CSS2DRenderer();
-  cssRenderer.setSize(window.innerWidth, window.innerHeight);
-  cssRenderer.domElement.style.position = "fixed";
-  cssRenderer.domElement.style.top = "0";
-  document.body.appendChild(cssRenderer.domElement);
+  // const cssRenderer = new CSS2DRenderer();
+  // cssRenderer.setSize(window.innerWidth, window.innerHeight);
+  // cssRenderer.domElement.style.position = "fixed";
+  // cssRenderer.domElement.style.top = "0";
+  // document.body.appendChild(cssRenderer.domElement);
 
-  const labelPanel = document.getElementById("label");
-  if (!labelPanel) {
-    throw new Error("Label panel not found");
-  }
-  const label = new CSS2DObject(labelPanel);
-  label.position.set(0, 0, 0);
-  console.log("label", label);
-  scene.add(label);
+  // const labelPanel = document.getElementById("label");
+  // if (!labelPanel) {
+  //   throw new Error("Label panel not found");
+  // }
+  // const label = new CSS2DObject(labelPanel);
+  // label.position.set(0, 0, 0);
+  // console.log("label", label);
+  // scene.add(label);
 
   window.addEventListener("mousemove", function (e) {
     if (drawingInProgress) {
@@ -107,17 +107,17 @@ export const createModelView = async () => {
               .floor()
               .addScalar(0.5);
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
-            label.position.set(highlightPos.x, 0, highlightPos.z);
+            // label.position.set(highlightPos.x, 0, highlightPos.z);
             break;
           case "extrusion":
             console.log("extrusion raycasting");
-            const ExtrudePos = new THREE.Vector3().copy(intersect.point);
-            label.position.set(ExtrudePos.x, 0, ExtrudePos.z);
+            // const ExtrudePos = new THREE.Vector3().copy(intersect.point);
+            // label.position.set(ExtrudePos.x, 0, ExtrudePos.z);
             break;
           case "blueprint":
             console.log("blueprint raycasting");
-            const BlueprintPos = new THREE.Vector3().copy(intersect.point);
-            label.position.set(BlueprintPos.x, 0, BlueprintPos.z);
+            // const BlueprintPos = new THREE.Vector3().copy(intersect.point);
+            // label.position.set(BlueprintPos.x, 0, BlueprintPos.z);
             break;
         }
       });
@@ -147,21 +147,35 @@ export const createModelView = async () => {
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   extrudeButton.domElement.addEventListener("mousedown", () => {
-    let blueprintShape: any;
-    let extrusionExists = false;
+    let blueprints: THREE.Mesh[] = [];
+    let extrusions: THREE.Mesh[] = [];
+
     scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "blueprint") {
-        blueprintShape = child.userData;
-      }
-      if (child instanceof THREE.Mesh && child.name === "extrusion") {
-        if ((child.userData = blueprintShape)) {
-          extrusionExists = true;
+      if (child instanceof THREE.Mesh) {
+        if (child.name === "blueprint") {
+          blueprints.push(child);
+        } else if (child.name === "extrusion") {
+          extrusions.push(child);
         }
       }
     });
-    if (!extrusionExists) {
-      createExtrusionFromBlueprint(blueprintShape, scene);
-    }
+
+    blueprints.forEach((blueprint) => {
+      let hasExtrusion = extrusions.some((extrusion) =>
+        Object.is(blueprint.userData, extrusion.userData)
+      );
+      if (!hasExtrusion) {
+        createExtrusionFromBlueprint(blueprint.userData, scene);
+      }
+    });
+
+    console.log("blueprints", blueprints);
+    console.log("extrusion", extrusions);
+
+    blueprints = [];
+    extrusions = [];
+
+    console.log(scene);
   });
 
   const shadows = new OBC.ShadowDropper(components);
@@ -178,4 +192,22 @@ export const createModelView = async () => {
   }
 
   animate();
+};
+
+const includesAny = (blueprints: any, extrusions: any) =>
+  extrusions.some((v: any) => blueprints.includes(v));
+
+const objectsEqual = (o1: any, o2: any): boolean =>
+  typeof o1 === "object" && Object.keys(o1).length > 0
+    ? Object.keys(o1).length === Object.keys(o2).length &&
+      Object.keys(o1).every((p) => objectsEqual(o1[p], o2[p]))
+    : o1 === o2;
+
+const deepEqual = (x: any, y: any) => {
+  return x && y && typeof x === "object" && typeof y === "object"
+    ? Object.keys(x).length === Object.keys(y).length &&
+        Object.keys(x).reduce(function (isEqual: any, key: any) {
+          return isEqual && deepEqual(x[key], y[key]);
+        }, true)
+    : x === y;
 };
