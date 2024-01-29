@@ -157,7 +157,7 @@ export const createModelView = async () => {
             // labelPanel.style.pointerEvents = "auto";
             break;
           case "line":
-            console.log("line")
+            // console.log("line")
             const length = intersect.object.userData.length;
             const LinePos = new THREE.Vector3().copy(intersect.point);
             labelPanel.style.visibility = "visible";
@@ -169,7 +169,7 @@ export const createModelView = async () => {
             labelPanel.style.pointerEvents = "auto";
             break;
           case "cubeClone":
-            console.log("cube")
+            // console.log("cube")
             labelPanel.style.visibility = "hidden";
             labelPanel.style.pointerEvents = "none";
             break;

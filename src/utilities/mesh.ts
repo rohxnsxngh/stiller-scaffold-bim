@@ -22,18 +22,28 @@ export function createShapeIsOutlined(
       cubeClone.name = "cubeClone";
       scene.add(cubeClone);
 
-      // Create line segments
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-      const line = new THREE.Line(geometry, material);
-      line.name = "line";
-      const [length, lastPoint, firstPoint] = measureLineLength(points);
-      line.userData = {
-        length: length,
-        first_point: firstPoint,
-        last_point: lastPoint,
-      };
-      scene.add(line);
+      // Create line segment from the last two points
+      if (points.length >= 2) {
+        const geometry = new THREE.BufferGeometry().setFromPoints([
+          points[points.length - 2],
+          points[points.length - 1],
+        ]);
+        const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+        const line = new THREE.Line(geometry, material);
+        line.name = "line";
+        const [length, lastPoint, firstPoint] = measureLineLength([
+          points[points.length - 2],
+          points[points.length - 1],
+        ]);
+        line.userData = {
+          length: length,
+          first_point: firstPoint,
+          last_point: lastPoint,
+        };
+        scene.add(line);
+        console.log(line)
+        console.log(scene)
+      }
     }
   });
 }
