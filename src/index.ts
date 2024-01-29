@@ -85,7 +85,7 @@ export const createModelView = async () => {
 
   const cssRenderer = new CSS2DRenderer();
   cssRenderer.setSize(window.innerWidth, window.innerHeight);
-  cssRenderer.domElement.style.position = "fixed";
+  cssRenderer.domElement.style.position = "relative";
   cssRenderer.domElement.style.top = "0";
   document.body.appendChild(cssRenderer.domElement);
 
@@ -93,7 +93,7 @@ export const createModelView = async () => {
   if (!labelPanel) {
     throw new Error("Label panel not found");
   }
-  // labelPanel.style.visibility = "hidden";
+  labelPanel.style.visibility = "hidden";
   const label = new CSS2DObject(labelPanel);
   label.position.set(0, 0, 0);
   console.log("label", label);

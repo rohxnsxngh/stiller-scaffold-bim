@@ -6,10 +6,10 @@ export function cameraTopView(gsap: any, camera: any) {
       camera.controls.setLookAt(0, 50, 0, 0, 0, 0);
     },
     onComplete: () => {
-      camera.controls.enabled = false;
-      camera.controls.enablePan = false;
-      camera.controls.enableZoom = false;
-      camera.controls.screenSpacePanning = false;
+      camera.controls.enabled = true;
+      camera.controls.enablePan = true;
+      camera.controls.enableZoom = true;
+      camera.controls.screenSpacePanning = true;
     },
   });
 }

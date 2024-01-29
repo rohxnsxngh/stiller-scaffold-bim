@@ -81,6 +81,7 @@ export const createSimple2DScene = (
     alert("I've been clicked!");
   });
 
+  // Move camera to top view button
   const topViewButton = new OBC.Button(components);
   topViewButton.materialIcon = "crop_free";
   topViewButton.tooltip = "Top View";
@@ -88,14 +89,43 @@ export const createSimple2DScene = (
   mainToolbar.addChild(topViewButton);
   topViewButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    cameraTopView(gsap, components.camera)
+    cameraTopView(gsap, components.camera);
     setDrawingInProgress(false);
   });
   topViewButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
   });
-  topViewButton.domElement.addEventListener("mouseleave", () => {
+
+  // Move camera to perspective view button
+  const perspectiveViewButton = new OBC.Button(components);
+  perspectiveViewButton.materialIcon = "fullscreen_exit";
+  perspectiveViewButton.tooltip = "Perspective View";
+  perspectiveViewButton.id = "delete-button";
+  mainToolbar.addChild(perspectiveViewButton);
+  perspectiveViewButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    cameraPerspectiveView(gsap, components.camera);
+    setDrawingInProgress(false);
+  });
+  perspectiveViewButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  perspectiveViewButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
+  });
+
+  // Allow panning and rotating button
+  const freeRotateButton = new OBC.Button(components);
+  freeRotateButton.materialIcon = "pan_tool";
+  freeRotateButton.tooltip = "Free Rotate";
+  freeRotateButton.id = "delete-button";
+  mainToolbar.addChild(freeRotateButton);
+  freeRotateButton.onClick.add(() => {
+    document.body.style.cursor = "grab";
+    setDrawingInProgress(false);
+  });
+  freeRotateButton.domElement.addEventListener("mouseenter", () => {
+    setDrawingInProgress(false);
   });
 
   // Start Drawing Blueprint
@@ -106,7 +136,7 @@ export const createSimple2DScene = (
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    cameraPerspectiveView(gsap, components.camera)
+    // cameraPerspectiveView(gsap, components.camera);
     setDrawingInProgress(true);
   });
 
@@ -162,7 +192,7 @@ export const createSimple2DScene = (
   drawerMenuButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(true);
   });
-/////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   // drawer element
   const drawer = new OBC.FloatingWindow(components);
   drawer.visible = false;
@@ -203,8 +233,8 @@ export const createSimple2DScene = (
   // Attach an onClick event handler to the button
   button.onClick.add(() => {
     console.log("Hello button");
-    window.location.href = '/home'
+    window.location.href = "/home";
   });
-////////////////////////////////////////////////
+  ////////////////////////////////////////////////
   return [extrusionButton, blueprintButton];
 };
