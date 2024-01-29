@@ -1,11 +1,14 @@
 <template>
   <div
     id="label"
-    class="bg-black text-white p-2 flex pointer-events-auto rounded"
+    class="bg-black text-white p-2 flex pointer-events-auto rounded overflow-hidden"
     @click="clicktest"
   >
-    <p contenteditable="true">Depth</p>
-    <button class="btn btn-xs btn-success ml-2" id="label-enter"></button>
+    <p contenteditable="true" class="overflow-hidden">Depth</p>
+    <button
+      class="btn btn-xs btn-success ml-2 overflow-hidden"
+      id="label-enter"
+    ></button>
   </div>
 </template>
 

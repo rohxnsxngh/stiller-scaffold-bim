@@ -20,6 +20,7 @@ import {
 // import { ShapeUtils } from "three";
 
 let intersects: any, components: OBC.Components;
+let selectedLine: THREE.Line | null = null;
 
 export const createModelView = async () => {
   const container = document.getElementById("model");
@@ -77,6 +78,7 @@ export const createModelView = async () => {
 
   const [extrudeButton, blueprintButton] = createSimple2DScene(
     components,
+    scene,
     cube
   );
 
@@ -94,6 +96,13 @@ export const createModelView = async () => {
     throw new Error("Label panel not found");
   }
   labelPanel.style.visibility = "hidden";
+  const pTag = labelPanel.querySelector("p");
+  if (!pTag) {
+    throw new Error("Label Paragraph Button not found");
+  }
+  pTag.addEventListener("mousedown", () => {
+    setDrawingInProgress(false);
+  });
   const label = new CSS2DObject(labelPanel);
   label.position.set(0, 0, 0);
   console.log("label", label);
@@ -112,7 +121,11 @@ export const createModelView = async () => {
   }
   labelButton.addEventListener("mousedown", () => {
     const newMeasurement = labelPanel.textContent;
-    console.log(newMeasurement);
+    if (newMeasurement !== null) {
+      const newLength = parseFloat(newMeasurement);
+      console.log(newLength);
+      console.log(newMeasurement);
+    }
   });
 
   // Set pointer-events to none initially
@@ -158,22 +171,19 @@ export const createModelView = async () => {
             break;
           case "line":
             // console.log("line")
+            selectedLine = intersect.object;
             const length = intersect.object.userData.length;
             const LinePos = new THREE.Vector3().copy(intersect.point);
             labelPanel.style.visibility = "visible";
-            let pTag = labelPanel.querySelector("p");
-            if (pTag !== null) {
-              pTag.textContent = `${length} m.`;
-            }
-            label.position.set(LinePos.x + 0.5, 0, LinePos.z - 0.5);
             labelPanel.style.pointerEvents = "auto";
+            pTag.textContent = `${length} m.`;
+            label.position.set(LinePos.x - 0.5, 0, LinePos.z - 0.5);
             break;
           case "cubeClone":
             // console.log("cube")
             labelPanel.style.visibility = "hidden";
             labelPanel.style.pointerEvents = "none";
             break;
-
         }
       });
     } else {

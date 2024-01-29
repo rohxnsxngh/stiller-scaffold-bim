@@ -10,6 +10,7 @@ export const setDrawingInProgress = (value: boolean) => {
 
 export const createSimple2DScene = (
   components: OBC.Components,
+  scene: THREE.Scene,
   plane: THREE.Mesh
 ) => {
   const simple2dScene = new OBC.Simple2DScene(components);
@@ -89,6 +90,11 @@ export const createSimple2DScene = (
   mainToolbar.addChild(topViewButton);
   topViewButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+        scene.remove(child);
+      }
+    });
     cameraTopView(gsap, components.camera);
     setDrawingInProgress(false);
   });
@@ -104,6 +110,11 @@ export const createSimple2DScene = (
   mainToolbar.addChild(perspectiveViewButton);
   perspectiveViewButton.onClick.add(() => {
     document.body.style.cursor = "auto";
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+        scene.remove(child);
+      }
+    });
     cameraPerspectiveView(gsap, components.camera);
     setDrawingInProgress(false);
   });
