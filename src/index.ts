@@ -100,7 +100,7 @@ export const createModelView = async () => {
   scene.add(label);
 
   labelPanel.addEventListener("mouseenter", () => {
-    setDrawingInProgress(false);
+    setDrawingInProgress(true);
   });
   labelPanel.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
@@ -157,6 +157,7 @@ export const createModelView = async () => {
             // labelPanel.style.pointerEvents = "auto";
             break;
           case "line":
+            console.log("line")
             const length = intersect.object.userData.length;
             const LinePos = new THREE.Vector3().copy(intersect.point);
             labelPanel.style.visibility = "visible";
@@ -164,9 +165,15 @@ export const createModelView = async () => {
             if (pTag !== null) {
               pTag.textContent = `${length} m.`;
             }
-            label.position.set(LinePos.x, 0, LinePos.z);
+            label.position.set(LinePos.x + 0.5, 0, LinePos.z - 0.5);
             labelPanel.style.pointerEvents = "auto";
             break;
+          case "cubeClone":
+            console.log("cube")
+            labelPanel.style.visibility = "hidden";
+            labelPanel.style.pointerEvents = "none";
+            break;
+
         }
       });
     } else {
