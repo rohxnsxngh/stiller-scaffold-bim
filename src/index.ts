@@ -200,7 +200,7 @@ export const createModelView = async () => {
         }
       });
     } else {
-      // labelPanel.style.pointerEvents = "none";
+      labelPanel.style.pointerEvents = "none";
     }
   });
 

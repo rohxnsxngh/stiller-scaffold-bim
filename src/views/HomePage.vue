@@ -32,21 +32,39 @@
       <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
         <!-- Sidebar content here -->
         <a class="btn btn-ghost text-xl text-red-500 mb-10">Logo</a>
-        <div class="card w-full bg-red-500 shadow-xl mb-10 hover:bg-red-400 hover:translate-x-6 duration-300">
-          <div class="card-body">
-            <h2 class="card-title text-white justify-center text-3xl">New Model</h2>
-            <span class="material-symbols-outlined text-black text-7xl text-center">
-              deployed_code_update
-            </span>
-          </div>
+        <div
+          class="card w-full bg-red-500 shadow-xl mb-10 hover:bg-red-400 hover:translate-x-6 duration-300"
+        >
+          <!-- <router-link :to="{ name: 'ModelPage' }"> -->
+          <a href="/model">
+            <div class="card-body">
+              <h2 class="card-title text-white justify-center text-3xl">
+                New Model
+              </h2>
+              <span
+                class="material-symbols-outlined text-black text-7xl text-center"
+              >
+                deployed_code_update
+              </span>
+            </div>
+          </a>
+          <!-- </router-link> -->
         </div>
-        <div class="card w-full bg-red-500 shadow-xl hover:bg-red-400 hover:translate-x-6 duration-300">
-          <div class="card-body">
-            <h2 class="card-title text-white justify-center text-3xl">Projects</h2>
-            <span class="material-symbols-outlined text-black text-7xl text-center">
-              deployed_code_account
-            </span>
-          </div>
+        <div
+          class="card w-full bg-red-500 shadow-xl hover:bg-red-400 hover:translate-x-6 duration-300"
+        >
+          <router-link :to="{ name: 'ProjectsPage' }">
+            <div class="card-body">
+              <h2 class="card-title text-white justify-center text-3xl">
+                Projects
+              </h2>
+              <span
+                class="material-symbols-outlined text-black text-7xl text-center"
+              >
+                deployed_code_account
+              </span>
+            </div>
+          </router-link>
         </div>
       </ul>
     </div>

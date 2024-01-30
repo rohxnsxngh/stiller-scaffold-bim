@@ -1,7 +1,11 @@
 <template>
   <div class="navbar bg-base-100">
     <div class="flex-1">
-      <a class="btn btn-ghost text-xl text-red-500">Logo</a>
+      <router-link :to="{ name: 'Home' }">
+        <label class="btn btn-ghost text-xl text-red-500"
+          >Logo</label
+        ></router-link
+      >
     </div>
     <div class="flex-none">
       <ul class="menu menu-horizontal px-1">
