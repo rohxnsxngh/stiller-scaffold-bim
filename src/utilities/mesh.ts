@@ -2,7 +2,6 @@ import * as THREE from "three";
 import * as OBC from "openbim-components";
 import {
   CSS2DObject,
-  CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 // Create Shape Outline
@@ -148,17 +147,8 @@ export function createRectangle(
   markup: any,
   components: OBC.Components,
   plane: THREE.Mesh,
-  raycaster: THREE.Raycaster,
-  scene: THREE.Scene
+  raycaster: THREE.Raycaster
 ) {
-  if (scene) {
-    scene.traverse((child) => {
-      if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
-        scene.remove(child);
-      }
-    });
-  }
-
   markupGroup.children.forEach((child) => {
     markupGroup.remove(child);
   });
@@ -197,7 +187,25 @@ export function createRectangle(
     pointStartMinY,
   ];
 
-  // Step 2: For each side of the rectangle, calculate the midpoint and create a label
+  //For each side of the rectangle, calculate the midpoint and create a label
+  const labels = createLabels(rectanglePoints);
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(rectanglePoints);
+  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+  markup = new THREE.Line(geometry, material);
+  markup.name = "rectangleLine";
+  markup.userData = {
+    rectanglePoints: rectanglePoints,
+    width: width,
+    height: height,
+  };
+  markupGroup.add(markup);
+
+  return [markup, labels];
+}
+
+// create labels for top view rectangle tool
+function createLabels(rectanglePoints: any) {
   const labels = [];
 
   for (let i = 0; i < rectanglePoints.length; i++) {
@@ -217,25 +225,12 @@ export function createRectangle(
     labels.push(label);
   }
 
-  // Step 3: Add the labels to the CSS2DRenderer
+  // Remove origin point
   labels.pop();
-  console.log(labels);
-  // labels.forEach((label) => scene.add(label));
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(rectanglePoints);
-  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-  markup = new THREE.Line(geometry, material);
-  markup.name = "rectangleLine";
-  markup.userData = {
-    rectanglePoints: rectanglePoints,
-    width: width,
-    height: height,
-  };
-  markupGroup.add(markup);
-
-  return [markup, labels];
+  return labels;
 }
 
+// cast point for top view rectangle tool
 function castPoint(
   mouse: any,
   components: OBC.Components,

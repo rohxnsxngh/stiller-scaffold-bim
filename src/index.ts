@@ -285,31 +285,36 @@ export const createModelView = async () => {
         markup,
         components,
         plane,
-        raycaster,
-        scene
+        raycaster
       );
     }
   }
+
+  let oldLabels: THREE.Object3D<THREE.Object3DEventMap>[] = [];
 
   function handleMouseMove(event: MouseEvent) {
     if (!drawingInProgress && isDrawingBlueprint) {
       if (isDragging) {
         getMousePointer({ event });
+        // Remove old labels from the scene
+        oldLabels.forEach((label) => {
+          scene.remove(label);
+        });
         const result = createRectangle(
           { start: markupStartPoint, end: markupMouse },
           markupGroup,
           markup,
           components,
           plane,
-          raycaster,
-          scene
+          raycaster
         );
         if (result) {
           [rectangleBlueprint, labels] = result;
-          // labels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
-          //   console.log(label)
-          //   scene.add(label)
-          // });
+          // Store the new labels for future removal
+          oldLabels = labels;
+          labels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
+            scene.add(label);
+          });
         }
       }
     }
@@ -317,10 +322,6 @@ export const createModelView = async () => {
 
   function handleMouseUp() {
     isDragging = false;
-    labels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
-      console.log(label);
-      scene.add(label);
-    });
   }
 
   function getMousePointer({ event }: { event: MouseEvent }) {
