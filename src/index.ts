@@ -21,7 +21,8 @@ import {
 // import { ShapeUtils } from "three";
 
 let intersects: any, components: OBC.Components;
-let selectedLine: any;
+let rectangleBlueprint: any;
+// let selectedLine: any;
 
 export const createModelView = async () => {
   const container = document.getElementById("model") as HTMLCanvasElement;
@@ -81,8 +82,12 @@ export const createModelView = async () => {
   components.meshes.push(plane);
   components.meshes.push(highlightMesh);
 
-  const [extrudeButton, blueprintButton, createBlueprintRectangleButton] =
-    createSimple2DScene(components, scene, cube);
+  const [
+    extrudeButton,
+    blueprintButton,
+    createBlueprintRectangleButton,
+    freeRotateButton,
+  ] = createSimple2DScene(components, scene, cube);
 
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
@@ -173,7 +178,7 @@ export const createModelView = async () => {
             break;
           case "line":
             // console.log("line")
-            selectedLine = intersect.object;
+            // const selectedLine = intersect.object;
             const length = intersect.object.userData.length;
             const LinePos = new THREE.Vector3().copy(intersect.point);
             labelPanel.style.visibility = "visible";
@@ -185,6 +190,9 @@ export const createModelView = async () => {
             // console.log("cube")
             labelPanel.style.visibility = "hidden";
             labelPanel.style.pointerEvents = "none";
+            break;
+          case "rectangleLine":
+            console.log("rectangle line");
             break;
         }
       });
@@ -206,6 +214,9 @@ export const createModelView = async () => {
     if (!drawingInProgress && points.length > 1) {
       // create extrusion from the blueprint after it has been created
       points = createBlueprintFromShapeOutline(points, scene);
+    }
+    if (rectangleBlueprint) {
+      points = createBlueprintFromShapeOutline(rectangleBlueprint.userData, scene);
     }
   });
 
@@ -238,19 +249,18 @@ export const createModelView = async () => {
   });
 
   //////////////////////////////////
-  let isMarkupStart = false;
+  // this section pertains to creating the rectangle from the top view by clicking and dragging
+  // need to organize and abstract the way this section is handled
   let isDragging = false;
+  let isDrawingBlueprint = false;
   let markupMouse = new THREE.Vector2();
   let markupStartPoint: THREE.Vector2 | null = null;
   let markup: any = null;
-  let markupDrawZone: any = null;
-  let initialMousePosition: any;
 
   createBlueprintRectangleButton.domElement.addEventListener(
     "mousedown",
     () => {
-      console.log("clicked");
-
+      isDrawingBlueprint = true;
       if (!isDragging) {
         window.addEventListener("mousedown", handleMouseDown);
         window.addEventListener("mousemove", handleMouseMove);
@@ -260,25 +270,12 @@ export const createModelView = async () => {
   );
 
   function handleMouseDown(event: MouseEvent) {
-    isDragging = true;
-    getMousePointer({ event })
-    markupStartPoint = markupMouse.clone();
-    // isDragging = true;
-    createRectangle(
-      { start: markupMouse, end: markupMouse },
-      markupGroup,
-      markup,
-      components,
-      plane,
-      raycaster
-    );
-  }
-
-  function handleMouseMove(event: MouseEvent) {
-    if (isDragging) {
+    if (!drawingInProgress && isDrawingBlueprint) {
+      isDragging = true;
       getMousePointer({ event });
+      markupStartPoint = markupMouse.clone();
       createRectangle(
-        { start: markupStartPoint, end: markupMouse },
+        { start: markupMouse, end: markupMouse },
         markupGroup,
         markup,
         components,
@@ -288,15 +285,34 @@ export const createModelView = async () => {
     }
   }
 
-  function handleMouseUp() {
-    isDragging = false;
-    console.log(markupGroup);
+  function handleMouseMove(event: MouseEvent) {
+    if (!drawingInProgress && isDrawingBlueprint) {
+      if (isDragging) {
+        getMousePointer({ event });
+        rectangleBlueprint = createRectangle(
+          { start: markupStartPoint, end: markupMouse },
+          markupGroup,
+          markup,
+          components,
+          plane,
+          raycaster
+        );
+      }
+    }
   }
 
-  function getMousePointer({ event }: {event: MouseEvent}) {
+  function handleMouseUp() {
+    isDragging = false;
+  }
+
+  function getMousePointer({ event }: { event: MouseEvent }) {
     markupMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     markupMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   }
+
+  freeRotateButton.domElement.addEventListener("mousedown", () => {
+    isDrawingBlueprint = false;
+  });
 
   /////////////////////
 
@@ -315,8 +331,3 @@ export const createModelView = async () => {
 
   animate();
 };
-
-// function getMousePointer({ event }: {event: MouseEvent}) {
-//   markupMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-//   markupMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-// }

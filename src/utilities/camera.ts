@@ -55,6 +55,7 @@ export function cameraEnableOrbitalFunctionality(gsap: any, camera: any) {
       camera.controls.enablePan = true;
       camera.controls.enableZoom = true;
       camera.controls.screenSpacePanning = true;
+      camera.controls.maxPolarAngle = Math.PI;
     },
   });
 }

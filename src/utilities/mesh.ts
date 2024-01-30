@@ -42,8 +42,6 @@ export function createShapeIsOutlined(
           last_point: lastPoint,
         };
         scene.add(line);
-        console.log(line);
-        console.log(scene);
       }
     }
   });
@@ -183,12 +181,13 @@ export function createRectangle(
   ];
 
   const geometry = new THREE.BufferGeometry().setFromPoints(rectanglePoints);
-  const material = new THREE.LineBasicMaterial({ color: 0x000000 });
+  const material = new THREE.LineBasicMaterial({ color: 0xFFFFFF });
   markup = new THREE.Line(geometry, material);
-  markup.name = "rectangle line";
+  markup.name = "rectangleLine";
   markup.userData = rectanglePoints;
-  console.log(markup);
   markupGroup.add(markup);
+
+  return markup
 }
 
 function castPoint(

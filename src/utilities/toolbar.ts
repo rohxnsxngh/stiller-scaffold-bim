@@ -265,5 +265,5 @@ export const createSimple2DScene = (
     window.location.href = "/home";
   });
   ////////////////////////////////////////////////
-  return [extrusionButton, blueprintButton, createBlueprintRectangleButton];
+  return [extrusionButton, blueprintButton, createBlueprintRectangleButton, freeRotateButton];
 };
