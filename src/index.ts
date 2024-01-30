@@ -4,6 +4,7 @@ import {
   createShapeIsOutlined,
   createBlueprintFromShapeOutline,
   createExtrusionFromBlueprint,
+  createRectangle,
 } from "./utilities/mesh";
 import {
   createSimple2DScene,
@@ -20,10 +21,10 @@ import {
 // import { ShapeUtils } from "three";
 
 let intersects: any, components: OBC.Components;
-let selectedLine: THREE.Line | null = null;
+let selectedLine: any;
 
 export const createModelView = async () => {
-  const container = document.getElementById("model");
+  const container = document.getElementById("model") as HTMLCanvasElement;
   if (!container) {
     throw new Error("Container element not found");
   }
@@ -51,6 +52,10 @@ export const createModelView = async () => {
   cube.position.set(0, 0.5, 0);
   // scene.add(cube);
 
+  // for the blueprint rectangle
+  const markupGroup = new THREE.Group();
+  scene.add(markupGroup);
+
   // Base plane: need to change the size of the plane to be bigger
   const planeGeometry = new THREE.PlaneGeometry(100, 100);
   const planeMaterial = new THREE.MeshStandardMaterial({
@@ -76,11 +81,8 @@ export const createModelView = async () => {
   components.meshes.push(plane);
   components.meshes.push(highlightMesh);
 
-  const [extrudeButton, blueprintButton] = createSimple2DScene(
-    components,
-    scene,
-    cube
-  );
+  const [extrudeButton, blueprintButton, createBlueprintRectangleButton] =
+    createSimple2DScene(components, scene, cube);
 
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
@@ -235,6 +237,69 @@ export const createModelView = async () => {
     extrusions = [];
   });
 
+  //////////////////////////////////
+  let isMarkupStart = false;
+  let isDragging = false;
+  let markupMouse = new THREE.Vector2();
+  let markupStartPoint: THREE.Vector2 | null = null;
+  let markup: any = null;
+  let markupDrawZone: any = null;
+  let initialMousePosition: any;
+
+  createBlueprintRectangleButton.domElement.addEventListener(
+    "mousedown",
+    () => {
+      console.log("clicked");
+
+      if (!isDragging) {
+        window.addEventListener("mousedown", handleMouseDown);
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+      }
+    }
+  );
+
+  function handleMouseDown(event: MouseEvent) {
+    isDragging = true;
+    getMousePointer({ event })
+    markupStartPoint = markupMouse.clone();
+    // isDragging = true;
+    createRectangle(
+      { start: markupMouse, end: markupMouse },
+      markupGroup,
+      markup,
+      components,
+      plane,
+      raycaster
+    );
+  }
+
+  function handleMouseMove(event: MouseEvent) {
+    if (isDragging) {
+      getMousePointer({ event });
+      createRectangle(
+        { start: markupStartPoint, end: markupMouse },
+        markupGroup,
+        markup,
+        components,
+        plane,
+        raycaster
+      );
+    }
+  }
+
+  function handleMouseUp() {
+    isDragging = false;
+    console.log(markupGroup);
+  }
+
+  function getMousePointer({ event }: {event: MouseEvent}) {
+    markupMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    markupMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  }
+
+  /////////////////////
+
   const shadows = new OBC.ShadowDropper(components);
   shadows.shadowExtraScaleFactor = 15;
   shadows.darkness = 2;
@@ -250,3 +315,8 @@ export const createModelView = async () => {
 
   animate();
 };
+
+// function getMousePointer({ event }: {event: MouseEvent}) {
+//   markupMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+//   markupMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+// }

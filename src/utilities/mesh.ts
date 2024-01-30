@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as OBC from "openbim-components";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -41,8 +42,8 @@ export function createShapeIsOutlined(
           last_point: lastPoint,
         };
         scene.add(line);
-        console.log(line)
-        console.log(scene)
+        console.log(line);
+        console.log(scene);
       }
     }
   });
@@ -133,4 +134,78 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   // meshExtrude.position.y = 1;
   meshExtrude.name = "extrusion";
   scene.add(meshExtrude);
+}
+
+interface IntersectionResult {
+  point: THREE.Vector3;
+}
+
+export function createRectangle(
+  { start, end }: { start: any; end: any },
+  markupGroup: THREE.Group,
+  markup: any,
+  components: OBC.Components,
+  plane: THREE.Mesh,
+  raycaster: THREE.Raycaster
+) {
+  markupGroup.children.forEach((child) => {
+    markupGroup.remove(child);
+  });
+  const startPoint = castPoint(start, components, plane, raycaster);
+  const endPoint = castPoint(end, components, plane, raycaster);
+  if (startPoint == null || endPoint == null) {
+    return;
+  }
+
+  const pointStartMinY = new THREE.Vector3(
+    startPoint.point.x,
+    0,
+    startPoint.point.z
+  );
+  const pointStartMaxY = new THREE.Vector3(
+    startPoint.point.x,
+    0,
+    endPoint.point.z
+  );
+  const pointEndMinY = new THREE.Vector3(
+    endPoint.point.x,
+    0,
+    startPoint.point.z
+  );
+  const pointEndMaxY = new THREE.Vector3(endPoint.point.x, 0, endPoint.point.z);
+
+  const rectanglePoints = [
+    pointStartMinY,
+    pointStartMaxY,
+    pointEndMaxY,
+    pointEndMinY,
+    pointStartMinY,
+  ];
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(rectanglePoints);
+  const material = new THREE.LineBasicMaterial({ color: 0x000000 });
+  markup = new THREE.Line(geometry, material);
+  markup.name = "rectangle line";
+  markup.userData = rectanglePoints;
+  console.log(markup);
+  markupGroup.add(markup);
+}
+
+function castPoint(
+  mouse: any,
+  components: OBC.Components,
+  plane: THREE.Mesh,
+  raycaster: THREE.Raycaster
+): IntersectionResult | null {
+  let result = null;
+  // @ts-ignore
+  raycaster.setFromCamera(mouse, components.camera.activeCamera);
+  const intersects = raycaster.intersectObject(plane);
+  intersects.some((item) => {
+    if (item.object == plane) {
+      result = item;
+      return true;
+    }
+  });
+  return result;
 }

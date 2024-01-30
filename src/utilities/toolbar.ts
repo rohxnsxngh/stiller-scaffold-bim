@@ -1,7 +1,12 @@
 import * as OBC from "openbim-components";
 import * as THREE from "three";
 import { gsap } from "gsap";
-import { cameraPerspectiveView, cameraTopView } from "./camera";
+import {
+  cameraDisableOrbitalFunctionality,
+  cameraEnableOrbitalFunctionality,
+  cameraPerspectiveView,
+  cameraTopView,
+} from "./camera";
 export let drawingInProgress = false;
 
 export const setDrawingInProgress = (value: boolean) => {
@@ -82,6 +87,8 @@ export const createSimple2DScene = (
     alert("I've been clicked!");
   });
 
+  console.log(components.camera)
+
   // Move camera to top view button
   const topViewButton = new OBC.Button(components);
   topViewButton.materialIcon = "crop_free";
@@ -89,7 +96,6 @@ export const createSimple2DScene = (
   topViewButton.id = "delete-button";
   mainToolbar.addChild(topViewButton);
   topViewButton.onClick.add(() => {
-    document.body.style.cursor = "crosshair";
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
         scene.remove(child);
@@ -101,6 +107,18 @@ export const createSimple2DScene = (
   topViewButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
   });
+
+  const createBlueprintRectangleButton = new OBC.Button(components, {
+    materialIconName: "square",
+    name: "Layout",
+    closeOnClick: true,
+  });
+  createBlueprintRectangleButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  topViewButton.addChild(createBlueprintRectangleButton);
 
   // Move camera to perspective view button
   const perspectiveViewButton = new OBC.Button(components);
@@ -133,6 +151,7 @@ export const createSimple2DScene = (
   mainToolbar.addChild(freeRotateButton);
   freeRotateButton.onClick.add(() => {
     document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
     setDrawingInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
@@ -141,13 +160,12 @@ export const createSimple2DScene = (
 
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
-  drawingButton.materialIcon = "draw";
+  drawingButton.materialIcon = "polyline";
   drawingButton.tooltip = "Draw Blueprint";
   drawingButton.id = "drawing-button";
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    // cameraPerspectiveView(gsap, components.camera);
     setDrawingInProgress(true);
   });
 
@@ -247,5 +265,5 @@ export const createSimple2DScene = (
     window.location.href = "/home";
   });
   ////////////////////////////////////////////////
-  return [extrusionButton, blueprintButton];
+  return [extrusionButton, blueprintButton, createBlueprintRectangleButton];
 };
