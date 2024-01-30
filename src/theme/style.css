@@ -3,10 +3,8 @@ body {
   padding: 0;
 }
 
-
 html {
-  overflow: scroll;
-  overflow-x: hidden;
+  overflow: hidden;
   overscroll-behavior: none;
 }
 ::-webkit-scrollbar {
@@ -18,7 +16,7 @@ html {
   background: #002022;
 }
 
-#marker{
+#marker {
   position: absolute;
   z-index: 10;
   border: 2px solid rgb(8, 24, 242);

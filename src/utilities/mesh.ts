@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
+import {
+  CSS2DObject,
+  CSS2DRenderer,
+} from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -144,8 +148,17 @@ export function createRectangle(
   markup: any,
   components: OBC.Components,
   plane: THREE.Mesh,
-  raycaster: THREE.Raycaster
+  raycaster: THREE.Raycaster,
+  scene: THREE.Scene
 ) {
+  if (scene) {
+    scene.traverse((child) => {
+      if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
+        scene.remove(child);
+      }
+    });
+  }
+
   markupGroup.children.forEach((child) => {
     markupGroup.remove(child);
   });
@@ -184,6 +197,31 @@ export function createRectangle(
     pointStartMinY,
   ];
 
+  // Step 2: For each side of the rectangle, calculate the midpoint and create a label
+  const labels = [];
+
+  for (let i = 0; i < rectanglePoints.length; i++) {
+    const nextIndex = (i + 1) % rectanglePoints.length;
+    const midpoint = rectanglePoints[i]
+      .clone()
+      .lerp(rectanglePoints[nextIndex], 0.5);
+    const distance = rectanglePoints[i].distanceTo(rectanglePoints[nextIndex]);
+    const labelDiv = document.createElement("div");
+    labelDiv.className = "label bg-black text-white";
+    labelDiv.textContent = `${distance.toFixed(2)} m.`;
+    const label = new CSS2DObject(labelDiv);
+    label.name = "rectangleLabel";
+    label.position.copy(
+      new THREE.Vector3(midpoint.x, midpoint.y, midpoint.z + 1)
+    );
+    labels.push(label);
+  }
+
+  // Step 3: Add the labels to the CSS2DRenderer
+  labels.pop();
+  console.log(labels);
+  // labels.forEach((label) => scene.add(label));
+
   const geometry = new THREE.BufferGeometry().setFromPoints(rectanglePoints);
   const material = new THREE.LineBasicMaterial({ color: 0xffffff });
   markup = new THREE.Line(geometry, material);
@@ -195,7 +233,7 @@ export function createRectangle(
   };
   markupGroup.add(markup);
 
-  return markup;
+  return [markup, labels];
 }
 
 function castPoint(

@@ -17,11 +17,10 @@ import {
   CSS2DObject,
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-// import { TransformControls } from "three/addons/controls/TransformControls.js";
-// import { ShapeUtils } from "three";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
+let labels: any;
 // let selectedLine: any;
 
 export const createModelView = async () => {
@@ -286,7 +285,8 @@ export const createModelView = async () => {
         markup,
         components,
         plane,
-        raycaster
+        raycaster,
+        scene
       );
     }
   }
@@ -295,20 +295,32 @@ export const createModelView = async () => {
     if (!drawingInProgress && isDrawingBlueprint) {
       if (isDragging) {
         getMousePointer({ event });
-        rectangleBlueprint = createRectangle(
+        const result = createRectangle(
           { start: markupStartPoint, end: markupMouse },
           markupGroup,
           markup,
           components,
           plane,
-          raycaster
+          raycaster,
+          scene
         );
+        if (result) {
+          [rectangleBlueprint, labels] = result;
+          // labels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
+          //   console.log(label)
+          //   scene.add(label)
+          // });
+        }
       }
     }
   }
 
   function handleMouseUp() {
     isDragging = false;
+    labels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
+      console.log(label);
+      scene.add(label);
+    });
   }
 
   function getMousePointer({ event }: { event: MouseEvent }) {
@@ -333,6 +345,7 @@ export const createModelView = async () => {
 
   function animate() {
     requestAnimationFrame(animate);
+    // cssRenderer.render(scene, components.camera.activeCamera)
   }
 
   animate();
