@@ -192,7 +192,10 @@ export const createModelView = async () => {
             labelPanel.style.pointerEvents = "none";
             break;
           case "rectangleLine":
-            console.log("rectangle line");
+            console.log(
+              intersect.object.userData.width,
+              intersect.object.userData.height
+            );
             break;
         }
       });
@@ -216,7 +219,10 @@ export const createModelView = async () => {
       points = createBlueprintFromShapeOutline(points, scene);
     }
     if (rectangleBlueprint) {
-      points = createBlueprintFromShapeOutline(rectangleBlueprint.userData, scene);
+      points = createBlueprintFromShapeOutline(
+        rectangleBlueprint.userData.rectanglePoints,
+        scene
+      );
     }
   });
 

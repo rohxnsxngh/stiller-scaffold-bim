@@ -172,6 +172,10 @@ export function createRectangle(
   );
   const pointEndMaxY = new THREE.Vector3(endPoint.point.x, 0, endPoint.point.z);
 
+  // Calculate the lengths of the sides
+  const width = pointStartMinY.distanceTo(pointStartMaxY);
+  const height = pointStartMaxY.distanceTo(pointEndMaxY);
+
   const rectanglePoints = [
     pointStartMinY,
     pointStartMaxY,
@@ -181,13 +185,17 @@ export function createRectangle(
   ];
 
   const geometry = new THREE.BufferGeometry().setFromPoints(rectanglePoints);
-  const material = new THREE.LineBasicMaterial({ color: 0xFFFFFF });
+  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
   markup = new THREE.Line(geometry, material);
   markup.name = "rectangleLine";
-  markup.userData = rectanglePoints;
+  markup.userData = {
+    rectanglePoints: rectanglePoints,
+    width: width,
+    height: height,
+  };
   markupGroup.add(markup);
 
-  return markup
+  return markup;
 }
 
 function castPoint(
