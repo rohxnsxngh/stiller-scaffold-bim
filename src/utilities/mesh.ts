@@ -145,8 +145,7 @@ export function createRectangle(
   markup: any,
   components: OBC.Components,
   plane: THREE.Mesh,
-  raycaster: THREE.Raycaster,
-  scene: THREE.Scene
+  raycaster: THREE.Raycaster
 ) {
   markupGroup.children.forEach((child) => {
     markupGroup.remove(child);
@@ -186,17 +185,19 @@ export function createRectangle(
     pointStartMinY,
   ];
 
+  const centerX = startPoint.point.x + height / 2;
+  const centerZ = startPoint.point.z + width / 2;
+
   //For each side of the rectangle, calculate the midpoint and create a label
   const labels = createLabels(rectanglePoints);
   currentLabels.forEach((label) => {
     attachLabelChangeHandler(
       label,
-      scene,
       markupGroup,
       width,
       height,
-      startPoint,
-      labels
+      centerX,
+      centerZ
     );
   });
 
@@ -206,11 +207,7 @@ export function createRectangle(
     side: THREE.DoubleSide,
   });
   markup = new THREE.Mesh(geometry, material);
-  markup.position.set(
-    startPoint.point.x + height / 2,
-    0,
-    startPoint.point.z + width / 2
-  );
+  markup.position.set(centerX, 0, centerZ);
   markup.rotation.x = Math.PI / 2;
   markup.name = "rectanglePlane";
   markup.userData = {
@@ -277,20 +274,17 @@ function updateLabelsForNewDimensions(
 
 function attachLabelChangeHandler(
   label: CSS2DObject,
-  scene: THREE.Scene,
   markupGroup: THREE.Group,
   width: number,
   height: number,
-  startPoint: IntersectionResult,
-  labels: any
+  centerX: any,
+  centerZ: any
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
 
   labelElement.addEventListener("focus", () => {
-    console.log("hello");
-    oldValue = labelElement.textContent
-    console.log(oldValue);
+    oldValue = labelElement.textContent;
   });
 
   labelElement.addEventListener("blur", () => {
@@ -300,29 +294,15 @@ function attachLabelChangeHandler(
       const newRectangleVertices = updateRectangleBlueprintGeometry(
         newValue,
         oldValue,
-        scene,
         markupGroup,
         width,
         height,
-        startPoint
+        centerX,
+        centerZ
       );
-      console.log("created new plane");
-      // remove all labels
-      // currentLabels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
-      //   scene.remove(label);
-      // });
-
-      console.log("removed all labels");
 
       // create new labels based on vertices
       updateLabelsForNewDimensions(newRectangleVertices);
-
-      console.log(currentLabels, "new labels created");
-      console.log(labels, "the fucking old labels");
-
-      // currentLabels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
-      //   scene.add(label);
-      // });
 
       return currentLabels;
     }
@@ -354,11 +334,11 @@ function castPoint(
 function updateRectangleBlueprintGeometry(
   newValue: string | null,
   oldValue: string | null,
-  scene: THREE.Scene,
   markupGroup: THREE.Group,
   width: number,
   height: number,
-  startPoint: any
+  centerX: any,
+  centerZ: any
 ) {
   let oldDistance, newDistance;
   if (newValue !== null && oldValue !== null) {
@@ -366,46 +346,43 @@ function updateRectangleBlueprintGeometry(
     newDistance = parseFloat(newValue).toFixed(2);
   }
 
-  const planeWidth = parseFloat(
-    markupGroup.children[0].geometry.parameters.width
-  ).toFixed(2);
-  const planeHeight = parseFloat(
-    markupGroup.children[0].geometry.parameters.height
-  ).toFixed(2);
-  ///////////////////////////////////////////////////////////
-  console.log(
-    "plane width",
-    planeWidth,
-    "plane height",
-    planeHeight,
-    "newest entered distance",
-    newDistance,
-    "old distance in the text box",
-    oldDistance
-  );
-  //////////////////////////////////////////////////
+  let planeWidth, planeHeight;
+
+  if (
+    (markupGroup.children[0] as THREE.Mesh).geometry instanceof
+    THREE.PlaneGeometry
+  ) {
+    const planeGeometry = (markupGroup.children[0] as THREE.Mesh)
+      .geometry as THREE.PlaneGeometry;
+    planeWidth = planeGeometry.parameters.width.toFixed(2);
+  }
+  if (
+    (markupGroup.children[0] as THREE.Mesh).geometry instanceof
+    THREE.PlaneGeometry
+  ) {
+    const planeGeometry = (markupGroup.children[0] as THREE.Mesh)
+      .geometry as THREE.PlaneGeometry;
+    planeHeight = planeGeometry.parameters.height.toFixed(2);
+  }
 
   if (oldDistance === planeWidth) {
-    console.log("width has been changed");
-
     // reset the width to the current plane
-    width = planeHeight
+    if (planeHeight !== undefined && planeWidth !== undefined) {
+      width = parseFloat(planeHeight);
+      height = parseFloat(planeWidth);
+    }
 
     markupGroup.children.forEach((child) => {
       markupGroup.remove(child);
     });
 
-    const geometry = new THREE.PlaneGeometry(newDistance, width);
+    const geometry = new THREE.PlaneGeometry(Number(newDistance), width);
     const material = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       side: THREE.DoubleSide,
     });
     const newRectangleBlueprint = new THREE.Mesh(geometry, material);
-    newRectangleBlueprint.position.set(
-      startPoint.point.x + height / 2,
-      0,
-      startPoint.point.z + width / 2
-    );
+    newRectangleBlueprint.position.set(centerX, 0, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
 
@@ -442,26 +419,23 @@ function updateRectangleBlueprintGeometry(
     return rectanglePointsUpdated;
   }
   if (oldDistance === planeHeight) {
-    console.log("height has been changed");
-
-    //reset the height to the current plane
-    height = planeWidth
+    // reset the width to the current plane
+    if (planeHeight !== undefined && planeWidth !== undefined) {
+      width = parseFloat(planeHeight);
+      height = parseFloat(planeWidth);
+    }
 
     markupGroup.children.forEach((child) => {
       markupGroup.remove(child);
     });
 
-    const geometry = new THREE.PlaneGeometry(height, newDistance);
+    const geometry = new THREE.PlaneGeometry(height, Number(newDistance));
     const material = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       side: THREE.DoubleSide,
     });
     const newRectangleBlueprint = new THREE.Mesh(geometry, material);
-    newRectangleBlueprint.position.set(
-      startPoint.point.x + height / 2,
-      0,
-      startPoint.point.z + width / 2
-    );
+    newRectangleBlueprint.position.set(centerX, 0, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
 
@@ -498,5 +472,3 @@ function updateRectangleBlueprintGeometry(
     return rectanglePointsUpdated;
   }
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////

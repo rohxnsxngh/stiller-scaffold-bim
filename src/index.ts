@@ -244,7 +244,7 @@ export const createModelView = async () => {
       }
     });
 
-    console.log(blueprints)
+    console.log(blueprints);
 
     blueprints.forEach((blueprint) => {
       let hasExtrusion = extrusions.some((extrusion) =>
@@ -294,8 +294,7 @@ export const createModelView = async () => {
         markup,
         components,
         plane,
-        raycaster,
-        scene
+        raycaster
       );
     }
   }
@@ -316,8 +315,7 @@ export const createModelView = async () => {
           markup,
           components,
           plane,
-          raycaster,
-          scene
+          raycaster
         );
         if (result) {
           [rectangleBlueprint, labels] = result;
