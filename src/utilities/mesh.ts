@@ -139,8 +139,6 @@ interface IntersectionResult {
   point: THREE.Vector3;
 }
 
-let newDistance: any;
-
 export function createRectangle(
   { start, end }: { start: any; end: any },
   markupGroup: THREE.Group,
@@ -189,164 +187,17 @@ export function createRectangle(
   ];
 
   //For each side of the rectangle, calculate the midpoint and create a label
-  const labels = createLabels(rectanglePoints, (newValue, oldValue) => {
-    // Convert the new value to a number
-    newDistance = parseFloat(newValue);
-    console.log(newDistance, oldValue);
-
-    if (oldValue === markup.geometry.parameters.width) {
-      console.log(markup.geometry.parameters.width, "plane first value: width");
-
-      scene.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.name === "rectanglePlane") {
-          scene.remove(child);
-        }
-      });
-
-      markupGroup.children.forEach((child) => {
-        markupGroup.remove(child);
-      });
-
-      const geometry = new THREE.PlaneGeometry(newDistance, width);
-      const material = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        side: THREE.DoubleSide,
-      });
-      markup = new THREE.Mesh(geometry, material);
-      markup.position.set(
-        startPoint.point.x + height / 2,
-        0,
-        startPoint.point.z + width / 2
-      );
-      const halfWidth = markup.geometry.parameters.width / 2;
-      const halfHeight = markup.geometry.parameters.height / 2;
-
-      const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-      const corner2 = new THREE.Vector3(halfWidth, 0, -halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-      const corner3 = new THREE.Vector3(halfWidth, 0, halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-      const corner4 = new THREE.Vector3(-halfWidth, 0, halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-
-      const rectanglePointsUpdated = [
-        corner1,
-        corner2,
-        corner3,
-        corner4,
-        corner1,
-      ];
-
-      markup.rotation.x = Math.PI / 2;
-      markup.name = "rectanglePlane";
-      markup.userData = {
-        rectanglePoints: rectanglePointsUpdated,
-        width: width,
-        height: height,
-      };
-      markupGroup.add(markup);
-
-      //remove old labels
-      //remove old labels
-      labels.forEach((label) => {
-        scene.remove(label);
-      });
-
-      // Create new labels based on the updated geometry
-      const updatedLabels = createLabels(
-        rectanglePointsUpdated,
-        (_newValue, _oldValue) => {}
-      );
-
-      // Add new labels to the scene or markupGroup
-      updatedLabels.forEach((label) => {
-        markupGroup.add(label);
-      });
-
-      return [markup, labels];
-    }
-    if (oldValue === markup.geometry.parameters.height) {
-      console.log(
-        markup.geometry.parameters.height,
-        "plane second value: height"
-      );
-
-      scene.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.name === "rectanglePlane") {
-          scene.remove(child);
-        }
-      });
-
-      markupGroup.children.forEach((child) => {
-        markupGroup.remove(child);
-      });
-
-      const geometry = new THREE.PlaneGeometry(height, newDistance);
-      const material = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        side: THREE.DoubleSide,
-      });
-      markup = new THREE.Mesh(geometry, material);
-      markup.position.set(
-        startPoint.point.x + height / 2,
-        0,
-        startPoint.point.z + width / 2
-      );
-      const halfWidth = markup.geometry.parameters.width / 2;
-      const halfHeight = markup.geometry.parameters.height / 2;
-
-      const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-      const corner2 = new THREE.Vector3(halfWidth, 0, -halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-      const corner3 = new THREE.Vector3(halfWidth, 0, halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-      const corner4 = new THREE.Vector3(-halfWidth, 0, halfHeight)
-        .applyMatrix4(markup.matrixWorld)
-        .add(markup.position);
-
-      const rectanglePointsUpdated = [
-        corner1,
-        corner2,
-        corner3,
-        corner4,
-        corner1,
-      ];
-      markup.rotation.x = Math.PI / 2;
-      markup.name = "rectanglePlane";
-      markup.userData = {
-        rectanglePoints: rectanglePointsUpdated,
-        width: width,
-        height: height,
-      };
-      markupGroup.add(markup);
-
-      //remove old labels
-      labels.forEach((label) => {
-        scene.remove(label);
-      });
-
-      // Create new labels based on the updated geometry
-      const updatedLabels = createLabels(
-        rectanglePointsUpdated,
-        (_newValue, _oldValue) => {}
-      );
-
-      // Add new labels to the scene or markupGroup
-      updatedLabels.forEach((label) => {
-        markupGroup.add(label);
-      });
-
-      return [markup, labels];
-    }
+  const labels = createLabels(rectanglePoints);
+  currentLabels.forEach((label) => {
+    attachLabelChangeHandler(
+      label,
+      scene,
+      markupGroup,
+      width,
+      height,
+      startPoint,
+      labels
+    );
   });
 
   const geometry = new THREE.PlaneGeometry(height, width);
@@ -371,46 +222,114 @@ export function createRectangle(
 
   return [markup, labels];
 }
-
+let currentLabels: CSS2DObject[] = [];
 // create labels for top view rectangle tool
-function createLabels(
-  rectanglePoints: any,
-  onLabelChange: (newValue: string, distance: any) => void
-) {
-  const labels = [];
+function createLabels(rectanglePoints: THREE.Vector3[] | undefined) {
+  // Clear the current labels array
+  currentLabels = [];
 
-  for (let i = 0; i < rectanglePoints.length; i++) {
-    const nextIndex = (i + 1) % rectanglePoints.length;
-    const midpoint = rectanglePoints[i]
-      .clone()
-      .lerp(rectanglePoints[nextIndex], 0.5);
-    const distance = rectanglePoints[i].distanceTo(rectanglePoints[nextIndex]);
-    const labelDiv = document.createElement("div");
-    labelDiv.className = "label bg-black text-white pointer-events-auto";
-    labelDiv.textContent = `${distance.toFixed(2)} m.`;
-    labelDiv.contentEditable = "true";
+  if (rectanglePoints) {
+    for (let i = 0; i < rectanglePoints.length - 1; i++) {
+      const midpoint = new THREE.Vector3().lerpVectors(
+        rectanglePoints[i],
+        rectanglePoints[i + 1],
+        0.5
+      );
+      const distance = rectanglePoints[i].distanceTo(rectanglePoints[i + 1]);
+      const labelDiv = document.createElement("div");
+      labelDiv.className = "label bg-black text-white pointer-events-auto";
+      labelDiv.textContent = `${distance.toFixed(2)} m.`;
+      labelDiv.contentEditable = "true";
 
-    // Handle focus and blur events
-    labelDiv.addEventListener("click", function () {
-      this.focus();
-    });
-    labelDiv.addEventListener("blur", function () {
-      this.innerText = this.innerText; // Trigger Vue reactivity
-      onLabelChange(this.innerText, distance);
-    });
-
-    const label = new CSS2DObject(labelDiv);
-    label.name = "rectangleLabel";
-    label.position.copy(
-      new THREE.Vector3(midpoint.x, midpoint.y, midpoint.z + 1)
-    );
-    labels.push(label);
+      const label = new CSS2DObject(labelDiv);
+      label.name = "rectangleLabel";
+      label.position.copy(
+        new THREE.Vector3(midpoint.x, midpoint.y, midpoint.z + 1)
+      );
+      currentLabels.push(label);
+    }
   }
 
-  // Remove origin point
-  labels.pop();
-  return labels;
+  return currentLabels;
 }
+
+function updateLabelsForNewDimensions(
+  newRectanglePoints: THREE.Vector3[] | undefined
+) {
+  // Assuming newRectanglePoints has the updated points for the rectangle
+  if (newRectanglePoints) {
+    currentLabels.forEach((label, index) => {
+      if (index < newRectanglePoints.length - 1) {
+        const midpoint = new THREE.Vector3().lerpVectors(
+          newRectanglePoints[index],
+          newRectanglePoints[index + 1],
+          0.5
+        );
+        const distance = newRectanglePoints[index].distanceTo(
+          newRectanglePoints[index + 1]
+        );
+        label.position.copy(midpoint);
+        label.element.textContent = `${distance.toFixed(2)} m.`;
+      }
+    });
+  }
+}
+
+function attachLabelChangeHandler(
+  label: CSS2DObject,
+  scene: THREE.Scene,
+  markupGroup: THREE.Group,
+  width: number,
+  height: number,
+  startPoint: IntersectionResult,
+  labels: any
+) {
+  const labelElement = label.element as HTMLDivElement;
+  let oldValue: any;
+
+  labelElement.addEventListener("focus", () => {
+    console.log("hello");
+    oldValue = labelElement.textContent
+    console.log(oldValue);
+  });
+
+  labelElement.addEventListener("blur", () => {
+    const newValue = labelElement.textContent;
+    if (oldValue !== newValue) {
+      // create new plane based on inputs
+      const newRectangleVertices = updateRectangleBlueprintGeometry(
+        newValue,
+        oldValue,
+        scene,
+        markupGroup,
+        width,
+        height,
+        startPoint
+      );
+      console.log("created new plane");
+      // remove all labels
+      // currentLabels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
+      //   scene.remove(label);
+      // });
+
+      console.log("removed all labels");
+
+      // create new labels based on vertices
+      updateLabelsForNewDimensions(newRectangleVertices);
+
+      console.log(currentLabels, "new labels created");
+      console.log(labels, "the fucking old labels");
+
+      // currentLabels.forEach((label: THREE.Object3D<THREE.Object3DEventMap>) => {
+      //   scene.add(label);
+      // });
+
+      return currentLabels;
+    }
+  });
+}
+
+////////////////////////////////////////
 
 // cast point for top view rectangle tool
 function castPoint(
@@ -431,3 +350,153 @@ function castPoint(
   });
   return result;
 }
+
+function updateRectangleBlueprintGeometry(
+  newValue: string | null,
+  oldValue: string | null,
+  scene: THREE.Scene,
+  markupGroup: THREE.Group,
+  width: number,
+  height: number,
+  startPoint: any
+) {
+  let oldDistance, newDistance;
+  if (newValue !== null && oldValue !== null) {
+    oldDistance = parseFloat(oldValue).toFixed(2);
+    newDistance = parseFloat(newValue).toFixed(2);
+  }
+
+  const planeWidth = parseFloat(
+    markupGroup.children[0].geometry.parameters.width
+  ).toFixed(2);
+  const planeHeight = parseFloat(
+    markupGroup.children[0].geometry.parameters.height
+  ).toFixed(2);
+  ///////////////////////////////////////////////////////////
+  console.log(
+    "plane width",
+    planeWidth,
+    "plane height",
+    planeHeight,
+    "newest entered distance",
+    newDistance,
+    "old distance in the text box",
+    oldDistance
+  );
+  //////////////////////////////////////////////////
+
+  if (oldDistance === planeWidth) {
+    console.log("width has been changed");
+
+    // reset the width to the current plane
+    width = planeHeight
+
+    markupGroup.children.forEach((child) => {
+      markupGroup.remove(child);
+    });
+
+    const geometry = new THREE.PlaneGeometry(newDistance, width);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+    });
+    const newRectangleBlueprint = new THREE.Mesh(geometry, material);
+    newRectangleBlueprint.position.set(
+      startPoint.point.x + height / 2,
+      0,
+      startPoint.point.z + width / 2
+    );
+    const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
+    const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
+
+    const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+    const corner2 = new THREE.Vector3(halfWidth, 0, -halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+    const corner3 = new THREE.Vector3(halfWidth, 0, halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+    const corner4 = new THREE.Vector3(-halfWidth, 0, halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+
+    const rectanglePointsUpdated = [
+      corner1,
+      corner2,
+      corner3,
+      corner4,
+      corner1,
+    ];
+
+    newRectangleBlueprint.rotation.x = Math.PI / 2;
+    newRectangleBlueprint.name = "rectanglePlane";
+    newRectangleBlueprint.userData = {
+      rectanglePoints: rectanglePointsUpdated,
+      width: width,
+      height: height,
+    };
+    markupGroup.add(newRectangleBlueprint);
+
+    return rectanglePointsUpdated;
+  }
+  if (oldDistance === planeHeight) {
+    console.log("height has been changed");
+
+    //reset the height to the current plane
+    height = planeWidth
+
+    markupGroup.children.forEach((child) => {
+      markupGroup.remove(child);
+    });
+
+    const geometry = new THREE.PlaneGeometry(height, newDistance);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+    });
+    const newRectangleBlueprint = new THREE.Mesh(geometry, material);
+    newRectangleBlueprint.position.set(
+      startPoint.point.x + height / 2,
+      0,
+      startPoint.point.z + width / 2
+    );
+    const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
+    const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
+
+    const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+    const corner2 = new THREE.Vector3(halfWidth, 0, -halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+    const corner3 = new THREE.Vector3(halfWidth, 0, halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+    const corner4 = new THREE.Vector3(-halfWidth, 0, halfHeight)
+      .applyMatrix4(newRectangleBlueprint.matrixWorld)
+      .add(newRectangleBlueprint.position);
+
+    const rectanglePointsUpdated = [
+      corner1,
+      corner2,
+      corner3,
+      corner4,
+      corner1,
+    ];
+
+    newRectangleBlueprint.rotation.x = Math.PI / 2;
+    newRectangleBlueprint.name = "rectanglePlane";
+    newRectangleBlueprint.userData = {
+      rectanglePoints: rectanglePointsUpdated,
+      width: width,
+      height: height,
+    };
+    markupGroup.add(newRectangleBlueprint);
+
+    return rectanglePointsUpdated;
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
