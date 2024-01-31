@@ -251,6 +251,23 @@ export function createRectangle(
       };
       markupGroup.add(markup);
 
+      //remove old labels
+      //remove old labels
+      labels.forEach((label) => {
+        scene.remove(label);
+      });
+
+      // Create new labels based on the updated geometry
+      const updatedLabels = createLabels(
+        rectanglePointsUpdated,
+        (_newValue, _oldValue) => {}
+      );
+
+      // Add new labels to the scene or markupGroup
+      updatedLabels.forEach((label) => {
+        markupGroup.add(label);
+      });
+
       return [markup, labels];
     }
     if (oldValue === markup.geometry.parameters.height) {
@@ -311,6 +328,22 @@ export function createRectangle(
         height: height,
       };
       markupGroup.add(markup);
+
+      //remove old labels
+      labels.forEach((label) => {
+        scene.remove(label);
+      });
+
+      // Create new labels based on the updated geometry
+      const updatedLabels = createLabels(
+        rectanglePointsUpdated,
+        (_newValue, _oldValue) => {}
+      );
+
+      // Add new labels to the scene or markupGroup
+      updatedLabels.forEach((label) => {
+        markupGroup.add(label);
+      });
 
       return [markup, labels];
     }
