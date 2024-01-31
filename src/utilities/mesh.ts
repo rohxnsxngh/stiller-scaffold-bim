@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
-import {
-  CSS2DObject,
-} from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -141,13 +139,16 @@ interface IntersectionResult {
   point: THREE.Vector3;
 }
 
+let newDistance: any;
+
 export function createRectangle(
   { start, end }: { start: any; end: any },
   markupGroup: THREE.Group,
   markup: any,
   components: OBC.Components,
   plane: THREE.Mesh,
-  raycaster: THREE.Raycaster
+  raycaster: THREE.Raycaster,
+  scene: THREE.Scene
 ) {
   markupGroup.children.forEach((child) => {
     markupGroup.remove(child);
@@ -188,12 +189,146 @@ export function createRectangle(
   ];
 
   //For each side of the rectangle, calculate the midpoint and create a label
-  const labels = createLabels(rectanglePoints);
+  const labels = createLabels(rectanglePoints, (newValue, oldValue) => {
+    // Convert the new value to a number
+    newDistance = parseFloat(newValue);
+    console.log(newDistance, oldValue);
 
-  const geometry = new THREE.BufferGeometry().setFromPoints(rectanglePoints);
-  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-  markup = new THREE.Line(geometry, material);
-  markup.name = "rectangleLine";
+    if (oldValue === markup.geometry.parameters.width) {
+      console.log(markup.geometry.parameters.width, "plane first value: width");
+
+      scene.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.name === "rectanglePlane") {
+          scene.remove(child);
+        }
+      });
+
+      markupGroup.children.forEach((child) => {
+        markupGroup.remove(child);
+      });
+
+      const geometry = new THREE.PlaneGeometry(newDistance, width);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+      });
+      markup = new THREE.Mesh(geometry, material);
+      markup.position.set(
+        startPoint.point.x + height / 2,
+        0,
+        startPoint.point.z + width / 2
+      );
+      const halfWidth = markup.geometry.parameters.width / 2;
+      const halfHeight = markup.geometry.parameters.height / 2;
+
+      const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+      const corner2 = new THREE.Vector3(halfWidth, 0, -halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+      const corner3 = new THREE.Vector3(halfWidth, 0, halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+      const corner4 = new THREE.Vector3(-halfWidth, 0, halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+
+      const rectanglePointsUpdated = [
+        corner1,
+        corner2,
+        corner3,
+        corner4,
+        corner1,
+      ];
+
+      markup.rotation.x = Math.PI / 2;
+      markup.name = "rectanglePlane";
+      markup.userData = {
+        rectanglePoints: rectanglePointsUpdated,
+        width: width,
+        height: height,
+      };
+      markupGroup.add(markup);
+
+      return [markup, labels];
+    }
+    if (oldValue === markup.geometry.parameters.height) {
+      console.log(
+        markup.geometry.parameters.height,
+        "plane second value: height"
+      );
+
+      scene.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.name === "rectanglePlane") {
+          scene.remove(child);
+        }
+      });
+
+      markupGroup.children.forEach((child) => {
+        markupGroup.remove(child);
+      });
+
+      const geometry = new THREE.PlaneGeometry(height, newDistance);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+      });
+      markup = new THREE.Mesh(geometry, material);
+      markup.position.set(
+        startPoint.point.x + height / 2,
+        0,
+        startPoint.point.z + width / 2
+      );
+      const halfWidth = markup.geometry.parameters.width / 2;
+      const halfHeight = markup.geometry.parameters.height / 2;
+
+      const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+      const corner2 = new THREE.Vector3(halfWidth, 0, -halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+      const corner3 = new THREE.Vector3(halfWidth, 0, halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+      const corner4 = new THREE.Vector3(-halfWidth, 0, halfHeight)
+        .applyMatrix4(markup.matrixWorld)
+        .add(markup.position);
+
+      const rectanglePointsUpdated = [
+        corner1,
+        corner2,
+        corner3,
+        corner4,
+        corner1,
+      ];
+      markup.rotation.x = Math.PI / 2;
+      markup.name = "rectanglePlane";
+      markup.userData = {
+        rectanglePoints: rectanglePointsUpdated,
+        width: width,
+        height: height,
+      };
+      markupGroup.add(markup);
+
+      return [markup, labels];
+    }
+  });
+
+  const geometry = new THREE.PlaneGeometry(height, width);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+  });
+  markup = new THREE.Mesh(geometry, material);
+  markup.position.set(
+    startPoint.point.x + height / 2,
+    0,
+    startPoint.point.z + width / 2
+  );
+  markup.rotation.x = Math.PI / 2;
+  markup.name = "rectanglePlane";
   markup.userData = {
     rectanglePoints: rectanglePoints,
     width: width,
@@ -205,7 +340,10 @@ export function createRectangle(
 }
 
 // create labels for top view rectangle tool
-function createLabels(rectanglePoints: any) {
+function createLabels(
+  rectanglePoints: any,
+  onLabelChange: (newValue: string, distance: any) => void
+) {
   const labels = [];
 
   for (let i = 0; i < rectanglePoints.length; i++) {
@@ -215,8 +353,19 @@ function createLabels(rectanglePoints: any) {
       .lerp(rectanglePoints[nextIndex], 0.5);
     const distance = rectanglePoints[i].distanceTo(rectanglePoints[nextIndex]);
     const labelDiv = document.createElement("div");
-    labelDiv.className = "label bg-black text-white";
+    labelDiv.className = "label bg-black text-white pointer-events-auto";
     labelDiv.textContent = `${distance.toFixed(2)} m.`;
+    labelDiv.contentEditable = "true";
+
+    // Handle focus and blur events
+    labelDiv.addEventListener("click", function () {
+      this.focus();
+    });
+    labelDiv.addEventListener("blur", function () {
+      this.innerText = this.innerText; // Trigger Vue reactivity
+      onLabelChange(this.innerText, distance);
+    });
+
     const label = new CSS2DObject(labelDiv);
     label.name = "rectangleLabel";
     label.position.copy(

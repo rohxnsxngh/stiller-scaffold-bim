@@ -86,6 +86,7 @@ export const createModelView = async () => {
     blueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
+    drawingButton,
   ] = createSimple2DScene(components, scene, cube);
 
   const mousePosition = new THREE.Vector2();
@@ -111,7 +112,6 @@ export const createModelView = async () => {
   });
   const label = new CSS2DObject(labelPanel);
   label.position.set(0, 0, 0);
-  console.log("label", label);
   scene.add(label);
 
   labelPanel.addEventListener("mouseenter", () => {
@@ -218,8 +218,12 @@ export const createModelView = async () => {
       points = createBlueprintFromShapeOutline(points, scene);
     }
     if (rectangleBlueprint) {
+      console.log(scene);
+      // markupGroup.children.forEach((child) => {
+      //   markupGroup.remove(child);
+      // });
       points = createBlueprintFromShapeOutline(
-        rectangleBlueprint.userData.rectanglePoints,
+        markupGroup.children[0].userData.rectanglePoints,
         scene
       );
     }
@@ -239,6 +243,8 @@ export const createModelView = async () => {
         }
       }
     });
+
+    console.log(blueprints)
 
     blueprints.forEach((blueprint) => {
       let hasExtrusion = extrusions.some((extrusion) =>
@@ -278,6 +284,9 @@ export const createModelView = async () => {
     if (!drawingInProgress && isDrawingBlueprint) {
       isDragging = true;
       getMousePointer({ event });
+      oldLabels.forEach((label) => {
+        scene.remove(label);
+      });
       markupStartPoint = markupMouse.clone();
       createRectangle(
         { start: markupMouse, end: markupMouse },
@@ -285,7 +294,8 @@ export const createModelView = async () => {
         markup,
         components,
         plane,
-        raycaster
+        raycaster,
+        scene
       );
     }
   }
@@ -306,7 +316,8 @@ export const createModelView = async () => {
           markup,
           components,
           plane,
-          raycaster
+          raycaster,
+          scene
         );
         if (result) {
           [rectangleBlueprint, labels] = result;
@@ -330,6 +341,10 @@ export const createModelView = async () => {
   }
 
   freeRotateButton.domElement.addEventListener("mousedown", () => {
+    isDrawingBlueprint = false;
+  });
+
+  drawingButton.domElement.addEventListener("mousedown", () => {
     isDrawingBlueprint = false;
   });
 
