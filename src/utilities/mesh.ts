@@ -125,7 +125,7 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   const materialExtrude = new THREE.MeshBasicMaterial({
     color: 0xff0000,
     side: THREE.DoubleSide,
-    wireframe: true
+    wireframe: true,
   });
 
   // Create the mesh with the extruded geometry
@@ -477,4 +477,95 @@ function updateRectangleBlueprintGeometry(
 
     return rectanglePointsUpdated;
   }
+}
+
+// create roof from extrusion shape
+export function createRoof(child: any, scene: THREE.Scene) {
+  console.log(child, "extrusion found");
+  console.log("depth:", child.geometry.parameters.options.depth);
+  console.log("position:", child.userData);
+  console.log("line curve points:", child.userData.curves[0].v1);
+  console.log("line curve points:", child.userData.curves[0].v2);
+
+  // Calculate the midpoint between the two points
+  const midpoint = new THREE.Vector2();
+  midpoint
+    .addVectors(child.userData.curves[0].v1, child.userData.curves[0].v2)
+    .multiplyScalar(0.5);
+
+  // Create a third point that forms a right angle with the line formed by the two points
+  const direction = new THREE.Vector2();
+  direction.subVectors(
+    child.userData.curves[0].v2,
+    child.userData.curves[0].v1
+  );
+  const normal = new THREE.Vector2(direction.y, -direction.x);
+  const thirdPoint = new THREE.Vector2();
+  thirdPoint.addVectors(midpoint, normal);
+
+  // Create a triangle using these three points
+  const shape = new THREE.Shape();
+  shape.moveTo(child.userData.curves[0].v1.x, child.userData.curves[0].v1.y);
+  shape.lineTo(child.userData.curves[0].v2.x, child.userData.curves[0].v2.y);
+  shape.lineTo(thirdPoint.x, thirdPoint.y);
+  shape.lineTo(child.userData.curves[0].v1.x, child.userData.curves[0].v1.y); // close the shape
+
+  const extrudeHeight = -1 * child.geometry.parameters.options.depth;
+
+  const geometry = new THREE.ShapeGeometry(shape);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+  });
+  const triangle = new THREE.Mesh(geometry, material);
+  triangle.position.y = extrudeHeight;
+  triangle.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+
+  const startPoint = new THREE.Vector3(
+    child.userData.curves[0].v1.x,
+    extrudeHeight,
+    child.userData.curves[0].v1.y
+  );
+  const endPoint = new THREE.Vector3(
+    child.userData.curves[0].v2.x,
+    extrudeHeight,
+    child.userData.curves[0].v2.y
+  );
+
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    startPoint,
+    endPoint,
+  ]);
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 }); // Red color
+  const rotationAxisLine = new THREE.Line(lineGeometry, lineMaterial);
+  scene.add(rotationAxisLine);
+
+  // // Assuming 'objectToRotate' is the object you want to rotate around the line
+  // // Calculate the direction vector from startPoint to endPoint
+  const edgeDirection = new THREE.Vector3()
+    .subVectors(endPoint, startPoint)
+    .normalize();
+
+  // // Calculate the translation vector to move the object to the origin
+  // const translationToOrigin = new THREE.Vector3().copy(startPoint).negate();
+
+  // // Translate the object to the origin
+  // triangle.position.add(translationToOrigin);
+
+  // // Determine the angle of rotation (in radians)
+  // const angle = Math.PI / 2; // Example: Rotate 45 degrees
+
+  // // Rotate the object around the axis
+  // triangle.rotateOnAxis(edgeDirection, angle);
+
+  // // Translate the object back to its original position
+  // triangle.position.sub(translationToOrigin);
+
+  scene.add(triangle);
+  console.log("triangle", triangle)
+
+  // After creating the triangle...
+  const axesHelper = new THREE.AxesHelper(5); // Length of the axes
+  axesHelper.position.copy(triangle.position); // Position the axes helper at the triangle's position
+  scene.add(axesHelper); // Add the axes helper to the scene
 }
