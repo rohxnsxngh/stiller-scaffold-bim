@@ -87,7 +87,7 @@ export const createSimple2DScene = (
     alert("I've been clicked!");
   });
 
-  console.log(components.camera)
+  console.log(components.camera);
 
   // Move camera to top view button
   const topViewButton = new OBC.Button(components);
@@ -197,6 +197,19 @@ export const createSimple2DScene = (
     setDrawingInProgress(false);
   });
 
+  const roofButton = new OBC.Button(components);
+  roofButton.materialIcon = "roofing";
+  roofButton.tooltip = "Add Roof";
+  roofButton.id = "roof-button";
+  sideToolBar.addChild(roofButton);
+  roofButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    setDrawingInProgress(false);
+  });
+  roofButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+
   const drawerToolBar = new OBC.Toolbar(components);
   drawerToolBar.position = "right";
   components.ui.addToolbar(drawerToolBar);
@@ -265,5 +278,12 @@ export const createSimple2DScene = (
     window.location.href = "/home";
   });
   ////////////////////////////////////////////////
-  return [extrusionButton, blueprintButton, createBlueprintRectangleButton, freeRotateButton, drawingButton];
+  return [
+    extrusionButton,
+    blueprintButton,
+    createBlueprintRectangleButton,
+    freeRotateButton,
+    drawingButton,
+    roofButton
+  ];
 };

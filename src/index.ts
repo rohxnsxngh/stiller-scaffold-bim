@@ -87,6 +87,7 @@ export const createModelView = async () => {
     createBlueprintRectangleButton,
     freeRotateButton,
     drawingButton,
+    roofButton,
   ] = createSimple2DScene(components, scene, cube);
 
   const mousePosition = new THREE.Vector2();
@@ -200,6 +201,7 @@ export const createModelView = async () => {
       });
     } else {
       labelPanel.style.pointerEvents = "none";
+      // labelPanel.style.visibility = "hidden";
     }
   });
 
@@ -257,6 +259,45 @@ export const createModelView = async () => {
 
     blueprints = [];
     extrusions = [];
+  });
+
+  roofButton.domElement.addEventListener("mousedown", () => {
+    console.log("roof button click");
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "extrusion") {
+        console.log(child, "extrusion found");
+        console.log("depth:", child.geometry.parameters.options.depth);
+        console.log("position:", child.userData);
+        console.log("line curve points:", child.userData.curves[0].v1);
+        console.log("line curve points:", child.userData.curves[0].v2);
+
+      // Calculate the midpoint between the two points
+      const midpoint = new THREE.Vector2();
+      midpoint.addVectors(child.userData.curves[0].v1, child.userData.curves[0].v2).multiplyScalar(0.5);
+
+      // Create a third point that forms a right angle with the line formed by the two points
+      const direction = new THREE.Vector2();
+      direction.subVectors(child.userData.curves[0].v2, child.userData.curves[0].v1);
+      const normal = new THREE.Vector2(direction.y, -direction.x);
+      const thirdPoint = new THREE.Vector2();
+      thirdPoint.addVectors(midpoint, normal);
+
+      // Create a triangle using these three points
+      const shape = new THREE.Shape();
+      shape.moveTo(child.userData.curves[0].v1.x, child.userData.curves[0].v1.y);
+      shape.lineTo(child.userData.curves[0].v2.x, child.userData.curves[0].v2.y);
+      shape.lineTo(thirdPoint.x, thirdPoint.y);
+      shape.lineTo(child.userData.curves[0].v1.x, child.userData.curves[0].v1.y); // close the shape
+
+      const geometry = new THREE.ShapeGeometry(shape);
+      const material = new THREE.MeshBasicMaterial({color: 0xffffff, side: THREE.DoubleSide});
+      const triangle = new THREE.Mesh(geometry, material);
+      triangle.position.y = -1 * child.geometry.parameters.options.depth
+      triangle.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+      triangle.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2)
+      scene.add(triangle);
+      }
+    });
   });
 
   //////////////////////////////////

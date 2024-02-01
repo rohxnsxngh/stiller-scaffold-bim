@@ -48,6 +48,7 @@ export function createShapeIsOutlined(
   });
 }
 
+// helper function to measure line length
 function measureLineLength(points: any) {
   const lastIndex = points.length - 1;
   const secondToLastIndex = points.length - 2;
@@ -124,13 +125,13 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   const materialExtrude = new THREE.MeshBasicMaterial({
     color: 0xff0000,
     side: THREE.DoubleSide,
+    wireframe: true
   });
 
   // Create the mesh with the extruded geometry
   const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
   meshExtrude.rotateX(Math.PI / 2);
   meshExtrude.userData = shape;
-  // meshExtrude.position.y = 1;
   meshExtrude.name = "extrusion";
   scene.add(meshExtrude);
 }
@@ -139,6 +140,7 @@ interface IntersectionResult {
   point: THREE.Vector3;
 }
 
+// function to create rectangle blueprint from dragging mouse
 export function createRectangle(
   { start, end }: { start: any; end: any },
   markupGroup: THREE.Group,
@@ -250,6 +252,7 @@ function createLabels(rectanglePoints: THREE.Vector3[] | undefined) {
   return currentLabels;
 }
 
+// updates the labels after a new dimension has been passed in
 function updateLabelsForNewDimensions(
   newRectanglePoints: THREE.Vector3[] | undefined
 ) {
@@ -272,6 +275,8 @@ function updateLabelsForNewDimensions(
   }
 }
 
+// serves as a callback function which listens for when the user clicks on a label
+// and when a user changes the value within a label
 function attachLabelChangeHandler(
   label: CSS2DObject,
   markupGroup: THREE.Group,
@@ -309,8 +314,6 @@ function attachLabelChangeHandler(
   });
 }
 
-////////////////////////////////////////
-
 // cast point for top view rectangle tool
 function castPoint(
   mouse: any,
@@ -331,6 +334,7 @@ function castPoint(
   return result;
 }
 
+// updates the rectangle based new dimensions that are passed in
 function updateRectangleBlueprintGeometry(
   newValue: string | null,
   oldValue: string | null,
@@ -386,6 +390,7 @@ function updateRectangleBlueprintGeometry(
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
 
+    // creating vertices from the shape of the plane
     const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
       .applyMatrix4(newRectangleBlueprint.matrixWorld)
       .add(newRectangleBlueprint.position);
@@ -439,6 +444,7 @@ function updateRectangleBlueprintGeometry(
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
 
+    // creating vertices from the shape of the plane
     const corner1 = new THREE.Vector3(-halfWidth, 0, -halfHeight)
       .applyMatrix4(newRectangleBlueprint.matrixWorld)
       .add(newRectangleBlueprint.position);
