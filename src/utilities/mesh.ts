@@ -481,12 +481,6 @@ function updateRectangleBlueprintGeometry(
 
 // create roof from extrusion shape
 export function createRoof(child: any, scene: THREE.Scene, index: number) {
-  console.log(child, "extrusion found");
-  console.log("depth:", child.geometry.parameters.options.depth);
-  console.log("position:", child.userData);
-  console.log("line curve points:", child.userData.curves[index].v1);
-  console.log("line curve points:", child.userData.curves[index].v2);
-
   // Calculate the midpoint between the two points
   const midpoint = new THREE.Vector2();
   midpoint
@@ -523,17 +517,6 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   ); // close the shape
 
   const extrudeHeight = -1 * child.geometry.parameters.options.depth;
-
-  const geometry = new THREE.ShapeGeometry(shape);
-  const material = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  });
-  const triangle = new THREE.Mesh(geometry, material);
-  triangle.position.y = extrudeHeight;
-  const quaternionY = new THREE.Quaternion();
-  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-  triangle.applyQuaternion(quaternionY);
 
   const startPoint = new THREE.Vector3(
     child.userData.curves[index].v1.x,
@@ -573,19 +556,52 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   );
   scene.add(arrowHelper);
 
+  const nextPoint = new THREE.Vector3(
+    child.userData.curves[index + 1].v2.x,
+    extrudeHeight,
+    child.userData.curves[index + 1].v2.y
+  );
+
+  const extrusionDistance = endPoint.distanceTo(nextPoint);
+  console.log("extrusion distance", extrusionDistance);
+
+  const extrudeSettings = {
+    depth: extrusionDistance,
+    bevelEnabled: true,
+  };
+
+  const roofExtrusionGeometry = new THREE.ExtrudeGeometry(
+    shape,
+    extrudeSettings
+  );
+  const roofExtrusionMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+  });
+  const roofExtrusionMesh = new THREE.Mesh(
+    roofExtrusionGeometry,
+    roofExtrusionMaterial
+  );
+  roofExtrusionMesh.position.y = extrudeHeight;
+
+  const quaternionY = new THREE.Quaternion();
+  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  roofExtrusionMesh.applyQuaternion(quaternionY);
+
+  // use quaternions to rotate triangle around arbitrary axis in space
+  // in order to align roof with the extrusion beneath it
   const customQuaternion = new THREE.Quaternion();
   customQuaternion.setFromAxisAngle(edgeDirection, rotationAngle);
-  triangle.applyQuaternion(customQuaternion)
-  triangle.position.sub(startPoint)
-  triangle.position.applyQuaternion(customQuaternion)
-  triangle.position.add(startPoint)
+  roofExtrusionMesh.applyQuaternion(customQuaternion);
+  roofExtrusionMesh.position.sub(startPoint);
+  roofExtrusionMesh.position.applyQuaternion(customQuaternion);
+  roofExtrusionMesh.position.add(startPoint);
+  roofExtrusionMesh.updateMatrix();
+  roofExtrusionMesh.updateMatrixWorld(true);
 
-  scene.add(triangle);
-  console.log("triangle points", shape.getPoints()[1]);
-  console.log("extrusion rectangle points", child.userData.getPoints()[1]);
+  scene.add(roofExtrusionMesh);
 
   // After creating the triangle...
   const axesHelper = new THREE.AxesHelper(5); // Length of the axes
-  axesHelper.position.copy(triangle.position); // Position the axes helper at the triangle's position
+  axesHelper.position.copy(roofExtrusionMesh.position); // Position the axes helper at the triangle's position
   scene.add(axesHelper); // Add the axes helper to the scene
 }
