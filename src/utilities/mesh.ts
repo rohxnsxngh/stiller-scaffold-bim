@@ -612,6 +612,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   roofExtrusionMesh.position.add(startPoint);
   roofExtrusionMesh.updateMatrix();
   roofExtrusionMesh.updateMatrixWorld(true);
+  roofExtrusionMesh.name = "roofExtrusion"
 
   scene.add(roofExtrusionMesh);
 
