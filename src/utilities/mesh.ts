@@ -480,24 +480,27 @@ function updateRectangleBlueprintGeometry(
 }
 
 // create roof from extrusion shape
-export function createRoof(child: any, scene: THREE.Scene) {
+export function createRoof(child: any, scene: THREE.Scene, index: number) {
   console.log(child, "extrusion found");
   console.log("depth:", child.geometry.parameters.options.depth);
   console.log("position:", child.userData);
-  console.log("line curve points:", child.userData.curves[0].v1);
-  console.log("line curve points:", child.userData.curves[0].v2);
+  console.log("line curve points:", child.userData.curves[index].v1);
+  console.log("line curve points:", child.userData.curves[index].v2);
 
   // Calculate the midpoint between the two points
   const midpoint = new THREE.Vector2();
   midpoint
-    .addVectors(child.userData.curves[0].v1, child.userData.curves[0].v2)
+    .addVectors(
+      child.userData.curves[index].v1,
+      child.userData.curves[index].v2
+    )
     .multiplyScalar(0.5);
 
   // Create a third point that forms a right angle with the line formed by the two points
   const direction = new THREE.Vector2();
   direction.subVectors(
-    child.userData.curves[0].v2,
-    child.userData.curves[0].v1
+    child.userData.curves[index].v2,
+    child.userData.curves[index].v1
   );
   const normal = new THREE.Vector2(direction.y, -direction.x);
   const thirdPoint = new THREE.Vector2();
@@ -505,10 +508,19 @@ export function createRoof(child: any, scene: THREE.Scene) {
 
   // Create a triangle using these three points
   const shape = new THREE.Shape();
-  shape.moveTo(child.userData.curves[0].v1.x, child.userData.curves[0].v1.y);
-  shape.lineTo(child.userData.curves[0].v2.x, child.userData.curves[0].v2.y);
+  shape.moveTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  );
+  shape.lineTo(
+    child.userData.curves[index].v2.x,
+    child.userData.curves[index].v2.y
+  );
   shape.lineTo(thirdPoint.x, thirdPoint.y);
-  shape.lineTo(child.userData.curves[0].v1.x, child.userData.curves[0].v1.y); // close the shape
+  shape.lineTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  ); // close the shape
 
   const extrudeHeight = -1 * child.geometry.parameters.options.depth;
 
@@ -519,17 +531,19 @@ export function createRoof(child: any, scene: THREE.Scene) {
   });
   const triangle = new THREE.Mesh(geometry, material);
   triangle.position.y = extrudeHeight;
-  triangle.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  const quaternionY = new THREE.Quaternion();
+  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  triangle.applyQuaternion(quaternionY);
 
   const startPoint = new THREE.Vector3(
-    child.userData.curves[0].v1.x,
+    child.userData.curves[index].v1.x,
     extrudeHeight,
-    child.userData.curves[0].v1.y
+    child.userData.curves[index].v1.y
   );
   const endPoint = new THREE.Vector3(
-    child.userData.curves[0].v2.x,
+    child.userData.curves[index].v2.x,
     extrudeHeight,
-    child.userData.curves[0].v2.y
+    child.userData.curves[index].v2.y
   );
 
   const lineGeometry = new THREE.BufferGeometry().setFromPoints([
@@ -540,29 +554,35 @@ export function createRoof(child: any, scene: THREE.Scene) {
   const rotationAxisLine = new THREE.Line(lineGeometry, lineMaterial);
   scene.add(rotationAxisLine);
 
-  // // Assuming 'objectToRotate' is the object you want to rotate around the line
-  // // Calculate the direction vector from startPoint to endPoint
+  // Calculate the midpoint of the line
+  const midPoint = new THREE.Vector3()
+    .addVectors(endPoint, startPoint)
+    .multiplyScalar(0.5);
+
   const edgeDirection = new THREE.Vector3()
     .subVectors(endPoint, startPoint)
     .normalize();
+  const rotationAngle = Math.PI / 2;
 
-  // // Calculate the translation vector to move the object to the origin
-  // const translationToOrigin = new THREE.Vector3().copy(startPoint).negate();
+  // Create an arrow helper to visualize the lineDirection
+  const arrowHelper = new THREE.ArrowHelper(
+    edgeDirection,
+    midPoint,
+    10,
+    0x000000
+  );
+  scene.add(arrowHelper);
 
-  // // Translate the object to the origin
-  // triangle.position.add(translationToOrigin);
-
-  // // Determine the angle of rotation (in radians)
-  // const angle = Math.PI / 2; // Example: Rotate 45 degrees
-
-  // // Rotate the object around the axis
-  // triangle.rotateOnAxis(edgeDirection, angle);
-
-  // // Translate the object back to its original position
-  // triangle.position.sub(translationToOrigin);
+  const customQuaternion = new THREE.Quaternion();
+  customQuaternion.setFromAxisAngle(edgeDirection, rotationAngle);
+  triangle.applyQuaternion(customQuaternion)
+  triangle.position.sub(startPoint)
+  triangle.position.applyQuaternion(customQuaternion)
+  triangle.position.add(startPoint)
 
   scene.add(triangle);
-  console.log("triangle", triangle)
+  console.log("triangle points", shape.getPoints()[1]);
+  console.log("extrusion rectangle points", child.userData.getPoints()[1]);
 
   // After creating the triangle...
   const axesHelper = new THREE.AxesHelper(5); // Length of the axes

@@ -266,7 +266,7 @@ export const createModelView = async () => {
     console.log("roof button click");
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name === "extrusion") {
-        createRoof(child, scene);
+        createRoof(child, scene, 3);
       }
     });
   });
