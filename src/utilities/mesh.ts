@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { distanceFromPointToLine } from "./helper";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -491,14 +492,28 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     .multiplyScalar(0.5);
 
   // Create a third point that forms a right angle with the line formed by the two points
+  const offsetFactor = 0.25;
   const direction = new THREE.Vector2();
   direction.subVectors(
     child.userData.curves[index].v2,
     child.userData.curves[index].v1
   );
   const normal = new THREE.Vector2(direction.y, -direction.x);
+  normal.x += offsetFactor;
   const thirdPoint = new THREE.Vector2();
   thirdPoint.addVectors(midpoint, normal);
+  thirdPoint.addVectors(midpoint, normal);
+
+  const triangleHeightOffsetDistance = distanceFromPointToLine(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y,
+    child.userData.curves[index].v2.x,
+    child.userData.curves[index].v2.y,
+    thirdPoint.x,
+    thirdPoint.y
+  );
+
+  console.log("distance from point to line", triangleHeightOffsetDistance);
 
   // Create a triangle using these three points
   const shape = new THREE.Shape();
@@ -562,8 +577,8 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     child.userData.curves[index + 1].v2.y
   );
 
+  // distance triangle should be extruded
   const extrusionDistance = endPoint.distanceTo(nextPoint);
-  console.log("extrusion distance", extrusionDistance);
 
   const extrudeSettings = {
     depth: extrusionDistance,

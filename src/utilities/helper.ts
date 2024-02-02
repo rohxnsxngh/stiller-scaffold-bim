@@ -15,11 +15,32 @@ export const deepEqual = (x: any, y: any): boolean => {
     : x === y;
 };
 
-export function getMousePosition(e: MouseEvent, mouse: THREE.Vector2, raycaster: THREE.Raycaster, scene: THREE.Scene, components: OBC.Components) {
+export function getMousePosition(
+  e: MouseEvent,
+  mouse: THREE.Vector2,
+  raycaster: THREE.Raycaster,
+  scene: THREE.Scene,
+  components: OBC.Components
+) {
   mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
   // @ts-ignore
   raycaster.setFromCamera(mouse, components.camera.activeCamera);
   const intersection = raycaster.intersectObjects(scene.children);
-  return intersection
+  return intersection;
+}
+
+export function distanceFromPointToLine(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  x0: number,
+  y0: number
+) {
+  const A = y2 - y1;
+  const B = x1 - x2;
+  const C = x2 * y1 - x1 * y2;
+
+  return Math.abs(A * x0 + B * y0 + C) / Math.sqrt(A * A + B * B);
 }
