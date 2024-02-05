@@ -120,8 +120,6 @@ export function createBlueprintFromShapeOutline(
 export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   let shape = blueprintShape;
 
-  console.log(scene);
-
   const depth = -12;
 
   const extrudeSettings = {
@@ -141,20 +139,22 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
     wireframe: true,
   });
 
-  createExtrusionLabel(scene, shape, depth);
-
   // Create the mesh with the extruded geometry
   const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
   meshExtrude.rotateX(Math.PI / 2);
   meshExtrude.userData = shape;
   meshExtrude.name = "extrusion";
   scene.add(meshExtrude);
+
+  const label = createExtrusionLabel(scene, shape, depth);
+  attachExtrusionLabelChangeHandler(label, meshExtrude, shape);
 }
 
 interface IntersectionResult {
   point: THREE.Vector3;
 }
 
+// create label for extrusion
 function createExtrusionLabel(scene: THREE.Scene, shape: any, depth: number) {
   const startPoint = new THREE.Vector3(
     shape.curves[0].v1.x,
@@ -180,6 +180,56 @@ function createExtrusionLabel(scene: THREE.Scene, shape: any, depth: number) {
   );
   scene.add(label);
   return label;
+}
+
+function attachExtrusionLabelChangeHandler(
+  label: CSS2DObject,
+  meshExtrude: THREE.Mesh,
+  shape: THREE.Shape
+) {
+  const labelElement = label.element as HTMLDivElement;
+  let oldValue: any;
+
+  labelElement.addEventListener("focus", () => {
+    oldValue = labelElement.textContent;
+    console.log(oldValue);
+  });
+
+  labelElement.addEventListener("blur", () => {
+    const newValue = labelElement.textContent;
+    if (oldValue !== newValue) {
+      console.log("values do not match");
+      updateExtrusionGeometry(newValue, meshExtrude, shape);
+    }
+  });
+}
+
+function updateExtrusionGeometry(
+  depth: string | null,
+  meshExtrude: THREE.Mesh,
+  shape: THREE.Shape
+) {
+  if (depth === null) {
+    throw new Error("Depth cannot be null");
+  }
+  const updatedDepth = parseFloat(depth);
+  console.log(updatedDepth);
+
+  // Define the extrude settings with the new depth
+  const extrudeSettings = {
+    depth: -updatedDepth,
+    bevelEnabled: false, // Adjust bevel settings as needed
+  };
+
+  const newGeometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  meshExtrude.geometry.dispose();
+  meshExtrude.geometry = newGeometryExtrude;
+
+  // Since the geometry has changed, you may need to adjust the mesh position or rotation
+  meshExtrude.rotation.set(0, 0, 0);
+  meshExtrude.rotateX(Math.PI / 2); 
+
+  return meshExtrude;
 }
 
 // function to create rectangle blueprint from dragging mouse
