@@ -513,8 +513,6 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     thirdPoint.y
   );
 
-  console.log("distance from point to line", triangleHeightOffsetDistance);
-
   // Create a triangle using these three points
   const shape = new THREE.Shape();
   shape.moveTo(
@@ -571,53 +569,60 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   );
   scene.add(arrowHelper);
 
+  const geometry = new THREE.ShapeGeometry(shape);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+  });
+  const triangle = new THREE.Mesh(geometry, material);
+  triangle.position.y = extrudeHeight;
+  const quaternionY = new THREE.Quaternion();
+  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  triangle.applyQuaternion(quaternionY);
+
+  const customQuaternion = new THREE.Quaternion();
+  customQuaternion.setFromAxisAngle(edgeDirection, rotationAngle);
+  triangle.applyQuaternion(customQuaternion);
+  triangle.position.sub(startPoint);
+  triangle.position.applyQuaternion(customQuaternion);
+  triangle.position.add(startPoint);
+  triangle.updateMatrix();
+  triangle.updateMatrixWorld(true);
+
+  scene.add(triangle);
+
   const nextPoint = new THREE.Vector3(
     child.userData.curves[index + 1].v2.x,
     extrudeHeight,
     child.userData.curves[index + 1].v2.y
   );
 
-  // distance triangle should be extruded
+  const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
 
-  const extrudeSettings = {
-    depth: extrusionDistance,
+  const extrusionSettings = {
+    steps: 100,
     bevelEnabled: true,
+    bevelThickness: 1,
+    bevelSize: 1,
+    bevelOffset: 0,
+    bevelSegments: 1,
+    depth: extrusionDistance,
+    path: extrusionPath
   };
 
-  const roofExtrusionGeometry = new THREE.ExtrudeGeometry(
-    shape,
-    extrudeSettings
+  const extrudeGeometry = new THREE.ExtrudeGeometry(
+    shape, // The shape to extrude
+    extrusionSettings // Extrusion settings
   );
-  const roofExtrusionMaterial = new THREE.MeshBasicMaterial({
+
+  const extrudedMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
+    side: THREE.DoubleSide,
   });
-  const roofExtrusionMesh = new THREE.Mesh(
-    roofExtrusionGeometry,
-    roofExtrusionMaterial
-  );
-  roofExtrusionMesh.position.y = extrudeHeight;
 
-  const quaternionY = new THREE.Quaternion();
-  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-  roofExtrusionMesh.applyQuaternion(quaternionY);
-
-  // use quaternions to rotate triangle around arbitrary axis in space
-  // in order to align roof with the extrusion beneath it
-  const customQuaternion = new THREE.Quaternion();
-  customQuaternion.setFromAxisAngle(edgeDirection, rotationAngle);
-  roofExtrusionMesh.applyQuaternion(customQuaternion);
-  roofExtrusionMesh.position.sub(startPoint);
-  roofExtrusionMesh.position.applyQuaternion(customQuaternion);
-  roofExtrusionMesh.position.add(startPoint);
-  roofExtrusionMesh.updateMatrix();
-  roofExtrusionMesh.updateMatrixWorld(true);
-  roofExtrusionMesh.name = "roofExtrusion"
-
-  scene.add(roofExtrusionMesh);
-
-  // After creating the triangle...
-  const axesHelper = new THREE.AxesHelper(5); // Length of the axes
-  axesHelper.position.copy(roofExtrusionMesh.position); // Position the axes helper at the triangle's position
-  scene.add(axesHelper); // Add the axes helper to the scene
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  extrudedMesh.position.copy(triangle.position);
+  extrudedMesh.rotation.copy(triangle.rotation);
+  scene.add(extrudedMesh);
 }
