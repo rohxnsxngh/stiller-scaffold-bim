@@ -335,6 +335,8 @@ function castPoint(
   return result;
 }
 
+let blueprintHasBeenUpdated: boolean = false;
+
 // updates the rectangle based new dimensions that are passed in
 function updateRectangleBlueprintGeometry(
   newValue: string | null,
@@ -352,6 +354,8 @@ function updateRectangleBlueprintGeometry(
   }
 
   let planeWidth, planeHeight;
+
+  blueprintHasBeenUpdated = true;
 
   if (
     (markupGroup.children[0] as THREE.Mesh).geometry instanceof
@@ -599,17 +603,31 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
 
   const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
+  let extrusionSettings
+  if (blueprintHasBeenUpdated) {
+    extrusionSettings = {
+      // steps: 100,
+      bevelEnabled: true,
+      // bevelThickness: 1,
+      // bevelSize: 1,
+      // bevelOffset: 0,
+      // bevelSegments: 1,
+      depth: - extrusionDistance,
+      path: extrusionPath,
+    };
+  } else {
+     extrusionSettings = {
+      // steps: 100,
+      bevelEnabled: true,
+      // bevelThickness: 1,
+      // bevelSize: 1,
+      // bevelOffset: 0,
+      // bevelSegments: 1,
+      depth: extrusionDistance,
+      path: extrusionPath,
+    };
+  }
 
-  const extrusionSettings = {
-    steps: 100,
-    bevelEnabled: true,
-    bevelThickness: 1,
-    bevelSize: 1,
-    bevelOffset: 0,
-    bevelSegments: 1,
-    depth: extrusionDistance,
-    path: extrusionPath
-  };
 
   const extrudeGeometry = new THREE.ExtrudeGeometry(
     shape, // The shape to extrude
