@@ -80,6 +80,11 @@ export function createBlueprintFromShapeOutline(
       if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
         scene.remove(child);
       }
+      if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
+        // console.log(child)
+        child.element.style.pointerEvents = "none";
+        child.visible = false;
+      }
     });
 
     // Create shape
@@ -114,13 +119,20 @@ export function createBlueprintFromShapeOutline(
 
 export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   let shape = blueprintShape;
+
+  console.log(scene);
+
+  const depth = -12;
+
   const extrudeSettings = {
-    depth: -12,
+    depth: depth,
     bevelEnabled: false, // You can enable beveling if needed
   };
 
   // Create extruded geometry
   const geometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+  console.log(shape);
 
   // Material for the extruded mesh
   const materialExtrude = new THREE.MeshBasicMaterial({
@@ -128,6 +140,8 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
     side: THREE.DoubleSide,
     wireframe: true,
   });
+
+  createExtrusionLabel(scene, shape, depth);
 
   // Create the mesh with the extruded geometry
   const meshExtrude = new THREE.Mesh(geometryExtrude, materialExtrude);
@@ -139,6 +153,33 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
 
 interface IntersectionResult {
   point: THREE.Vector3;
+}
+
+function createExtrusionLabel(scene: THREE.Scene, shape: any, depth: number) {
+  const startPoint = new THREE.Vector3(
+    shape.curves[0].v1.x,
+    0,
+    shape.curves[0].v1.y
+  );
+  const endPoint = new THREE.Vector3(
+    shape.curves[0].v1.x,
+    -depth,
+    shape.curves[0].v1.y
+  );
+  const midpoint = new THREE.Vector3().lerpVectors(startPoint, endPoint, 0.5);
+  const distance = -depth;
+  const labelDiv = document.createElement("div");
+  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.textContent = `${distance.toFixed(2)} m.`;
+  labelDiv.contentEditable = "true";
+
+  const label = new CSS2DObject(labelDiv);
+  label.name = "rectangleExtrusionLabel";
+  label.position.copy(
+    new THREE.Vector3(midpoint.x, midpoint.y, midpoint.z + 1)
+  );
+  scene.add(label);
+  return label;
 }
 
 // function to create rectangle blueprint from dragging mouse
@@ -517,6 +558,16 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     thirdPoint.y
   );
 
+  scene.traverse((child) => {
+    if (
+      child instanceof CSS2DObject &&
+      child.name === "rectangleExtrusionLabel"
+    ) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
   // Create a triangle using these three points
   const shape = new THREE.Shape();
   shape.moveTo(
@@ -613,6 +664,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
       // bevelOffset: 0,
       // bevelSegments: 1,
       depth: -extrusionDistance,
+      // @ts-ignore
       path: extrusionPath,
     };
   } else {
@@ -624,11 +676,12 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
       // bevelOffset: 0,
       // bevelSegments: 1,
       depth: extrusionDistance,
+      // @ts-ignore
       path: extrusionPath,
     };
   }
 
-  createRoofLabel(scene, endPoint, thirdPoint, triangleHeightOffsetDistance)
+  createRoofLabel(scene, endPoint, thirdPoint, triangleHeightOffsetDistance);
 
   const extrudeGeometry = new THREE.ExtrudeGeometry(
     shape, // The shape to extrude
@@ -646,6 +699,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   scene.add(extrudedMesh);
 }
 
+// let currentRoofLabel: CSS2DObject[] = [];
 function createRoofLabel(
   scene: THREE.Scene,
   endPoint: THREE.Vector3,
@@ -674,4 +728,42 @@ function createRoofLabel(
     new THREE.Vector3(midpoint.x, midpoint.y, midpoint.z + 1)
   );
   scene.add(label);
+  return label;
 }
+
+// function attachRoofLabelChangeHandler(
+//   label: CSS2DObject,
+//   scene: THREE.Scene,
+//   endPoint: THREE.Vector3,
+//   thirdPoint: THREE.Vector2,
+//   triangleHeightOffsetDistance: number
+// ) {
+//   const labelElement = label.element as HTMLDivElement;
+//   let oldValue: any;
+
+//   labelElement.addEventListener("focus", () => {
+//     oldValue = labelElement.textContent;
+//     console.log(oldValue);
+//   });
+
+//   labelElement.addEventListener("blur", () => {
+//     const newValue = labelElement.textContent;
+//     if (oldValue !== newValue) {
+//       // create new plane based on inputs
+//       // const newRoofVertices = updateRectangleBlueprintGeometry(
+//       //   newValue,
+//       //   oldValue,
+//       //   markupGroup,
+//       //   width,
+//       //   height,
+//       //   centerX,
+//       //   centerZ
+//       // );
+//       // create new labels based on vertices
+//       // updateLabelsForNewDimensions(newRectangleVertices);
+//       // return currentLabels;
+//     }
+//   });
+// }
+
+// function updateRoofGeometry() {}

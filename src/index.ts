@@ -158,24 +158,8 @@ export const createModelView = async () => {
             break;
           case "extrusion":
             console.log("extrusion raycasting");
-            // const ExtrudePos = new THREE.Vector3().copy(intersect.point);
-            // const depth =
-            //   intersect.object.geometry.parameters.options.depth * -1;
-            // labelPanel.style.visibility = "visible";
-            // let pTag = labelPanel.querySelector("p");
-            // if (pTag !== null) {
-            //   pTag.textContent = `${depth} m.`;
-            // }
-            // label.position.set(ExtrudePos.x, 0, ExtrudePos.z);
-            // labelPanel.style.pointerEvents = "auto";
             break;
           case "blueprint":
-            // console.log("blueprint raycasting");
-            // const BlueprintPos = new THREE.Vector3().copy(intersect.point);
-            // labelPanel.style.visibility = "visible";
-            // labelPanel.textContent = "Blueprint";
-            // label.position.set(BlueprintPos.x, 0, BlueprintPos.z);
-            // labelPanel.style.pointerEvents = "auto";
             break;
           case "line":
             // console.log("line")
