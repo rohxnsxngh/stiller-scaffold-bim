@@ -603,7 +603,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
 
   const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
-  let extrusionSettings
+  let extrusionSettings;
   if (blueprintHasBeenUpdated) {
     extrusionSettings = {
       // steps: 100,
@@ -612,11 +612,11 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
       // bevelSize: 1,
       // bevelOffset: 0,
       // bevelSegments: 1,
-      depth: - extrusionDistance,
+      depth: -extrusionDistance,
       path: extrusionPath,
     };
   } else {
-     extrusionSettings = {
+    extrusionSettings = {
       // steps: 100,
       bevelEnabled: true,
       // bevelThickness: 1,
@@ -628,6 +628,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     };
   }
 
+  createRoofLabel(scene, endPoint, thirdPoint, triangleHeightOffsetDistance)
 
   const extrudeGeometry = new THREE.ExtrudeGeometry(
     shape, // The shape to extrude
@@ -643,4 +644,34 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   scene.add(extrudedMesh);
+}
+
+function createRoofLabel(
+  scene: THREE.Scene,
+  endPoint: THREE.Vector3,
+  thirdPoint: THREE.Vector2,
+  triangleHeightOffsetDistance: number
+) {
+  const topTrianglePoint = new THREE.Vector3(
+    thirdPoint.x,
+    endPoint.y + triangleHeightOffsetDistance,
+    thirdPoint.y
+  );
+  const midpoint = new THREE.Vector3().lerpVectors(
+    endPoint,
+    topTrianglePoint,
+    0.5
+  );
+  const distance = triangleHeightOffsetDistance;
+  const labelDiv = document.createElement("div");
+  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.textContent = `${distance.toFixed(2)} m.`;
+  labelDiv.contentEditable = "true";
+
+  const label = new CSS2DObject(labelDiv);
+  label.name = "rectangleRoofLabel";
+  label.position.copy(
+    new THREE.Vector3(midpoint.x, midpoint.y, midpoint.z + 1)
+  );
+  scene.add(label);
 }
