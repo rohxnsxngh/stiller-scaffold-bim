@@ -192,13 +192,11 @@ function attachExtrusionLabelChangeHandler(
 
   labelElement.addEventListener("focus", () => {
     oldValue = labelElement.textContent;
-    console.log(oldValue);
   });
 
   labelElement.addEventListener("blur", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
-      console.log("values do not match");
       updateExtrusionGeometry(newValue, meshExtrude, shape);
     }
   });
@@ -227,7 +225,7 @@ function updateExtrusionGeometry(
 
   // Since the geometry has changed, you may need to adjust the mesh position or rotation
   meshExtrude.rotation.set(0, 0, 0);
-  meshExtrude.rotateX(Math.PI / 2); 
+  meshExtrude.rotateX(Math.PI / 2);
 
   return meshExtrude;
 }
@@ -587,18 +585,22 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     .multiplyScalar(0.5);
 
   // Create a third point that forms a right angle with the line formed by the two points
-  const offsetFactor = 0.25;
   const direction = new THREE.Vector2();
   direction.subVectors(
     child.userData.curves[index].v2,
     child.userData.curves[index].v1
   );
-  const normal = new THREE.Vector2(direction.y, -direction.x);
-  normal.x += offsetFactor;
-  const thirdPoint = new THREE.Vector2();
-  thirdPoint.addVectors(midpoint, normal);
-  thirdPoint.addVectors(midpoint, normal);
+  // Normalize the direction vector to get the unit vector
+  direction.normalize();
 
+  // Calculate the perpendicular vector to the direction vector
+  const perpendicular = new THREE.Vector2(-direction.y, direction.x);
+
+  // Scale the perpendicular vector by the desired distance (10 units)
+  const scaledPerpendicular = perpendicular.clone().multiplyScalar(-10);
+
+  // Add the scaled perpendicular vector to the midpoint to get the third point
+  const thirdPoint = midpoint.clone().add(scaledPerpendicular);
   const triangleHeightOffsetDistance = distanceFromPointToLine(
     child.userData.curves[index].v1.x,
     child.userData.curves[index].v1.y,
@@ -656,7 +658,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   scene.add(rotationAxisLine);
 
   // Calculate the midpoint of the line
-  const midPoint = new THREE.Vector3()
+  const midpointLine = new THREE.Vector3()
     .addVectors(endPoint, startPoint)
     .multiplyScalar(0.5);
 
@@ -668,7 +670,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   // Create an arrow helper to visualize the lineDirection
   const arrowHelper = new THREE.ArrowHelper(
     edgeDirection,
-    midPoint,
+    midpointLine,
     10,
     0x000000
   );
@@ -693,6 +695,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   triangle.position.add(startPoint);
   triangle.updateMatrix();
   triangle.updateMatrixWorld(true);
+  triangle.name = "roofTriangle";
 
   scene.add(triangle);
 
@@ -731,7 +734,13 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     };
   }
 
-  createRoofLabel(scene, endPoint, thirdPoint, triangleHeightOffsetDistance);
+  const label = createRoofLabel(
+    scene,
+    endPoint,
+    thirdPoint,
+    triangleHeightOffsetDistance
+  );
+  attachRoofLabelChangeHandler(label, child, index, midpoint, scene);
 
   const extrudeGeometry = new THREE.ExtrudeGeometry(
     shape, // The shape to extrude
@@ -746,7 +755,8 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
-  scene.add(extrudedMesh);
+  extrudedMesh.name = "roof";
+  // scene.add(extrudedMesh);
 }
 
 // let currentRoofLabel: CSS2DObject[] = [];
@@ -781,39 +791,127 @@ function createRoofLabel(
   return label;
 }
 
-// function attachRoofLabelChangeHandler(
-//   label: CSS2DObject,
-//   scene: THREE.Scene,
-//   endPoint: THREE.Vector3,
-//   thirdPoint: THREE.Vector2,
-//   triangleHeightOffsetDistance: number
-// ) {
-//   const labelElement = label.element as HTMLDivElement;
-//   let oldValue: any;
+function attachRoofLabelChangeHandler(
+  label: CSS2DObject,
+  child: any,
+  index: number,
+  midpoint: THREE.Vector2,
+  scene: THREE.Scene
+) {
+  const labelElement = label.element as HTMLDivElement;
+  let oldValue: any;
 
-//   labelElement.addEventListener("focus", () => {
-//     oldValue = labelElement.textContent;
-//     console.log(oldValue);
-//   });
+  labelElement.addEventListener("focus", () => {
+    oldValue = labelElement.textContent;
+    console.log(oldValue);
+  });
 
-//   labelElement.addEventListener("blur", () => {
-//     const newValue = labelElement.textContent;
-//     if (oldValue !== newValue) {
-//       // create new plane based on inputs
-//       // const newRoofVertices = updateRectangleBlueprintGeometry(
-//       //   newValue,
-//       //   oldValue,
-//       //   markupGroup,
-//       //   width,
-//       //   height,
-//       //   centerX,
-//       //   centerZ
-//       // );
-//       // create new labels based on vertices
-//       // updateLabelsForNewDimensions(newRectangleVertices);
-//       // return currentLabels;
-//     }
-//   });
-// }
+  labelElement.addEventListener("blur", () => {
+    const newValue = labelElement.textContent;
+    if (oldValue !== newValue) {
+      console.log("values do not match");
+      updateRoofGeometry(child, index, newValue, midpoint, scene);
+    }
+  });
+}
 
-// function updateRoofGeometry() {}
+function updateRoofGeometry(
+  child: any,
+  index: number,
+  triangleHeightOffsetDistance: number,
+  midpoint: THREE.Vector2,
+  scene: THREE.Scene
+) {
+  // if (scene) {
+  //   scene.traverse((child) => {
+  //     if (
+  //       (child instanceof THREE.Mesh && child.name === "roof") ||
+  //       child.name === "roofTriangle"
+  //     ) {
+  //       scene.remove(child);
+  //     }
+  //   });
+  // }
+  // Calculate the offset based on the desired triangle height
+  console.log("new height", triangleHeightOffsetDistance);
+  const desiredHeight = parseFloat(triangleHeightOffsetDistance);
+
+  // Recalculate the third point with the new offset factor
+  const direction = new THREE.Vector2();
+  direction.subVectors(
+    child.userData.curves[index].v2,
+    child.userData.curves[index].v1
+  );
+  // Normalize the direction vector to get the unit vector
+  direction.normalize();
+
+  // Calculate the perpendicular vector to the direction vector
+  const perpendicular = new THREE.Vector2(-direction.y, direction.x);
+
+  // Scale the perpendicular vector by the desired distance (10 units)
+  const scaledPerpendicular = perpendicular
+    .clone()
+    .multiplyScalar(-desiredHeight);
+
+  // Add the scaled perpendicular vector to the midpoint to get the third point
+  const thirdPoint = midpoint.clone().add(scaledPerpendicular);
+
+  const extrudeHeight = -1 * child.geometry.parameters.options.depth;
+
+  const startPoint = new THREE.Vector3(
+    child.userData.curves[index].v1.x,
+    extrudeHeight,
+    child.userData.curves[index].v1.y
+  );
+  const endPoint = new THREE.Vector3(
+    child.userData.curves[index].v2.x,
+    extrudeHeight,
+    child.userData.curves[index].v2.y
+  );
+
+  console.log(startPoint, endPoint, thirdPoint);
+
+  // Create a triangle using these three points
+  const shape = new THREE.Shape();
+  shape.moveTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  );
+  shape.lineTo(
+    child.userData.curves[index].v2.x,
+    child.userData.curves[index].v2.y
+  );
+  shape.lineTo(thirdPoint.x, thirdPoint.y);
+  shape.lineTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  ); // close the shape
+
+  const edgeDirection = new THREE.Vector3()
+    .subVectors(endPoint, startPoint)
+    .normalize();
+  const rotationAngle = Math.PI / 2;
+
+  const geometry = new THREE.ShapeGeometry(shape);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x0000ff,
+    side: THREE.DoubleSide,
+  });
+  const triangle = new THREE.Mesh(geometry, material);
+  triangle.position.y = extrudeHeight;
+
+  const quaternionY = new THREE.Quaternion();
+  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  triangle.applyQuaternion(quaternionY);
+
+  const customQuaternion = new THREE.Quaternion();
+  customQuaternion.setFromAxisAngle(edgeDirection, rotationAngle);
+  triangle.applyQuaternion(customQuaternion);
+  triangle.position.sub(startPoint);
+  triangle.position.applyQuaternion(customQuaternion);
+  triangle.position.add(startPoint);
+  triangle.updateMatrix();
+  triangle.updateMatrixWorld(true);
+  triangle.name = "roofTriangle";
+  scene.add(triangle);
+}
