@@ -738,7 +738,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     scene,
     endPoint,
     thirdPoint,
-    triangleHeightOffsetDistance
+    triangleHeightOffsetDistance,
   );
   attachRoofLabelChangeHandler(label, child, index, midpoint, scene);
 
@@ -756,7 +756,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
-  // scene.add(extrudedMesh);
+  scene.add(extrudedMesh);
 }
 
 // let currentRoofLabel: CSS2DObject[] = [];
@@ -764,7 +764,7 @@ function createRoofLabel(
   scene: THREE.Scene,
   endPoint: THREE.Vector3,
   thirdPoint: THREE.Vector2,
-  triangleHeightOffsetDistance: number
+  triangleHeightOffsetDistance: number,
 ) {
   const topTrianglePoint = new THREE.Vector3(
     thirdPoint.x,
@@ -796,7 +796,7 @@ function attachRoofLabelChangeHandler(
   child: any,
   index: number,
   midpoint: THREE.Vector2,
-  scene: THREE.Scene
+  scene: THREE.Scene,
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
@@ -822,19 +822,9 @@ function updateRoofGeometry(
   midpoint: THREE.Vector2,
   scene: THREE.Scene
 ) {
-  // if (scene) {
-  //   scene.traverse((child) => {
-  //     if (
-  //       (child instanceof THREE.Mesh && child.name === "roof") ||
-  //       child.name === "roofTriangle"
-  //     ) {
-  //       scene.remove(child);
-  //     }
-  //   });
-  // }
+
   // Calculate the offset based on the desired triangle height
-  console.log("new height", triangleHeightOffsetDistance);
-  const desiredHeight = parseFloat(triangleHeightOffsetDistance);
+  const desiredHeight = parseFloat(triangleHeightOffsetDistance as unknown as string);
 
   // Recalculate the third point with the new offset factor
   const direction = new THREE.Vector2();
@@ -856,6 +846,20 @@ function updateRoofGeometry(
   // Add the scaled perpendicular vector to the midpoint to get the third point
   const thirdPoint = midpoint.clone().add(scaledPerpendicular);
 
+  let itemsToRemove: THREE.Mesh<any, any, any>[] = [];
+  scene.traverse((item) => {
+    if (item instanceof THREE.Mesh && (item.name === "roof" || item.name === "roofTriangle")) {
+      itemsToRemove.push(item);
+    }
+  });
+  
+  // Dispose of the geometries and materials and remove the items from the scene after the traversal
+  itemsToRemove.forEach((item) => {
+    item.geometry.dispose();
+    item.material.dispose();
+    scene.remove(item);
+  });
+
   const extrudeHeight = -1 * child.geometry.parameters.options.depth;
 
   const startPoint = new THREE.Vector3(
@@ -868,8 +872,6 @@ function updateRoofGeometry(
     extrudeHeight,
     child.userData.curves[index].v2.y
   );
-
-  console.log(startPoint, endPoint, thirdPoint);
 
   // Create a triangle using these three points
   const shape = new THREE.Shape();
@@ -914,4 +916,45 @@ function updateRoofGeometry(
   triangle.updateMatrixWorld(true);
   triangle.name = "roofTriangle";
   scene.add(triangle);
+
+  const nextPoint = new THREE.Vector3(
+    child.userData.curves[index + 1].v2.x,
+    extrudeHeight,
+    child.userData.curves[index + 1].v2.y
+  );
+
+  const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
+  const extrusionDistance = endPoint.distanceTo(nextPoint);
+  let extrusionSettings;
+  if (blueprintHasBeenUpdated) {
+    extrusionSettings = {
+      bevelEnabled: true,
+      depth: -extrusionDistance,
+      // @ts-ignore
+      path: extrusionPath,
+    };
+  } else {
+    extrusionSettings = {
+      bevelEnabled: true,
+      depth: extrusionDistance,
+      // @ts-ignore
+      path: extrusionPath,
+    };
+  }
+
+  const extrudeGeometry = new THREE.ExtrudeGeometry(
+    shape, // The shape to extrude
+    extrusionSettings // Extrusion settings
+  );
+
+  const extrudedMaterial = new THREE.MeshBasicMaterial({
+    color: 0x0000ff,
+    side: THREE.DoubleSide,
+  });
+
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  extrudedMesh.position.copy(triangle.position);
+  extrudedMesh.rotation.copy(triangle.rotation);
+  extrudedMesh.name = "roof";
+  scene.add(extrudedMesh);
 }
