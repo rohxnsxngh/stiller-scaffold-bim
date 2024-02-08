@@ -132,7 +132,6 @@ export const createModelView = async () => {
     if (newMeasurement !== null) {
       const newLength = parseFloat(newMeasurement);
       console.log(newLength);
-      console.log(newMeasurement);
     }
   });
 
@@ -157,12 +156,10 @@ export const createModelView = async () => {
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
             break;
           case "extrusion":
-            console.log("extrusion raycasting");
             break;
           case "blueprint":
             break;
           case "line":
-            // console.log("line")
             // const selectedLine = intersect.object;
             const length = intersect.object.userData.length;
             const LinePos = new THREE.Vector3().copy(intersect.point);
@@ -172,7 +169,6 @@ export const createModelView = async () => {
             label.position.set(LinePos.x - 0.5, 0, LinePos.z - 0.5);
             break;
           case "cubeClone":
-            // console.log("cube")
             labelPanel.style.visibility = "hidden";
             labelPanel.style.pointerEvents = "none";
             break;
@@ -205,10 +201,6 @@ export const createModelView = async () => {
       points = createBlueprintFromShapeOutline(points, scene);
     }
     if (rectangleBlueprint) {
-      console.log(scene);
-      // markupGroup.children.forEach((child) => {
-      //   markupGroup.remove(child);
-      // });
       points = createBlueprintFromShapeOutline(
         markupGroup.children[0].userData.rectanglePoints,
         scene
@@ -231,8 +223,6 @@ export const createModelView = async () => {
       }
     });
 
-    console.log(blueprints);
-
     blueprints.forEach((blueprint) => {
       let hasExtrusion = extrusions.some((extrusion) =>
         Object.is(blueprint.userData, extrusion.userData)
@@ -247,12 +237,33 @@ export const createModelView = async () => {
   });
 
   roofButton.domElement.addEventListener("mousedown", () => {
-    console.log("roof button click");
+    let extrusions: THREE.Mesh[] = [];
+    let roofs: THREE.Mesh[] = [];
+
     scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "extrusion") {
-        createRoof(child, scene, 0);
+      if (child instanceof THREE.Mesh) {
+        if (child.name === "roof") {
+          roofs.push(child);
+        } else if (child.name === "extrusion") {
+          extrusions.push(child);
+        }
       }
     });
+
+    console.log("roofs", roofs);
+    console.log("extrusions", extrusions)
+
+    extrusions.forEach((extrusion) => {
+      let hasRoof = roofs.some((roof) =>
+        extrusion.userData.currentPoint.equals(roof.userData.currentPoint)
+      );
+      if (!hasRoof) {
+        createRoof(extrusion, scene, 0);
+      }
+    });
+
+    roofs = [];
+    extrusions = [];
   });
 
   //////////////////////////////////

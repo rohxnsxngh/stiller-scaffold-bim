@@ -710,37 +710,19 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   let extrusionSettings;
   if (blueprintHasBeenUpdated) {
     extrusionSettings = {
-      // steps: 100,
       bevelEnabled: true,
-      // bevelThickness: 1,
-      // bevelSize: 1,
-      // bevelOffset: 0,
-      // bevelSegments: 1,
       depth: -extrusionDistance,
       // @ts-ignore
       path: extrusionPath,
     };
   } else {
     extrusionSettings = {
-      // steps: 100,
       bevelEnabled: true,
-      // bevelThickness: 1,
-      // bevelSize: 1,
-      // bevelOffset: 0,
-      // bevelSegments: 1,
       depth: extrusionDistance,
       // @ts-ignore
       path: extrusionPath,
     };
   }
-
-  const label = createRoofLabel(
-    scene,
-    endPoint,
-    thirdPoint,
-    triangleHeightOffsetDistance,
-  );
-  attachRoofLabelChangeHandler(label, child, index, midpoint, scene);
 
   const extrudeGeometry = new THREE.ExtrudeGeometry(
     shape, // The shape to extrude
@@ -756,7 +738,27 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
+  extrudedMesh.userData = shape;
+  const blueprintState = blueprintHasBeenUpdated
   scene.add(extrudedMesh);
+
+  const label = createRoofLabel(
+    scene,
+    endPoint,
+    thirdPoint,
+    triangleHeightOffsetDistance,
+  );
+  attachRoofLabelChangeHandler(
+    label,
+    child,
+    index,
+    midpoint,
+    scene,
+    triangle,
+    extrudedMesh,
+    blueprintState
+  );
+  blueprintHasBeenUpdated = false;
 }
 
 // let currentRoofLabel: CSS2DObject[] = [];
@@ -797,6 +799,9 @@ function attachRoofLabelChangeHandler(
   index: number,
   midpoint: THREE.Vector2,
   scene: THREE.Scene,
+  triangleMesh: THREE.Mesh,
+  extrudedRoofMesh: THREE.Mesh,
+  blueprintState: boolean
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
@@ -810,7 +815,16 @@ function attachRoofLabelChangeHandler(
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
       console.log("values do not match");
-      updateRoofGeometry(child, index, newValue, midpoint, scene);
+      updateRoofGeometry(
+        child,
+        index,
+        newValue,
+        midpoint,
+        scene,
+        triangleMesh,
+        extrudedRoofMesh,
+        blueprintState
+      );
     }
   });
 }
@@ -818,13 +832,17 @@ function attachRoofLabelChangeHandler(
 function updateRoofGeometry(
   child: any,
   index: number,
-  triangleHeightOffsetDistance: number,
+  triangleHeightOffsetDistance: string | null,
   midpoint: THREE.Vector2,
-  scene: THREE.Scene
+  scene: THREE.Scene,
+  triangleMesh: THREE.Mesh,
+  extrudedRoofMesh: THREE.Mesh,
+  blueprintState: boolean
 ) {
-
   // Calculate the offset based on the desired triangle height
-  const desiredHeight = parseFloat(triangleHeightOffsetDistance as unknown as string);
+  const desiredHeight = parseFloat(
+    triangleHeightOffsetDistance as unknown as string
+  );
 
   // Recalculate the third point with the new offset factor
   const direction = new THREE.Vector2();
@@ -846,19 +864,10 @@ function updateRoofGeometry(
   // Add the scaled perpendicular vector to the midpoint to get the third point
   const thirdPoint = midpoint.clone().add(scaledPerpendicular);
 
-  let itemsToRemove: THREE.Mesh<any, any, any>[] = [];
-  scene.traverse((item) => {
-    if (item instanceof THREE.Mesh && (item.name === "roof" || item.name === "roofTriangle")) {
-      itemsToRemove.push(item);
-    }
-  });
-  
-  // Dispose of the geometries and materials and remove the items from the scene after the traversal
-  itemsToRemove.forEach((item) => {
-    item.geometry.dispose();
-    item.material.dispose();
-    scene.remove(item);
-  });
+  triangleMesh.geometry.dispose();
+  extrudedRoofMesh.geometry.dispose();
+  scene.remove(triangleMesh);
+  scene.remove(extrudedRoofMesh);
 
   const extrudeHeight = -1 * child.geometry.parameters.options.depth;
 
@@ -926,7 +935,7 @@ function updateRoofGeometry(
   const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
   let extrusionSettings;
-  if (blueprintHasBeenUpdated) {
+  if (blueprintState) {
     extrusionSettings = {
       bevelEnabled: true,
       depth: -extrusionDistance,
@@ -948,7 +957,7 @@ function updateRoofGeometry(
   );
 
   const extrudedMaterial = new THREE.MeshBasicMaterial({
-    color: 0x0000ff,
+    color: 0xffffff,
     side: THREE.DoubleSide,
   });
 
@@ -956,5 +965,6 @@ function updateRoofGeometry(
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
+  extrudedMesh.userData = shape;
   scene.add(extrudedMesh);
 }
