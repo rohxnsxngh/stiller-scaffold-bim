@@ -2,6 +2,7 @@ import * as THREE from "three";
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { distanceFromPointToLine } from "./helper";
+import { rectMaterial } from "./material";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -293,12 +294,8 @@ export function createRectangle(
   });
 
   const geometry = new THREE.PlaneGeometry(height, width);
-  const material = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  });
-  markup = new THREE.Mesh(geometry, material);
-  markup.position.set(centerX, 0, centerZ);
+  markup = new THREE.Mesh(geometry, rectMaterial);
+  markup.position.set(centerX, -0.125, centerZ);
   markup.rotation.x = Math.PI / 2;
   markup.name = "rectanglePlane";
   markup.userData = {
@@ -474,12 +471,8 @@ function updateRectangleBlueprintGeometry(
     });
 
     const geometry = new THREE.PlaneGeometry(Number(newDistance), width);
-    const material = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.DoubleSide,
-    });
-    const newRectangleBlueprint = new THREE.Mesh(geometry, material);
-    newRectangleBlueprint.position.set(centerX, 0, centerZ);
+    const newRectangleBlueprint = new THREE.Mesh(geometry, rectMaterial);
+    newRectangleBlueprint.position.set(centerX, -0.125, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
 
@@ -528,12 +521,8 @@ function updateRectangleBlueprintGeometry(
     });
 
     const geometry = new THREE.PlaneGeometry(height, Number(newDistance));
-    const material = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.DoubleSide,
-    });
-    const newRectangleBlueprint = new THREE.Mesh(geometry, material);
-    newRectangleBlueprint.position.set(centerX, 0, centerZ);
+    const newRectangleBlueprint = new THREE.Mesh(geometry, rectMaterial);
+    newRectangleBlueprint.position.set(centerX, -0.125, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
 
@@ -738,14 +727,14 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
   extrudedMesh.userData = shape;
-  const blueprintState = blueprintHasBeenUpdated
+  const blueprintState = blueprintHasBeenUpdated;
   scene.add(extrudedMesh);
 
   const label = createRoofLabel(
     scene,
     endPoint,
     thirdPoint,
-    triangleHeightOffsetDistance,
+    triangleHeightOffsetDistance
   );
   attachRoofLabelChangeHandler(
     label,
@@ -765,7 +754,7 @@ function createRoofLabel(
   scene: THREE.Scene,
   endPoint: THREE.Vector3,
   thirdPoint: THREE.Vector2,
-  triangleHeightOffsetDistance: number,
+  triangleHeightOffsetDistance: number
 ) {
   const topTrianglePoint = new THREE.Vector3(
     thirdPoint.x,
