@@ -8,7 +8,7 @@ import {
   createRoof,
 } from "./utilities/mesh";
 import {
-  createSimple2DScene,
+  createToolbar,
   drawingInProgress,
   setDrawingInProgress,
 } from "./utilities/toolbar";
@@ -89,7 +89,7 @@ export const createModelView = async () => {
     freeRotateButton,
     drawingButton,
     roofButton,
-  ] = createSimple2DScene(components, scene, cube);
+  ] = createToolbar(components, scene);
 
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
@@ -251,7 +251,7 @@ export const createModelView = async () => {
     });
 
     console.log("roofs", roofs);
-    console.log("extrusions", extrusions)
+    console.log("extrusions", extrusions);
 
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some((roof) =>

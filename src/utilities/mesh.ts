@@ -864,8 +864,8 @@ function updateRoofGeometry(
   // Add the scaled perpendicular vector to the midpoint to get the third point
   const thirdPoint = midpoint.clone().add(scaledPerpendicular);
 
-  triangleMesh.geometry.dispose();
-  extrudedRoofMesh.geometry.dispose();
+  // triangleMesh.geometry.dispose();
+  // extrudedRoofMesh.geometry.dispose();
   scene.remove(triangleMesh);
   scene.remove(extrudedRoofMesh);
 
@@ -924,7 +924,6 @@ function updateRoofGeometry(
   triangle.updateMatrix();
   triangle.updateMatrixWorld(true);
   triangle.name = "roofTriangle";
-  scene.add(triangle);
 
   const nextPoint = new THREE.Vector3(
     child.userData.curves[index + 1].v2.x,
