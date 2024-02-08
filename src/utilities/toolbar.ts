@@ -154,6 +154,18 @@ export const createToolbar = (
     setDrawingInProgress(false);
   });
 
+  const createEditExtrusionButton = new OBC.Button(components, {
+    materialIconName: "unfold_less",
+    name: "Edit Extrusion",
+    closeOnClick: true,
+  });
+  createEditExtrusionButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  extrusionButton.addChild(createEditExtrusionButton);
+
   const roofButton = new OBC.Button(components);
   roofButton.materialIcon = "roofing";
   roofButton.tooltip = "Add Roof";
@@ -241,6 +253,7 @@ export const createToolbar = (
     createBlueprintRectangleButton,
     freeRotateButton,
     drawingButton,
-    roofButton
+    roofButton,
+    createEditExtrusionButton
   ];
 };

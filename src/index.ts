@@ -94,6 +94,7 @@ export const createModelView = async () => {
     freeRotateButton,
     drawingButton,
     roofButton,
+    createEditExtrusionButton,
   ] = createToolbar(components, scene);
 
   const mousePosition = new THREE.Vector2();
@@ -269,6 +270,58 @@ export const createModelView = async () => {
 
     roofs = [];
     extrusions = [];
+  });
+
+  createEditExtrusionButton.domElement.addEventListener("mousedown", () => {
+    let editedExtrusionHeight: any;
+    let originalExtrusionHeight: any;
+    // let extrusionRatio: number;
+    let extrudedRoof: THREE.Mesh;
+    // let extrusion: THREE.Mesh
+    // let extrusions: THREE.Mesh[] = [];
+    // let roofs: THREE.Mesh[] = [];
+    scene.traverse((child) => {
+      if (
+        child instanceof CSS2DObject &&
+        child.name === "rectangleExtrusionLabel"
+      ) {
+        if (
+          child.element.style.pointerEvents === "none" &&
+          child.visible === false
+        ) {
+          child.element.style.pointerEvents = "auto";
+          child.visible = true;
+          child.element.addEventListener("focus", () => {
+            originalExtrusionHeight = parseFloat(
+              child.element.textContent as unknown as string
+            );
+            console.log(originalExtrusionHeight);
+          });
+          child.element.addEventListener("blur", () => {
+            editedExtrusionHeight = parseFloat(
+              child.element.textContent as unknown as string
+            );
+            const newRoofPosition =
+              (extrudedRoof.position.y * editedExtrusionHeight) /
+              originalExtrusionHeight;
+            console.log(extrudedRoof.position.y, newRoofPosition);
+            extrudedRoof.position.y = newRoofPosition;
+
+
+          });
+        }
+      }
+      if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
+        child.element.style.pointerEvents = "none";
+        child.visible = false;
+      }
+      // if (child instanceof THREE.Mesh && child.name === "roof") {
+      //   roofs.push(child)
+      // }
+      // if (child instanceof THREE.Mesh && child.name === "extrusion") {
+      //   extrusions.push(child);
+      // }
+    });
   });
 
   //////////////////////////////////

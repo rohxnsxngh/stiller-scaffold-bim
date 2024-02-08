@@ -211,7 +211,6 @@ function updateExtrusionGeometry(
     throw new Error("Depth cannot be null");
   }
   const updatedDepth = parseFloat(depth);
-  console.log(updatedDepth);
 
   // Define the extrude settings with the new depth
   const extrudeSettings = {
