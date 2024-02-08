@@ -3,6 +3,7 @@ import HomePage from "../views/HomePage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import SignInPage from "../views/SignInPage.vue";
 import ModelPage from "../views/ModelPage.vue";
+import ProjectsPage from "../views/ProjectsPage.vue";
 import { useNavbarStore } from '../store/index'
 
 const routes: Array<RouteRecordRaw> = [
@@ -30,6 +31,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "ModelPage",
     component: ModelPage,
   },
+  {
+    path: "/projects",
+    name: "ProjectsPage",
+    component: ProjectsPage,
+  },
 ];
 
 const router = createRouter({
@@ -37,7 +43,7 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   if (to.path === '/model') {
      useNavbarStore().toggleNavbar();
   }

@@ -1,20 +1,18 @@
 <template>
   <div class="navbar bg-base-100">
     <div class="flex-1">
-      <a class="btn btn-ghost text-xl text-red-500">Logo</a>
+      <router-link :to="{ name: 'Home' }">
+        <label class="btn btn-ghost text-xl text-red-500"
+          >Logo</label
+        ></router-link
+      >
     </div>
     <div class="flex-none">
       <ul class="menu menu-horizontal px-1">
-        <li class="bg-red-500 text-white rounded"><a href="/model">New Model</a></li>
-        <li>
-          <details>
-            <summary>Parent</summary>
-            <ul class="p-2 bg-base-100 rounded-t-none">
-              <li><a>Link 1</a></li>
-              <li><a>Link 2</a></li>
-            </ul>
-          </details>
+        <li class="bg-red-500 text-white font-semibold rounded">
+          <a href="/model">New Model</a>
         </li>
+        <span class="material-symbols-outlined mx-2 text-3xl"> login </span>
       </ul>
     </div>
   </div>
