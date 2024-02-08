@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
+import Stats from "stats.js";
 import {
   createShapeIsOutlined,
   createBlueprintFromShapeOutline,
@@ -23,6 +24,10 @@ let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
 let labels: any;
 // let selectedLine: any;
+
+const stats = new Stats();
+stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom);
 
 export const createModelView = async () => {
   const container = document.getElementById("model") as HTMLCanvasElement;
@@ -365,8 +370,10 @@ export const createModelView = async () => {
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 
   function animate() {
+    stats.begin();
     requestAnimationFrame(animate);
     // cssRenderer.render(scene, components.camera.activeCamera)
+    stats.end();
   }
 
   animate();
