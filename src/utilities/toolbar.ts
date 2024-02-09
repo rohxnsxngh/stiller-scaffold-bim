@@ -49,7 +49,7 @@ export const createToolbar = (
   // Move camera to top view button
   const topViewButton = new OBC.Button(components);
   topViewButton.materialIcon = "crop_free";
-  topViewButton.tooltip = "Top View";
+  topViewButton.tooltip = "Draw Blueprint";
   topViewButton.id = "delete-button";
   mainToolbar.addChild(topViewButton);
   topViewButton.onClick.add(() => {
@@ -118,7 +118,7 @@ export const createToolbar = (
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
   drawingButton.materialIcon = "polyline";
-  drawingButton.tooltip = "Draw Blueprint";
+  drawingButton.tooltip = "Grid Sketch";
   drawingButton.id = "drawing-button";
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
@@ -129,7 +129,7 @@ export const createToolbar = (
   //Solidify Blueprint
   const blueprintButton = new OBC.Button(components);
   blueprintButton.materialIcon = "view_in_ar";
-  blueprintButton.tooltip = "Blueprint Shape";
+  blueprintButton.tooltip = "Blueprint";
   blueprintButton.id = "blueprint-button";
   sideToolBar.addChild(blueprintButton);
   blueprintButton.onClick.add(() => {
@@ -143,7 +143,7 @@ export const createToolbar = (
   // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
   extrusionButton.materialIcon = "expand";
-  extrusionButton.tooltip = "Extrude Shape";
+  extrusionButton.tooltip = "Extrude";
   extrusionButton.id = "extrusion-button";
   sideToolBar.addChild(extrusionButton);
   extrusionButton.onClick.add(() => {
@@ -168,7 +168,7 @@ export const createToolbar = (
 
   const roofButton = new OBC.Button(components);
   roofButton.materialIcon = "roofing";
-  roofButton.tooltip = "Add Roof";
+  roofButton.tooltip = "Roof";
   roofButton.id = "roof-button";
   sideToolBar.addChild(roofButton);
   roofButton.onClick.add(() => {
@@ -178,6 +178,32 @@ export const createToolbar = (
   roofButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
   });
+
+  const scaffoldButton = new OBC.Button(components);
+  scaffoldButton.materialIcon = "foundation";
+  scaffoldButton.tooltip = "Scaffolding";
+  scaffoldButton.id = "scaffold-button";
+  sideToolBar.addChild(scaffoldButton);
+  scaffoldButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    setDrawingInProgress(false);
+  });
+  scaffoldButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+
+  
+  const rotateRoofOrientationButton = new OBC.Button(components, {
+    materialIconName: "360",
+    name: "Rotate Roof",
+    closeOnClick: true,
+  });
+  rotateRoofOrientationButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  roofButton.addChild(rotateRoofOrientationButton);
 
   const drawerToolBar = new OBC.Toolbar(components);
   drawerToolBar.position = "right";
@@ -254,6 +280,8 @@ export const createToolbar = (
     freeRotateButton,
     drawingButton,
     roofButton,
-    createEditExtrusionButton
+    createEditExtrusionButton,
+    rotateRoofOrientationButton,
+    scaffoldButton
   ];
 };

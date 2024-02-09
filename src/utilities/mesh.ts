@@ -697,7 +697,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     extrusionSettings // Extrusion settings
   );
 
-  const extrudedMaterial = new THREE.MeshBasicMaterial({
+  const extrudedMaterial = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     side: THREE.DoubleSide,
   });
@@ -923,7 +923,7 @@ function updateRoofGeometry(
     extrusionSettings // Extrusion settings
   );
 
-  const extrudedMaterial = new THREE.MeshBasicMaterial({
+  const extrudedMaterial = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     side: THREE.DoubleSide,
   });
