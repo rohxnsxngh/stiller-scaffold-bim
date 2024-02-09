@@ -19,7 +19,7 @@ import {
   CSS2DObject,
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { calculateTransformedBoundingBox } from "./utilities/helper";
+import { calculateTransformedBoundingBox, createBoundingBoxVisualizationFromBox } from "./utilities/helper";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -204,7 +204,7 @@ export const createModelView = async () => {
   document.addEventListener("mousedown", () => {
     if (drawingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
-      createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
+      // createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
   });
 
@@ -307,28 +307,34 @@ export const createModelView = async () => {
               child.element.textContent as unknown as string
             );
             const mesh = child.userData;
-            console.log(mesh.userData);
+            console.log(roofs)
             roofs.forEach((roof) => {
+              console.log(mesh.userData.currentPoint);
+              console.log(roof.userData.currentPoint);
               if (
-                mesh.userData.currentPoint.equals(roof.userData.currentPoint)
+                mesh.userData.currentPoint.x = roof.userData.currentPoint.x
               ) {
-                extrudedRoof = roof;
+                // extrudedRoof = roof;
+                if (mesh) {
+                  const transformedBoundingBox =
+                    calculateTransformedBoundingBox(roof);
+                  const boundingBox = createBoundingBoxVisualizationFromBox(transformedBoundingBox)
+                  // scene.add(boundingBox)
+                  const roofBottomVertex = new THREE.Vector3(
+                    transformedBoundingBox.min.x,
+                    transformedBoundingBox.min.y,
+                    transformedBoundingBox.min.z
+                  );
+                  // difference between the center of the roof and it's bounding box bottom
+                  const deltaY = roof.position.y - roofBottomVertex.y;
+                  const differenceDeltaY = deltaY + editedExtrusionHeight;
+                  roof.position.y = differenceDeltaY;
+                }
               }
             });
-            if (mesh) {
-              const transformedBoundingBox =
-                calculateTransformedBoundingBox(extrudedRoof);
-              const roofBottomVertex = new THREE.Vector3(
-                transformedBoundingBox.min.x,
-                transformedBoundingBox.min.y,
-                transformedBoundingBox.min.z
-              );
-              // difference between the center of the roof and it's bounding box bottom
-              const deltaY = extrudedRoof.position.y - roofBottomVertex.y;
-              const differenceDeltaY = deltaY + editedExtrusionHeight;
-              extrudedRoof.position.y = differenceDeltaY;
-            }
           });
+
+          roofs = []
         }
       }
       if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
@@ -346,6 +352,7 @@ export const createModelView = async () => {
     window.addEventListener("mousedown", () => {
       // Check if the click is on the roof
       if (intersects.length > 0 && intersects[0].object.name === "roof") {
+        console.log("rotating roof")
         scene.remove(intersects[0].object);
         let extrusions: THREE.Mesh[] = [];
         let roofs: THREE.Mesh[] = [];
@@ -357,9 +364,14 @@ export const createModelView = async () => {
           if (child instanceof THREE.Mesh) {
             if (child.name === "roof") {
               roofs.push(child);
-            } else if (child.name === "extrusion") {
+            }
+            if (child.name === "extrusion") {
               extrusions.push(child);
             }
+          }
+          if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
+            child.element.style.pointerEvents = "none";
+            child.visible = false;
           }
         });
 
@@ -379,16 +391,10 @@ export const createModelView = async () => {
         extrusions = [];
       }
     });
-    scene.traverse((child) => {
-      if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
-        child.element.style.pointerEvents = "none"
-        child.visible = false
-      }
-    });
   });
 
   scaffoldButton.domElement.addEventListener("mousedown", () => {
-    console.log("creating scaffolding");
+    console.log("creating scaffolding", scene);
   });
 
   //////////////////////////////////

@@ -716,6 +716,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     thirdPoint,
     triangleHeightOffsetDistance
   );
+  label.userData = extrudedMesh
   attachRoofLabelChangeHandler(
     label,
     child,
@@ -783,6 +784,9 @@ function attachRoofLabelChangeHandler(
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
       console.log("values do not match");
+      if (label.userData) {
+        scene.remove(label.userData as THREE.Object3D)
+      }
       updateRoofGeometry(
         child,
         index,
@@ -791,7 +795,8 @@ function attachRoofLabelChangeHandler(
         scene,
         triangleMesh,
         extrudedRoofMesh,
-        blueprintState
+        blueprintState,
+        label
       );
     }
   });
@@ -805,7 +810,8 @@ function updateRoofGeometry(
   scene: THREE.Scene,
   triangleMesh: THREE.Mesh,
   extrudedRoofMesh: THREE.Mesh,
-  blueprintState: boolean
+  blueprintState: boolean,
+  label: CSS2DObject
 ) {
   // Calculate the offset based on the desired triangle height
   const desiredHeight = parseFloat(
@@ -933,5 +939,6 @@ function updateRoofGeometry(
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
   extrudedMesh.userData = shape;
+  label.userData = extrudedMesh
   scene.add(extrudedMesh);
 }

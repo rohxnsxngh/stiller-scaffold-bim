@@ -15,7 +15,7 @@ export const setDrawingInProgress = (value: boolean) => {
 
 export const createToolbar = (
   components: OBC.Components,
-  scene: THREE.Scene,
+  scene: THREE.Scene
 ) => {
   const mainWindow = new OBC.FloatingWindow(components);
   components.ui.add(mainWindow);
@@ -32,7 +32,7 @@ export const createToolbar = (
   sideToolBar.position = "right";
   components.ui.addToolbar(sideToolBar);
   sideToolBar.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
+    // setDrawingInProgress(false);
   });
 
   const alertButton = new OBC.Button(components);
@@ -192,7 +192,6 @@ export const createToolbar = (
     setDrawingInProgress(false);
   });
 
-  
   const rotateRoofOrientationButton = new OBC.Button(components, {
     materialIconName: "360",
     name: "Rotate Roof",
@@ -202,6 +201,9 @@ export const createToolbar = (
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
     cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  rotateRoofOrientationButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
   });
   roofButton.addChild(rotateRoofOrientationButton);
 
@@ -282,6 +284,6 @@ export const createToolbar = (
     roofButton,
     createEditExtrusionButton,
     rotateRoofOrientationButton,
-    scaffoldButton
+    scaffoldButton,
   ];
 };
