@@ -19,6 +19,9 @@ import {
   CSS2DObject,
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import {
+  calculateTransformedBoundingBox,
+} from "./utilities/helper";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -272,14 +275,12 @@ export const createModelView = async () => {
     extrusions = [];
   });
 
+  // edit extrusion after roof as been created
   createEditExtrusionButton.domElement.addEventListener("mousedown", () => {
     let editedExtrusionHeight: any;
     let originalExtrusionHeight: any;
-    // let extrusionRatio: number;
     let extrudedRoof: THREE.Mesh;
-    // let extrusion: THREE.Mesh
-    // let extrusions: THREE.Mesh[] = [];
-    // let roofs: THREE.Mesh[] = [];
+    let roofs: THREE.Mesh[] = [];
     scene.traverse((child) => {
       if (
         child instanceof CSS2DObject &&
@@ -301,13 +302,28 @@ export const createModelView = async () => {
             editedExtrusionHeight = parseFloat(
               child.element.textContent as unknown as string
             );
-            const newRoofPosition =
-              (extrudedRoof.position.y * editedExtrusionHeight) /
-              originalExtrusionHeight;
-            console.log(extrudedRoof.position.y, newRoofPosition);
-            extrudedRoof.position.y = newRoofPosition;
-
-
+            const mesh = child.userData;
+            console.log(mesh.userData);
+            roofs.forEach((roof) => {
+              if (
+                mesh.userData.currentPoint.equals(roof.userData.currentPoint)
+              ) {
+                extrudedRoof = roof;
+              }
+            });
+            if (mesh) {
+              const transformedBoundingBox =
+                calculateTransformedBoundingBox(extrudedRoof);
+              const roofBottomVertex = new THREE.Vector3(
+                transformedBoundingBox.min.x,
+                transformedBoundingBox.min.y,
+                transformedBoundingBox.min.z
+              );
+              // difference between the center of the roof and it's bounding box bottom
+              const deltaY = extrudedRoof.position.y - roofBottomVertex.y;
+              const differenceDeltaY = deltaY + editedExtrusionHeight;
+              extrudedRoof.position.y = differenceDeltaY;
+            }
           });
         }
       }
@@ -315,12 +331,9 @@ export const createModelView = async () => {
         child.element.style.pointerEvents = "none";
         child.visible = false;
       }
-      // if (child instanceof THREE.Mesh && child.name === "roof") {
-      //   roofs.push(child)
-      // }
-      // if (child instanceof THREE.Mesh && child.name === "extrusion") {
-      //   extrusions.push(child);
-      // }
+      if (child instanceof THREE.Mesh && child.name === "roof") {
+        roofs.push(child);
+      }
     });
   });
 

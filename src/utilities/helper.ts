@@ -1,4 +1,5 @@
 import * as OBC from "openbim-components";
+import * as THREE from "three";
 
 export const objectsEqual = (o1: any, o2: any): boolean =>
   typeof o1 === "object" && Object.keys(o1).length > 0
@@ -44,3 +45,71 @@ export function distanceFromPointToLine(
 
   return Math.abs(A * x0 + B * y0 + C) / Math.sqrt(A * A + B * B);
 }
+
+export function createBoundingBoxVisualization(mesh: THREE.Mesh) {
+  mesh.geometry.computeBoundingBox();
+  const boundingBox = mesh.geometry.boundingBox;
+
+  if (!boundingBox) {
+    throw new Error("Bounding Box does not exist")
+  }
+
+  const boxGeometry = new THREE.BoxGeometry(
+    boundingBox.max.x - boundingBox.min.x,
+    boundingBox.max.y - boundingBox.min.y,
+    boundingBox.max.z - boundingBox.min.z
+  );
+  const boxMaterial = new THREE.MeshBasicMaterial({
+    color:  0xFFFFFF, // Red color
+    wireframe: true,
+  });
+  const box = new THREE.Mesh(boxGeometry, boxMaterial);
+  box.position.set(
+    boundingBox.min.x + (boundingBox.max.x - boundingBox.min.x) /  2,
+    boundingBox.min.y + (boundingBox.max.y - boundingBox.min.y) /  2,
+    boundingBox.min.z + (boundingBox.max.z - boundingBox.min.z) /  2
+  );
+
+  return box;
+}
+
+export function calculateTransformedBoundingBox(mesh: THREE.Mesh): THREE.Box3 {
+  // const geometry = mesh.geometry;
+  const matrix = mesh.matrixWorld;
+  const boundingBox = new THREE.Box3().setFromObject(mesh);
+
+  // Apply the mesh's transformation matrix to the bounding box
+  boundingBox.applyMatrix4(matrix);
+
+  return boundingBox;
+}
+
+export function createBoundingBoxVisualizationFromBox(box: THREE.Box3) {
+  const boxGeometry = new THREE.BoxGeometry(
+    box.max.x - box.min.x,
+    box.max.y - box.min.y,
+    box.max.z - box.min.z
+  );
+  const boxMaterial = new THREE.MeshBasicMaterial({
+    color:  0xff0000, // Red color
+    wireframe: true,
+  });
+  const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  boxMesh.position.set(
+    box.min.x + (box.max.x - box.min.x) /  2,
+    box.min.y + (box.max.y - box.min.y) /  2,
+    box.min.z + (box.max.z - box.min.z) /  2
+  );
+
+  return boxMesh;
+}
+
+export function createArrowHelper(scene: THREE.Scene, direction: THREE.Vector3, origin: THREE.Vector3, length: number, color: number) {
+  const arrowHelper = new THREE.ArrowHelper(direction, origin, length, color);
+  scene.add(arrowHelper);
+}
+
+// Usage:
+// const edgeDirection = new THREE.Vector3(1,  0,  0); // Example direction
+// const midpointLine = new THREE.Vector3(0,  0,  0); // Example origin
+// createArrowHelper(scene, edgeDirection, midpointLine,  10,  0x000000);

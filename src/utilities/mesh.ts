@@ -149,6 +149,8 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
 
   const label = createExtrusionLabel(scene, shape, depth);
   attachExtrusionLabelChangeHandler(label, meshExtrude, shape);
+
+  label.userData = meshExtrude
 }
 
 interface IntersectionResult {
@@ -198,7 +200,7 @@ function attachExtrusionLabelChangeHandler(
   labelElement.addEventListener("blur", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
-      updateExtrusionGeometry(newValue, meshExtrude, shape);
+      updateExtrusionGeometry(newValue, meshExtrude, shape, label);
     }
   });
 }
@@ -206,7 +208,8 @@ function attachExtrusionLabelChangeHandler(
 function updateExtrusionGeometry(
   depth: string | null,
   meshExtrude: THREE.Mesh,
-  shape: THREE.Shape
+  shape: THREE.Shape,
+  label: CSS2DObject
 ) {
   if (depth === null) {
     throw new Error("Depth cannot be null");
@@ -226,6 +229,7 @@ function updateExtrusionGeometry(
   // Since the geometry has changed, you may need to adjust the mesh position or rotation
   meshExtrude.rotation.set(0, 0, 0);
   meshExtrude.rotateX(Math.PI / 2);
+  label.userData = meshExtrude
 
   return meshExtrude;
 }
@@ -585,7 +589,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   const perpendicular = new THREE.Vector2(-direction.y, direction.x);
 
   // Scale the perpendicular vector by the desired distance (10 units)
-  const scaledPerpendicular = perpendicular.clone().multiplyScalar(-10);
+  const scaledPerpendicular = perpendicular.clone().multiplyScalar(-3);
 
   // Add the scaled perpendicular vector to the midpoint to get the third point
   const thirdPoint = midpoint.clone().add(scaledPerpendicular);
@@ -637,32 +641,10 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     child.userData.curves[index].v2.y
   );
 
-  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-    startPoint,
-    endPoint,
-  ]);
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 }); // Red color
-  const rotationAxisLine = new THREE.Line(lineGeometry, lineMaterial);
-  scene.add(rotationAxisLine);
-
-  // Calculate the midpoint of the line
-  const midpointLine = new THREE.Vector3()
-    .addVectors(endPoint, startPoint)
-    .multiplyScalar(0.5);
-
   const edgeDirection = new THREE.Vector3()
     .subVectors(endPoint, startPoint)
     .normalize();
   const rotationAngle = Math.PI / 2;
-
-  // Create an arrow helper to visualize the lineDirection
-  const arrowHelper = new THREE.ArrowHelper(
-    edgeDirection,
-    midpointLine,
-    10,
-    0x000000
-  );
-  scene.add(arrowHelper);
 
   const geometry = new THREE.ShapeGeometry(shape);
   const material = new THREE.MeshBasicMaterial({
@@ -684,8 +666,6 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   triangle.updateMatrix();
   triangle.updateMatrixWorld(true);
   triangle.name = "roofTriangle";
-
-  scene.add(triangle);
 
   const nextPoint = new THREE.Vector3(
     child.userData.curves[index + 1].v2.x,
