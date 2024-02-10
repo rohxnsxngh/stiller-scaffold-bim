@@ -113,6 +113,7 @@ export function createBlueprintFromShapeOutline(
 
     //Empty Points
     points = [];
+    // blueprintHasBeenUpdated = false
 
     return points;
   }
@@ -727,7 +728,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     extrudedMesh,
     blueprintState
   );
-  blueprintHasBeenUpdated = false;
+  // blueprintHasBeenUpdated = false;
 }
 
 // let currentRoofLabel: CSS2DObject[] = [];
