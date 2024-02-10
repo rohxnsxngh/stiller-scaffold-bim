@@ -1,65 +1,89 @@
-import * as OBC from "openbim-components";
-import { setDrawingInProgress } from "./toolbar";
 
-export const createDrawer = (
-  components: OBC.Components
-) => {
-  const drawerToolBar = new OBC.Toolbar(components);
-  drawerToolBar.position = "right";
-  components.ui.addToolbar(drawerToolBar);
-  drawerToolBar.domElement.style.position = "absolute";
-  drawerToolBar.domElement.style.top = "20px";
-  drawerToolBar.domElement.style.right = "10px";
-  drawerToolBar.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
+
+  // Example usage of the createDropdown function
+  // const dropdownItems = ["Item  1", "Item  2"];
+  // const dropdown = createDropdown("Hover", dropdownItems);
+  // drawer.domElement.appendChild(dropdown);
+export function createDropdown(buttonText: string, items: string[]): HTMLElement {
+  // Create the outer div with the dropdown class
+  const dropdownDiv = document.createElement("div");
+  dropdownDiv.className = "dropdown";
+
+  // Create the button that triggers the dropdown
+  const button = document.createElement("summary");
+  button.tabIndex = 0;
+  button.setAttribute("role", "button");
+  button.className = "btn btn-sm w-5/6 ml-6";
+  button.textContent = buttonText;
+  dropdownDiv.appendChild(button);
+
+  // Create the unordered list for the dropdown content
+  const ul = document.createElement("ul");
+  ul.tabIndex = 0;
+  ul.className =
+    "dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-5/6 ml-6";
+
+  // Create list items with links based on the items array
+  items.forEach((itemText) => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.textContent = itemText;
+    li.appendChild(a);
+    ul.appendChild(li);
   });
 
-  const drawerMenuButton = new OBC.Button(components);
-  drawerMenuButton.materialIcon = "menu";
-  drawerMenuButton.tooltip = "Menu";
-  drawerMenuButton.id = "menu-button";
-  drawerToolBar.addChild(drawerMenuButton);
-  drawerMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
-  });
-  drawerMenuButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(true);
-  });
+  // Append the unordered list to the outer div
+  dropdownDiv.appendChild(ul);
 
-  const drawer = new OBC.FloatingWindow(components);
-  drawer.visible = false;
-  drawer.domElement.style.position = "right";
-  drawer.domElement.style.width = "20rem";
-  drawer.domElement.style.height = "100vh";
-  drawer.domElement.style.left = "0";
-  drawer.domElement.style.top = "0";
-  drawer.domElement.style.zIndex = "1000";
-  drawer.domElement.style.backgroundColor = "#000000";
-  drawer.domElement.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
-  drawer.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-  });
-  drawer.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
-  });
-  components.ui.add(drawer);
+  return dropdownDiv;
+}
 
-  const title = document.createElement("h1");
-  title.textContent = "Drawer Title";
-  drawer.domElement.appendChild(title);
+export function createCollapse(title: string, content: string): HTMLElement {
+  // Create the outer div with the collapse class
+  const collapseDiv = document.createElement("div");
+  collapseDiv.className = "collapse bg-base-200";
 
+  // Create the checkbox input
+  const checkboxInput = document.createElement("input");
+  checkboxInput.type = "checkbox";
+  collapseDiv.appendChild(checkboxInput);
+
+  // Create the collapse title div
+  const collapseTitleDiv = document.createElement("div");
+  collapseTitleDiv.className = "collapse-title text-xl font-medium";
+  collapseTitleDiv.textContent = title;
+  collapseDiv.appendChild(collapseTitleDiv);
+
+  // Create the collapse content div
+  const collapseContentDiv = document.createElement("div");
+  collapseContentDiv.className = "collapse-content";
   const paragraph = document.createElement("p");
-  paragraph.textContent = "This is some text in the drawer.";
-  drawer.domElement.appendChild(paragraph);
+  paragraph.textContent = content;
+  collapseContentDiv.appendChild(paragraph);
+  collapseDiv.appendChild(collapseContentDiv);
 
-  const button = new OBC.Button(components);
-  button.materialIcon = "info";
-  button.tooltip = "Info";
-  button.id = "info-button";
-  drawer.domElement.appendChild(button.domElement);
+  return collapseDiv;
+}
 
-  // Attach an onClick event handler to the button
-  button.onClick.add(() => {
-    console.log("Hello button");
+export function createSelect(options: string[], defaultOptionText: string = 'Default'): HTMLElement {
+  // Create the select element with the specified class
+  const selectElement = document.createElement('select');
+  selectElement.className = 'select select-danger bg-black select-ghost w-full max-w-xs';
+
+  // Create the default disabled option
+  const defaultOption = document.createElement('option');
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  defaultOption.textContent = defaultOptionText;
+  selectElement.appendChild(defaultOption);
+
+  // Create and append the other options based on the options array
+  options.forEach(optionText => {
+    const option = document.createElement('option');
+    option.textContent = optionText;
+    option.className = "bg-black font-semibold hover:bg-red-200 "
+    selectElement.appendChild(option);
   });
-};
+
+  return selectElement;
+}

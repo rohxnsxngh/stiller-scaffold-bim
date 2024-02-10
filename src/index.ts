@@ -11,6 +11,7 @@ import {
 import {
   createToolbar,
   drawingInProgress,
+  deletionInProgress,
   setDrawingInProgress,
 } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
@@ -19,7 +20,10 @@ import {
   CSS2DObject,
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { calculateTransformedBoundingBox, createBoundingBoxVisualizationFromBox } from "./utilities/helper";
+import {
+  calculateTransformedBoundingBox,
+  createBoundingBoxVisualizationFromBox,
+} from "./utilities/helper";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -29,7 +33,7 @@ let roofToggleState: number = 0;
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+// document.body.appendChild(stats.dom);
 
 export const createModelView = async () => {
   const container = document.getElementById("model") as HTMLCanvasElement;
@@ -169,6 +173,14 @@ export const createModelView = async () => {
             break;
           case "roof":
             console.log("roof");
+            // implementation of delete button 
+            // TODO tweak so that it only grabs one object
+            if (deletionInProgress) {
+              window.addEventListener("mousedown", () => {
+                intersect.object.geometry.dispose()
+                scene.remove(intersect.object)
+              });
+            }
             break;
           case "blueprint":
             break;
@@ -204,7 +216,7 @@ export const createModelView = async () => {
   document.addEventListener("mousedown", () => {
     if (drawingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
-      // createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
+      createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
   });
 
@@ -307,18 +319,20 @@ export const createModelView = async () => {
               child.element.textContent as unknown as string
             );
             const mesh = child.userData;
-            console.log(roofs)
+            console.log(roofs);
             roofs.forEach((roof) => {
               console.log(mesh.userData.currentPoint);
               console.log(roof.userData.currentPoint);
               if (
-                mesh.userData.currentPoint.x = roof.userData.currentPoint.x
+                (mesh.userData.currentPoint.equals(roof.userData.currentPoint))
               ) {
                 // extrudedRoof = roof;
                 if (mesh) {
                   const transformedBoundingBox =
                     calculateTransformedBoundingBox(roof);
-                  const boundingBox = createBoundingBoxVisualizationFromBox(transformedBoundingBox)
+                  const boundingBox = createBoundingBoxVisualizationFromBox(
+                    transformedBoundingBox
+                  );
                   // scene.add(boundingBox)
                   const roofBottomVertex = new THREE.Vector3(
                     transformedBoundingBox.min.x,
@@ -330,11 +344,13 @@ export const createModelView = async () => {
                   const differenceDeltaY = deltaY + editedExtrusionHeight;
                   roof.position.y = differenceDeltaY;
                 }
+              } else {
+                console.log("roof not found")
               }
             });
           });
 
-          roofs = []
+          roofs = [];
         }
       }
       if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
@@ -347,51 +363,52 @@ export const createModelView = async () => {
     });
   });
 
-  rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
-    // Add a mousedown event listener to the window or a specific element
-    window.addEventListener("mousedown", () => {
-      // Check if the click is on the roof
-      if (intersects.length > 0 && intersects[0].object.name === "roof") {
-        console.log("rotating roof")
-        scene.remove(intersects[0].object);
-        let extrusions: THREE.Mesh[] = [];
-        let roofs: THREE.Mesh[] = [];
+  // handles roof rotation, snap the roof to a different rotation.
+  // rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
+  //   // Add a mousedown event listener to the window or a specific element
+  //   window.addEventListener("mousedown", () => {
+  //     // Check if the click is on the roof
+  //     if (intersects.length > 0 && intersects[0].object.name === "roof") {
+  //       console.log("rotating roof")
+  //       scene.remove(intersects[0].object);
+  //       let extrusions: THREE.Mesh[] = [];
+  //       let roofs: THREE.Mesh[] = [];
 
-        // Toggle the roofToggleState between  0 and  1
-        roofToggleState = roofToggleState === 0 ? 1 : 0;
+  //       // Toggle the roofToggleState between  0 and  1
+  //       roofToggleState = roofToggleState === 0 ? 1 : 0;
 
-        scene.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            if (child.name === "roof") {
-              roofs.push(child);
-            }
-            if (child.name === "extrusion") {
-              extrusions.push(child);
-            }
-          }
-          if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
-            child.element.style.pointerEvents = "none";
-            child.visible = false;
-          }
-        });
+  //       scene.traverse((child) => {
+  //         if (child instanceof THREE.Mesh) {
+  //           if (child.name === "roof") {
+  //             roofs.push(child);
+  //           }
+  //           if (child.name === "extrusion") {
+  //             extrusions.push(child);
+  //           }
+  //         }
+  //         if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
+  //           child.element.style.pointerEvents = "none";
+  //           child.visible = false;
+  //         }
+  //       });
 
-        console.log("roofs", roofs);
-        console.log("extrusions", extrusions);
+  //       console.log("roofs", roofs);
+  //       console.log("extrusions", extrusions);
 
-        extrusions.forEach((extrusion) => {
-          let hasRoof = roofs.some((roof) =>
-            extrusion.userData.currentPoint.equals(roof.userData.currentPoint)
-          );
-          if (!hasRoof) {
-            createRoof(extrusion, scene, roofToggleState);
-          }
-        });
+  //       extrusions.forEach((extrusion) => {
+  //         let hasRoof = roofs.some((roof) =>
+  //           extrusion.userData.currentPoint.equals(roof.userData.currentPoint)
+  //         );
+  //         if (!hasRoof) {
+  //           createRoof(extrusion, scene, roofToggleState);
+  //         }
+  //       });
 
-        roofs = [];
-        extrusions = [];
-      }
-    });
-  });
+  //       roofs = [];
+  //       extrusions = [];
+  //     }
+  //   });
+  // });
 
   scaffoldButton.domElement.addEventListener("mousedown", () => {
     console.log("creating scaffolding", scene);

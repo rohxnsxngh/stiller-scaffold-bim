@@ -8,9 +8,16 @@ import {
   cameraTopView,
 } from "./camera";
 export let drawingInProgress = false;
+export let deletionInProgress = false;
+import deletePNG from "../assets/images/delete.png";
+import { createCollapse, createDropdown, createSelect } from "./drawer";
 
 export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
+};
+
+export const setDeletionInProgress = (value: boolean) => {
+  deletionInProgress = value;
 };
 
 export const createToolbar = (
@@ -50,7 +57,7 @@ export const createToolbar = (
   const topViewButton = new OBC.Button(components);
   topViewButton.materialIcon = "crop_free";
   topViewButton.tooltip = "Draw Blueprint";
-  topViewButton.id = "delete-button";
+  topViewButton.id = "top-view-button";
   mainToolbar.addChild(topViewButton);
   topViewButton.onClick.add(() => {
     scene.traverse((child) => {
@@ -73,6 +80,7 @@ export const createToolbar = (
   createBlueprintRectangleButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
+    setDeletionInProgress(false);
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   topViewButton.addChild(createBlueprintRectangleButton);
@@ -81,7 +89,7 @@ export const createToolbar = (
   const perspectiveViewButton = new OBC.Button(components);
   perspectiveViewButton.materialIcon = "fullscreen_exit";
   perspectiveViewButton.tooltip = "Perspective View";
-  perspectiveViewButton.id = "delete-button";
+  perspectiveViewButton.id = "perspective-button";
   mainToolbar.addChild(perspectiveViewButton);
   perspectiveViewButton.onClick.add(() => {
     document.body.style.cursor = "auto";
@@ -91,6 +99,7 @@ export const createToolbar = (
       }
     });
     cameraPerspectiveView(gsap, components.camera);
+    setDeletionInProgress(false);
     setDrawingInProgress(false);
   });
   perspectiveViewButton.domElement.addEventListener("mouseover", () => {
@@ -104,11 +113,12 @@ export const createToolbar = (
   const freeRotateButton = new OBC.Button(components);
   freeRotateButton.materialIcon = "pan_tool";
   freeRotateButton.tooltip = "Free Rotate";
-  freeRotateButton.id = "delete-button";
+  freeRotateButton.id = "rotate-button";
   mainToolbar.addChild(freeRotateButton);
   freeRotateButton.onClick.add(() => {
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setDeletionInProgress(false);
     setDrawingInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
@@ -123,6 +133,29 @@ export const createToolbar = (
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
     document.body.style.cursor = "auto";
+    setDeletionInProgress(false);
+    setDrawingInProgress(true);
+  });
+
+  const deleteObjectButton = new OBC.Button(components);
+  deleteObjectButton.materialIcon = "delete_forever";
+  deleteObjectButton.tooltip = "Delete Object";
+  deleteObjectButton.id = "delete-button";
+  mainToolbar.addChild(deleteObjectButton);
+  deleteObjectButton.onClick.add(() => {
+    document.body.style.cursor = `url(${deletePNG}), auto;`;
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+        scene.remove(child);
+      }
+    });
+    setDeletionInProgress(true);
+    setDrawingInProgress(false);
+  });
+  deleteObjectButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  deleteObjectButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
   });
 
@@ -135,6 +168,7 @@ export const createToolbar = (
   blueprintButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
+    setDeletionInProgress(false);
   });
   blueprintButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -149,6 +183,7 @@ export const createToolbar = (
   extrusionButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
+    setDeletionInProgress(false);
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -162,6 +197,7 @@ export const createToolbar = (
   createEditExtrusionButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
+    setDeletionInProgress(false);
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   extrusionButton.addChild(createEditExtrusionButton);
@@ -174,6 +210,7 @@ export const createToolbar = (
   roofButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
+    setDeletionInProgress(false);
   });
   roofButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -185,8 +222,8 @@ export const createToolbar = (
   scaffoldButton.id = "scaffold-button";
   sideToolBar.addChild(scaffoldButton);
   scaffoldButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
     setDrawingInProgress(false);
+    setDeletionInProgress(false);
   });
   scaffoldButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -227,6 +264,7 @@ export const createToolbar = (
   drawerMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     drawer.visible = !drawer.visible;
+    updateTitle();
   });
   drawerMenuButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(true);
@@ -252,15 +290,75 @@ export const createToolbar = (
   components.ui.add(drawer);
   console.log(drawer);
 
-  // Create a title
-  const title = document.createElement("h1");
-  title.textContent = "Drawer Title";
-  drawer.domElement.appendChild(title);
+  // Function to update the title
+  const updateTitle = () => {
+    const titleElement = drawer.domElement.querySelector(
+      "h3.text-3xl.text-ifcjs-200.font-medium.my-0"
+    );
+    if (titleElement) {
+      titleElement.textContent = "Stiller";
+      // @ts-ignore
+      titleElement.classList =
+        "text-3xl text-red-500 font-medium my-0 btn btn-ghost";
+      titleElement.id = "drawerTitle";
+      titleElement.addEventListener("mousedown", () => {
+        window.location.href = "/home";
+      });
+    }
+  };
 
-  // Create a paragraph
-  const paragraph = document.createElement("p");
-  paragraph.textContent = "This is some text in the drawer.";
-  drawer.domElement.appendChild(paragraph);
+  // Create a title 1/5
+  const title1 = document.createElement("h1");
+  title1.textContent = "1/5";
+  title1.classList =
+    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
+  drawer.domElement.appendChild(title1);
+
+  // Example usage of the createSelect function
+// Example usage of the createSelect function with a custom default option text
+const selectOptions1 = ['Length', 'Height', 'Area'];
+const customDefaultOptionText1 = 'Building Shape';
+const selectElement1 = createSelect(selectOptions1, customDefaultOptionText1);
+drawer.domElement.appendChild(selectElement1);
+
+  // Create a title 2/5
+  const title2 = document.createElement("h1");
+  title2.textContent = "2/5";
+  title2.classList =
+    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
+  drawer.domElement.appendChild(title2);
+
+  // Example usage of the createCollapse function
+  // const collapseTitle = "Click me to show/hide content";
+  // const collapseContent = "hello";
+  // const collapse = createCollapse(collapseTitle, collapseContent);
+  // drawer.domElement.appendChild(collapse);
+
+  // Create a title 3/5
+  const title3 = document.createElement("h1");
+  title3.textContent = "3/5";
+  title3.classList =
+    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
+  drawer.domElement.appendChild(title3);
+
+  // Example usage of the createSelect function
+  const selectOptions = ["Svelte", "Vue", "React"];
+  const selectElement = createSelect(selectOptions);
+  drawer.domElement.appendChild(selectElement);
+
+  // Create a title 4/5
+  const title4 = document.createElement("h1");
+  title4.textContent = "4/5";
+  title4.classList =
+    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
+  drawer.domElement.appendChild(title4);
+
+  // Create a title 5/5
+  const title5 = document.createElement("h1");
+  title5.textContent = "5/5";
+  title5.classList =
+    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
+  drawer.domElement.appendChild(title5);
 
   // Create a button
   const button = new OBC.Button(components);
