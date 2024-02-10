@@ -1,4 +1,5 @@
 import * as OBC from "openbim-components";
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import * as THREE from "three";
 
 export const objectsEqual = (o1: any, o2: any): boolean =>
@@ -51,7 +52,7 @@ export function createBoundingBoxVisualization(mesh: THREE.Mesh) {
   const boundingBox = mesh.geometry.boundingBox;
 
   if (!boundingBox) {
-    throw new Error("Bounding Box does not exist")
+    throw new Error("Bounding Box does not exist");
   }
 
   const boxGeometry = new THREE.BoxGeometry(
@@ -60,14 +61,14 @@ export function createBoundingBoxVisualization(mesh: THREE.Mesh) {
     boundingBox.max.z - boundingBox.min.z
   );
   const boxMaterial = new THREE.MeshBasicMaterial({
-    color:  0xFFFFFF, // Red color
+    color: 0xffffff, // Red color
     wireframe: true,
   });
   const box = new THREE.Mesh(boxGeometry, boxMaterial);
   box.position.set(
-    boundingBox.min.x + (boundingBox.max.x - boundingBox.min.x) /  2,
-    boundingBox.min.y + (boundingBox.max.y - boundingBox.min.y) /  2,
-    boundingBox.min.z + (boundingBox.max.z - boundingBox.min.z) /  2
+    boundingBox.min.x + (boundingBox.max.x - boundingBox.min.x) / 2,
+    boundingBox.min.y + (boundingBox.max.y - boundingBox.min.y) / 2,
+    boundingBox.min.z + (boundingBox.max.z - boundingBox.min.z) / 2
   );
 
   return box;
@@ -91,20 +92,26 @@ export function createBoundingBoxVisualizationFromBox(box: THREE.Box3) {
     box.max.z - box.min.z
   );
   const boxMaterial = new THREE.MeshBasicMaterial({
-    color:  0xff0000, // Red color
+    color: 0xff0000, // Red color
     wireframe: true,
   });
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
   boxMesh.position.set(
-    box.min.x + (box.max.x - box.min.x) /  2,
-    box.min.y + (box.max.y - box.min.y) /  2,
-    box.min.z + (box.max.z - box.min.z) /  2
+    box.min.x + (box.max.x - box.min.x) / 2,
+    box.min.y + (box.max.y - box.min.y) / 2,
+    box.min.z + (box.max.z - box.min.z) / 2
   );
 
   return boxMesh;
 }
 
-export function createArrowHelper(scene: THREE.Scene, direction: THREE.Vector3, origin: THREE.Vector3, length: number, color: number) {
+export function createArrowHelper(
+  scene: THREE.Scene,
+  direction: THREE.Vector3,
+  origin: THREE.Vector3,
+  length: number,
+  color: number
+) {
   const arrowHelper = new THREE.ArrowHelper(direction, origin, length, color);
   scene.add(arrowHelper);
 }
@@ -113,3 +120,26 @@ export function createArrowHelper(scene: THREE.Scene, direction: THREE.Vector3, 
 // const edgeDirection = new THREE.Vector3(1,  0,  0); // Example direction
 // const midpointLine = new THREE.Vector3(0,  0,  0); // Example origin
 // createArrowHelper(scene, edgeDirection, midpointLine,  10,  0x000000);
+
+export function resetScene(scene: THREE.Scene) {
+  const objectsToRemove: any = [];
+  scene.traverse((child) => {
+    if (child instanceof CSS2DObject) {
+      child.visible = false;
+      child.element.style.pointerEvents = "none";
+      objectsToRemove.push(child);
+    } else if (
+      child.name !== "ground" &&
+      (child instanceof THREE.Mesh || child instanceof THREE.Points || child instanceof THREE.Line) &&
+      !(child.geometry instanceof THREE.PlaneGeometry)
+    ) {
+      console.log(child);
+      if (child.geometry) child.geometry.dispose();
+      if (child.material.map) child.material.map.dispose();
+      objectsToRemove.push(child);
+    }
+  });
+  objectsToRemove.forEach((object: any) => {
+    scene.remove(object);
+  });
+}

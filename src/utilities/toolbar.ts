@@ -10,7 +10,8 @@ import {
 export let drawingInProgress = false;
 export let deletionInProgress = false;
 import deletePNG from "../assets/images/delete.png";
-import { createCollapse, createDropdown, createSelect } from "./drawer";
+import { createSelect } from "./drawer";
+import { resetScene } from "./helper";
 
 export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
@@ -128,7 +129,7 @@ export const createToolbar = (
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
   drawingButton.materialIcon = "polyline";
-  drawingButton.tooltip = "Grid Sketch";
+  drawingButton.tooltip = "Polygon Sketch";
   drawingButton.id = "drawing-button";
   mainToolbar.addChild(drawingButton);
   drawingButton.onClick.add(() => {
@@ -156,6 +157,25 @@ export const createToolbar = (
     setDrawingInProgress(false);
   });
   deleteObjectButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
+  });
+
+  // Start Drawing Blueprint
+  const clearSceneButton = new OBC.Button(components);
+  clearSceneButton.materialIcon = "check_box_outline_blank";
+  clearSceneButton.tooltip = "Reset Scene";
+  clearSceneButton.id = "drawing-button";
+  mainToolbar.addChild(clearSceneButton);
+  clearSceneButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    resetScene(scene)
+    setDeletionInProgress(false);
+    setDrawingInProgress(true);
+  });
+  clearSceneButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  clearSceneButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
   });
 
@@ -310,20 +330,22 @@ export const createToolbar = (
   // Create a title 1/5
   const title1 = document.createElement("h1");
   title1.textContent = "1/5";
+  // @ts-ignore
   title1.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title1);
 
   // Example usage of the createSelect function
-// Example usage of the createSelect function with a custom default option text
-const selectOptions1 = ['Length', 'Height', 'Area'];
-const customDefaultOptionText1 = 'Building Shape';
-const selectElement1 = createSelect(selectOptions1, customDefaultOptionText1);
-drawer.domElement.appendChild(selectElement1);
+  // Example usage of the createSelect function with a custom default option text
+  const selectOptions1 = ["Length", "Height", "Area"];
+  const customDefaultOptionText1 = "Building Shape";
+  const selectElement1 = createSelect(selectOptions1, customDefaultOptionText1);
+  drawer.domElement.appendChild(selectElement1);
 
   // Create a title 2/5
   const title2 = document.createElement("h1");
   title2.textContent = "2/5";
+    // @ts-ignore
   title2.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title2);
@@ -337,6 +359,7 @@ drawer.domElement.appendChild(selectElement1);
   // Create a title 3/5
   const title3 = document.createElement("h1");
   title3.textContent = "3/5";
+    // @ts-ignore
   title3.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title3);
@@ -349,6 +372,7 @@ drawer.domElement.appendChild(selectElement1);
   // Create a title 4/5
   const title4 = document.createElement("h1");
   title4.textContent = "4/5";
+    // @ts-ignore
   title4.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title4);
@@ -356,6 +380,7 @@ drawer.domElement.appendChild(selectElement1);
   // Create a title 5/5
   const title5 = document.createElement("h1");
   title5.textContent = "5/5";
+    // @ts-ignore
   title5.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title5);
