@@ -9,6 +9,7 @@ import {
   createRoof,
   createScaffoldingShapeIsOutlined,
   createScaffoldModel,
+  placeScaffoldModelsAlongLine,
 } from "./utilities/mesh";
 import {
   createToolbar,
@@ -99,7 +100,6 @@ export const createModelView = async () => {
   components.meshes.push(highlightMesh);
 
   const [
-    extrudeButton,
     blueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
@@ -107,7 +107,8 @@ export const createModelView = async () => {
     roofButton,
     createEditExtrusionButton,
     rotateRoofOrientationButton,
-    scaffoldButton,
+    createScaffoldButton,
+    generateScaffoldButton,
     createExtrusionButton,
   ] = createToolbar(components, scene);
 
@@ -454,7 +455,7 @@ export const createModelView = async () => {
     });
   });
 
-  scaffoldButton.domElement.addEventListener("mousedown", () => {
+  createScaffoldButton.domElement.addEventListener("mousedown", () => {
     console.log("creating scaffolding", scene);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
@@ -468,6 +469,15 @@ export const createModelView = async () => {
       );
     }
   });
+
+  generateScaffoldButton.domElement.addEventListener("mousedown", () => {
+    console.log("generate scaffolding")
+    scene.traverse((child) => {
+      if (child instanceof THREE.Line && child.name === "scaffoldLine") {
+        placeScaffoldModelsAlongLine(child, scene)
+      }
+    })
+  })
 
   //////////////////////////////////
   // this section pertains to creating the rectangle from the top view by clicking and dragging

@@ -277,23 +277,6 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
 
-  const scaffoldButton = new OBC.Button(components);
-  scaffoldButton.materialIcon = "foundation";
-  scaffoldButton.tooltip = "Scaffolding";
-  scaffoldButton.id = "scaffold-button";
-  sideToolBar.addChild(scaffoldButton);
-  scaffoldButton.onClick.add(() => {
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(true);
-  });
-  scaffoldButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-  });
-  scaffoldButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
-  });
-
   const rotateRoofOrientationButton = new OBC.Button(components, {
     materialIconName: "360",
     name: "Rotate Roof",
@@ -308,6 +291,68 @@ export const createToolbar = (
     setDrawingInProgress(true);
   });
   roofButton.addChild(rotateRoofOrientationButton);
+
+  const scaffoldButton = new OBC.Button(components);
+  scaffoldButton.materialIcon = "foundation";
+  scaffoldButton.tooltip = "Scaffolding";
+  scaffoldButton.id = "scaffold-button";
+  sideToolBar.addChild(scaffoldButton);
+  scaffoldButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  scaffoldButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  scaffoldButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(false);
+  });
+  scaffoldButton.domElement.addEventListener("mouseenter", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
+  // create scaffolding outline
+  const createScaffoldButton = new OBC.Button(components, {
+    materialIconName: "aspect_ratio",
+    name: "Create Scaffolding Outline",
+    closeOnClick: true,
+  });
+  createScaffoldButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(true);
+  });
+  createScaffoldButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  createScaffoldButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(false);
+  });
+  scaffoldButton.addChild(createScaffoldButton);
+
+  // generate scaffolding
+  const generateScaffoldButton = new OBC.Button(components, {
+    materialIconName: "select_all",
+    name: "Generate Scaffolding",
+    closeOnClick: true,
+  });
+  generateScaffoldButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  generateScaffoldButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  generateScaffoldButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(false);
+  });
+  scaffoldButton.addChild(generateScaffoldButton);
 
   const drawerToolBar = new OBC.Toolbar(components);
   drawerToolBar.position = "right";
@@ -444,7 +489,6 @@ export const createToolbar = (
   });
   ////////////////////////////////////////////////
   return [
-    extrusionButton,
     blueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
@@ -452,7 +496,8 @@ export const createToolbar = (
     roofButton,
     createEditExtrusionButton,
     rotateRoofOrientationButton,
-    scaffoldButton,
+    createScaffoldButton,
+    generateScaffoldButton,
     createExtrusionButton,
   ];
 };
