@@ -52,13 +52,16 @@ export function createShapeIsOutlined(
 }
 
 // Create Scaffolding Shape Outline
-export function createScaffoldingShapeIsOutlined(
+export async function createScaffoldingShapeIsOutlined(
   intersects: any,
   points: any,
   highlightMesh: THREE.Mesh,
   scene: THREE.Scene,
   cube: THREE.Mesh
 ) {
+  const [bboxWireframing, scaffoldModeling] = await createScaffoldModel(1.57);
+  let scaffoldModel = scaffoldModeling.clone();
+  let bboxWireframe = bboxWireframing
 
   intersects.forEach(function (intersect: any) {
     if (intersect.object.name === "ground") {
@@ -94,45 +97,70 @@ export function createScaffoldingShapeIsOutlined(
         };
         scene.add(line);
 
+        placeScaffoldModelsAlongLine(line, scaffoldModel, bboxWireframe, scene);
       }
     }
   });
 }
 
-function placeScaffoldModelsAlongLine(
+async function placeScaffoldModelsAlongLine(
   line: THREE.Line,
   scaffoldModel: THREE.Object3D,
+  bboxWireframe: THREE.LineSegments<THREE.BufferGeometry<THREE.NormalBufferAttributes>, THREE.Material | THREE.Material[]>,
   scene: THREE.Scene
 ) {
   const lineLength = line.userData.length;
-  const numSegments = Math.ceil(lineLength /  1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
+  const numSegments = Math.ceil(lineLength / 1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
   const segmentLength = lineLength / numSegments;
+  try {
+    // Get the start and end points of the line
+    // const startPoint = new THREE.Vector3(
+    //   line.geometry.attributes.position.getX(0),
+    //   line.geometry.attributes.position.getY(0),
+    //   line.geometry.attributes.position.getZ(0)
+    // );
+    // const endPoint = new THREE.Vector3(
+    //   line.geometry.attributes.position.getX(1),
+    //   line.geometry.attributes.position.getY(1),
+    //   line.geometry.attributes.position.getZ(1)
+    // );
+    const startPoint = line.userData.first_point;
+    const endPoint = line.userData.last_point;
+    console.log(startPoint, endPoint);
 
-  // Get the start and end points of the line
-  const startPoint = new THREE.Vector3(
-    line.geometry.attributes.position.getX(0),
-    line.geometry.attributes.position.getY(0),
-    line.geometry.attributes.position.getZ(0)
-  );
-  const endPoint = new THREE.Vector3(
-    line.geometry.attributes.position.getX(1),
-    line.geometry.attributes.position.getY(1),
-    line.geometry.attributes.position.getZ(1)
-  );
+    for (let i = 0; i < numSegments; i++) {
+      // Calculate the interpolated position along the line
+      const t = i / numSegments; // Parameter for interpolation along the line
+      const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
 
-  for (let i =  0; i < numSegments; i++) {
-    // Calculate the interpolated position along the line
-    const t = i / numSegments; // Parameter for interpolation along the line
-    const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
+      // Instantiate the GLB model
+      const modelInstance = scaffoldModel.clone();
+      // modelInstance.scale.set(0.73, 2.0, 1.57); // Set the scale to match the dimensions
+      modelInstance.position.copy(position); // Position the model at the interpolated position
+      const lineDirection = new THREE.Vector3()
+        .subVectors(endPoint, startPoint)
+        .normalize();
+      // Create a quaternion that represents the rotation needed to align a model with the line
+      const quaternion = new THREE.Quaternion().setFromUnitVectors(
+        new THREE.Vector3(0, 0, 1),
+        lineDirection
+      );
+      // Rotate the quaternion by 180 degrees around the z-axis (if necessary)
+      // This line is just an example. Adjust it according to your needs.
+      // quaternion.multiply(
+      //   new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, Math.PI))
+      // );
+      // Convert the quaternion to Euler angles
+      const euler = new THREE.Euler().setFromQuaternion(quaternion);
+      // modelInstance.lookAt(
+      //   new THREE.Vector3().subVectors(endPoint, startPoint).normalize()
+      // ); // Orient the model towards the direction of the line
+      modelInstance.rotation.copy(euler);
 
-    // Instantiate the GLB model
-    const modelInstance = scaffoldModel.clone();
-    modelInstance.scale.set(0.73,  2.0,  1.57); // Set the scale to match the dimensions
-    modelInstance.position.copy(position); // Position the model at the interpolated position
-    modelInstance.lookAt(new THREE.Vector3().subVectors(endPoint, startPoint).normalize()); // Orient the model towards the direction of the line
-
-
-    scene.add(modelInstance);
+      scene.add(modelInstance);
+    }
+  } catch (error) {
+    console.error("Error creating scaffold model:", error);
   }
 }
 
@@ -1135,4 +1163,122 @@ function updateRoofGeometry(
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
   scene.add(extrudedMesh);
+}
+
+// export function createScaffoldModel(scene: THREE.Scene, length: number) {
+//     // Load the GLB model
+//     const loader = new GLTFLoader();
+//     // let scaffoldModel: THREE.Object3D;
+//     loader.load(
+//       "/models/scaffolding-home.glb",
+//       // onLoad callback
+//       (gltf: any) => {
+//       const scaffoldModel = gltf.scene;
+//       scaffoldModel.name = "scaffoldingModel"
+//       // Calculate bounding box
+//       const bbox = new THREE.Box3().setFromObject(scaffoldModel);
+//       const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
+
+//       // Calculate scale factor to achieve desired length (1.57 meters)
+//       const scaleFactor = length / currentLength;
+
+//       // Apply scale factor to the model
+//       scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+//       // Update the bounding box with the scaled model
+//       scaffoldModel.updateMatrixWorld();
+//       const newBBox = new THREE.Box3().setFromObject(scaffoldModel);
+
+//       // Create wireframe geometry
+//       const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
+//         newBBox.min,
+//         new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
+//         new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
+//         new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
+//         new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
+//         new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
+//         new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
+//         newBBox.max
+//       ]);
+
+//       // Create wireframe material
+//       const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+
+//       // Create wireframe
+//       const bboxWireframe = new THREE.LineSegments(new THREE.WireframeGeometry(bboxGeometry), bboxMaterial);
+//       bboxWireframe.name = "scaffoldingWireframe"
+
+//       // Add wireframe to the scene
+//       // scene.add(bboxWireframe);
+//       // scene.add(scaffoldModel)
+
+//       return [bboxWireframe, scaffoldModel]
+//       },
+//       // onProgress callback (optional)
+//       (xhr) => {
+//         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+//       },
+//       // onError callback
+//       (error) => {
+//         console.error("Error loading GLB model:", error);
+//       }
+//     );
+// }
+
+export function createScaffoldModel(
+  length: number
+): Promise<[THREE.LineSegments, THREE.Object3D]> {
+  return new Promise((resolve, reject) => {
+    const loader = new GLTFLoader();
+    loader.load(
+      "/models/scaffolding-home.glb",
+      (gltf: any) => {
+        const scaffoldModel = gltf.scene;
+        scaffoldModel.name = "scaffoldingModel";
+        // Calculate bounding box
+        const bbox = new THREE.Box3().setFromObject(scaffoldModel);
+        const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
+
+        // Calculate scale factor to achieve desired length (1.57 meters)
+        const scaleFactor = length / currentLength;
+
+        // Apply scale factor to the model
+        scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+        // Update the bounding box with the scaled model
+        scaffoldModel.updateMatrixWorld();
+        const newBBox = new THREE.Box3().setFromObject(scaffoldModel);
+
+        // Create wireframe geometry
+        const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
+          newBBox.min,
+          new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
+          newBBox.max,
+        ]);
+
+        // Create wireframe material
+        const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+
+        // Create wireframe
+        const bboxWireframe = new THREE.LineSegments(
+          new THREE.WireframeGeometry(bboxGeometry),
+          bboxMaterial
+        );
+        bboxWireframe.name = "scaffoldingWireframe";
+        resolve([bboxWireframe, scaffoldModel]);
+      },
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      },
+      (error) => {
+        console.error("Error loading GLB model:", error);
+        reject(error);
+      }
+    );
+  });
 }

@@ -8,6 +8,7 @@ import {
   createRectangle,
   createRoof,
   createScaffoldingShapeIsOutlined,
+  createScaffoldModel,
 } from "./utilities/mesh";
 import {
   createToolbar,
@@ -26,7 +27,6 @@ import {
   calculateTransformedBoundingBox,
   // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -92,59 +92,7 @@ export const createModelView = async () => {
   highlightMesh.position.set(0.5, 0, 0.5);
   highlightMesh.name = "highlightMesh";
 
-  // Load the GLB model
-  const loader = new GLTFLoader();
-  // let scaffoldModel: THREE.Object3D;
-  loader.load(
-    "/models/scaffolding-home.glb",
-    // onLoad callback
-    (gltf: any) => {
-      const scaffoldModel = gltf.scene;
-    // Calculate bounding box
-    const bbox = new THREE.Box3().setFromObject(scaffoldModel);
-    const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
-
-    // Calculate scale factor to achieve desired length (1.57 meters)
-    const scaleFactor = 1.57 / currentLength;
-
-    // Apply scale factor to the model
-    scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-    // Update the bounding box with the scaled model
-    scaffoldModel.updateMatrixWorld();
-    const newBBox = new THREE.Box3().setFromObject(scaffoldModel);
-
-    // Create wireframe geometry
-    const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
-      newBBox.min,
-      new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
-      new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
-      new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
-      new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
-      new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
-      new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
-      newBBox.max
-    ]);
-
-    // Create wireframe material
-    const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-
-    // Create wireframe
-    const bboxWireframe = new THREE.LineSegments(new THREE.WireframeGeometry(bboxGeometry), bboxMaterial);
-
-    // Add wireframe to the scene
-    scene.add(bboxWireframe);
-    scene.add(scaffoldModel)
-    },
-    // onProgress callback (optional)
-    (xhr) => {
-      console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-    },
-    // onError callback
-    (error) => {
-      console.error("Error loading GLB model:", error);
-    }
-  );
+  // createScaffoldModel(scene, 1.57)
 
   components.meshes.push(cube);
   components.meshes.push(plane);
