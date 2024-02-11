@@ -37,10 +37,13 @@ export function cameraDisableOrbitalFunctionality(gsap: any, camera: any) {
     duration: 0.1,
     ease: "power1.inOut",
     onComplete: () => {
-      camera.controls.enabled = false;
+      console.log(camera.controls);
+      camera.controls.enabled = true;
+      camera.controls.dollyToCursor = false;
       camera.controls.enablePan = false;
       camera.controls.enableZoom = false;
       camera.controls.screenSpacePanning = false;
+      camera.controls.azimuthRotateSpeed = 0;
       camera.controls.maxPolarAngle = 0;
     },
   });
@@ -52,9 +55,11 @@ export function cameraEnableOrbitalFunctionality(gsap: any, camera: any) {
     ease: "power1.inOut",
     onComplete: () => {
       camera.controls.enabled = true;
+      camera.controls.dollyToCursor = true;
       camera.controls.enablePan = true;
       camera.controls.enableZoom = true;
       camera.controls.screenSpacePanning = true;
+      camera.controls.azimuthRotateSpeed = 1;
       camera.controls.maxPolarAngle = Math.PI;
     },
   });

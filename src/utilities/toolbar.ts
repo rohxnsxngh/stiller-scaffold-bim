@@ -7,14 +7,20 @@ import {
   cameraPerspectiveView,
   cameraTopView,
 } from "./camera";
-export let drawingInProgress = false;
-export let deletionInProgress = false;
 import deletePNG from "../assets/images/delete.png";
 import { createSelect } from "./drawer";
 import { resetScene } from "./helper";
 
+export let drawingInProgress = false;
+export let drawingScaffoldingInProgress = false;
+export let deletionInProgress = false;
+
 export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
+};
+
+export const setDrawingScaffoldingInProgress = (value: boolean) => {
+  drawingScaffoldingInProgress = value;
 };
 
 export const setDeletionInProgress = (value: boolean) => {
@@ -68,9 +74,11 @@ export const createToolbar = (
     });
     cameraTopView(gsap, components.camera);
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   topViewButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
 
   const createBlueprintRectangleButton = new OBC.Button(components, {
@@ -82,6 +90,7 @@ export const createToolbar = (
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false)
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   topViewButton.addChild(createBlueprintRectangleButton);
@@ -105,9 +114,11 @@ export const createToolbar = (
   });
   perspectiveViewButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   perspectiveViewButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
+    setDrawingScaffoldingInProgress(false)
   });
 
   // Allow panning and rotating button
@@ -121,9 +132,11 @@ export const createToolbar = (
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setDeletionInProgress(false);
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
 
   // Start Drawing Blueprint
@@ -136,6 +149,7 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDeletionInProgress(false);
     setDrawingInProgress(true);
+    setDrawingScaffoldingInProgress(false)
   });
 
   const deleteObjectButton = new OBC.Button(components);
@@ -152,12 +166,15 @@ export const createToolbar = (
     });
     setDeletionInProgress(true);
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   deleteObjectButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   deleteObjectButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
+    setDrawingScaffoldingInProgress(false)
   });
 
   // Start Drawing Blueprint
@@ -171,12 +188,15 @@ export const createToolbar = (
     resetScene(scene)
     setDeletionInProgress(false);
     setDrawingInProgress(true);
+    setDrawingScaffoldingInProgress(false)
   });
   clearSceneButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   clearSceneButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
+    setDrawingScaffoldingInProgress(false)
   });
 
   //Solidify Blueprint
@@ -189,9 +209,11 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   blueprintButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
 
   // Create Extrusion from Blueprint
@@ -204,9 +226,11 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
 
   const createEditExtrusionButton = new OBC.Button(components, {
@@ -218,6 +242,7 @@ export const createToolbar = (
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false)
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   extrusionButton.addChild(createEditExtrusionButton);
@@ -231,9 +256,27 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
   roofButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
+  });
+
+  const roofSecondaryButton = new OBC.Button(components);
+  roofSecondaryButton.materialIcon = "details";
+  roofSecondaryButton.tooltip = "Roof";
+  roofSecondaryButton.id = "roof-button";
+  sideToolBar.addChild(roofSecondaryButton);
+  roofSecondaryButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false)
+  });
+  roofSecondaryButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false)
   });
 
   const scaffoldButton = new OBC.Button(components);
@@ -244,8 +287,12 @@ export const createToolbar = (
   scaffoldButton.onClick.add(() => {
     setDrawingInProgress(false);
     setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(true)
   });
   scaffoldButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  scaffoldButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(false);
   });
 
@@ -408,5 +455,6 @@ export const createToolbar = (
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     scaffoldButton,
+    roofSecondaryButton
   ];
 };

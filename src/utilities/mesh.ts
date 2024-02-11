@@ -50,6 +50,52 @@ export function createShapeIsOutlined(
   });
 }
 
+// Create Scaffolding Shape Outline
+export function createScaffoldingShapeIsOutlined(
+  intersects: any,
+  points: any,
+  highlightMesh: THREE.Mesh,
+  scene: THREE.Scene,
+  cube: THREE.Mesh
+) {
+  intersects.forEach(function (intersect: any) {
+    if (intersect.object.name === "ground") {
+      points.push(
+        new THREE.Vector3(highlightMesh.position.x, 0, highlightMesh.position.z)
+      );
+      const cubeClone = cube.clone();
+      cubeClone.position.set(
+        highlightMesh.position.x,
+        0.5,
+        highlightMesh.position.z
+      );
+      cubeClone.name = "cubeClone";
+      scene.add(cubeClone);
+
+      // Create line segment from the last two points
+      if (points.length >= 2) {
+        const geometry = new THREE.BufferGeometry().setFromPoints([
+          points[points.length - 2],
+          points[points.length - 1],
+        ]);
+        const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+        const line = new THREE.Line(geometry, material);
+        line.name = "line";
+        const [length, lastPoint, firstPoint] = measureLineLength([
+          points[points.length - 2],
+          points[points.length - 1],
+        ]);
+        line.userData = {
+          length: length,
+          first_point: firstPoint,
+          last_point: lastPoint,
+        };
+        scene.add(line);
+      }
+    }
+  });
+}
+
 // helper function to measure line length
 function measureLineLength(points: any) {
   const lastIndex = points.length - 1;
@@ -151,7 +197,7 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   const label = createExtrusionLabel(scene, shape, depth);
   attachExtrusionLabelChangeHandler(label, meshExtrude, shape);
 
-  label.userData = meshExtrude
+  label.userData = meshExtrude;
 }
 
 interface IntersectionResult {
@@ -230,7 +276,7 @@ function updateExtrusionGeometry(
   // Since the geometry has changed, you may need to adjust the mesh position or rotation
   meshExtrude.rotation.set(0, 0, 0);
   meshExtrude.rotateX(Math.PI / 2);
-  label.userData = meshExtrude
+  label.userData = meshExtrude;
 
   return meshExtrude;
 }
@@ -566,6 +612,120 @@ function updateRectangleBlueprintGeometry(
   }
 }
 
+//EXPERIMENTAL
+export function createAlternativeRoof(
+  child: any,
+  scene: THREE.Scene,
+  index: number
+) {
+  // Calculate the midpoint between the two points
+  const midpoint = new THREE.Vector2();
+  midpoint
+    .addVectors(
+      child.userData.curves[index].v1,
+      child.userData.curves[index].v2
+    )
+    .multiplyScalar(0.5);
+
+  console.log(child.userData);
+
+  const extrudeHeight = -1 * child.geometry.parameters.options.depth;
+
+  const midPoint = new THREE.Vector3(midpoint.x, extrudeHeight, midpoint.y);
+
+  const startPoint = new THREE.Vector3(
+    child.userData.curves[index].v1.x,
+    extrudeHeight,
+    child.userData.curves[index].v1.y
+  );
+  const endPoint = new THREE.Vector3(
+    child.userData.curves[index].v2.x,
+    extrudeHeight,
+    child.userData.curves[index].v2.y
+  );
+
+  const nextPoint = new THREE.Vector3(
+    child.userData.curves[index + 1].v2.x,
+    extrudeHeight,
+    child.userData.curves[index + 1].v2.y
+  );
+
+  // Calculate the width and depth of the box
+  const width = startPoint.distanceTo(midPoint);
+  const depth = endPoint.distanceTo(nextPoint);
+  console.log(width, depth);
+  const height = 3;
+
+  // Create the box geometry
+  const boxGeometry = new THREE.BoxGeometry(width, height, depth);
+
+  // Create the box material
+  const boxMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00ff00,
+    wireframe: true,
+  });
+
+  // Create the box mesh
+  const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  boxMesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+
+  // Calculate the midpoint between startPoint and endPoint
+  const startToEndPoint = new THREE.Vector3().lerpVectors(
+    startPoint,
+    endPoint,
+    0
+  );
+
+  // Calculate the midpoint between endPoint and nextPoint
+  const endToNextPoint = new THREE.Vector3().lerpVectors(
+    endPoint,
+    nextPoint,
+    1
+  );
+
+  // Calculate the center point of the square
+  const centralPoint = new THREE.Vector3().lerpVectors(
+    startToEndPoint,
+    endToNextPoint,
+    0.5
+  );
+  centralPoint.y += height / 2
+
+  // Calculate the center point of the square
+  const centerPoint = new THREE.Vector3(
+    startToEndPoint.z,
+    extrudeHeight,
+    endToNextPoint.x
+  );
+
+  // Position the box at the midpoint
+  boxMesh.position.copy(centralPoint);
+  // Rotate the box to align with the path
+
+  // Calculate the shear matrix
+  const shearMatrix = new THREE.Matrix4();
+  shearMatrix.makeShear(0, 0, 1, 0, 0, 0); // Adjust the parameters to control the shear
+
+  // Apply the shear matrix to the geometry of the boxMesh
+  boxGeometry.applyMatrix4(shearMatrix);
+
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: "purple" });
+  const cube = new THREE.Mesh(geometry, material);
+  cube.position.copy(centralPoint);
+  scene.add(cube);
+
+  const cube1 = cube.clone();
+  cube1.position.copy(startToEndPoint);
+  scene.add(cube1);
+  const cube2 = cube.clone();
+  cube2.position.copy(endToNextPoint);
+  scene.add(cube2);
+
+  // Add the box to the scene
+  scene.add(boxMesh);
+}
+
 // create roof from extrusion shape
 export function createRoof(child: any, scene: THREE.Scene, index: number) {
   // Calculate the midpoint between the two points
@@ -717,7 +877,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
     thirdPoint,
     triangleHeightOffsetDistance
   );
-  label.userData = extrudedMesh
+  label.userData = extrudedMesh;
   attachRoofLabelChangeHandler(
     label,
     child,
@@ -786,7 +946,7 @@ function attachRoofLabelChangeHandler(
     if (oldValue !== newValue) {
       console.log("values do not match");
       if (label.userData) {
-        scene.remove(label.userData as THREE.Object3D)
+        scene.remove(label.userData as THREE.Object3D);
       }
       updateRoofGeometry(
         child,
@@ -940,6 +1100,6 @@ function updateRoofGeometry(
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
   extrudedMesh.userData = shape;
-  label.userData = extrudedMesh
+  label.userData = extrudedMesh;
   scene.add(extrudedMesh);
 }
