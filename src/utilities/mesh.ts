@@ -4,6 +4,7 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { distanceFromPointToLine } from "./helper";
 import { rectMaterial } from "./material";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -99,10 +100,12 @@ export async function createScaffoldingShapeIsOutlined(
 
 export async function placeScaffoldModelsAlongLine(
   line: THREE.Line,
-  scene: THREE.Scene
+  scene: THREE.Scene,
+  scaffoldModeling: any,
+  bboxWireframing: any
 ) {
-  const [bboxWireframing, scaffoldModeling] = await createScaffoldModel(1.57);
-  let scaffoldModel = scaffoldModeling.clone();
+  // const [bboxWireframing, scaffoldModeling] = await createScaffoldModel(1.57);
+  let scaffoldModel = SkeletonUtils.clone(scaffoldModeling);
   let bboxWireframe = bboxWireframing
 
   const lineLength = line.userData.length;
@@ -1142,66 +1145,6 @@ function updateRoofGeometry(
   scene.add(extrudedMesh);
 }
 
-// export function createScaffoldModel(scene: THREE.Scene, length: number) {
-//     // Load the GLB model
-//     const loader = new GLTFLoader();
-//     // let scaffoldModel: THREE.Object3D;
-//     loader.load(
-//       "/models/scaffolding-home.glb",
-//       // onLoad callback
-//       (gltf: any) => {
-//       const scaffoldModel = gltf.scene;
-//       scaffoldModel.name = "scaffoldingModel"
-//       // Calculate bounding box
-//       const bbox = new THREE.Box3().setFromObject(scaffoldModel);
-//       const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
-
-//       // Calculate scale factor to achieve desired length (1.57 meters)
-//       const scaleFactor = length / currentLength;
-
-//       // Apply scale factor to the model
-//       scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-//       // Update the bounding box with the scaled model
-//       scaffoldModel.updateMatrixWorld();
-//       const newBBox = new THREE.Box3().setFromObject(scaffoldModel);
-
-//       // Create wireframe geometry
-//       const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
-//         newBBox.min,
-//         new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
-//         new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
-//         new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
-//         new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
-//         new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
-//         new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
-//         newBBox.max
-//       ]);
-
-//       // Create wireframe material
-//       const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-
-//       // Create wireframe
-//       const bboxWireframe = new THREE.LineSegments(new THREE.WireframeGeometry(bboxGeometry), bboxMaterial);
-//       bboxWireframe.name = "scaffoldingWireframe"
-
-//       // Add wireframe to the scene
-//       // scene.add(bboxWireframe);
-//       // scene.add(scaffoldModel)
-
-//       return [bboxWireframe, scaffoldModel]
-//       },
-//       // onProgress callback (optional)
-//       (xhr) => {
-//         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-//       },
-//       // onError callback
-//       (error) => {
-//         console.error("Error loading GLB model:", error);
-//       }
-//     );
-// }
-
 export function createScaffoldModel(
   length: number
 ): Promise<[THREE.LineSegments, THREE.Object3D]> {
@@ -1212,6 +1155,7 @@ export function createScaffoldModel(
       (gltf: any) => {
         const scaffoldModel = gltf.scene;
         scaffoldModel.name = "scaffoldingModel";
+        scaffoldModel.userData.name = "scaffoldingModel"
         // Calculate bounding box
         const bbox = new THREE.Box3().setFromObject(scaffoldModel);
         const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis

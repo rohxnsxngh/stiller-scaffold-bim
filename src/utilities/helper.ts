@@ -128,7 +128,8 @@ export function resetScene(scene: THREE.Scene) {
       child.visible = false;
       child.element.style.pointerEvents = "none";
       objectsToRemove.push(child);
-    } else if (
+    } 
+    if (
       child.name !== "ground" &&
       (child instanceof THREE.Mesh || child instanceof THREE.Points || child instanceof THREE.Line) &&
       !(child.geometry instanceof THREE.PlaneGeometry)
@@ -137,6 +138,9 @@ export function resetScene(scene: THREE.Scene) {
       if (child.geometry) child.geometry.dispose();
       if (child.material.map) child.material.map.dispose();
       objectsToRemove.push(child);
+    }
+    if (child.name === "scaffoldingModel") {
+      objectsToRemove.push(child)
     }
   });
   objectsToRemove.forEach((object: any) => {

@@ -471,13 +471,22 @@ export const createModelView = async () => {
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
-    console.log("generate scaffolding")
+    console.log("generate scaffolding");
+    generateScaffolding();
+  });
+  async function generateScaffolding() {
+    const [bboxWireframing, scaffoldModeling] = await createScaffoldModel(1.57);
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
-        placeScaffoldModelsAlongLine(child, scene)
+        placeScaffoldModelsAlongLine(
+          child,
+          scene,
+          scaffoldModeling,
+          bboxWireframing
+        );
       }
-    })
-  })
+    });
+  }
 
   //////////////////////////////////
   // this section pertains to creating the rectangle from the top view by clicking and dragging
