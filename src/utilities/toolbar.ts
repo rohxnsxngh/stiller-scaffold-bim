@@ -74,11 +74,11 @@ export const createToolbar = (
     });
     cameraTopView(gsap, components.camera);
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   topViewButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   const createBlueprintRectangleButton = new OBC.Button(components, {
@@ -90,7 +90,7 @@ export const createToolbar = (
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   topViewButton.addChild(createBlueprintRectangleButton);
@@ -114,11 +114,11 @@ export const createToolbar = (
   });
   perspectiveViewButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   perspectiveViewButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   // Allow panning and rotating button
@@ -132,11 +132,11 @@ export const createToolbar = (
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setDeletionInProgress(false);
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   // Start Drawing Blueprint
@@ -149,7 +149,7 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDeletionInProgress(false);
     setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   const deleteObjectButton = new OBC.Button(components);
@@ -166,15 +166,15 @@ export const createToolbar = (
     });
     setDeletionInProgress(true);
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   deleteObjectButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   deleteObjectButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   // Start Drawing Blueprint
@@ -185,23 +185,23 @@ export const createToolbar = (
   mainToolbar.addChild(clearSceneButton);
   clearSceneButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    resetScene(scene)
+    resetScene(scene);
     setDeletionInProgress(false);
     setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   clearSceneButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   clearSceneButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   //Solidify Blueprint
   const blueprintButton = new OBC.Button(components);
-  blueprintButton.materialIcon = "view_in_ar";
+  blueprintButton.materialIcon = "dashboard";
   blueprintButton.tooltip = "Blueprint";
   blueprintButton.id = "blueprint-button";
   sideToolBar.addChild(blueprintButton);
@@ -209,16 +209,16 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   blueprintButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
-  extrusionButton.materialIcon = "expand";
+  extrusionButton.materialIcon = "view_in_ar";
   extrusionButton.tooltip = "Extrude";
   extrusionButton.id = "extrusion-button";
   sideToolBar.addChild(extrusionButton);
@@ -226,12 +226,26 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
+
+  const createExtrusionButton = new OBC.Button(components, {
+    materialIconName: "expand",
+    name: "Create Extrusion",
+    closeOnClick: true,
+  });
+  createExtrusionButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  extrusionButton.addChild(createExtrusionButton);
 
   const createEditExtrusionButton = new OBC.Button(components, {
     materialIconName: "unfold_less",
@@ -242,7 +256,7 @@ export const createToolbar = (
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   extrusionButton.addChild(createEditExtrusionButton);
@@ -256,27 +270,11 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
   roofButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
-  });
-
-  const roofSecondaryButton = new OBC.Button(components);
-  roofSecondaryButton.materialIcon = "details";
-  roofSecondaryButton.tooltip = "Roof";
-  roofSecondaryButton.id = "roof-button";
-  sideToolBar.addChild(roofSecondaryButton);
-  roofSecondaryButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false)
-  });
-  roofSecondaryButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false)
+    setDrawingScaffoldingInProgress(false);
   });
 
   const scaffoldButton = new OBC.Button(components);
@@ -287,7 +285,7 @@ export const createToolbar = (
   scaffoldButton.onClick.add(() => {
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(true)
+    setDrawingScaffoldingInProgress(true);
   });
   scaffoldButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -392,7 +390,7 @@ export const createToolbar = (
   // Create a title 2/5
   const title2 = document.createElement("h1");
   title2.textContent = "2/5";
-    // @ts-ignore
+  // @ts-ignore
   title2.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title2);
@@ -406,7 +404,7 @@ export const createToolbar = (
   // Create a title 3/5
   const title3 = document.createElement("h1");
   title3.textContent = "3/5";
-    // @ts-ignore
+  // @ts-ignore
   title3.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title3);
@@ -419,7 +417,7 @@ export const createToolbar = (
   // Create a title 4/5
   const title4 = document.createElement("h1");
   title4.textContent = "4/5";
-    // @ts-ignore
+  // @ts-ignore
   title4.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title4);
@@ -427,7 +425,7 @@ export const createToolbar = (
   // Create a title 5/5
   const title5 = document.createElement("h1");
   title5.textContent = "5/5";
-    // @ts-ignore
+  // @ts-ignore
   title5.classList =
     "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
   drawer.domElement.appendChild(title5);
@@ -455,6 +453,6 @@ export const createToolbar = (
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     scaffoldButton,
-    roofSecondaryButton
+    createExtrusionButton,
   ];
 };

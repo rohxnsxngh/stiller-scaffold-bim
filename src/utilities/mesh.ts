@@ -3,6 +3,7 @@ import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { distanceFromPointToLine } from "./helper";
 import { rectMaterial } from "./material";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -58,6 +59,7 @@ export function createScaffoldingShapeIsOutlined(
   scene: THREE.Scene,
   cube: THREE.Mesh
 ) {
+
   intersects.forEach(function (intersect: any) {
     if (intersect.object.name === "ground") {
       points.push(
@@ -80,7 +82,7 @@ export function createScaffoldingShapeIsOutlined(
         ]);
         const material = new THREE.LineBasicMaterial({ color: 0xffffff });
         const line = new THREE.Line(geometry, material);
-        line.name = "line";
+        line.name = "scaffoldLine";
         const [length, lastPoint, firstPoint] = measureLineLength([
           points[points.length - 2],
           points[points.length - 1],
@@ -91,9 +93,47 @@ export function createScaffoldingShapeIsOutlined(
           last_point: lastPoint,
         };
         scene.add(line);
+
       }
     }
   });
+}
+
+function placeScaffoldModelsAlongLine(
+  line: THREE.Line,
+  scaffoldModel: THREE.Object3D,
+  scene: THREE.Scene
+) {
+  const lineLength = line.userData.length;
+  const numSegments = Math.ceil(lineLength /  1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
+  const segmentLength = lineLength / numSegments;
+
+  // Get the start and end points of the line
+  const startPoint = new THREE.Vector3(
+    line.geometry.attributes.position.getX(0),
+    line.geometry.attributes.position.getY(0),
+    line.geometry.attributes.position.getZ(0)
+  );
+  const endPoint = new THREE.Vector3(
+    line.geometry.attributes.position.getX(1),
+    line.geometry.attributes.position.getY(1),
+    line.geometry.attributes.position.getZ(1)
+  );
+
+  for (let i =  0; i < numSegments; i++) {
+    // Calculate the interpolated position along the line
+    const t = i / numSegments; // Parameter for interpolation along the line
+    const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
+
+    // Instantiate the GLB model
+    const modelInstance = scaffoldModel.clone();
+    modelInstance.scale.set(0.73,  2.0,  1.57); // Set the scale to match the dimensions
+    modelInstance.position.copy(position); // Position the model at the interpolated position
+    modelInstance.lookAt(new THREE.Vector3().subVectors(endPoint, startPoint).normalize()); // Orient the model towards the direction of the line
+
+
+    scene.add(modelInstance);
+  }
 }
 
 // helper function to measure line length
@@ -689,14 +729,7 @@ export function createAlternativeRoof(
     endToNextPoint,
     0.5
   );
-  centralPoint.y += height / 2
-
-  // Calculate the center point of the square
-  const centerPoint = new THREE.Vector3(
-    startToEndPoint.z,
-    extrudeHeight,
-    endToNextPoint.x
-  );
+  centralPoint.y += height / 2;
 
   // Position the box at the midpoint
   boxMesh.position.copy(centralPoint);
