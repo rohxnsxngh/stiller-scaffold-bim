@@ -110,7 +110,7 @@ export const createModelView = async () => {
     createShedRoofButton,
     createEditExtrusionButton,
     rotateRoofOrientationButton,
-    createScaffoldButton,
+    drawScaffoldButton,
     generateScaffoldButton,
     createExtrusionButton,
   ] = createToolbar(components, scene);
@@ -160,7 +160,7 @@ export const createModelView = async () => {
   });
 
   // Set pointer-events to none initially
-  labelPanel.style.pointerEvents = "none";
+  // labelPanel.style.pointerEvents = "none";
 
   window.addEventListener("mousemove", function (e) {
     if (drawingScaffoldingInProgress) {
@@ -572,7 +572,7 @@ export const createModelView = async () => {
     drawingInProgressSwitch = false;
   });
 
-  createScaffoldButton.domElement.addEventListener("mousedown", () => {
+  drawScaffoldButton.domElement.addEventListener("mousedown", () => {
     console.log("creating scaffolding", scene);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
@@ -592,14 +592,13 @@ export const createModelView = async () => {
     generateScaffolding();
   });
   async function generateScaffolding() {
-    const [bboxWireframing, scaffoldModeling] = await createScaffoldModel(1.57);
+    const scaffoldModeling = await createScaffoldModel(1.57);
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
         placeScaffoldModelsAlongLine(
           child,
           scene,
           scaffoldModeling,
-          bboxWireframing
         );
       }
     });

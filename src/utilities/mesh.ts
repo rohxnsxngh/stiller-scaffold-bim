@@ -101,16 +101,12 @@ export async function createScaffoldingShapeIsOutlined(
 export async function placeScaffoldModelsAlongLine(
   line: THREE.Line,
   scene: THREE.Scene,
-  scaffoldModeling: any,
-  bboxWireframing: any
+  scaffoldModeling: any
 ) {
-  // const [bboxWireframing, scaffoldModeling] = await createScaffoldModel(1.57);
   let scaffoldModel = SkeletonUtils.clone(scaffoldModeling);
-  let bboxWireframe = bboxWireframing;
 
   const lineLength = line.userData.length;
   const numSegments = Math.ceil(lineLength / 1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
-  const segmentLength = lineLength / numSegments;
   try {
     const startPoint = line.userData.first_point;
     const endPoint = line.userData.last_point;
@@ -121,23 +117,34 @@ export async function placeScaffoldModelsAlongLine(
       const t = i / numSegments; // Parameter for interpolation along the line
       const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
 
-      // Instantiate the GLB model
-      const modelInstance = scaffoldModel.clone();
-      modelInstance.position.copy(position); // Position the model at the interpolated position
-      const lineDirection = new THREE.Vector3()
-        .subVectors(endPoint, startPoint)
-        .normalize();
-      // Create a quaternion that represents the rotation needed to align a model with the line
-      const quaternion = new THREE.Quaternion().setFromUnitVectors(
-        new THREE.Vector3(0, 0, 1),
-        lineDirection
-      );
+      // Check if there is already a model at this position
+      const isModelAlreadyPlaced = scene.children.some((child) => {
+        return (
+          child instanceof THREE.Object3D && child.position.equals(position)
+        );
+      });
 
-      const euler = new THREE.Euler().setFromQuaternion(quaternion);
+      if (!isModelAlreadyPlaced) {
+        // Instantiate the GLB model
+        const modelInstance = scaffoldModel.clone();
+        modelInstance.position.copy(position); // Position the model at the interpolated position
+        const lineDirection = new THREE.Vector3()
+          .subVectors(endPoint, startPoint)
+          .normalize();
+        // Create a quaternion that represents the rotation needed to align a model with the line
+        const quaternion = new THREE.Quaternion().setFromUnitVectors(
+          new THREE.Vector3(0, 0, 1),
+          lineDirection
+        );
 
-      modelInstance.rotation.copy(euler);
+        const euler = new THREE.Euler().setFromQuaternion(quaternion);
 
-      scene.add(modelInstance);
+        modelInstance.rotation.copy(euler);
+        console.log("model instance", modelInstance)
+
+        scene.add(modelInstance);
+        // scene.add(modelInstance.userData)
+      } else {console.log("there are already children at this position")}
     }
   } catch (error) {
     console.error("Error creating scaffold model:", error);
@@ -209,7 +216,9 @@ export function createScaffoldModel(
           bboxMaterial
         );
         bboxWireframe.name = "scaffoldingWireframe";
-        resolve([bboxWireframe, scaffoldModel]);
+        scaffoldModel.userData = {"wireframe": bboxWireframe};
+        console.log(bboxWireframe)
+        resolve(scaffoldModel);
       },
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
