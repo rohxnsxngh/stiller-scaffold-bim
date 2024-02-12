@@ -106,7 +106,7 @@ export async function placeScaffoldModelsAlongLine(
 ) {
   // const [bboxWireframing, scaffoldModeling] = await createScaffoldModel(1.57);
   let scaffoldModel = SkeletonUtils.clone(scaffoldModeling);
-  let bboxWireframe = bboxWireframing
+  let bboxWireframe = bboxWireframing;
 
   const lineLength = line.userData.length;
   const numSegments = Math.ceil(lineLength / 1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
@@ -173,7 +173,7 @@ export function createScaffoldModel(
       (gltf: any) => {
         const scaffoldModel = gltf.scene;
         scaffoldModel.name = "scaffoldingModel";
-        scaffoldModel.userData.name = "scaffoldingModel"
+        scaffoldModel.userData.name = "scaffoldingModel";
         // Calculate bounding box
         const bbox = new THREE.Box3().setFromObject(scaffoldModel);
         const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
@@ -992,7 +992,6 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   // blueprintHasBeenUpdated = false;
 }
 
-// let currentRoofLabel: CSS2DObject[] = [];
 function createRoofLabel(
   scene: THREE.Scene,
   endPoint: THREE.Vector3,
@@ -1206,20 +1205,31 @@ function updateRoofGeometry(
 }
 
 export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
-  console.log(child.userData)
-  const height = 3
-  let thirdPoint: THREE.Vector2 = new THREE.Vector2(0,  0);
+  const height = 3;
+  let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   if (index == 0) {
-    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x + height, child.userData.curves[index].v1.y)
-  } 
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x + height,
+      child.userData.curves[index].v1.y
+    );
+  }
   if (index == 1) {
-    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x, child.userData.curves[index].v1.y - height)
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x,
+      child.userData.curves[index].v1.y - height
+    );
   }
   if (index == 2) {
-    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x - height, child.userData.curves[index].v1.y)
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x - height,
+      child.userData.curves[index].v1.y
+    );
   }
   if (index == 3) {
-    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x, child.userData.curves[index].v1.y + height)
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x,
+      child.userData.curves[index].v1.y + height
+    );
   }
 
   const triangleHeightOffsetDistance = distanceFromPointToLine(
@@ -1231,7 +1241,7 @@ export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
     thirdPoint.y
   );
 
-  console.log(triangleHeightOffsetDistance)
+  console.log(triangleHeightOffsetDistance);
 
   // Create a right triangle using the two points and the third point
   const shape = new THREE.Shape();
@@ -1265,17 +1275,17 @@ export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
   const edgeDirection = new THREE.Vector3()
     .subVectors(endPoint, startPoint)
     .normalize();
-  const rotationAngle = Math.PI /  2;
+  const rotationAngle = Math.PI / 2;
 
   const geometry = new THREE.ShapeGeometry(shape);
   const material = new THREE.MeshBasicMaterial({
-    color:  0xffffff,
+    color: 0xffffff,
     side: THREE.DoubleSide,
   });
   const triangle = new THREE.Mesh(geometry, material);
   triangle.position.y = extrudeHeight;
   const quaternionY = new THREE.Quaternion();
-  quaternionY.setFromAxisAngle(new THREE.Vector3(1,  0,  0), Math.PI /  2);
+  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   triangle.applyQuaternion(quaternionY);
 
   const customQuaternion = new THREE.Quaternion();
@@ -1287,8 +1297,6 @@ export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
   triangle.updateMatrix();
   triangle.updateMatrixWorld(true);
   triangle.name = "shedRoofTriangle";
-  // scene.add(triangle)
-
 
   let nextPoint: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
   if (index == 3) {
@@ -1299,9 +1307,9 @@ export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
     );
   } else {
     nextPoint = new THREE.Vector3(
-      child.userData.curves[index +  1].v2.x,
+      child.userData.curves[index + 1].v2.x,
       extrudeHeight,
-      child.userData.curves[index +  1].v2.y
+      child.userData.curves[index + 1].v2.y
     );
   }
 
@@ -1330,7 +1338,7 @@ export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
   );
 
   const extrudedMaterial = new THREE.MeshPhongMaterial({
-    color:  0xffffff,
+    color: 0xffffff,
     side: THREE.DoubleSide,
   });
 
@@ -1339,5 +1347,208 @@ export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "shedRoof";
   extrudedMesh.userData = shape;
+  scene.add(extrudedMesh);
+
+  const label = createRoofLabel(
+    scene,
+    endPoint,
+    thirdPoint,
+    triangleHeightOffsetDistance
+  );
+  attachShedRoofLabelChangeHandler(
+    label,
+    child,
+    index,
+    scene,
+    triangle,
+    extrudedMesh,
+    blueprintHasBeenUpdated
+  );
+}
+
+function attachShedRoofLabelChangeHandler(
+  label: CSS2DObject,
+  child: any,
+  index: number,
+  scene: THREE.Scene,
+  triangleMesh: THREE.Mesh,
+  extrudedRoofMesh: THREE.Mesh,
+  blueprintState: boolean
+) {
+  const labelElement = label.element as HTMLDivElement;
+  let oldValue: any;
+
+  labelElement.addEventListener("focus", () => {
+    oldValue = labelElement.textContent;
+    console.log(oldValue);
+  });
+
+  labelElement.addEventListener("blur", () => {
+    const newValue = labelElement.textContent;
+    if (oldValue !== newValue) {
+      console.log("values do not match");
+      if (label.userData) {
+        scene.remove(label.userData as THREE.Object3D);
+      }
+      updateShedRoofGeometry(
+        child,
+        index,
+        newValue,
+        scene,
+        triangleMesh,
+        extrudedRoofMesh,
+        blueprintState,
+        label
+      );
+    }
+  });
+}
+
+function updateShedRoofGeometry(
+  child: any,
+  index: number,
+  triangleHeightOffsetDistance: string | null,
+  scene: THREE.Scene,
+  triangleMesh: THREE.Mesh,
+  extrudedRoofMesh: THREE.Mesh,
+  blueprintState: boolean,
+  label: CSS2DObject
+) {
+  const height = parseFloat(triangleHeightOffsetDistance as unknown as string);
+  let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
+  if (index == 0) {
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x + height,
+      child.userData.curves[index].v1.y
+    );
+  }
+  if (index == 1) {
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x,
+      child.userData.curves[index].v1.y - height
+    );
+  }
+  if (index == 2) {
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x - height,
+      child.userData.curves[index].v1.y
+    );
+  }
+  if (index == 3) {
+    thirdPoint = new THREE.Vector2(
+      child.userData.curves[index].v1.x,
+      child.userData.curves[index].v1.y + height
+    );
+  }
+
+  scene.remove(triangleMesh);
+  scene.remove(extrudedRoofMesh);
+
+  const extrudeHeight = -1 * child.geometry.parameters.options.depth;
+
+  const startPoint = new THREE.Vector3(
+    child.userData.curves[index].v1.x,
+    extrudeHeight,
+    child.userData.curves[index].v1.y
+  );
+  const endPoint = new THREE.Vector3(
+    child.userData.curves[index].v2.x,
+    extrudeHeight,
+    child.userData.curves[index].v2.y
+  );
+
+  // Create a triangle using these three points
+  const shape = new THREE.Shape();
+  shape.moveTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  );
+  shape.lineTo(
+    child.userData.curves[index].v2.x,
+    child.userData.curves[index].v2.y
+  );
+  shape.lineTo(thirdPoint.x, thirdPoint.y);
+  shape.lineTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  ); // close the shape
+
+  const edgeDirection = new THREE.Vector3()
+    .subVectors(endPoint, startPoint)
+    .normalize();
+  const rotationAngle = Math.PI / 2;
+
+  const geometry = new THREE.ShapeGeometry(shape);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x0000ff,
+    side: THREE.DoubleSide,
+  });
+  const triangle = new THREE.Mesh(geometry, material);
+  triangle.position.y = extrudeHeight;
+
+  const quaternionY = new THREE.Quaternion();
+  quaternionY.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  triangle.applyQuaternion(quaternionY);
+
+  const customQuaternion = new THREE.Quaternion();
+  customQuaternion.setFromAxisAngle(edgeDirection, rotationAngle);
+  triangle.applyQuaternion(customQuaternion);
+  triangle.position.sub(startPoint);
+  triangle.position.applyQuaternion(customQuaternion);
+  triangle.position.add(startPoint);
+  triangle.updateMatrix();
+  triangle.updateMatrixWorld(true);
+  triangle.name = "roofTriangle";
+
+  let nextPoint: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+  if (index == 3) {
+    nextPoint = new THREE.Vector3(
+      child.userData.curves[0].v2.x,
+      extrudeHeight,
+      child.userData.curves[0].v2.y
+    );
+  } else {
+    nextPoint = new THREE.Vector3(
+      child.userData.curves[index + 1].v2.x,
+      extrudeHeight,
+      child.userData.curves[index + 1].v2.y
+    );
+  }
+
+  const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
+  const extrusionDistance = endPoint.distanceTo(nextPoint);
+  let extrusionSettings;
+  if (blueprintState) {
+    extrusionSettings = {
+      bevelEnabled: true,
+      depth: -extrusionDistance,
+      // @ts-ignore
+      path: extrusionPath,
+    };
+  } else {
+    extrusionSettings = {
+      bevelEnabled: true,
+      depth: extrusionDistance,
+      // @ts-ignore
+      path: extrusionPath,
+    };
+  }
+
+  const extrudeGeometry = new THREE.ExtrudeGeometry(
+    shape, // The shape to extrude
+    extrusionSettings // Extrusion settings
+  );
+
+  const extrudedMaterial = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+  });
+
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  extrudedMesh.position.copy(triangle.position);
+  extrudedMesh.rotation.copy(triangle.rotation);
+  extrudedMesh.name = "roof";
+  extrudedMesh.userData = shape;
+  label.userData = extrudedMesh;
   scene.add(extrudedMesh);
 }
