@@ -1498,7 +1498,7 @@ function updateShedRoofGeometry(
   triangle.position.add(startPoint);
   triangle.updateMatrix();
   triangle.updateMatrixWorld(true);
-  triangle.name = "roofTriangle";
+  triangle.name = "shedRoofTriangle";
 
   let nextPoint: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
   if (index == 3) {
@@ -1547,7 +1547,7 @@ function updateShedRoofGeometry(
   const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
-  extrudedMesh.name = "roof";
+  extrudedMesh.name = "shedRoof";
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
   scene.add(extrudedMesh);
