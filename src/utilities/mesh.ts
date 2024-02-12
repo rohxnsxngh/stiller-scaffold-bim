@@ -162,6 +162,66 @@ function measureLineLength(points: any) {
   }
 }
 
+// scaffolding model creation along with bounding box for respective scaffolding model
+export function createScaffoldModel(
+  length: number
+): Promise<[THREE.LineSegments, THREE.Object3D]> {
+  return new Promise((resolve, reject) => {
+    const loader = new GLTFLoader();
+    loader.load(
+      "/models/scaffolding-home.glb",
+      (gltf: any) => {
+        const scaffoldModel = gltf.scene;
+        scaffoldModel.name = "scaffoldingModel";
+        scaffoldModel.userData.name = "scaffoldingModel"
+        // Calculate bounding box
+        const bbox = new THREE.Box3().setFromObject(scaffoldModel);
+        const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
+
+        // Calculate scale factor to achieve desired length (1.57 meters)
+        const scaleFactor = length / currentLength;
+
+        // Apply scale factor to the model
+        scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+        // Update the bounding box with the scaled model
+        scaffoldModel.updateMatrixWorld();
+        const newBBox = new THREE.Box3().setFromObject(scaffoldModel);
+
+        // Create wireframe geometry
+        const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
+          newBBox.min,
+          new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
+          newBBox.max,
+        ]);
+
+        // Create wireframe material
+        const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+
+        // Create wireframe
+        const bboxWireframe = new THREE.LineSegments(
+          new THREE.WireframeGeometry(bboxGeometry),
+          bboxMaterial
+        );
+        bboxWireframe.name = "scaffoldingWireframe";
+        resolve([bboxWireframe, scaffoldModel]);
+      },
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      },
+      (error) => {
+        console.error("Error loading GLB model:", error);
+        reject(error);
+      }
+    );
+  });
+}
+
 // Create Blueprint from Shape Outline
 export function createBlueprintFromShapeOutline(
   points: any,
@@ -1145,61 +1205,139 @@ function updateRoofGeometry(
   scene.add(extrudedMesh);
 }
 
-export function createScaffoldModel(
-  length: number
-): Promise<[THREE.LineSegments, THREE.Object3D]> {
-  return new Promise((resolve, reject) => {
-    const loader = new GLTFLoader();
-    loader.load(
-      "/models/scaffolding-home.glb",
-      (gltf: any) => {
-        const scaffoldModel = gltf.scene;
-        scaffoldModel.name = "scaffoldingModel";
-        scaffoldModel.userData.name = "scaffoldingModel"
-        // Calculate bounding box
-        const bbox = new THREE.Box3().setFromObject(scaffoldModel);
-        const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
+export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
+  console.log(child.userData)
+  const height = 3
+  let thirdPoint: THREE.Vector2 = new THREE.Vector2(0,  0);
+  if (index == 0) {
+    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x + height, child.userData.curves[index].v1.y)
+  } 
+  if (index == 1) {
+    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x, child.userData.curves[index].v1.y - height)
+  }
+  if (index == 2) {
+    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x - height, child.userData.curves[index].v1.y)
+  }
+  if (index == 3) {
+    thirdPoint = new THREE.Vector2(child.userData.curves[index].v1.x, child.userData.curves[index].v1.y + height)
+  }
 
-        // Calculate scale factor to achieve desired length (1.57 meters)
-        const scaleFactor = length / currentLength;
+  const triangleHeightOffsetDistance = distanceFromPointToLine(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y,
+    child.userData.curves[index].v2.x,
+    child.userData.curves[index].v2.y,
+    thirdPoint.x,
+    thirdPoint.y
+  );
 
-        // Apply scale factor to the model
-        scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+  console.log(triangleHeightOffsetDistance)
 
-        // Update the bounding box with the scaled model
-        scaffoldModel.updateMatrixWorld();
-        const newBBox = new THREE.Box3().setFromObject(scaffoldModel);
+  // Create a right triangle using the two points and the third point
+  const shape = new THREE.Shape();
+  shape.moveTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  );
+  shape.lineTo(
+    child.userData.curves[index].v2.x,
+    child.userData.curves[index].v2.y
+  );
+  shape.lineTo(thirdPoint.x, thirdPoint.y);
+  shape.lineTo(
+    child.userData.curves[index].v1.x,
+    child.userData.curves[index].v1.y
+  ); // close the shape
 
-        // Create wireframe geometry
-        const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
-          newBBox.min,
-          new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
-          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
-          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
-          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
-          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
-          new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
-          newBBox.max,
-        ]);
+  const extrudeHeight = -1 * child.geometry.parameters.options.depth;
 
-        // Create wireframe material
-        const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+  const startPoint = new THREE.Vector3(
+    child.userData.curves[index].v1.x,
+    extrudeHeight,
+    child.userData.curves[index].v1.y
+  );
+  const endPoint = new THREE.Vector3(
+    child.userData.curves[index].v2.x,
+    extrudeHeight,
+    child.userData.curves[index].v2.y
+  );
 
-        // Create wireframe
-        const bboxWireframe = new THREE.LineSegments(
-          new THREE.WireframeGeometry(bboxGeometry),
-          bboxMaterial
-        );
-        bboxWireframe.name = "scaffoldingWireframe";
-        resolve([bboxWireframe, scaffoldModel]);
-      },
-      (xhr) => {
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
-      (error) => {
-        console.error("Error loading GLB model:", error);
-        reject(error);
-      }
-    );
+  const edgeDirection = new THREE.Vector3()
+    .subVectors(endPoint, startPoint)
+    .normalize();
+  const rotationAngle = Math.PI /  2;
+
+  const geometry = new THREE.ShapeGeometry(shape);
+  const material = new THREE.MeshBasicMaterial({
+    color:  0xffffff,
+    side: THREE.DoubleSide,
   });
+  const triangle = new THREE.Mesh(geometry, material);
+  triangle.position.y = extrudeHeight;
+  const quaternionY = new THREE.Quaternion();
+  quaternionY.setFromAxisAngle(new THREE.Vector3(1,  0,  0), Math.PI /  2);
+  triangle.applyQuaternion(quaternionY);
+
+  const customQuaternion = new THREE.Quaternion();
+  customQuaternion.setFromAxisAngle(edgeDirection, rotationAngle);
+  triangle.applyQuaternion(customQuaternion);
+  triangle.position.sub(startPoint);
+  triangle.position.applyQuaternion(customQuaternion);
+  triangle.position.add(startPoint);
+  triangle.updateMatrix();
+  triangle.updateMatrixWorld(true);
+  triangle.name = "shedRoofTriangle";
+  // scene.add(triangle)
+
+
+  let nextPoint: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+  if (index == 3) {
+    nextPoint = new THREE.Vector3(
+      child.userData.curves[0].v2.x,
+      extrudeHeight,
+      child.userData.curves[0].v2.y
+    );
+  } else {
+    nextPoint = new THREE.Vector3(
+      child.userData.curves[index +  1].v2.x,
+      extrudeHeight,
+      child.userData.curves[index +  1].v2.y
+    );
+  }
+
+  const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
+  const extrusionDistance = endPoint.distanceTo(nextPoint);
+  let extrusionSettings;
+  if (blueprintHasBeenUpdated) {
+    extrusionSettings = {
+      bevelEnabled: true,
+      depth: -extrusionDistance,
+      // @ts-ignore
+      path: extrusionPath,
+    };
+  } else {
+    extrusionSettings = {
+      bevelEnabled: true,
+      depth: extrusionDistance,
+      // @ts-ignore
+      path: extrusionPath,
+    };
+  }
+
+  const extrudeGeometry = new THREE.ExtrudeGeometry(
+    shape, // The shape to extrude
+    extrusionSettings // Extrusion settings
+  );
+
+  const extrudedMaterial = new THREE.MeshPhongMaterial({
+    color:  0xffffff,
+    side: THREE.DoubleSide,
+  });
+
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  extrudedMesh.position.copy(triangle.position);
+  extrudedMesh.rotation.copy(triangle.rotation);
+  extrudedMesh.name = "shedRoof";
+  extrudedMesh.userData = shape;
+  scene.add(extrudedMesh);
 }

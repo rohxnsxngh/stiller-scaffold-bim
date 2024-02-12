@@ -10,6 +10,7 @@ import {
   createScaffoldingShapeIsOutlined,
   createScaffoldModel,
   placeScaffoldModelsAlongLine,
+  createShedRoof,
 } from "./utilities/mesh";
 import {
   createToolbar,
@@ -104,7 +105,8 @@ export const createModelView = async () => {
     createBlueprintRectangleButton,
     freeRotateButton,
     drawingButton,
-    roofButton,
+    createGableRoofButton,
+    createShedRoofButton,
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     createScaffoldButton,
@@ -248,9 +250,10 @@ export const createModelView = async () => {
 
   let points: THREE.Vector3[] = [];
   let scaffoldPoints: THREE.Vector3[] = [];
+  let drawingInProgressSwitch: boolean = true;
 
   document.addEventListener("mousedown", () => {
-    if (drawingInProgress) {
+    if (drawingInProgress && drawingInProgressSwitch) {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
@@ -307,7 +310,7 @@ export const createModelView = async () => {
     extrusions = [];
   });
 
-  roofButton.domElement.addEventListener("mousedown", () => {
+  createGableRoofButton.domElement.addEventListener("mousedown", () => {
     let extrusions: THREE.Mesh[] = [];
     let roofs: THREE.Mesh[] = [];
 
@@ -330,6 +333,36 @@ export const createModelView = async () => {
       );
       if (!hasRoof) {
         createRoof(extrusion, scene, 0);
+      }
+    });
+
+    roofs = [];
+    extrusions = [];
+  });
+
+  createShedRoofButton.domElement.addEventListener("mousedown", () => {
+    let extrusions: THREE.Mesh[] = [];
+    let roofs: THREE.Mesh[] = [];
+
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.name === "roof") {
+          roofs.push(child);
+        } else if (child.name === "extrusion") {
+          extrusions.push(child);
+        }
+      }
+    });
+
+    console.log("roofs", roofs);
+    console.log("extrusions", extrusions);
+
+    extrusions.forEach((extrusion) => {
+      let hasRoof = roofs.some((roof) =>
+        extrusion.userData.currentPoint.equals(roof.userData.currentPoint)
+      );
+      if (!hasRoof) {
+        createShedRoof(extrusion, scene, 0)
       }
     });
 
@@ -410,32 +443,34 @@ export const createModelView = async () => {
 
   // handles roof rotation, snap the roof to a different rotation.
   rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
+    console.log("rotating roof")
+    drawingInProgressSwitch =  false
     // Add a mousedown event listener to the window or a specific element
     window.addEventListener("mousedown", () => {
       // Check if the click is on the roof
       if (intersects.length > 0 && intersects[0].object.name === "roof") {
         console.log("rotating roof");
-        // scene.remove(intersects[0].object);
+        scene.remove(intersects[0].object);
         let extrusions: THREE.Mesh[] = [];
         let roofs: THREE.Mesh[] = [];
 
         // Toggle the roofToggleState between  0 and  1
         roofToggleState = roofToggleState === 0 ? 1 : 0;
 
-        // scene.traverse((child) => {
-        //   if (child instanceof THREE.Mesh) {
-        //     if (child.name === "roof") {
-        //       roofs.push(child);
-        //     }
-        //     if (child.name === "extrusion") {
-        //       extrusions.push(child);
-        //     }
-        //   }
-        //   if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
-        //     child.element.style.pointerEvents = "none";
-        //     child.visible = false;
-        //   }
-        // });
+        scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.name === "roof") {
+              roofs.push(child);
+            }
+            if (child.name === "extrusion") {
+              extrusions.push(child);
+            }
+          }
+          if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
+            child.element.style.pointerEvents = "none";
+            child.visible = false;
+          }
+        });
 
         console.log("roofs", roofs);
         console.log("extrusions", extrusions);
@@ -445,7 +480,7 @@ export const createModelView = async () => {
             extrusion.userData.currentPoint.equals(roof.userData.currentPoint)
           );
           if (!hasRoof) {
-            // createRoof(extrusion, scene, roofToggleState);
+            createRoof(extrusion, scene, roofToggleState);
           }
         });
 
@@ -573,6 +608,10 @@ export const createModelView = async () => {
 
   drawingButton.domElement.addEventListener("mousedown", () => {
     isDrawingBlueprint = false;
+  });
+
+  drawingButton.domElement.addEventListener("mousedown", () => {
+    drawingInProgressSwitch = true;
   });
 
   /////////////////////

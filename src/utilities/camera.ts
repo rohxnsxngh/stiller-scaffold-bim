@@ -37,7 +37,6 @@ export function cameraDisableOrbitalFunctionality(gsap: any, camera: any) {
     duration: 0.1,
     ease: "power1.inOut",
     onComplete: () => {
-      console.log(camera.controls);
       camera.controls.enabled = true;
       camera.controls.dollyToCursor = false;
       camera.controls.enablePan = false;

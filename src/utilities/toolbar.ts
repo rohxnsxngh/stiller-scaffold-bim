@@ -277,6 +277,36 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
 
+  const createGableRoofButton = new OBC.Button(components, {
+    materialIconName: "change_history",
+    name: "Gable Roof",
+    closeOnClick: true,
+  });
+  createGableRoofButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  createGableRoofButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
+  });
+  roofButton.addChild(createGableRoofButton);
+
+  const createShedRoofButton = new OBC.Button(components, {
+    materialIconName: "details",
+    name: "Shed Roof",
+    closeOnClick: true,
+  });
+  createShedRoofButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  createShedRoofButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
+  });
+  roofButton.addChild(createShedRoofButton);
+
   const rotateRoofOrientationButton = new OBC.Button(components, {
     materialIconName: "360",
     name: "Rotate Roof",
@@ -493,7 +523,8 @@ export const createToolbar = (
     createBlueprintRectangleButton,
     freeRotateButton,
     drawingButton,
-    roofButton,
+    createGableRoofButton,
+    createShedRoofButton,
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     createScaffoldButton,
