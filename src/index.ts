@@ -7,17 +7,18 @@ import {
   createExtrusionFromBlueprint,
   createRectangle,
   createRoof,
+  createShedRoof,
+} from "./utilities/mesh";
+import {
   createScaffoldingShapeIsOutlined,
   createScaffoldModel,
   placeScaffoldModelsAlongLine,
-  createShedRoof,
-} from "./utilities/mesh";
+} from "./utilities/scaffold";
 import {
   createToolbar,
   drawingInProgress,
   drawingScaffoldingInProgress,
   deletionInProgress,
-  setDrawingInProgress,
 } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
@@ -563,10 +564,15 @@ export const createModelView = async () => {
     generateScaffolding();
   });
   async function generateScaffolding() {
-    const [bboxWireframe ,scaffoldModeling] = await createScaffoldModel(1.57);
+    const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57);
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
-        placeScaffoldModelsAlongLine(child, scene, scaffoldModeling, bboxWireframe);
+        placeScaffoldModelsAlongLine(
+          child,
+          scene,
+          scaffoldModeling,
+          bboxWireframe
+        );
       }
     });
   }

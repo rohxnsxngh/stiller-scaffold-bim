@@ -147,3 +147,21 @@ export function resetScene(scene: THREE.Scene) {
     scene.remove(object);
   });
 }
+
+// helper function to measure line length
+export function measureLineLength(points: any) {
+  const lastIndex = points.length - 1;
+  const secondToLastIndex = points.length - 2;
+  if (points.length > 1) {
+    let length;
+    // use pythagorean theorem to calculate distance
+    const xLeg = Math.abs(points[lastIndex].x - points[secondToLastIndex].x);
+    const zLeg = Math.abs(points[lastIndex].z - points[secondToLastIndex].z);
+    const hypotenuse = Math.sqrt(Math.pow(xLeg, 2) + Math.pow(zLeg, 2));
+    length = hypotenuse;
+
+    return [length, points[lastIndex], points[secondToLastIndex]];
+  } else {
+    return [0, null, null];
+  }
+}
