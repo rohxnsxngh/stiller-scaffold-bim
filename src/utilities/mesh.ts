@@ -131,10 +131,9 @@ export async function createScaffoldingShapeIsOutlined(
 export async function placeScaffoldModelsAlongLine(
   line: THREE.Line,
   scene: THREE.Scene,
-  scaffoldModeling: any
+  scaffoldModeling: any,
+  bboxWireframe: any
 ) {
-  let scaffoldModel = SkeletonUtils.clone(scaffoldModeling);
-
   const lineLength = line.userData.length;
   const numSegments = Math.ceil(lineLength / 1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
   try {
@@ -156,8 +155,10 @@ export async function placeScaffoldModelsAlongLine(
 
       if (!isModelAlreadyPlaced) {
         // Instantiate the GLB model
-        const modelInstance = scaffoldModel.clone();
+        const modelInstance = SkeletonUtils.clone(scaffoldModeling);
+        const boundBoxInstance = bboxWireframe.clone();
         modelInstance.position.copy(position); // Position the model at the interpolated position
+        boundBoxInstance.position.copy(position);
         const lineDirection = new THREE.Vector3()
           .subVectors(endPoint, startPoint)
           .normalize();
@@ -170,10 +171,11 @@ export async function placeScaffoldModelsAlongLine(
         const euler = new THREE.Euler().setFromQuaternion(quaternion);
 
         modelInstance.rotation.copy(euler);
+        boundBoxInstance.rotation.copy(euler);
         console.log("model instance", modelInstance);
 
         scene.add(modelInstance);
-        // scene.add(modelInstance.userData)
+        scene.add(boundBoxInstance);
       } else {
         console.log("there are already children at this position");
       }
@@ -248,9 +250,33 @@ export function createScaffoldModel(
           bboxMaterial
         );
         bboxWireframe.name = "scaffoldingWireframe";
-        scaffoldModel.userData = { wireframe: bboxWireframe };
-        console.log(bboxWireframe);
-        resolve(scaffoldModel);
+
+        // TODO Solution for improving speed of model loading
+        // Create instanced mesh for the model and its bounding box
+        // Traverse the scaffoldModel and remove non-Mesh children
+        // const scaffoldingModelChildren = scaffoldModel.children[0];
+        // Remove non-Mesh children from scaffoldingModelChildren using a forEach loop
+        // scaffoldingModelChildren.children.forEach(
+        //   (child: any, index: number) => {
+        //     if (!(child instanceof THREE.Mesh)) {
+        //       scaffoldingModelChildren.children.splice(index, 1);
+        //     }
+        //   }
+        // );
+        // console.log("scaffolding model", scaffoldModel);
+
+        // const modelInstances = new THREE.InstancedMesh(
+        //   scaffoldModel.geometry,
+        //   scaffoldModel.material,
+        //   numSegments
+        // );
+        // const boundBoxInstances = new THREE.InstancedMesh(
+        //   bboxWireframe.geometry,
+        //   bboxMaterial,
+        //   numSegments
+        // );
+
+        resolve([bboxWireframe, scaffoldModel]);
       },
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");

@@ -563,10 +563,10 @@ export const createModelView = async () => {
     generateScaffolding();
   });
   async function generateScaffolding() {
-    const scaffoldModeling = await createScaffoldModel(1.57);
+    const [bboxWireframe ,scaffoldModeling] = await createScaffoldModel(1.57);
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
-        placeScaffoldModelsAlongLine(child, scene, scaffoldModeling);
+        placeScaffoldModelsAlongLine(child, scene, scaffoldModeling, bboxWireframe);
       }
     });
   }
