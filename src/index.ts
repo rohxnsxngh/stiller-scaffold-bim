@@ -28,8 +28,6 @@ import {
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   calculateTransformedBoundingBox,
-  createBoundingBoxVisualizationFromBox,
-  // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
 
 let intersects: any, components: OBC.Components;
@@ -351,7 +349,7 @@ export const createModelView = async () => {
           extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
       );
       if (!hasRoof) {
-        createShedRoof(extrusion, scene, 0);
+        createShedRoof(extrusion, scene, 3);
       }
     });
 
