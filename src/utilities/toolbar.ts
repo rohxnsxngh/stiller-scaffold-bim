@@ -374,7 +374,7 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(true);
+    setDrawingScaffoldingInProgress(false);
   });
   generateScaffoldOutlineButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -387,28 +387,25 @@ export const createToolbar = (
   );
   scaffoldButton.addChild(generateScaffoldOutlineButton);
 
-    // generate scaffolding outline
-    const placeScaffoldButton = new OBC.Button(components, {
-      materialIconName: "domain_add",
-      name: "Place Individual Scaffold",
-      closeOnClick: true,
-    });
-    placeScaffoldButton.onClick.add(() => {
-      document.body.style.cursor = "auto";
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setDrawingScaffoldingInProgress(true);
-    });
-    placeScaffoldButton.domElement.addEventListener("mouseover", () => {
-      setDrawingInProgress(false);
-    });
-    placeScaffoldButton.domElement.addEventListener(
-      "mouseleave",
-      () => {
-        setDrawingInProgress(false);
-      }
-    );
-    scaffoldButton.addChild(placeScaffoldButton);
+  // generate scaffolding outline
+  const placeScaffoldButton = new OBC.Button(components, {
+    materialIconName: "domain_add",
+    name: "Place Individual Scaffold",
+    closeOnClick: true,
+  });
+  placeScaffoldButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  placeScaffoldButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  placeScaffoldButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(false);
+  });
+  scaffoldButton.addChild(placeScaffoldButton);
 
   // generate scaffolding
   const generateScaffoldButton = new OBC.Button(components, {
@@ -574,6 +571,7 @@ export const createToolbar = (
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     drawScaffoldButton,
+    placeScaffoldButton,
     generateScaffoldButton,
     createExtrusionButton,
   ];

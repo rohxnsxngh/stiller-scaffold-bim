@@ -35,6 +35,7 @@ let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
 let labels: any;
 let roofToggleState: number = 0;
+let placeScaffoldIndividually: boolean = false;
 // let selectedLine: any;
 
 const stats = new Stats();
@@ -111,6 +112,7 @@ export const createModelView = async () => {
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     drawScaffoldButton,
+    placeScaffoldButton,
     generateScaffoldButton,
     createExtrusionButton,
   ] = createToolbar(components, scene);
@@ -124,43 +126,25 @@ export const createModelView = async () => {
   cssRenderer.domElement.style.top = "0";
   document.body.appendChild(cssRenderer.domElement);
 
-  const labelPanel = document.getElementById("label");
-  if (!labelPanel) {
-    throw new Error("Label panel not found");
-  }
-  labelPanel.style.visibility = "hidden";
-  const pTag = labelPanel.querySelector("p");
-  if (!pTag) {
-    throw new Error("Label Paragraph Button not found");
-  }
-  pTag.addEventListener("mousedown", () => {
-    setDrawingInProgress(false);
-  });
-  const label = new CSS2DObject(labelPanel);
-  label.position.set(0, 0, 0);
-  scene.add(label);
-
-  labelPanel.addEventListener("mouseenter", () => {
-    setDrawingInProgress(true);
-  });
-  labelPanel.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
-  });
-
-  const labelButton = document.getElementById("label-enter");
-  if (!labelButton) {
-    throw new Error("Label Enter Button not found");
-  }
-  labelButton.addEventListener("mousedown", () => {
-    const newMeasurement = labelPanel.textContent;
-    if (newMeasurement !== null) {
-      const newLength = parseFloat(newMeasurement);
-      console.log(newLength);
+  window.addEventListener("mousemove", function (e) {
+    if (placeScaffoldIndividually) {
+      scene.add(highlightMesh);
+      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      // @ts-ignore
+      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
+      intersects = raycaster.intersectObjects(scene.children);
+      intersects.forEach(function (intersect: any) {
+        switch (intersect.object.name) {
+          case "ground":
+            const highlightPos = new THREE.Vector3().copy(intersect.point);
+            highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
+            highlightMesh.material.color.set(0x00ff00);
+            break;
+        }
+      });
     }
   });
-
-  // Set pointer-events to none initially
-  // labelPanel.style.pointerEvents = "none";
 
   window.addEventListener("mousemove", function (e) {
     if (drawingScaffoldingInProgress) {
@@ -223,29 +207,13 @@ export const createModelView = async () => {
           case "blueprint":
             break;
           case "line":
-            // const selectedLine = intersect.object;
-            const length = intersect.object.userData.length;
-            const LinePos = new THREE.Vector3().copy(intersect.point);
-            labelPanel.style.visibility = "visible";
-            labelPanel.style.pointerEvents = "auto";
-            pTag.textContent = `${length} m.`;
-            label.position.set(LinePos.x - 0.5, 0, LinePos.z - 0.5);
             break;
           case "cubeClone":
-            labelPanel.style.visibility = "hidden";
-            labelPanel.style.pointerEvents = "none";
             break;
           case "rectangleLine":
-            console.log(
-              intersect.object.userData.width,
-              intersect.object.userData.height
-            );
             break;
         }
       });
-    } else {
-      labelPanel.style.pointerEvents = "none";
-      // labelPanel.style.visibility = "hidden";
     }
   });
 
@@ -422,8 +390,7 @@ export const createModelView = async () => {
               console.log(mesh.userData.currentPoint);
               console.log(roof.userData.currentPoint);
               if (
-                mesh.userData.currentPoint.x ===
-                roof.userData.currentPoint.x ||
+                mesh.userData.currentPoint.x === roof.userData.currentPoint.x ||
                 mesh.userData.currentPoint.y === roof.userData.currentPoint.y
               ) {
                 // extrudedRoof = roof;
@@ -573,7 +540,6 @@ export const createModelView = async () => {
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
-    console.log("creating scaffolding", scene);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       console.log("creating scaffolding", scene);
@@ -587,6 +553,11 @@ export const createModelView = async () => {
     }
   });
 
+  placeScaffoldButton.domElement.addEventListener("mousedown", () => {
+    console.log("place scaffold individually");
+    placeScaffoldIndividually = true;
+  });
+
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
     console.log("generate scaffolding");
     generateScaffolding();
@@ -595,11 +566,7 @@ export const createModelView = async () => {
     const scaffoldModeling = await createScaffoldModel(1.57);
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
-        placeScaffoldModelsAlongLine(
-          child,
-          scene,
-          scaffoldModeling,
-        );
+        placeScaffoldModelsAlongLine(child, scene, scaffoldModeling);
       }
     });
   }

@@ -47,9 +47,39 @@ export function createShapeIsOutlined(
           last_point: lastPoint,
         };
         scene.add(line);
+        createLineLabel(
+          scene,
+          line.userData.first_point,
+          line.userData.last_point,
+          line.userData.length
+        );
       }
     }
   });
+}
+
+function createLineLabel(
+  scene: THREE.Scene,
+  firstPoint: THREE.Vector3,
+  lastPoint: THREE.Vector3,
+  length: number
+) {
+  // Calculate midpoint
+  const midpoint = new THREE.Vector3();
+  midpoint.addVectors(lastPoint, firstPoint).multiplyScalar(0.5);
+  const distance = length;
+  const labelDiv = document.createElement("div");
+  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.textContent = `${distance.toFixed(2)} m.`;
+  labelDiv.contentEditable = "true";
+
+  const label = new CSS2DObject(labelDiv);
+  label.name = "rectangleRoofLabel";
+  label.position.copy(
+    new THREE.Vector3(midpoint.x, midpoint.y, midpoint.z + 1)
+  );
+  scene.add(label);
+  return label;
 }
 
 // Create Scaffolding Shape Outline
@@ -140,11 +170,13 @@ export async function placeScaffoldModelsAlongLine(
         const euler = new THREE.Euler().setFromQuaternion(quaternion);
 
         modelInstance.rotation.copy(euler);
-        console.log("model instance", modelInstance)
+        console.log("model instance", modelInstance);
 
         scene.add(modelInstance);
         // scene.add(modelInstance.userData)
-      } else {console.log("there are already children at this position")}
+      } else {
+        console.log("there are already children at this position");
+      }
     }
   } catch (error) {
     console.error("Error creating scaffold model:", error);
@@ -216,8 +248,8 @@ export function createScaffoldModel(
           bboxMaterial
         );
         bboxWireframe.name = "scaffoldingWireframe";
-        scaffoldModel.userData = {"wireframe": bboxWireframe};
-        console.log(bboxWireframe)
+        scaffoldModel.userData = { wireframe: bboxWireframe };
+        console.log(bboxWireframe);
         resolve(scaffoldModel);
       },
       (xhr) => {
