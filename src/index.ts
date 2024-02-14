@@ -397,7 +397,7 @@ export const createModelView = async () => {
                   const boundingBox = createBoundingBoxVisualizationFromBox(
                     transformedBoundingBox
                   );
-                  scene.add(boundingBox);
+                  // scene.add(boundingBox);
                   const roofBottomVertex = new THREE.Vector3(
                     transformedBoundingBox.min.x,
                     transformedBoundingBox.min.y,
