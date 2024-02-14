@@ -75,12 +75,7 @@ export function createBoundingBoxVisualization(mesh: THREE.Mesh) {
 }
 
 export function calculateTransformedBoundingBox(mesh: THREE.Mesh): THREE.Box3 {
-  // const geometry = mesh.geometry;
-  const matrix = mesh.matrixWorld;
   const boundingBox = new THREE.Box3().setFromObject(mesh);
-
-  // Apply the mesh's transformation matrix to the bounding box
-  boundingBox.applyMatrix4(matrix);
 
   return boundingBox;
 }
@@ -128,10 +123,12 @@ export function resetScene(scene: THREE.Scene) {
       child.visible = false;
       child.element.style.pointerEvents = "none";
       objectsToRemove.push(child);
-    } 
+    }
     if (
       child.name !== "ground" &&
-      (child instanceof THREE.Mesh || child instanceof THREE.Points || child instanceof THREE.Line) &&
+      (child instanceof THREE.Mesh ||
+        child instanceof THREE.Points ||
+        child instanceof THREE.Line) &&
       !(child.geometry instanceof THREE.PlaneGeometry)
     ) {
       console.log(child);
@@ -140,7 +137,7 @@ export function resetScene(scene: THREE.Scene) {
       objectsToRemove.push(child);
     }
     if (child.name === "scaffoldingModel") {
-      objectsToRemove.push(child)
+      objectsToRemove.push(child);
     }
   });
   objectsToRemove.forEach((object: any) => {

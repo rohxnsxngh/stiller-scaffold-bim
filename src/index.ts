@@ -26,9 +26,7 @@ import {
   CSS2DObject,
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import {
-  calculateTransformedBoundingBox,
-} from "./utilities/helper";
+import { calculateTransformedBoundingBox, createBoundingBoxVisualizationFromBox } from "./utilities/helper";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -349,7 +347,7 @@ export const createModelView = async () => {
           extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
       );
       if (!hasRoof) {
-        createShedRoof(extrusion, scene, 3);
+        createShedRoof(extrusion, scene, 0);
       }
     });
 
@@ -396,10 +394,10 @@ export const createModelView = async () => {
                 if (mesh) {
                   const transformedBoundingBox =
                     calculateTransformedBoundingBox(roof);
-                  // const boundingBox = createBoundingBoxVisualizationFromBox(
-                  //   transformedBoundingBox
-                  // );
-                  // scene.add(boundingBox);
+                  const boundingBox = createBoundingBoxVisualizationFromBox(
+                    transformedBoundingBox
+                  );
+                  scene.add(boundingBox);
                   const roofBottomVertex = new THREE.Vector3(
                     transformedBoundingBox.min.x,
                     transformedBoundingBox.min.y,
@@ -408,6 +406,14 @@ export const createModelView = async () => {
                   // difference between the center of the roof and it's bounding box bottom
                   const deltaY = roof.position.y - roofBottomVertex.y;
                   const differenceDeltaY = deltaY + editedExtrusionHeight;
+
+                  console.log("deltaY", deltaY)
+                  console.log("roof position", roof.position)
+                  console.log("roof current position", roof.userData.currentPoint)
+                  console.log("roof bottom vertex", roofBottomVertex)
+                  console.log("edited extrusion", editedExtrusionHeight)
+                  console.log("difference delta Y", differenceDeltaY)
+
                   roof.position.y = differenceDeltaY;
                 } else {
                   console.log("mesh does not exist");
