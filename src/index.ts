@@ -10,6 +10,7 @@ import {
   createShedRoof,
 } from "./utilities/mesh";
 import {
+  createIndividualScaffoldOnClick,
   createScaffoldingShapeIsOutlined,
   createScaffoldModel,
   placeScaffoldModelsAlongLine,
@@ -26,7 +27,10 @@ import {
   CSS2DObject,
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { calculateTransformedBoundingBox, createBoundingBoxVisualizationFromBox } from "./utilities/helper";
+import {
+  calculateTransformedBoundingBox,
+  createBoundingBoxVisualizationFromBox,
+} from "./utilities/helper";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -136,7 +140,6 @@ export const createModelView = async () => {
           case "ground":
             const highlightPos = new THREE.Vector3().copy(intersect.point);
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
-            highlightMesh.material.color.set(0x00ff00);
             break;
         }
       });
@@ -218,7 +221,7 @@ export const createModelView = async () => {
   let scaffoldPoints: THREE.Vector3[] = [];
   let drawingInProgressSwitch: boolean = true;
 
-  document.addEventListener("mousedown", () => {
+  document.addEventListener("mousedown", async () => {
     if (drawingInProgress && drawingInProgressSwitch) {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
@@ -231,6 +234,16 @@ export const createModelView = async () => {
         highlightMesh,
         scene,
         cube
+      );
+    }
+    if (placeScaffoldIndividually) {
+      const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57);
+      createIndividualScaffoldOnClick(
+        intersects,
+        highlightMesh,
+        scene,
+        scaffoldModeling,
+        bboxWireframe
       );
     }
   });
@@ -407,12 +420,15 @@ export const createModelView = async () => {
                   const deltaY = roof.position.y - roofBottomVertex.y;
                   const differenceDeltaY = deltaY + editedExtrusionHeight;
 
-                  console.log("deltaY", deltaY)
-                  console.log("roof position", roof.position)
-                  console.log("roof current position", roof.userData.currentPoint)
-                  console.log("roof bottom vertex", roofBottomVertex)
-                  console.log("edited extrusion", editedExtrusionHeight)
-                  console.log("difference delta Y", differenceDeltaY)
+                  console.log("deltaY", deltaY);
+                  console.log("roof position", roof.position);
+                  console.log(
+                    "roof current position",
+                    roof.userData.currentPoint
+                  );
+                  console.log("roof bottom vertex", roofBottomVertex);
+                  console.log("edited extrusion", editedExtrusionHeight);
+                  console.log("difference delta Y", differenceDeltaY);
 
                   roof.position.y = differenceDeltaY;
                 } else {
@@ -545,6 +561,7 @@ export const createModelView = async () => {
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
+    placeScaffoldIndividually = false;
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       console.log("creating scaffolding", scene);
@@ -558,7 +575,7 @@ export const createModelView = async () => {
     }
   });
 
-  placeScaffoldButton.domElement.addEventListener("mousedown", () => {
+  placeScaffoldButton.domElement.addEventListener("mousedown", async () => {
     console.log("place scaffold individually");
     placeScaffoldIndividually = true;
   });
