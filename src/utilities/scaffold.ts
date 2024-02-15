@@ -2,6 +2,13 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import { measureLineLength } from "./helper";
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+
+export let placeScaffoldIndividually = false;
+
+export const setPlaceScaffoldIndividually = (value: boolean) => {
+  placeScaffoldIndividually = value;
+};
 
 // Create Scaffolding Shape Outline
 export async function createScaffoldingShapeIsOutlined(
@@ -202,7 +209,6 @@ export function createIndividualScaffoldOnClick(
 ) {
   intersects.forEach(function (intersect: any) {
     if (intersect.object.name === "ground") {
-
       const modelInstance = SkeletonUtils.clone(scaffoldModeling);
       const boundBoxInstance = bboxWireframe.clone();
       modelInstance.position.set(
@@ -217,6 +223,102 @@ export function createIndividualScaffoldOnClick(
       );
       scene.add(modelInstance);
       scene.add(boundBoxInstance);
+      modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+      boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+      const label = createIndividualScaffoldLabel(
+        scene,
+        modelInstance,
+        boundBoxInstance
+      );
+      attachIndividualScaffoldLabelChangeHandler(
+        label,
+        modelInstance,
+        boundBoxInstance
+      );
     }
   });
+}
+
+function createIndividualScaffoldLabel(
+  scene: THREE.Scene,
+  scaffold: THREE.Object3D,
+  scaffoldBoundingBox: any
+) {
+  const position = scaffold.position;
+  const rotation = scaffold.rotation;
+  const labelDiv = document.createElement("div");
+  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  // Convert the rotation Euler angles to degrees and format them as strings
+  const rotationY = (rotation.y * (180 / Math.PI)).toFixed(2);
+  labelDiv.textContent = `Rotation: ${rotationY}°`;
+  labelDiv.contentEditable = "true";
+
+  const label = new CSS2DObject(labelDiv);
+  label.name = "scaffoldLabel";
+  label.position.copy(
+    new THREE.Vector3(position.x, position.y, position.z + 1)
+  );
+  scene.add(label);
+  return label;
+}
+
+function attachIndividualScaffoldLabelChangeHandler(
+  label: CSS2DObject,
+  scaffold: THREE.Object3D,
+  scaffoldBoundingBox: any
+) {
+  const labelElement = label.element as HTMLDivElement;
+  let oldValue: any;
+
+  labelElement.addEventListener("mouseenter", () => {
+    setPlaceScaffoldIndividually(false);
+  });
+
+  labelElement.addEventListener("focus", () => {
+    setPlaceScaffoldIndividually(false);
+    oldValue = labelElement.textContent;
+  });
+
+  labelElement.addEventListener("blur", () => {
+    setPlaceScaffoldIndividually(true);
+    const newValue = labelElement.textContent;
+    if (oldValue !== newValue) {
+      updateScaffoldRotation(newValue, scaffold, scaffoldBoundingBox);
+      console.log(newValue);
+    }
+  });
+}
+
+function updateScaffoldRotation(
+  newValue: string | null,
+  scaffold: THREE.Object3D,
+  boundBox: THREE.Object3D
+) {
+  // Parse the new rotation value from the label text content
+  if (newValue == null) {
+    newValue = "90";
+  }
+  const rotationAngleInDegrees = parseFloat(newValue.split(":")[1].trim());
+  const rotationAngleInRadians = THREE.MathUtils.degToRad(
+    rotationAngleInDegrees
+  );
+
+  // Rotate the scaffold and bounding box instances
+  scaffold.rotation.y = rotationAngleInRadians;
+  boundBox.rotation.y = rotationAngleInRadians;
+
+  // Update the label text content to reflect the new rotation
+  const labelDiv = document.createElement("div");
+  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.textContent = `Rotation: ${newValue}`;
+  labelDiv.contentEditable = "true";
+
+  // Replace the existing label with the updated one
+  const existingLabel = scaffold.getObjectByName(
+    "scaffoldLabel"
+  ) as CSS2DObject;
+  if (existingLabel) {
+    existingLabel.element.parentNode?.removeChild(existingLabel.element);
+    existingLabel.element = labelDiv;
+  }
 }

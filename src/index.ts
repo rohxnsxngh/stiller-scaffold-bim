@@ -14,6 +14,8 @@ import {
   createScaffoldingShapeIsOutlined,
   createScaffoldModel,
   placeScaffoldModelsAlongLine,
+  setPlaceScaffoldIndividually,
+  placeScaffoldIndividually
 } from "./utilities/scaffold";
 import {
   createToolbar,
@@ -36,7 +38,7 @@ let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
 let labels: any;
 let roofToggleState: number = 0;
-let placeScaffoldIndividually: boolean = false;
+// let placeScaffoldIndividually: boolean = false;
 // let selectedLine: any;
 
 const stats = new Stats();
@@ -561,7 +563,7 @@ export const createModelView = async () => {
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
-    placeScaffoldIndividually = false;
+    setPlaceScaffoldIndividually(false)
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       console.log("creating scaffolding", scene);
@@ -577,7 +579,7 @@ export const createModelView = async () => {
 
   placeScaffoldButton.domElement.addEventListener("mousedown", async () => {
     console.log("place scaffold individually");
-    placeScaffoldIndividually = true;
+    setPlaceScaffoldIndividually(true)
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
