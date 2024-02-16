@@ -3,6 +3,7 @@ import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { distanceFromPointToLine, measureLineLength } from "./helper";
 import { rectMaterial } from "./material";
+import { setDrawingInProgress } from "./toolbar";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -67,7 +68,8 @@ function createLineLabel(
   midpoint.addVectors(lastPoint, firstPoint).multiplyScalar(0.5);
   const distance = length;
   const labelDiv = document.createElement("div");
-  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.className =
+    "label bg-black text-white pointer-events-auto rounded-full py-1";
   labelDiv.textContent = `${distance.toFixed(2)} m.`;
   labelDiv.contentEditable = "true";
 
@@ -185,7 +187,8 @@ function createExtrusionLabel(scene: THREE.Scene, shape: any, depth: number) {
   const midpoint = new THREE.Vector3().lerpVectors(startPoint, endPoint, 0.5);
   const distance = -depth;
   const labelDiv = document.createElement("div");
-  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.className =
+    "label bg-black text-white pointer-events-auto rounded-full py-1";
   labelDiv.textContent = `${distance.toFixed(2)} m.`;
   labelDiv.contentEditable = "true";
 
@@ -339,7 +342,8 @@ function createLabels(rectanglePoints: THREE.Vector3[] | undefined) {
       );
       const distance = rectanglePoints[i].distanceTo(rectanglePoints[i + 1]);
       const labelDiv = document.createElement("div");
-      labelDiv.className = "label bg-black text-white pointer-events-auto";
+      labelDiv.className =
+        "label bg-black text-white pointer-events-auto rounded-full py-1";
       labelDiv.textContent = `${distance.toFixed(2)} m.`;
       labelDiv.contentEditable = "true";
 
@@ -391,7 +395,18 @@ function attachLabelChangeHandler(
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
 
+  labelElement.addEventListener("mouseenter", () => {
+    document.body.style.cursor = "grab";
+    setDrawingInProgress(false);
+  });
+
+  labelElement.addEventListener("mouseleave", () => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+  });
+
   labelElement.addEventListener("focus", () => {
+    setDrawingInProgress(false);
     oldValue = labelElement.textContent;
   });
 
@@ -868,7 +883,8 @@ function createRoofLabel(
   );
   const distance = triangleHeightOffsetDistance;
   const labelDiv = document.createElement("div");
-  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.className =
+    "label bg-black text-white pointer-events-auto rounded-full py-1";
   labelDiv.textContent = `${distance.toFixed(2)} m.`;
   labelDiv.contentEditable = "true";
 
