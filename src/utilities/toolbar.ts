@@ -573,6 +573,7 @@ export const createToolbar = (
     drawScaffoldButton,
     placeScaffoldButton,
     generateScaffoldButton,
+    generateScaffoldOutlineButton,
     createExtrusionButton,
   ];
 };

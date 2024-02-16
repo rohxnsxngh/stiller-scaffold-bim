@@ -224,8 +224,15 @@ export function createIndividualScaffoldOnClick(
           0,
           highlightMesh.position.z
         );
+
+        // TODO DO NOT LET THE BOUNDING BOXES INTERSECT
+        // FIND A WAY TO SNAP SCAFFOLDING TOGETHER SO THEY ARE TOUCHING
+        // Check if there is already a model at this position
+        console.log(boundBoxInstance);
+
         scene.add(modelInstance);
         scene.add(boundBoxInstance);
+
         modelInstance.rotateOnAxis(
           new THREE.Vector3(0, 1, 0),
           scaffoldRotation
@@ -263,9 +270,9 @@ function createIndividualScaffoldLabel(
   labelDiv.className =
     "label bg-black text-white pointer-events-auto rounded-full py-1";
   // Convert the rotation Euler angles to degrees and format them as strings
-  console.log(rotation.y)
+  console.log(rotation.y);
   const rotationY = THREE.MathUtils.RAD2DEG * rotation.y;
-  console.log("rotationY", rotation)
+  console.log("rotationY", rotation);
   scaffoldRotation = rotation.y;
   labelDiv.textContent = `${rotationY.toFixed(2)}°`;
   labelDiv.contentEditable = "true";
@@ -288,6 +295,7 @@ function createIndividualScaffoldLabel(
     new THREE.Vector3(position.x, position.y, position.z + 1)
   );
   scene.add(label);
+  label.userData = { boundingBox: scaffoldBoundingBox };
   return { label, button };
 }
 
@@ -347,7 +355,7 @@ function updateScaffoldRotation(
     THREE.MathUtils.RAD2DEG * rotationAngleInDegrees;
 
   scaffoldRotation = rotationAngleInRadians;
-  console.log("rotationAngleInRadians", rotationAngleInRadians)
+  console.log("rotationAngleInRadians", rotationAngleInRadians);
   console.log(scaffoldRotation);
 
   // Rotate the scaffold and bounding box instances
@@ -368,4 +376,60 @@ function updateScaffoldRotation(
     existingLabel.element.parentNode?.removeChild(existingLabel.element);
     existingLabel.element = labelDiv;
   }
+}
+
+export function generateScaffoldOutline(blueprint: THREE.Mesh, scene: THREE.Scene) {
+  console.log(blueprint.userData)
+  const shape = blueprint.userData; // Assuming the shape is stored in userData
+  const points: any = [];
+  const offsetDistance =  2; // Define the offset distance
+
+  shape.curves.forEach((curve: any) => {
+    if (curve instanceof THREE.LineCurve) {
+      const startPoint = curve.v1;
+      const endPoint = curve.v2;
+
+      const startPointXYZ = new THREE.Vector3(startPoint.x, 0, startPoint.y)
+      const endPointXYZ = new THREE.Vector3(startPoint.x, 0, startPoint.y)
+
+      // Calculate the direction vector of the line segment
+      const direction = new THREE.Vector3().subVectors(endPointXYZ, startPointXYZ).normalize();
+
+      // Calculate the normal vector to the line segment
+      const normal = new THREE.Vector3(direction.z,  0, -direction.x).normalize();
+
+      // Calculate the offset vectors
+      const offsetStart = new THREE.Vector3().crossVectors(direction, normal).multiplyScalar(offsetDistance);
+      const offsetEnd = offsetStart.clone().negate();
+
+      // Apply the offsets to the start and end points
+      const offsetStartPoint = new THREE.Vector3(startPoint.x,  0, startPoint.y).add(offsetStart);
+      const offsetEndPoint = new THREE.Vector3(endPoint.x,  0, endPoint.y).add(offsetEnd);
+
+      // Push the offset points to the array
+      points.push(offsetStartPoint);
+      points.push(offsetEndPoint);
+
+      // Create line segment from the last two points
+      if (points.length >=  2) {
+        const geometry = new THREE.BufferGeometry().setFromPoints([
+          points[points.length -  2],
+          points[points.length -  1],
+        ]);
+        const material = new THREE.LineBasicMaterial({ color:  0xffffff });
+        const line = new THREE.Line(geometry, material);
+        line.name = "scaffoldLine";
+        const [length, lastPoint, firstPoint] = measureLineLength([
+          points[points.length -  2],
+          points[points.length -  1],
+        ]);
+        line.userData = {
+          length: length,
+          first_point: firstPoint,
+          last_point: lastPoint,
+        };
+        scene.add(line);
+      }
+    }
+  });
 }

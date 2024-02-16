@@ -15,7 +15,8 @@ import {
   createScaffoldModel,
   placeScaffoldModelsAlongLine,
   setPlaceScaffoldIndividually,
-  placeScaffoldIndividually
+  placeScaffoldIndividually,
+  generateScaffoldOutline
 } from "./utilities/scaffold";
 import {
   createToolbar,
@@ -31,7 +32,7 @@ import {
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   calculateTransformedBoundingBox,
-  createBoundingBoxVisualizationFromBox,
+  // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
 
 let intersects: any, components: OBC.Components;
@@ -117,6 +118,7 @@ export const createModelView = async () => {
     drawScaffoldButton,
     placeScaffoldButton,
     generateScaffoldButton,
+    generateScaffoldOutlineButton,
     createExtrusionButton,
   ] = createToolbar(components, scene);
 
@@ -409,9 +411,9 @@ export const createModelView = async () => {
                 if (mesh) {
                   const transformedBoundingBox =
                     calculateTransformedBoundingBox(roof);
-                  const boundingBox = createBoundingBoxVisualizationFromBox(
-                    transformedBoundingBox
-                  );
+                  // const boundingBox = createBoundingBoxVisualizationFromBox(
+                  //   transformedBoundingBox
+                  // );
                   // scene.add(boundingBox);
                   const roofBottomVertex = new THREE.Vector3(
                     transformedBoundingBox.min.x,
@@ -599,6 +601,14 @@ export const createModelView = async () => {
       }
     });
   }
+
+  generateScaffoldOutlineButton.domElement.addEventListener("mousedown", () => {
+    scene.traverse((child: any) => {
+      if (child instanceof THREE.Mesh && child.name === "blueprint") {
+        generateScaffoldOutline(child, scene)
+      }
+    })
+  })
 
   //////////////////////////////////
   // this section pertains to creating the rectangle from the top view by clicking and dragging
