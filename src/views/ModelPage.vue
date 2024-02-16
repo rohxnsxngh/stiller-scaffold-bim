@@ -1,7 +1,6 @@
 <template>
   <div id="model" v-if="showDrawer"></div>
   <div id="marker"></div>
-  <Label />
 </template>
 
 <script setup lang="ts">
@@ -23,12 +22,8 @@ onMounted(() => {
 </script>
 
 <script lang="ts">
-import Label from "../components/Label.vue";
-
 export default {
-  components: {
-    Label,
-  },
+  components: {},
   data() {
     return {};
   },

@@ -199,59 +199,85 @@ export function createScaffoldModel(
   });
 }
 
+let scaffoldRotation: number = Math.PI / 2;
 // Create Shape Outline
 export function createIndividualScaffoldOnClick(
-  intersects: any,
+  intersects: any[] = [],
   highlightMesh: THREE.Mesh,
   scene: THREE.Scene,
   scaffoldModeling: any,
   bboxWireframe: any
 ) {
-  intersects.forEach(function (intersect: any) {
-    if (intersect.object.name === "ground") {
-      const modelInstance = SkeletonUtils.clone(scaffoldModeling);
-      const boundBoxInstance = bboxWireframe.clone();
-      modelInstance.position.set(
-        highlightMesh.position.x,
-        0,
-        highlightMesh.position.z
-      );
-      boundBoxInstance.position.set(
-        highlightMesh.position.x,
-        0,
-        highlightMesh.position.z
-      );
-      scene.add(modelInstance);
-      scene.add(boundBoxInstance);
-      modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
-      boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
-      const label = createIndividualScaffoldLabel(
-        scene,
-        modelInstance,
-        boundBoxInstance
-      );
-      attachIndividualScaffoldLabelChangeHandler(
-        label,
-        modelInstance,
-        boundBoxInstance
-      );
-    }
-  });
+  if (Array.isArray(intersects)) {
+    // Check if intersects is an array
+    intersects.forEach(function (intersect: any) {
+      if (intersect.object.name === "ground") {
+        const modelInstance = SkeletonUtils.clone(scaffoldModeling);
+        const boundBoxInstance = bboxWireframe.clone();
+        modelInstance.position.set(
+          highlightMesh.position.x,
+          0,
+          highlightMesh.position.z
+        );
+        boundBoxInstance.position.set(
+          highlightMesh.position.x,
+          0,
+          highlightMesh.position.z
+        );
+        scene.add(modelInstance);
+        scene.add(boundBoxInstance);
+        modelInstance.rotateOnAxis(
+          new THREE.Vector3(0, 1, 0),
+          scaffoldRotation
+        );
+        boundBoxInstance.rotateOnAxis(
+          new THREE.Vector3(0, 1, 0),
+          scaffoldRotation
+        );
+        const { label, button } = createIndividualScaffoldLabel(
+          scene,
+          modelInstance,
+          boundBoxInstance
+        );
+        attachIndividualScaffoldLabelChangeHandler(
+          label,
+          modelInstance,
+          boundBoxInstance,
+          button
+        );
+      }
+    });
+  } else {
+    console.error("Intersects is not an array");
+  }
 }
 
 function createIndividualScaffoldLabel(
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any
-) {
+): { label: CSS2DObject; button: HTMLButtonElement } {
   const position = scaffold.position;
   const rotation = scaffold.rotation;
   const labelDiv = document.createElement("div");
-  labelDiv.className = "label bg-black text-white pointer-events-auto";
+  labelDiv.className =
+    "label bg-black text-white pointer-events-auto rounded-full py-1";
   // Convert the rotation Euler angles to degrees and format them as strings
   const rotationY = (rotation.y * (180 / Math.PI)).toFixed(2);
-  labelDiv.textContent = `Rotation: ${rotationY}°`;
+  labelDiv.textContent = `${rotationY}°`;
   labelDiv.contentEditable = "true";
+
+  // Create a button element
+  const button = document.createElement("button");
+  button.className = "material-icons btn btn-sm btn-ghost mx-2";
+  button.textContent = "rotate_right"
+  button.contentEditable = "false";
+  // const icon = document.createElement("i");
+  // icon.className = "material-icons";
+  // icon.textContent = "rotate_right";
+  // button.appendChild(icon);
+
+  labelDiv.appendChild(button);
 
   const label = new CSS2DObject(labelDiv);
   label.name = "scaffoldLabel";
@@ -259,13 +285,14 @@ function createIndividualScaffoldLabel(
     new THREE.Vector3(position.x, position.y, position.z + 1)
   );
   scene.add(label);
-  return label;
+  return { label, button };
 }
 
 function attachIndividualScaffoldLabelChangeHandler(
   label: CSS2DObject,
   scaffold: THREE.Object3D,
-  scaffoldBoundingBox: any
+  scaffoldBoundingBox: any,
+  button: HTMLButtonElement
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
@@ -274,13 +301,16 @@ function attachIndividualScaffoldLabelChangeHandler(
     setPlaceScaffoldIndividually(false);
   });
 
+  labelElement.addEventListener("mouseleave", () => {
+    setPlaceScaffoldIndividually(true);
+  });
+
   labelElement.addEventListener("focus", () => {
     setPlaceScaffoldIndividually(false);
     oldValue = labelElement.textContent;
   });
 
-  labelElement.addEventListener("blur", () => {
-    setPlaceScaffoldIndividually(true);
+  button.addEventListener("click", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
       updateScaffoldRotation(newValue, scaffold, scaffoldBoundingBox);
@@ -294,14 +324,24 @@ function updateScaffoldRotation(
   scaffold: THREE.Object3D,
   boundBox: THREE.Object3D
 ) {
+  // Default rotation angle if newValue is null or doesn't contain a colon
+  let rotationAngleInDegrees = 90;
+
   // Parse the new rotation value from the label text content
-  if (newValue == null) {
-    newValue = "90";
+  if (newValue != null) {
+    const parts = newValue.split("°");
+    console.log("new values", parts)
+    if (parts.length > 1) {
+      rotationAngleInDegrees = parseFloat(parts[0].trim());
+      console.log("rotation angle in degrees", rotationAngleInDegrees)
+    }
   }
-  const rotationAngleInDegrees = parseFloat(newValue.split(":")[1].trim());
+
   const rotationAngleInRadians = THREE.MathUtils.degToRad(
     rotationAngleInDegrees
-  );
+  )
+  scaffoldRotation = rotationAngleInRadians;
+  console.log(scaffoldRotation)
 
   // Rotate the scaffold and bounding box instances
   scaffold.rotation.y = rotationAngleInRadians;
@@ -310,7 +350,7 @@ function updateScaffoldRotation(
   // Update the label text content to reflect the new rotation
   const labelDiv = document.createElement("div");
   labelDiv.className = "label bg-black text-white pointer-events-auto";
-  labelDiv.textContent = `Rotation: ${newValue}`;
+  labelDiv.textContent = `${newValue}`;
   labelDiv.contentEditable = "true";
 
   // Replace the existing label with the updated one
