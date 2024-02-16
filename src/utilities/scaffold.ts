@@ -378,58 +378,64 @@ function updateScaffoldRotation(
   }
 }
 
-export function generateScaffoldOutline(blueprint: THREE.Mesh, scene: THREE.Scene) {
-  console.log(blueprint.userData)
-  const shape = blueprint.userData; // Assuming the shape is stored in userData
-  const points: any = [];
-  const offsetDistance =  2; // Define the offset distance
+export function generateScaffoldOutline(
+  blueprint: THREE.Mesh,
+  scene: THREE.Scene
+) {
+  console.log(blueprint.userData);
+  const shape = blueprint.userData as THREE.Shape; // Assuming the shape is stored in userData
 
-  shape.curves.forEach((curve: any) => {
-    if (curve instanceof THREE.LineCurve) {
-      const startPoint = curve.v1;
-      const endPoint = curve.v2;
+  const extrudeSettings = {
+    steps: 0,
+    depth: 0,
+    bevelEnabled: true,
+    bevelThickness: 0,
+    bevelSize: 0,
+    bevelOffset: 1,
+    bevelSegments: 0,
+  };
 
-      const startPointXYZ = new THREE.Vector3(startPoint.x, 0, startPoint.y)
-      const endPointXYZ = new THREE.Vector3(startPoint.x, 0, startPoint.y)
+  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const mesh = new THREE.Mesh(geometry, material);
+  console.log(mesh);
+  mesh.rotateX(Math.PI / 2);
 
-      // Calculate the direction vector of the line segment
-      const direction = new THREE.Vector3().subVectors(endPointXYZ, startPointXYZ).normalize();
+  // Access the vertices of the extruded geometry
+  // Create a bounding box around the extruded mesh
+  const boundingBox = new THREE.Box3().setFromObject(mesh);
 
-      // Calculate the normal vector to the line segment
-      const normal = new THREE.Vector3(direction.z,  0, -direction.x).normalize();
+  // Get the vertices of the bounding box
+  const vertices = [
+    boundingBox.min,
+    new THREE.Vector3(boundingBox.max.x, 0, boundingBox.min.z),
+    boundingBox.max,
+    new THREE.Vector3(boundingBox.min.x, 0, boundingBox.max.z),
+  ];
 
-      // Calculate the offset vectors
-      const offsetStart = new THREE.Vector3().crossVectors(direction, normal).multiplyScalar(offsetDistance);
-      const offsetEnd = offsetStart.clone().negate();
+  console.log(vertices);
 
-      // Apply the offsets to the start and end points
-      const offsetStartPoint = new THREE.Vector3(startPoint.x,  0, startPoint.y).add(offsetStart);
-      const offsetEndPoint = new THREE.Vector3(endPoint.x,  0, endPoint.y).add(offsetEnd);
+  // Create line segments from the vertices of the bounding box
+  for (let i = 0; i < vertices.length; i++) {
+    const nextIndex = (i + 1) % vertices.length; // Wrap around to the first vertex after the last
+    const geometry = new THREE.BufferGeometry().setFromPoints([
+      vertices[i],
+      vertices[nextIndex],
+    ]);
+    const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const line = new THREE.Line(geometry, material);
+    // Calculate the length of the line segment
+    const length = vertices[i].distanceTo(vertices[nextIndex]);
+    const firstPoint = vertices[i];
+    const lastPoint = vertices[nextIndex];
 
-      // Push the offset points to the array
-      points.push(offsetStartPoint);
-      points.push(offsetEndPoint);
-
-      // Create line segment from the last two points
-      if (points.length >=  2) {
-        const geometry = new THREE.BufferGeometry().setFromPoints([
-          points[points.length -  2],
-          points[points.length -  1],
-        ]);
-        const material = new THREE.LineBasicMaterial({ color:  0xffffff });
-        const line = new THREE.Line(geometry, material);
-        line.name = "scaffoldLine";
-        const [length, lastPoint, firstPoint] = measureLineLength([
-          points[points.length -  2],
-          points[points.length -  1],
-        ]);
-        line.userData = {
-          length: length,
-          first_point: firstPoint,
-          last_point: lastPoint,
-        };
-        scene.add(line);
-      }
-    }
-  });
+    // Add userData to the line
+    line.userData = {
+      length: length,
+      first_point: firstPoint,
+      last_point: lastPoint,
+    };
+    line.name = "scaffoldLine";
+    scene.add(line);
+  }
 }
