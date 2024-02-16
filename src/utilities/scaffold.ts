@@ -263,14 +263,17 @@ function createIndividualScaffoldLabel(
   labelDiv.className =
     "label bg-black text-white pointer-events-auto rounded-full py-1";
   // Convert the rotation Euler angles to degrees and format them as strings
-  const rotationY = (rotation.y * (180 / Math.PI)).toFixed(2);
-  labelDiv.textContent = `${rotationY}°`;
+  console.log(rotation.y)
+  const rotationY = THREE.MathUtils.RAD2DEG * rotation.y;
+  console.log("rotationY", rotation)
+  scaffoldRotation = rotation.y;
+  labelDiv.textContent = `${rotationY.toFixed(2)}°`;
   labelDiv.contentEditable = "true";
 
   // Create a button element
   const button = document.createElement("button");
   button.className = "material-icons btn btn-sm btn-ghost mx-2";
-  button.textContent = "rotate_right"
+  button.textContent = "rotate_right";
   button.contentEditable = "false";
   // const icon = document.createElement("i");
   // icon.className = "material-icons";
@@ -330,18 +333,22 @@ function updateScaffoldRotation(
   // Parse the new rotation value from the label text content
   if (newValue != null) {
     const parts = newValue.split("°");
-    console.log("new values", parts)
+    console.log("new values", parts);
     if (parts.length > 1) {
       rotationAngleInDegrees = parseFloat(parts[0].trim());
-      console.log("rotation angle in degrees", rotationAngleInDegrees)
+      console.log(
+        "rotation angle in degrees",
+        rotationAngleInDegrees.toFixed(2)
+      );
     }
   }
 
-  const rotationAngleInRadians = THREE.MathUtils.degToRad(
-    rotationAngleInDegrees
-  )
+  const rotationAngleInRadians =
+    THREE.MathUtils.RAD2DEG * rotationAngleInDegrees;
+
   scaffoldRotation = rotationAngleInRadians;
-  console.log(scaffoldRotation)
+  console.log("rotationAngleInRadians", rotationAngleInRadians)
+  console.log(scaffoldRotation);
 
   // Rotate the scaffold and bounding box instances
   scaffold.rotation.y = rotationAngleInRadians;
