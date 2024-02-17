@@ -698,7 +698,6 @@ export const createModelView = async () => {
   shadows.shadowOffset = 0.1;
   // Collect all meshes in the scene that you want to have shadows
 
-
   const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
 
   document.addEventListener("mousedown", () => {
@@ -712,6 +711,12 @@ export const createModelView = async () => {
         } else if (object.name === "blueprint") {
           shadowId = object.uuid;
         } else if (object.name === "extrusion") {
+          shadowId = object.uuid;
+        } else if (object.name === "scaffoldingModel") {
+          shadowId = object.uuid;
+        } else if (object.name === "roof") {
+          shadowId = object.uuid;
+        } else if (object.name === "shedRoof") {
           shadowId = object.uuid;
         } else {
           // Skip if the object name is not one of the specified types
