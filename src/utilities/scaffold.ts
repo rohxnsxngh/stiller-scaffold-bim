@@ -111,6 +111,9 @@ export async function placeScaffoldModelsAlongLine(
   } catch (error) {
     console.error("Error creating scaffold model:", error);
   }
+
+  const {label, buttonAdd, buttonMinus} = attachScaffoldStackingLabel(scene, line.userData.first_point);
+  attachScaffoldRowLabelChangeHandler(label, scaffoldModeling, bboxWireframe, buttonAdd, buttonMinus)
 }
 
 // scaffolding model creation along with bounding box for respective scaffolding model
@@ -269,10 +272,6 @@ function createIndividualScaffoldLabel(
   button.className = "material-icons btn btn-sm btn-ghost mx-2";
   button.textContent = "rotate_right";
   button.contentEditable = "false";
-  // const icon = document.createElement("i");
-  // icon.className = "material-icons";
-  // icon.textContent = "rotate_right";
-  // button.appendChild(icon);
 
   labelDiv.appendChild(button);
 
@@ -308,7 +307,7 @@ function attachIndividualScaffoldLabelChangeHandler(
     oldValue = labelElement.textContent;
   });
 
-  button.addEventListener("click", () => {
+  button.addEventListener("mousedown", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
       updateScaffoldRotation(newValue, scaffold, scaffoldBoundingBox);
@@ -427,6 +426,72 @@ export function generateScaffoldOutline(
   }
 }
 
-function attachScaffoldStackingLabel() {
-  
+function attachScaffoldStackingLabel(
+  scene: THREE.Scene,
+  position: THREE.Vector3
+): {
+  label: CSS2DObject;
+  buttonAdd: HTMLButtonElement;
+  buttonMinus: HTMLButtonElement;
+} {
+  const labelDiv = document.createElement("div");
+  labelDiv.className =
+    "label bg-black text-white pointer-events-auto rounded-full py-1";
+  labelDiv.contentEditable = "false";
+
+  // Create Add button element
+  const buttonAdd = document.createElement("button");
+  buttonAdd.className =
+    "material-icons btn btn-sm btn-ghost rounded-full hover:bg-red-400 hover:text-black";
+  buttonAdd.textContent = "add";
+  buttonAdd.contentEditable = "false";
+
+  // Create minus button element
+  const buttonMinus = document.createElement("button");
+  buttonMinus.className =
+    "material-icons btn btn-sm btn-ghost rounded-full hover:bg-red-400 hover:text-black";
+  buttonMinus.textContent = "remove";
+  buttonMinus.contentEditable = "false";
+
+  labelDiv.appendChild(buttonAdd);
+  labelDiv.appendChild(buttonMinus);
+
+  const label = new CSS2DObject(labelDiv);
+  label.position.copy(position);
+  scene.add(label);
+
+  return { label, buttonAdd, buttonMinus };
+}
+
+let currentScaffoldingHeight: number =  0;
+function attachScaffoldRowLabelChangeHandler(
+  label: CSS2DObject,
+  scaffold: THREE.Object3D,
+  scaffoldBoundingBox: any,
+  buttonAdd: HTMLButtonElement,
+  buttonMinus: HTMLButtonElement,
+) {
+  const labelElement = label.element as HTMLDivElement;
+  labelElement.addEventListener("mouseenter", () => {
+    setPlaceScaffoldIndividually(false);
+  });
+
+  labelElement.addEventListener("mouseleave", () => {
+    setPlaceScaffoldIndividually(true);
+  });
+
+  labelElement.addEventListener("focus", () => {
+    setPlaceScaffoldIndividually(false);
+  });
+
+
+  buttonAdd.addEventListener("mousedown", () => {
+    currentScaffoldingHeight++
+    console.log("add button")
+  });
+
+  buttonMinus.addEventListener("mousedown", () => {
+    currentScaffoldingHeight--
+    console.log("minus button")
+  });
 }

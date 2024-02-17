@@ -723,8 +723,6 @@ export const createModelView = async () => {
           return;
         }
 
-        console.log(shadowIds);
-
         // Check if the shadow ID already exists in the set
         if (!shadowIds.has(shadowId)) {
           shadows.renderShadow([object], shadowId);
