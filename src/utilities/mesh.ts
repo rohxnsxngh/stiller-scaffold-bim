@@ -1488,3 +1488,24 @@ function updateShedRoofGeometry(
   label.userData = extrudedMesh;
   scene.add(extrudedMesh);
 }
+
+export function deleteObject(intersects: any) {
+  if (Array.isArray(intersects)) {
+    intersects.forEach(function (intersect: any) {
+      switch (intersect.object.name) {
+        // case "ground":
+        //   console.log("ground");
+        //   break;
+        case "extrusion":
+          console.log("extrusion");
+          break;
+        case "roof":
+          console.log("roof");
+          break;
+        case "blueprint":
+          console.log("blueprint");
+          break;
+      }
+    });
+  }
+}

@@ -1,6 +1,6 @@
 <template>
   <div
-    id="label"
+    id="label-component"
     class="bg-black text-white p-2 flex pointer-events-auto rounded overflow-hidden"
     @click="clicktest"
   >

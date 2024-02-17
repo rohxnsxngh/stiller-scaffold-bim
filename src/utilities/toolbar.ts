@@ -8,9 +8,8 @@ import {
   cameraTopView,
 } from "./camera";
 import deletePNG from "../assets/images/delete.png";
-import { createSelect } from "./drawer";
 import { resetScene } from "./helper";
-
+import { createTabs } from "./tab";
 export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
@@ -170,10 +169,6 @@ export const createToolbar = (
   });
   deleteObjectButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  deleteObjectButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
     setDrawingScaffoldingInProgress(false);
   });
 
@@ -438,41 +433,6 @@ export const createToolbar = (
     setDrawingInProgress(true);
   });
 
-  //Drawer Menu Button
-  const drawerMenuButton = new OBC.Button(components);
-  drawerMenuButton.materialIcon = "menu";
-  drawerMenuButton.tooltip = "Menu";
-  drawerMenuButton.id = "menu-button";
-  drawerToolBar.addChild(drawerMenuButton);
-  drawerMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
-    drawer.visible = !drawer.visible;
-    updateTitle();
-  });
-  drawerMenuButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(true);
-  });
-  /////////////////////////////////////////////////////////
-  // drawer element
-  const drawer = new OBC.FloatingWindow(components);
-  drawer.visible = false;
-  drawer.domElement.style.position = "left";
-  drawer.domElement.style.width = "20rem";
-  drawer.domElement.style.height = "100vh";
-  drawer.domElement.style.left = "0";
-  drawer.domElement.style.top = "0";
-  drawer.domElement.style.zIndex = "1000";
-  drawer.domElement.style.backgroundColor = "#000000";
-  drawer.domElement.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
-  drawer.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-  });
-  drawer.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
-  });
-  components.ui.add(drawer);
-  console.log(drawer);
-
   // Function to update the title
   const updateTitle = () => {
     const titleElement = drawer.domElement.querySelector(
@@ -490,76 +450,46 @@ export const createToolbar = (
     }
   };
 
-  // Create a title 1/5
-  const title1 = document.createElement("h1");
-  title1.textContent = "1/5";
-  // @ts-ignore
-  title1.classList =
-    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
-  drawer.domElement.appendChild(title1);
-
-  // Example usage of the createSelect function
-  // Example usage of the createSelect function with a custom default option text
-  const selectOptions1 = ["Length", "Height", "Area"];
-  const customDefaultOptionText1 = "Building Shape";
-  const selectElement1 = createSelect(selectOptions1, customDefaultOptionText1);
-  drawer.domElement.appendChild(selectElement1);
-
-  // Create a title 2/5
-  const title2 = document.createElement("h1");
-  title2.textContent = "2/5";
-  // @ts-ignore
-  title2.classList =
-    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
-  drawer.domElement.appendChild(title2);
-
-  // Example usage of the createCollapse function
-  // const collapseTitle = "Click me to show/hide content";
-  // const collapseContent = "hello";
-  // const collapse = createCollapse(collapseTitle, collapseContent);
-  // drawer.domElement.appendChild(collapse);
-
-  // Create a title 3/5
-  const title3 = document.createElement("h1");
-  title3.textContent = "3/5";
-  // @ts-ignore
-  title3.classList =
-    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
-  drawer.domElement.appendChild(title3);
-
-  // Example usage of the createSelect function
-  const selectOptions = ["Svelte", "Vue", "React"];
-  const selectElement = createSelect(selectOptions);
-  drawer.domElement.appendChild(selectElement);
-
-  // Create a title 4/5
-  const title4 = document.createElement("h1");
-  title4.textContent = "4/5";
-  // @ts-ignore
-  title4.classList =
-    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
-  drawer.domElement.appendChild(title4);
-
-  // Create a title 5/5
-  const title5 = document.createElement("h1");
-  title5.textContent = "5/5";
-  // @ts-ignore
-  title5.classList =
-    "stacked-fractions text-red-500 text-2xl font-bold p-2 ml-4";
-  drawer.domElement.appendChild(title5);
-
-  // Create a button
-  const button = new OBC.Button(components);
-  button.materialIcon = "info";
-  button.tooltip = "Info";
-  button.id = "info-button";
-  drawer.domElement.appendChild(button.domElement);
-
-  // Attach an onClick event handler to the button
-  button.onClick.add(() => {
-    console.log("Hello button");
-    window.location.href = "/home";
+  //Drawer Menu Button
+  const drawerMenuButton = new OBC.Button(components);
+  drawerMenuButton.materialIcon = "menu";
+  drawerMenuButton.tooltip = "Menu";
+  drawerMenuButton.id = "menu-button";
+  drawerToolBar.addChild(drawerMenuButton);
+  drawerMenuButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    drawer.visible = !drawer.visible;
   });
+  drawerMenuButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(true);
+  });
+  /////////////////////////////////////////////////////////
+  // drawer element
+  const drawer = new OBC.FloatingWindow(components);
+  updateTitle();
+  drawer.domElement.style.position = "left";
+  drawer.domElement.style.width = "25rem";
+  drawer.domElement.style.height = "100vh";
+  drawer.domElement.style.left = "0";
+  drawer.domElement.style.top = "0";
+  drawer.domElement.style.zIndex = "1000";
+  drawer.domElement.style.backgroundColor = "#000000";
+  drawer.domElement.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+  drawer.visible = false; // change this to true to make the drawer open on mount
+  drawer.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+  });
+  drawer.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(true);
+  });
+  components.ui.add(drawer);
+  console.log(drawer);
+
+  // TabList
+  const tablist = createTabs();
+  // Append the tablist to the drawer
+  drawer.domElement.appendChild(tablist);
+
   ////////////////////////////////////////////////
   return [
     blueprintButton,

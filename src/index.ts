@@ -8,6 +8,7 @@ import {
   createRectangle,
   createRoof,
   createShedRoof,
+  deleteObject,
 } from "./utilities/mesh";
 import {
   createIndividualScaffoldOnClick,
@@ -16,7 +17,7 @@ import {
   placeScaffoldModelsAlongLine,
   setPlaceScaffoldIndividually,
   placeScaffoldIndividually,
-  generateScaffoldOutline
+  generateScaffoldOutline,
 } from "./utilities/scaffold";
 import {
   createToolbar,
@@ -190,23 +191,8 @@ export const createModelView = async () => {
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
             break;
           case "extrusion":
-            if (deletionInProgress) {
-              window.addEventListener("mousedown", () => {
-                intersect.object.geometry.dispose();
-                scene.remove(intersect.object);
-              });
-            }
             break;
           case "roof":
-            console.log("roof");
-            // implementation of delete button
-            // TODO tweak so that it only grabs one object
-            if (deletionInProgress) {
-              window.addEventListener("mousedown", () => {
-                intersect.object.geometry.dispose();
-                scene.remove(intersect.object);
-              });
-            }
             break;
           case "blueprint":
             break;
@@ -249,6 +235,10 @@ export const createModelView = async () => {
         scaffoldModeling,
         bboxWireframe
       );
+    }
+    if (deletionInProgress && !drawingInProgress) {
+      // console.log("delete");
+      deleteObject(intersects);
     }
   });
 
@@ -565,7 +555,7 @@ export const createModelView = async () => {
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
-    setPlaceScaffoldIndividually(false)
+    setPlaceScaffoldIndividually(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       console.log("creating scaffolding", scene);
@@ -581,7 +571,7 @@ export const createModelView = async () => {
 
   placeScaffoldButton.domElement.addEventListener("mousedown", async () => {
     console.log("place scaffold individually");
-    setPlaceScaffoldIndividually(true)
+    setPlaceScaffoldIndividually(true);
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
@@ -605,10 +595,10 @@ export const createModelView = async () => {
   generateScaffoldOutlineButton.domElement.addEventListener("mousedown", () => {
     scene.traverse((child: any) => {
       if (child instanceof THREE.Mesh && child.name === "blueprint") {
-        generateScaffoldOutline(child, scene)
+        generateScaffoldOutline(child, scene);
       }
-    })
-  })
+    });
+  });
 
   //////////////////////////////////
   // this section pertains to creating the rectangle from the top view by clicking and dragging
