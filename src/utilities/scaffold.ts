@@ -426,3 +426,7 @@ export function generateScaffoldOutline(
     scene.add(line);
   }
 }
+
+function attachScaffoldStackingLabel() {
+  
+}

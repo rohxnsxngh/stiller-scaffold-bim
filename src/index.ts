@@ -698,19 +698,35 @@ export const createModelView = async () => {
   shadows.shadowOffset = 0.1;
   // Collect all meshes in the scene that you want to have shadows
 
+
+  const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
+
   document.addEventListener("mousedown", () => {
-    const meshesWithShadows: any = [];
     scene.traverse((object) => {
-      if (object instanceof THREE.Mesh && !(object.name === "ground")) {
-        meshesWithShadows.push(object);
+      if (object instanceof THREE.Mesh) {
+        let shadowId: string;
+        if (object.name === "cubeClone") {
+          shadowId = object.uuid;
+        } else if (object.name === "line") {
+          shadowId = object.uuid;
+        } else if (object.name === "blueprint") {
+          shadowId = object.uuid;
+        } else if (object.name === "extrusion") {
+          shadowId = object.uuid;
+        } else {
+          // Skip if the object name is not one of the specified types
+          return;
+        }
+
+        console.log(shadowIds);
+
+        // Check if the shadow ID already exists in the set
+        if (!shadowIds.has(shadowId)) {
+          shadows.renderShadow([object], shadowId);
+          shadowIds.add(shadowId); // Add the shadow ID to the set
+        }
       }
     });
-    console.log(scene)
-    console.log(meshesWithShadows)
-
-    // meshesWithShadows.forEach((mesh: any) => {
-    //   shadows.renderShadow(mesh, "meshes");
-    // })
   });
 
   // @ts-ignore
