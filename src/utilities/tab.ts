@@ -2,7 +2,7 @@ export function createTabs() {
       // Create the tablist container
   const tablist = document.createElement("div");
   tablist.setAttribute("role", "tablist");
-  tablist.classList.add("tabs", "tabs-lifted", "tab-xs");
+  tablist.classList.add("tabs", "tabs-bordered", "tab-xs");
 
   // Create the first tab
   const tab1 = document.createElement("input");
