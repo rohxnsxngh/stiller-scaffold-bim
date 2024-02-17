@@ -114,12 +114,12 @@ export function createBlueprintFromShapeOutline(
       // Create mesh from shape
       const geometryShape = new THREE.ShapeGeometry(shape);
       const materialShape = new THREE.MeshBasicMaterial({
-        color: 0xff0000,
+        color: 0x7F1D1D,
         side: THREE.DoubleSide,
       });
       const meshShape = new THREE.Mesh(geometryShape, materialShape);
       meshShape.rotateX(Math.PI / 2);
-      //   meshShape.position.y = 0.2
+        meshShape.position.y = 0.01
       meshShape.name = "blueprint";
       meshShape.userData = shape;
       scene.add(meshShape);
@@ -149,10 +149,10 @@ export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
   console.log(shape);
 
   // Material for the extruded mesh
-  const materialExtrude = new THREE.MeshBasicMaterial({
-    color: 0xff0000,
+  const materialExtrude = new THREE.MeshStandardMaterial({
+    color: 0x9d4b4b,
     side: THREE.DoubleSide,
-    wireframe: true,
+    wireframe: false,
   });
 
   // Create the mesh with the extruded geometry

@@ -71,7 +71,7 @@ export const createModelView = async () => {
 
   // Add some elements to the scene
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshStandardMaterial({ color: "purple" });
+  const material = new THREE.MeshStandardMaterial({ color: 0x9d4b4b });
   const cube = new THREE.Mesh(geometry, material);
   cube.position.set(0, 0.5, 0);
   // scene.add(cube);
@@ -84,7 +84,6 @@ export const createModelView = async () => {
   // Base plane: need to change the size of the plane to be bigger
   const planeGeometry = new THREE.PlaneGeometry(100, 100);
   const planeMaterial = new THREE.MeshStandardMaterial({
-    color: "red",
     side: THREE.DoubleSide,
     visible: false,
   }); // add visible: false to remove from visibility
@@ -697,7 +696,22 @@ export const createModelView = async () => {
   shadows.shadowExtraScaleFactor = 15;
   shadows.darkness = 2;
   shadows.shadowOffset = 0.1;
-  shadows.renderShadow([cube], "example2");
+  // Collect all meshes in the scene that you want to have shadows
+
+  document.addEventListener("mousedown", () => {
+    const meshesWithShadows: any = [];
+    scene.traverse((object) => {
+      if (object instanceof THREE.Mesh && !(object.name === "ground")) {
+        meshesWithShadows.push(object);
+      }
+    });
+    console.log(scene)
+    console.log(meshesWithShadows)
+
+    // meshesWithShadows.forEach((mesh: any) => {
+    //   shadows.renderShadow(mesh, "meshes");
+    // })
+  });
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);

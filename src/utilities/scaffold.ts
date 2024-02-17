@@ -161,30 +161,17 @@ export function createScaffoldModel(
         );
         bboxWireframe.name = "scaffoldingWireframe";
 
-        // TODO Solution for improving speed of model loading
-        // Create instanced mesh for the model and its bounding box
         // Traverse the scaffoldModel and remove non-Mesh children
-        // const scaffoldingModelChildren = scaffoldModel.children[0];
+        const scaffoldingModelChildren = scaffoldModel.children[0];
         // Remove non-Mesh children from scaffoldingModelChildren using a forEach loop
-        // scaffoldingModelChildren.children.forEach(
-        //   (child: any, index: number) => {
-        //     if (!(child instanceof THREE.Mesh)) {
-        //       scaffoldingModelChildren.children.splice(index, 1);
-        //     }
-        //   }
-        // );
-        // console.log("scaffolding model", scaffoldModel);
-
-        // const modelInstances = new THREE.InstancedMesh(
-        //   scaffoldModel.geometry,
-        //   scaffoldModel.material,
-        //   numSegments
-        // );
-        // const boundBoxInstances = new THREE.InstancedMesh(
-        //   bboxWireframe.geometry,
-        //   bboxMaterial,
-        //   numSegments
-        // );
+        scaffoldingModelChildren.children.forEach(
+          (child: any, index: number) => {
+            if (!(child instanceof THREE.Mesh)) {
+              scaffoldingModelChildren.children.splice(index, 1);
+            }
+          }
+        );
+        console.log("scaffolding model", scaffoldModel);
 
         resolve([bboxWireframe, scaffoldModel]);
       },
