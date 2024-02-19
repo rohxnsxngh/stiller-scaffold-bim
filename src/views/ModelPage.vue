@@ -1,6 +1,5 @@
 <template>
   <div id="model" v-if="showDrawer"></div>
-  <div id="marker"></div>
 </template>
 
 <script setup lang="ts">

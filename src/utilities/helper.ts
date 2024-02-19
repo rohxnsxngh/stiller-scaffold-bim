@@ -162,3 +162,11 @@ export function measureLineLength(points: any) {
     return [0, null, null];
   }
 }
+
+// Function to disable OrbitControls
+export function disableOrbitControls(controls: any) {
+  controls.enabled = false;
+  controls.enableZoom = false;
+  controls.enablePan = false;
+  controls.enableRotate = false;
+}

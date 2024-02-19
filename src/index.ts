@@ -23,7 +23,10 @@ import {
   createToolbar,
   drawingInProgress,
   drawingScaffoldingInProgress,
+  setDrawingInProgress,
   deletionInProgress,
+  setDrawingScaffoldingInProgress,
+  setDeletionInProgress
 } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
@@ -33,19 +36,22 @@ import {
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   calculateTransformedBoundingBox,
+  disableOrbitControls,
   // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { OrbitViewHelper } from "./utilities/orbit";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
 let labels: any;
 let roofToggleState: number = 0;
-// let placeScaffoldIndividually: boolean = false;
-// let selectedLine: any;
+let controls: any;
+let viewHelper: any;
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-// document.body.appendChild(stats.dom);
+document.body.appendChild(stats.dom);
 
 export const createModelView = async () => {
   const container = document.getElementById("model") as HTMLCanvasElement;
@@ -59,6 +65,32 @@ export const createModelView = async () => {
   components.camera = new OBC.SimpleCamera(components);
   components.raycaster = new OBC.SimpleRaycaster(components);
   components.init();
+
+  // Orbit Controls
+  controls = new OrbitControls(
+    // @ts-ignore
+    components.camera.activeCamera,
+    // @ts-ignore
+    components.renderer._renderer.domElement
+  );
+
+  // Obit Controls Gizmo
+  viewHelper = new OrbitViewHelper(controls, { size: 100, padding: 8 });
+
+  // Add the Gizmo to the document
+  document.body.appendChild(viewHelper.domElement);
+
+  viewHelper.domElement.addEventListener("mouseover", () => {
+    setPlaceScaffoldIndividually(false)
+    setDrawingInProgress(false)
+    setDrawingScaffoldingInProgress(false)
+    setDeletionInProgress(false)
+  })
+
+  console.log(viewHelper);
+
+  // Call the function to disable OrbitControls
+  disableOrbitControls(controls);
 
   // Scene
   const scene = components.scene.get();
@@ -691,7 +723,9 @@ export const createModelView = async () => {
   });
 
   /////////////////////
+  console.log(components);
 
+  // Shadow
   const shadows = new OBC.ShadowDropper(components);
   shadows.shadowExtraScaleFactor = 15;
   shadows.darkness = 2;
@@ -738,7 +772,9 @@ export const createModelView = async () => {
   function animate() {
     stats.begin();
     requestAnimationFrame(animate);
-    // cssRenderer.render(scene, components.camera.activeCamera)
+
+    controls.update();
+
     stats.end();
   }
 

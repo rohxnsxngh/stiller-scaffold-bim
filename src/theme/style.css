@@ -16,8 +16,23 @@ html {
   background: #002022;
 }
 
-#marker {
+.obit-controls-gizmo {
   position: absolute;
-  z-index: 10;
-  border: 2px solid rgb(8, 24, 242);
+  bottom: 1em;
+  right: 1em;
+  z-index: 1000;
+  background-color: #FFF0;
+  border-radius: 100%;
+  transition: background-color .15s  linear;
+  cursor: pointer;
+}
+
+.obit-controls-gizmo.dragging, 
+.obit-controls-gizmo:hover {
+  background-color: #FFF3;
+}
+
+.obit-controls-gizmo.inactive {
+  pointer-events: none;
+  background-color: #FFF0  !important;
 }

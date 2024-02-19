@@ -9,7 +9,7 @@ import {
 } from "./camera";
 import deletePNG from "../assets/images/delete.png";
 import { resetScene } from "./helper";
-import { createTabs } from "./tab";
+import { createTabs, createTimeline } from "./tab";
 export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
@@ -57,7 +57,7 @@ export const createToolbar = (
     alert("I've been clicked!");
   });
   alertButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  alertButton.domElement.classList.add("hover:bg-red-400");
+  alertButton.domElement.classList.add("hover:bg-red-600");
 
   console.log(components.camera);
 
@@ -82,7 +82,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   topViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  topViewButton.domElement.classList.add("hover:bg-red-400");
+  topViewButton.domElement.classList.add("hover:bg-red-600");
 
   const createBlueprintRectangleButton = new OBC.Button(components, {
     materialIconName: "square",
@@ -100,7 +100,7 @@ export const createToolbar = (
   createBlueprintRectangleButton.domElement.classList.remove(
     "hover:bg-ifcjs-200"
   );
-  createBlueprintRectangleButton.domElement.classList.add("hover:bg-red-400");
+  createBlueprintRectangleButton.domElement.classList.add("hover:bg-red-600");
 
   // Move camera to perspective view button
   const perspectiveViewButton = new OBC.Button(components);
@@ -128,7 +128,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   perspectiveViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  perspectiveViewButton.domElement.classList.add("hover:bg-red-400");
+  perspectiveViewButton.domElement.classList.add("hover:bg-red-600");
 
   // Allow panning and rotating button
   const freeRotateButton = new OBC.Button(components);
@@ -148,7 +148,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  freeRotateButton.domElement.classList.add("hover:bg-red-400");
+  freeRotateButton.domElement.classList.add("hover:bg-red-600");
 
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
@@ -163,7 +163,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   drawingButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  drawingButton.domElement.classList.add("hover:bg-red-400");
+  drawingButton.domElement.classList.add("hover:bg-red-600");
 
   const deleteObjectButton = new OBC.Button(components);
   deleteObjectButton.materialIcon = "delete_forever";
@@ -186,7 +186,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  deleteObjectButton.domElement.classList.add("hover:bg-red-400");
+  deleteObjectButton.domElement.classList.add("hover:bg-red-600");
 
   // Start Drawing Blueprint
   const clearSceneButton = new OBC.Button(components);
@@ -210,7 +210,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  clearSceneButton.domElement.classList.add("hover:bg-red-400");
+  clearSceneButton.domElement.classList.add("hover:bg-red-600");
 
   //Solidify Blueprint
   const blueprintButton = new OBC.Button(components);
@@ -229,7 +229,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   blueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  blueprintButton.domElement.classList.add("hover:bg-red-400");
+  blueprintButton.domElement.classList.add("hover:bg-red-600");
 
   // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
@@ -250,7 +250,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   extrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  extrusionButton.domElement.classList.add("hover:bg-red-400");
+  extrusionButton.domElement.classList.add("hover:bg-red-600");
 
   const createExtrusionButton = new OBC.Button(components, {
     materialIconName: "expand",
@@ -266,7 +266,7 @@ export const createToolbar = (
   });
   extrusionButton.addChild(createExtrusionButton);
   createExtrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createExtrusionButton.domElement.classList.add("hover:bg-red-400");
+  createExtrusionButton.domElement.classList.add("hover:bg-red-600");
 
   const createEditExtrusionButton = new OBC.Button(components, {
     materialIconName: "unfold_less",
@@ -282,7 +282,7 @@ export const createToolbar = (
   });
   extrusionButton.addChild(createEditExtrusionButton);
   createEditExtrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createEditExtrusionButton.domElement.classList.add("hover:bg-red-400");
+  createEditExtrusionButton.domElement.classList.add("hover:bg-red-600");
 
   const roofButton = new OBC.Button(components, {
     closeOnClick: true,
@@ -304,7 +304,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  roofButton.domElement.classList.add("hover:bg-red-400");
+  roofButton.domElement.classList.add("hover:bg-red-600");
 
   const createGableRoofButton = new OBC.Button(components, {
     materialIconName: "change_history",
@@ -321,7 +321,7 @@ export const createToolbar = (
   });
   roofButton.addChild(createGableRoofButton);
   createGableRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createGableRoofButton.domElement.classList.add("hover:bg-red-400");
+  createGableRoofButton.domElement.classList.add("hover:bg-red-600");
 
   const createShedRoofButton = new OBC.Button(components, {
     materialIconName: "details",
@@ -338,7 +338,7 @@ export const createToolbar = (
   });
   roofButton.addChild(createShedRoofButton);
   createShedRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createShedRoofButton.domElement.classList.add("hover:bg-red-400");
+  createShedRoofButton.domElement.classList.add("hover:bg-red-600");
 
   const rotateRoofOrientationButton = new OBC.Button(components, {
     materialIconName: "360",
@@ -355,7 +355,7 @@ export const createToolbar = (
   });
   roofButton.addChild(rotateRoofOrientationButton);
   roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  roofButton.domElement.classList.add("hover:bg-red-400");
+  roofButton.domElement.classList.add("hover:bg-red-600");
 
   const scaffoldButton = new OBC.Button(components);
   scaffoldButton.materialIcon = "foundation";
@@ -381,7 +381,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   scaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  scaffoldButton.domElement.classList.add("hover:bg-red-400");
+  scaffoldButton.domElement.classList.add("hover:bg-red-600");
 
   // draw scaffolding outline
   const drawScaffoldButton = new OBC.Button(components, {
@@ -403,7 +403,7 @@ export const createToolbar = (
   });
   scaffoldButton.addChild(drawScaffoldButton);
   drawScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  drawScaffoldButton.domElement.classList.add("hover:bg-red-400");
+  drawScaffoldButton.domElement.classList.add("hover:bg-red-600");
 
   // generate scaffolding outline
   const generateScaffoldOutlineButton = new OBC.Button(components, {
@@ -430,7 +430,7 @@ export const createToolbar = (
   generateScaffoldOutlineButton.domElement.classList.remove(
     "hover:bg-ifcjs-200"
   );
-  generateScaffoldOutlineButton.domElement.classList.add("hover:bg-red-400");
+  generateScaffoldOutlineButton.domElement.classList.add("hover:bg-red-600");
 
   // generate scaffolding outline
   const placeScaffoldButton = new OBC.Button(components, {
@@ -452,7 +452,7 @@ export const createToolbar = (
   });
   scaffoldButton.addChild(placeScaffoldButton);
   placeScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  placeScaffoldButton.domElement.classList.add("hover:bg-red-400");
+  placeScaffoldButton.domElement.classList.add("hover:bg-red-600");
 
   // generate scaffolding
   const generateScaffoldButton = new OBC.Button(components, {
@@ -474,7 +474,7 @@ export const createToolbar = (
   });
   scaffoldButton.addChild(generateScaffoldButton);
   generateScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  generateScaffoldButton.domElement.classList.add("hover:bg-red-400");
+  generateScaffoldButton.domElement.classList.add("hover:bg-red-600");
 
   const drawerToolBar = new OBC.Toolbar(components);
   drawerToolBar.position = "right";
@@ -504,6 +504,18 @@ export const createToolbar = (
     }
   };
 
+  const closeDrawer = () => {
+    const closeDrawerElement = Array.from(
+      drawer.domElement.querySelectorAll("span")
+    ).find((span) => span.textContent === "close");
+    if (closeDrawerElement) {
+      // @ts-ignore
+      closeDrawerElement.classList =
+        "material-icons text-2xl ml-4 text-gray-400 z-20 hover:cursor-pointer hover:text-red-500";
+      closeDrawerElement.id = "drawerCloseButton";
+    }
+  };
+
   //Drawer Menu Button
   const drawerMenuButton = new OBC.Button(components);
   drawerMenuButton.materialIcon = "menu";
@@ -518,11 +530,12 @@ export const createToolbar = (
     setDrawingInProgress(true);
   });
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  drawerMenuButton.domElement.classList.add("hover:bg-red-400");
+  drawerMenuButton.domElement.classList.add("hover:bg-red-600");
   /////////////////////////////////////////////////////////
   // drawer element
   const drawer = new OBC.FloatingWindow(components);
   updateTitle();
+  closeDrawer();
   drawer.domElement.style.position = "left";
   drawer.domElement.style.width = "25rem";
   drawer.domElement.style.height = "100vh";
@@ -540,6 +553,9 @@ export const createToolbar = (
   });
   components.ui.add(drawer);
   console.log(drawer);
+
+  const timeline=  createTimeline();
+  drawer.domElement.appendChild(timeline);
 
   // TabList
   const tablist = createTabs();

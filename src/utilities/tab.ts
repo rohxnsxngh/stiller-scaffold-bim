@@ -1,5 +1,5 @@
 export function createTabs() {
-      // Create the tablist container
+  // Create the tablist container
   const tablist = document.createElement("div");
   tablist.setAttribute("role", "tablist");
   tablist.classList.add("tabs", "tabs-bordered", "tab-xs");
@@ -10,7 +10,7 @@ export function createTabs() {
   tab1.setAttribute("name", "my_tabs_2");
   tab1.setAttribute("role", "tab");
   tab1.setAttribute("class", "tab");
-  tab1.setAttribute("aria-label", "Tab  1");
+  tab1.setAttribute("aria-label", "Blueprint");
   tab1.setAttribute("checked", "");
 
   const tabContent1 = document.createElement("div");
@@ -31,7 +31,7 @@ export function createTabs() {
   tab2.setAttribute("name", "my_tabs_2");
   tab2.setAttribute("role", "tab");
   tab2.setAttribute("class", "tab");
-  tab2.setAttribute("aria-label", "Tab  2");
+  tab2.setAttribute("aria-label", "Extrude");
 
   const tabContent2 = document.createElement("div");
   tabContent2.setAttribute("role", "tabpanel");
@@ -51,7 +51,7 @@ export function createTabs() {
   tab3.setAttribute("name", "my_tabs_2");
   tab3.setAttribute("role", "tab");
   tab3.setAttribute("class", "tab");
-  tab3.setAttribute("aria-label", "Tab  3");
+  tab3.setAttribute("aria-label", "Roof");
 
   const tabContent3 = document.createElement("div");
   tabContent3.setAttribute("role", "tabpanel");
@@ -71,7 +71,7 @@ export function createTabs() {
   tab4.setAttribute("name", "my_tabs_2");
   tab4.setAttribute("role", "tab");
   tab4.setAttribute("class", "tab");
-  tab4.setAttribute("aria-label", "Tab  4");
+  tab4.setAttribute("aria-label", "Scaffold");
 
   const tabContent4 = document.createElement("div");
   tabContent4.setAttribute("role", "tabpanel");
@@ -85,25 +85,25 @@ export function createTabs() {
   );
   tabContent4.textContent = "Tab content  4";
 
-    // Create the fourth tab
-    const tab5 = document.createElement("input");
-    tab5.setAttribute("type", "radio");
-    tab5.setAttribute("name", "my_tabs_2");
-    tab5.setAttribute("role", "tab");
-    tab5.setAttribute("class", "tab");
-    tab5.setAttribute("aria-label", "Tab  5");
-  
-    const tabContent5 = document.createElement("div");
-    tabContent5.setAttribute("role", "tabpanel");
-    tabContent5.classList.add(
-      "tab-content",
-      "bg-base-100",
-      "border-base-300",
-      "rounded-box",
-      "p-6",
-      "h-screen"
-    );
-    tabContent5.textContent = "Tab content  5";
+  // Create the fourth tab
+  const tab5 = document.createElement("input");
+  tab5.setAttribute("type", "radio");
+  tab5.setAttribute("name", "my_tabs_2");
+  tab5.setAttribute("role", "tab");
+  tab5.setAttribute("class", "tab");
+  tab5.setAttribute("aria-label", "BOM");
+
+  const tabContent5 = document.createElement("div");
+  tabContent5.setAttribute("role", "tabpanel");
+  tabContent5.classList.add(
+    "tab-content",
+    "bg-base-100",
+    "border-base-300",
+    "rounded-box",
+    "p-6",
+    "h-screen"
+  );
+  tabContent5.textContent = "Tab content  5";
 
   // Append the tabs and their content to the tablist
   tablist.appendChild(tab1);
@@ -117,5 +117,52 @@ export function createTabs() {
   tablist.appendChild(tab5);
   tablist.appendChild(tabContent5);
 
-  return tablist
+  return tablist;
 }
+
+export const createTimeline = () => {
+  // ... (existing toolbar code)
+
+  // Create a timeline with only icons
+  const timeline = document.createElement("ul");
+  timeline.className = "timeline";
+
+  const icons = [
+    "M10  18a8  8  0  100-16  8  8  0  000  16zm3.857-9.809a.75.75  0  00-1.214-.882l-3.483  4.79-1.88-1.88a.75.75  0  10-1.06  1.061l2.5  2.5a.75.75  0  001.137-.089l4-5.5z",
+    "M10  18a8  8  0  100-16  8  8  0  000  16zm3.857-9.809a.75.75  0  00-1.214-.882l-3.483  4.79-1.88-1.88a.75.75  0  10-1.06  1.061l2.5  2.5a.75.75  0  001.137-.089l4-5.5z",
+    "M10  18a8  8  0  100-16  8  8  0  000  16zm3.857-9.809a.75.75  0  00-1.214-.882l-3.483  4.79-1.88-1.88a.75.75  0  10-1.06  1.061l2.5  2.5a.75.75  0  001.137-.089l4-5.5z",
+    "M10  18a8  8  0  100-16  8  8  0  000  16zm3.857-9.809a.75.75  0  00-1.214-.882l-3.483  4.79-1.88-1.88a.75.75  0  10-1.06  1.061l2.5  2.5a.75.75  0  001.137-.089l4-5.5z",
+    "M10  18a8  8  0  100-16  8  8  0  000  16zm3.857-9.809a.75.75  0  00-1.214-.882l-3.483  4.79-1.88-1.88a.75.75  0  10-1.06  1.061l2.5  2.5a.75.75  0  001.137-.089l4-5.5z",
+  ];
+
+  icons.forEach((iconPath) => {
+    const listItem = document.createElement("li");
+    const timelineMiddle = document.createElement("div");
+    timelineMiddle.className = "timeline-middle";
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0  0  20  20");
+    svg.setAttribute("fill", "red");
+    svg.setAttribute("class", "w-5 h-5 mx-7");
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("fill-rule", "evenodd");
+    path.setAttribute("d", iconPath);
+    path.setAttribute("clip-rule", "evenodd");
+
+    svg.appendChild(path);
+    timelineMiddle.appendChild(svg);
+    listItem.appendChild(timelineMiddle);
+
+    const hr = document.createElement("hr");
+
+    listItem.appendChild(hr);
+
+    timeline.appendChild(listItem);
+  });
+
+  // Append the timeline to the mainToolbar
+  // drawer.domElement.appendChild(timeline);
+  return timeline;
+  // ... (rest of the toolbar code)
+};
