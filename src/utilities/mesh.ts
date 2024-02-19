@@ -114,12 +114,12 @@ export function createBlueprintFromShapeOutline(
       // Create mesh from shape
       const geometryShape = new THREE.ShapeGeometry(shape);
       const materialShape = new THREE.MeshBasicMaterial({
-        color: 0x7F1D1D,
+        color: 0x7f1d1d,
         side: THREE.DoubleSide,
       });
       const meshShape = new THREE.Mesh(geometryShape, materialShape);
       meshShape.rotateX(Math.PI / 2);
-        meshShape.position.y = 0.01
+      meshShape.position.y = 0.025;
       meshShape.name = "blueprint";
       meshShape.userData = shape;
       scene.add(meshShape);
@@ -591,113 +591,6 @@ function updateRectangleBlueprintGeometry(
 
     return rectanglePointsUpdated;
   }
-}
-
-//EXPERIMENTAL
-export function createAlternativeRoof(
-  child: any,
-  scene: THREE.Scene,
-  index: number
-) {
-  // Calculate the midpoint between the two points
-  const midpoint = new THREE.Vector2();
-  midpoint
-    .addVectors(
-      child.userData.curves[index].v1,
-      child.userData.curves[index].v2
-    )
-    .multiplyScalar(0.5);
-
-  console.log(child.userData);
-
-  const extrudeHeight = -1 * child.geometry.parameters.options.depth;
-
-  const midPoint = new THREE.Vector3(midpoint.x, extrudeHeight, midpoint.y);
-
-  const startPoint = new THREE.Vector3(
-    child.userData.curves[index].v1.x,
-    extrudeHeight,
-    child.userData.curves[index].v1.y
-  );
-  const endPoint = new THREE.Vector3(
-    child.userData.curves[index].v2.x,
-    extrudeHeight,
-    child.userData.curves[index].v2.y
-  );
-
-  const nextPoint = new THREE.Vector3(
-    child.userData.curves[index + 1].v2.x,
-    extrudeHeight,
-    child.userData.curves[index + 1].v2.y
-  );
-
-  // Calculate the width and depth of the box
-  const width = startPoint.distanceTo(midPoint);
-  const depth = endPoint.distanceTo(nextPoint);
-  console.log(width, depth);
-  const height = 3;
-
-  // Create the box geometry
-  const boxGeometry = new THREE.BoxGeometry(width, height, depth);
-
-  // Create the box material
-  const boxMaterial = new THREE.MeshBasicMaterial({
-    color: 0x00ff00,
-    wireframe: true,
-  });
-
-  // Create the box mesh
-  const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-  boxMesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
-
-  // Calculate the midpoint between startPoint and endPoint
-  const startToEndPoint = new THREE.Vector3().lerpVectors(
-    startPoint,
-    endPoint,
-    0
-  );
-
-  // Calculate the midpoint between endPoint and nextPoint
-  const endToNextPoint = new THREE.Vector3().lerpVectors(
-    endPoint,
-    nextPoint,
-    1
-  );
-
-  // Calculate the center point of the square
-  const centralPoint = new THREE.Vector3().lerpVectors(
-    startToEndPoint,
-    endToNextPoint,
-    0.5
-  );
-  centralPoint.y += height / 2;
-
-  // Position the box at the midpoint
-  boxMesh.position.copy(centralPoint);
-  // Rotate the box to align with the path
-
-  // Calculate the shear matrix
-  const shearMatrix = new THREE.Matrix4();
-  shearMatrix.makeShear(0, 0, 1, 0, 0, 0); // Adjust the parameters to control the shear
-
-  // Apply the shear matrix to the geometry of the boxMesh
-  boxGeometry.applyMatrix4(shearMatrix);
-
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshStandardMaterial({ color: "purple" });
-  const cube = new THREE.Mesh(geometry, material);
-  cube.position.copy(centralPoint);
-  scene.add(cube);
-
-  const cube1 = cube.clone();
-  cube1.position.copy(startToEndPoint);
-  scene.add(cube1);
-  const cube2 = cube.clone();
-  cube2.position.copy(endToNextPoint);
-  scene.add(cube2);
-
-  // Add the box to the scene
-  scene.add(boxMesh);
 }
 
 // create roof from extrusion shape
@@ -1487,25 +1380,4 @@ function updateShedRoofGeometry(
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
   scene.add(extrudedMesh);
-}
-
-export function deleteObject(intersects: any) {
-  if (Array.isArray(intersects)) {
-    intersects.forEach(function (intersect: any) {
-      switch (intersect.object.name) {
-        // case "ground":
-        //   console.log("ground");
-        //   break;
-        case "extrusion":
-          console.log("extrusion");
-          break;
-        case "roof":
-          console.log("roof");
-          break;
-        case "blueprint":
-          console.log("blueprint");
-          break;
-      }
-    });
-  }
 }

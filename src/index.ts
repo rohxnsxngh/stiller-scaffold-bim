@@ -8,7 +8,6 @@ import {
   createRectangle,
   createRoof,
   createShedRoof,
-  deleteObject,
 } from "./utilities/mesh";
 import {
   createIndividualScaffoldOnClick,
@@ -36,6 +35,7 @@ import {
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   calculateTransformedBoundingBox,
+  deleteObject,
   disableOrbitControls,
   // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
@@ -144,6 +144,8 @@ export const createModelView = async () => {
 
   const [
     blueprintButton,
+    editBlueprintButton,
+    moveBlueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
     drawingButton,
@@ -167,6 +169,63 @@ export const createModelView = async () => {
   cssRenderer.domElement.style.top = "0";
   document.body.appendChild(cssRenderer.domElement);
 
+  // Modify the mousemove event listener
+  let lastHighlightedObject: THREE.Mesh | null = null;
+  let lastHighlightedObjectColor: any | null = null;
+
+  // highlight object whens deletion is in progress
+  window.addEventListener("mousemove", function (e) {
+    if (deletionInProgress && !drawingInProgress) {
+      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      // @ts-ignore
+      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
+      intersects = raycaster.intersectObjects(scene.children);
+
+      // If there is an intersection, apply the glow to the intersected object
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object;
+        if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name !== "ground"
+        ) {
+          if (lastHighlightedObject) {
+            lastHighlightedObject.material.color.setHex(lastHighlightedObjectColor)
+            lastHighlightedObject.material.needsUpdate = true
+            lastHighlightedObject = null;
+          }
+          // Apply the glow to the new intersected object
+          lastHighlightedObjectColor = intersectedObject.material.color.getHex()
+          intersectedObject.material.color.set(0xff0000)
+          intersectedObject.material.needsUpdate = true
+          // applyGlow(intersectedObject);
+          lastHighlightedObject = intersectedObject;
+        } else if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name === "ground"
+        ) {
+          if (lastHighlightedObject) {
+            lastHighlightedObject.material.color.setHex(lastHighlightedObjectColor)
+            lastHighlightedObject.material.needsUpdate = true
+            lastHighlightedObject = null;
+          }
+        }
+      } else {
+        // If there is no intersection, revert the material of the last highlighted object
+        if (lastHighlightedObject) {
+          // revertMaterial(lastHighlightedObject);
+          console.log(
+            lastHighlightedObject.material,
+            lastHighlightedObject.userData
+          );
+          // lastHighlightedObject.material = lastHighlightedObject.userData
+          lastHighlightedObject = null;
+        }
+      }
+    }
+  });
+
+  // place scaffold individually
   window.addEventListener("mousemove", function (e) {
     if (placeScaffoldIndividually) {
       scene.add(highlightMesh);
@@ -186,6 +245,7 @@ export const createModelView = async () => {
     }
   });
 
+  // draw scaffolding tool
   window.addEventListener("mousemove", function (e) {
     if (drawingScaffoldingInProgress) {
       scene.add(highlightMesh);
@@ -208,6 +268,7 @@ export const createModelView = async () => {
     }
   });
 
+  // general poly draw tool
   window.addEventListener("mousemove", function (e) {
     if (drawingInProgress) {
       scene.add(highlightMesh);
@@ -272,8 +333,11 @@ export const createModelView = async () => {
       );
     }
     if (deletionInProgress && !drawingInProgress) {
-      // console.log("delete");
-      deleteObject(intersects);
+      console.log("delete");
+      // deleteObject(intersects);
+      intersects.forEach(function (intersect: any) {
+        console.log(intersect.object.name);
+      });
     }
   });
 
@@ -288,6 +352,16 @@ export const createModelView = async () => {
         scene
       );
     }
+  });
+
+  // Edit Blueprint
+  editBlueprintButton.domElement.addEventListener("mousedown", () => {
+    console.log("drag blueprint");
+  });
+
+  // Move Blueprint
+  moveBlueprintButton.domElement.addEventListener("mousedown", () => {
+    console.log("move blueprint");
   });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
@@ -720,9 +794,6 @@ export const createModelView = async () => {
 
   drawingButton.domElement.addEventListener("mousedown", () => {
     isDrawingBlueprint = false;
-  });
-
-  drawingButton.domElement.addEventListener("mousedown", () => {
     drawingInProgressSwitch = true;
   });
 
