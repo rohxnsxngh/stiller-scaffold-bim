@@ -96,7 +96,7 @@ export const createModelView = async () => {
   const scene = components.scene.get();
   console.log("scene", scene);
 
-  const backgroundColor = new THREE.Color("#303035");
+  const backgroundColor = new THREE.Color("#252529");
   scene.background = backgroundColor;
 
   // Lighting

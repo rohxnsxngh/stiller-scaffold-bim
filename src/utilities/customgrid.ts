@@ -10,13 +10,11 @@ export class CustomGrid extends OBC.SimpleGrid {
   constructor(
     components: OBC.Components,
     color?: THREE.Color,
-    color2?: THREE.Color,
     size1?: number,
     size2?: number,
     distance?: number
   ) {
     super(components, color, size1, size2, distance);
-    this.color2 = new THREE.Color("#000000")
   }
 
 
@@ -25,7 +23,7 @@ export class CustomGrid extends OBC.SimpleGrid {
       this.size1,
       this.size2,
       this.color,
-      this.color2
+      this.color
     );
     return grid;
   }
