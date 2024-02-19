@@ -315,7 +315,7 @@ export function createRectangle(
 
   const geometry = new THREE.PlaneGeometry(height, width);
   markup = new THREE.Mesh(geometry, rectMaterial);
-  markup.position.set(centerX, -0.125, centerZ);
+  markup.position.set(centerX, -0.025, centerZ);
   markup.rotation.x = Math.PI / 2;
   markup.name = "rectanglePlane";
   markup.userData = {

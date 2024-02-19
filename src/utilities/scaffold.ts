@@ -112,8 +112,17 @@ export async function placeScaffoldModelsAlongLine(
     console.error("Error creating scaffold model:", error);
   }
 
-  const {label, buttonAdd, buttonMinus} = attachScaffoldStackingLabel(scene, line.userData.first_point);
-  attachScaffoldRowLabelChangeHandler(label, scaffoldModeling, bboxWireframe, buttonAdd, buttonMinus)
+  const { label, buttonAdd, buttonMinus } = attachScaffoldStackingLabel(
+    scene,
+    line.userData.first_point
+  );
+  attachScaffoldRowLabelChangeHandler(
+    label,
+    scaffoldModeling,
+    bboxWireframe,
+    buttonAdd,
+    buttonMinus
+  );
 }
 
 // scaffolding model creation along with bounding box for respective scaffolding model
@@ -463,13 +472,13 @@ function attachScaffoldStackingLabel(
   return { label, buttonAdd, buttonMinus };
 }
 
-let currentScaffoldingHeight: number =  0;
+let currentScaffoldingHeight: number = 0;
 function attachScaffoldRowLabelChangeHandler(
   label: CSS2DObject,
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any,
   buttonAdd: HTMLButtonElement,
-  buttonMinus: HTMLButtonElement,
+  buttonMinus: HTMLButtonElement
 ) {
   const labelElement = label.element as HTMLDivElement;
   labelElement.addEventListener("mouseenter", () => {
@@ -484,14 +493,13 @@ function attachScaffoldRowLabelChangeHandler(
     setPlaceScaffoldIndividually(false);
   });
 
-
   buttonAdd.addEventListener("mousedown", () => {
-    currentScaffoldingHeight++
-    console.log("add button")
+    currentScaffoldingHeight++;
+    console.log("add button");
   });
 
   buttonMinus.addEventListener("mousedown", () => {
-    currentScaffoldingHeight--
-    console.log("minus button")
+    currentScaffoldingHeight--;
+    console.log("minus button");
   });
 }

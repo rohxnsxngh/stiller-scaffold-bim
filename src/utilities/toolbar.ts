@@ -554,7 +554,7 @@ export const createToolbar = (
   components.ui.add(drawer);
   console.log(drawer);
 
-  const timeline=  createTimeline();
+  const timeline = createTimeline();
   drawer.domElement.appendChild(timeline);
 
   // TabList

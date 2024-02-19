@@ -26,7 +26,7 @@ import {
   setDrawingInProgress,
   deletionInProgress,
   setDrawingScaffoldingInProgress,
-  setDeletionInProgress
+  setDeletionInProgress,
 } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
@@ -81,11 +81,11 @@ export const createModelView = async () => {
   document.body.appendChild(viewHelper.domElement);
 
   viewHelper.domElement.addEventListener("mouseover", () => {
-    setPlaceScaffoldIndividually(false)
-    setDrawingInProgress(false)
-    setDrawingScaffoldingInProgress(false)
-    setDeletionInProgress(false)
-  })
+    setPlaceScaffoldIndividually(false);
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+    setDeletionInProgress(false);
+  });
 
   console.log(viewHelper);
 
@@ -94,6 +94,10 @@ export const createModelView = async () => {
 
   // Scene
   const scene = components.scene.get();
+  console.log("scene", scene);
+
+  const backgroundColor = new THREE.Color("#303035");
+  scene.background = backgroundColor;
 
   // Lighting
   createLighting(scene);
@@ -114,7 +118,7 @@ export const createModelView = async () => {
   scene.add(markupGroup);
 
   // Base plane: need to change the size of the plane to be bigger
-  const planeGeometry = new THREE.PlaneGeometry(100, 100);
+  const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
   const planeMaterial = new THREE.MeshStandardMaterial({
     side: THREE.DoubleSide,
     visible: false,
@@ -728,8 +732,8 @@ export const createModelView = async () => {
   // Shadow
   const shadows = new OBC.ShadowDropper(components);
   shadows.shadowExtraScaleFactor = 15;
-  shadows.darkness = 2;
-  shadows.shadowOffset = 0.1;
+  shadows.darkness = 5;
+  shadows.shadowOffset = 0.25;
   // Collect all meshes in the scene that you want to have shadows
 
   const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
@@ -747,10 +751,6 @@ export const createModelView = async () => {
         } else if (object.name === "extrusion") {
           shadowId = object.uuid;
         } else if (object.name === "scaffoldingModel") {
-          shadowId = object.uuid;
-        } else if (object.name === "roof") {
-          shadowId = object.uuid;
-        } else if (object.name === "shedRoof") {
           shadowId = object.uuid;
         } else {
           // Skip if the object name is not one of the specified types

@@ -1,10 +1,11 @@
-
-
-  // Example usage of the createDropdown function
-  // const dropdownItems = ["Item  1", "Item  2"];
-  // const dropdown = createDropdown("Hover", dropdownItems);
-  // drawer.domElement.appendChild(dropdown);
-export function createDropdown(buttonText: string, items: string[]): HTMLElement {
+// Example usage of the createDropdown function
+// const dropdownItems = ["Item  1", "Item  2"];
+// const dropdown = createDropdown("Hover", dropdownItems);
+// drawer.domElement.appendChild(dropdown);
+export function createDropdown(
+  buttonText: string,
+  items: string[]
+): HTMLElement {
   // Create the outer div with the dropdown class
   const dropdownDiv = document.createElement("div");
   dropdownDiv.className = "dropdown";
@@ -65,23 +66,27 @@ export function createCollapse(title: string, content: string): HTMLElement {
   return collapseDiv;
 }
 
-export function createSelect(options: string[], defaultOptionText: string = 'Default'): HTMLElement {
+export function createSelect(
+  options: string[],
+  defaultOptionText: string = "Default"
+): HTMLElement {
   // Create the select element with the specified class
-  const selectElement = document.createElement('select');
-  selectElement.className = 'select select-danger bg-black select-ghost w-full max-w-xs';
+  const selectElement = document.createElement("select");
+  selectElement.className =
+    "select select-danger bg-black select-ghost w-full max-w-xs";
 
   // Create the default disabled option
-  const defaultOption = document.createElement('option');
+  const defaultOption = document.createElement("option");
   defaultOption.disabled = true;
   defaultOption.selected = true;
   defaultOption.textContent = defaultOptionText;
   selectElement.appendChild(defaultOption);
 
   // Create and append the other options based on the options array
-  options.forEach(optionText => {
-    const option = document.createElement('option');
+  options.forEach((optionText) => {
+    const option = document.createElement("option");
     option.textContent = optionText;
-    option.className = "bg-black font-semibold hover:bg-red-200 "
+    option.className = "bg-black font-semibold hover:bg-red-200 ";
     selectElement.appendChild(option);
   });
 
