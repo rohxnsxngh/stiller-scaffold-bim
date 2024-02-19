@@ -188,8 +188,8 @@ export const createModelView = async () => {
           intersectedObject.name !== "ground"
         ) {
           if (lastHighlightedObject) {
-            lastHighlightedObject.material.color.setHex(lastHighlightedObjectColor)
-            lastHighlightedObject.material.needsUpdate = true
+            (lastHighlightedObject.material as THREE.MeshStandardMaterial).color.setHex(lastHighlightedObjectColor);
+            (lastHighlightedObject.material as THREE.MeshStandardMaterial).needsUpdate = true;
             lastHighlightedObject = null;
           }
           // Apply the glow to the new intersected object
@@ -203,8 +203,8 @@ export const createModelView = async () => {
           intersectedObject.name === "ground"
         ) {
           if (lastHighlightedObject) {
-            lastHighlightedObject.material.color.setHex(lastHighlightedObjectColor)
-            lastHighlightedObject.material.needsUpdate = true
+            (lastHighlightedObject.material as THREE.MeshStandardMaterial).color.setHex(lastHighlightedObjectColor);
+            (lastHighlightedObject.material as THREE.MeshStandardMaterial).needsUpdate = true;
             lastHighlightedObject = null;
           }
         }
