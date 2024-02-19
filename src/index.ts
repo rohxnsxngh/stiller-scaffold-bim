@@ -78,7 +78,7 @@ export const createModelView = async () => {
   viewHelper = new OrbitViewHelper(controls, { size: 100, padding: 8 });
 
   // Add the Gizmo to the document
-  document.body.appendChild(viewHelper.domElement);
+  // document.body.appendChild(viewHelper.domElement);
 
   viewHelper.domElement.addEventListener("mouseover", () => {
     setPlaceScaffoldIndividually(false);
@@ -86,8 +86,6 @@ export const createModelView = async () => {
     setDrawingScaffoldingInProgress(false);
     setDeletionInProgress(false);
   });
-
-  console.log(viewHelper);
 
   // Call the function to disable OrbitControls
   disableOrbitControls(controls);
