@@ -323,14 +323,15 @@ export const createModelView = async () => {
       );
     }
     if (placeScaffoldIndividually) {
-      const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57);
-      createIndividualScaffoldOnClick(
-        intersects,
-        highlightMesh,
-        scene,
-        scaffoldModeling,
-        bboxWireframe
-      );
+      // const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57, 2.00, 0.73);
+      // //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
+      // createIndividualScaffoldOnClick(
+      //   intersects,
+      //   highlightMesh,
+      //   scene,
+      //   scaffoldModeling,
+      //   bboxWireframe
+      // );
     }
     if (deletionInProgress && !drawingInProgress) {
       console.log("delete");
@@ -688,7 +689,7 @@ export const createModelView = async () => {
     generateScaffolding();
   });
   async function generateScaffolding() {
-    const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57);
+    const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57, 2.00, 0.73);
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
         placeScaffoldModelsAlongLine(

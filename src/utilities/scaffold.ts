@@ -63,11 +63,10 @@ export async function placeScaffoldModelsAlongLine(
   bboxWireframe: any
 ) {
   const lineLength = line.userData.length;
+  const startPoint = line.userData.first_point;
+  const endPoint = line.userData.last_point;
   const numSegments = Math.ceil(lineLength / 1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
   try {
-    const startPoint = line.userData.first_point;
-    const endPoint = line.userData.last_point;
-
     for (let i = 0; i < numSegments; i++) {
       // Calculate the interpolated position along the line
       const t = i / numSegments; // Parameter for interpolation along the line
@@ -100,6 +99,9 @@ export async function placeScaffoldModelsAlongLine(
         modelInstance.rotation.copy(euler);
         boundBoxInstance.rotation.copy(euler);
 
+        modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+        boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+
         scene.add(modelInstance);
         scene.add(boundBoxInstance);
       } else {
@@ -114,8 +116,15 @@ export async function placeScaffoldModelsAlongLine(
     scene,
     line.userData.first_point
   );
+  label.userData = {
+    level: 0,
+    length: lineLength,
+    first_point: startPoint,
+    last_point: endPoint,
+  };
   attachScaffoldRowLabelChangeHandler(
     label,
+    scene,
     scaffoldModeling,
     bboxWireframe,
     buttonAdd,
@@ -125,7 +134,9 @@ export async function placeScaffoldModelsAlongLine(
 
 // scaffolding model creation along with bounding box for respective scaffolding model
 export function createScaffoldModel(
-  length: number
+  length: number,
+  height: number,
+  width: number
 ): Promise<[THREE.LineSegments, THREE.Object3D]> {
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
@@ -137,17 +148,36 @@ export function createScaffoldModel(
         scaffoldModel.userData.name = "scaffoldingModel";
         // Calculate bounding box
         const bbox = new THREE.Box3().setFromObject(scaffoldModel);
-        const currentLength = bbox.max.z - bbox.min.z; // Assuming length is along X axis
+        // Get the dimensions of the bounding box
+        const size = bbox.getSize(new THREE.Vector3());
 
-        // Calculate scale factor to achieve desired length (1.57 meters)
-        const scaleFactor = length / currentLength;
+        // Calculate the scale factor for each dimension
+        const scaleX = length / size.x;
+        const scaleY = height / size.y;
+        const scaleZ = width / size.z;
 
-        // Apply scale factor to the model
-        scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        // THIS CODE CREATES THE MODEL AND MAINTAINS THE CORRECT RATIOS
+        // Choose the smallest scale factor to maintain aspect ratio
+        // const scaleFactor = Math.min(scaleX, scaleY, scaleZ);
+        // Apply the scale factor to the model
+        // scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+        // Apply the scale factor to the model
+        scaffoldModel.scale.set(scaleX, scaleY, scaleZ);
 
         // Update the bounding box with the scaled model
         scaffoldModel.updateMatrixWorld();
         const newBBox = new THREE.Box3().setFromObject(scaffoldModel);
+
+        // Calculate and print the new bounding box dimensions
+        const newLength = newBBox.max.z - newBBox.min.z;
+        const newWidth = newBBox.max.x - newBBox.min.x;
+        const newHeight = newBBox.max.y - newBBox.min.y;
+        console.log("New bounding box dimensions:", {
+          length: newLength,
+          width: newWidth,
+          height: newHeight,
+        });
 
         // Create wireframe geometry
         const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
@@ -234,6 +264,8 @@ export function createIndividualScaffoldOnClick(
           new THREE.Vector3(0, 1, 0),
           scaffoldRotation
         );
+        scene.add(modelInstance);
+        scene.add(boundBoxInstance);
         const { label, button } = createIndividualScaffoldLabel(
           scene,
           modelInstance,
@@ -456,9 +488,10 @@ function attachScaffoldStackingLabel(
   return { label, buttonAdd, buttonMinus };
 }
 
-let currentScaffoldingHeight: number = 0;
+// label that controls how many levels of scaffolding exist
 function attachScaffoldRowLabelChangeHandler(
   label: CSS2DObject,
+  scene: THREE.Scene,
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any,
   buttonAdd: HTMLButtonElement,
@@ -478,12 +511,131 @@ function attachScaffoldRowLabelChangeHandler(
   });
 
   buttonAdd.addEventListener("mousedown", () => {
-    currentScaffoldingHeight++;
     console.log("add button");
+    addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox);
   });
 
   buttonMinus.addEventListener("mousedown", () => {
-    currentScaffoldingHeight--;
     console.log("minus button");
+    removeScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox);
   });
+}
+
+// add a level of scaffolding to the selected side
+function addScaffoldingLevel(
+  label: CSS2DObject,
+  scene: THREE.Scene,
+  scaffold: THREE.Object3D,
+  scaffoldBoundingBox: any
+) {
+  console.log(label.userData);
+  label.userData.level++;
+  const lineLength = label.userData.length;
+  const lineLevel = label.userData.level;
+  const startPoint = new THREE.Vector3(
+    label.userData.first_point.x,
+    lineLevel * 2,
+    label.userData.first_point.z
+  );
+  const endPoint = new THREE.Vector3(
+    label.userData.last_point.x,
+    lineLevel * 2,
+    label.userData.last_point.z
+  );
+  const numSegments = Math.ceil(lineLength / 1.57);
+  try {
+    for (let i = 0; i < numSegments; i++) {
+      // Calculate the interpolated position along the line
+      const t = i / numSegments; // Parameter for interpolation along the line
+      const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
+
+      // Check if there is already a model at this position
+      const isModelAlreadyPlaced = scene.children.some((child) => {
+        return (
+          child instanceof THREE.Object3D && child.position.equals(position)
+        );
+      });
+
+      if (!isModelAlreadyPlaced) {
+        // Instantiate the GLB model
+        const modelInstance = SkeletonUtils.clone(scaffold);
+        const boundBoxInstance = scaffoldBoundingBox.clone();
+        modelInstance.position.copy(position); // Position the model at the interpolated position
+        boundBoxInstance.position.copy(position);
+        const lineDirection = new THREE.Vector3()
+          .subVectors(endPoint, startPoint)
+          .normalize();
+        // Create a quaternion that represents the rotation needed to align a model with the line
+        const quaternion = new THREE.Quaternion().setFromUnitVectors(
+          new THREE.Vector3(0, 0, 1),
+          lineDirection
+        );
+
+        const euler = new THREE.Euler().setFromQuaternion(quaternion);
+
+        modelInstance.rotation.copy(euler);
+        boundBoxInstance.rotation.copy(euler);
+
+        modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+        boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+
+        scene.add(modelInstance);
+        scene.add(boundBoxInstance);
+      } else {
+        console.log("there are already children at this position");
+      }
+    }
+  } catch (error) {
+    console.error("Error creating scaffold model:", error);
+  }
+  console.log(label.userData.level);
+}
+
+// remove a level of scaffolding from the selected side
+function removeScaffoldingLevel(
+  label: CSS2DObject,
+  scene: THREE.Scene,
+  scaffold: THREE.Object3D,
+  scaffoldBoundingBox: any
+) {
+  console.log(label.userData);
+  const lineLength = label.userData.length;
+  const lineLevel = label.userData.level;
+  const startPoint = new THREE.Vector3(
+    label.userData.first_point.x,
+    lineLevel * 2,
+    label.userData.first_point.z
+  );
+  const endPoint = new THREE.Vector3(
+    label.userData.last_point.x,
+    lineLevel * 2,
+    label.userData.last_point.z
+  );
+  const numSegments = Math.ceil(lineLength / 1.57);
+  try {
+    for (let i = 0; i < numSegments; i++) {
+      // Calculate the interpolated position along the line
+      const t = i / numSegments; // Parameter for interpolation along the line
+      const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
+
+      const scaffoldingLevelToBeRemoved: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+      scene.children.some((child) => {
+        if (
+          child instanceof THREE.Object3D &&
+          child.position.equals(position)
+        ) {
+          scaffoldingLevelToBeRemoved.push(child);
+        }
+      });
+
+      scaffoldingLevelToBeRemoved.forEach((scaffold: THREE.Object3D) => {
+        console.log(scaffold)
+        scene.remove(scaffold)
+      })
+
+    }
+  } catch (error) {
+    console.error("Error creating scaffold model:", error);
+  }
+  label.userData.level--;
 }
