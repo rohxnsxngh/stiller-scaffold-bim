@@ -7,7 +7,7 @@ import {
   cameraPerspectiveView,
   cameraTopView,
 } from "./camera";
-import { resetScene } from "./helper";
+import { hideAllCSS2DObjects } from "./helper";
 import { createTabs, createTimeline } from "./tab";
 export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
@@ -37,9 +37,11 @@ export const createToolbar = (
   mainWindow.slots.content.domElement.style.overflow = "hidden";
   mainWindow.domElement.style.width = "20rem";
   mainWindow.domElement.style.height = "20rem";
+  // main tool bar
   const mainToolbar = new OBC.Toolbar(components);
+  mainToolbar.position = "bottom";
   components.ui.addToolbar(mainToolbar);
-
+  // side tool bar
   const sideToolBar = new OBC.Toolbar(components);
   sideToolBar.position = "right";
   components.ui.addToolbar(sideToolBar);
@@ -195,7 +197,7 @@ export const createToolbar = (
   mainToolbar.addChild(clearSceneButton);
   clearSceneButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    resetScene(scene);
+    // resetScene(scene, components);
     setDeletionInProgress(false);
     setDrawingInProgress(true);
     setDrawingScaffoldingInProgress(false);
@@ -536,6 +538,35 @@ export const createToolbar = (
     setDrawingInProgress(true);
   });
 
+  const removeLabelsButton = new OBC.Button(components);
+  removeLabelsButton.materialIcon = "disabled_by_default";
+  removeLabelsButton.tooltip = "Hide Labels";
+  removeLabelsButton.id = "scaffold-button";
+  sideToolBar.addChild(removeLabelsButton);
+  removeLabelsButton.onClick.add(() => {
+    blueprintButton.closeMenus()
+    roofButton.closeMenus();
+    extrusionButton.closeMenus();
+    scaffoldButton.closeMenus()
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+    hideAllCSS2DObjects(scene)
+  });
+  removeLabelsButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  removeLabelsButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(false);
+  });
+  removeLabelsButton.domElement.addEventListener("mouseenter", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  removeLabelsButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  removeLabelsButton.domElement.classList.add("hover:bg-red-600");
+
   // Function to update the title
   const updateTitle = () => {
     const titleElement = drawer.domElement.querySelector(
@@ -628,5 +659,6 @@ export const createToolbar = (
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
+    clearSceneButton
   ];
 };

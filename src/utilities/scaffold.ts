@@ -67,7 +67,6 @@ export async function placeScaffoldModelsAlongLine(
   try {
     const startPoint = line.userData.first_point;
     const endPoint = line.userData.last_point;
-    console.log(startPoint, endPoint);
 
     for (let i = 0; i < numSegments; i++) {
       // Calculate the interpolated position along the line
@@ -100,7 +99,6 @@ export async function placeScaffoldModelsAlongLine(
 
         modelInstance.rotation.copy(euler);
         boundBoxInstance.rotation.copy(euler);
-        console.log("model instance", modelInstance);
 
         scene.add(modelInstance);
         scene.add(boundBoxInstance);
@@ -183,7 +181,6 @@ export function createScaffoldModel(
             }
           }
         );
-        console.log("scaffolding model", scaffoldModel);
 
         resolve([bboxWireframe, scaffoldModel]);
       },
@@ -229,9 +226,6 @@ export function createIndividualScaffoldOnClick(
         // Check if there is already a model at this position
         console.log(boundBoxInstance);
 
-        scene.add(modelInstance);
-        scene.add(boundBoxInstance);
-
         modelInstance.rotateOnAxis(
           new THREE.Vector3(0, 1, 0),
           scaffoldRotation
@@ -269,9 +263,7 @@ function createIndividualScaffoldLabel(
   labelDiv.className =
     "label bg-black text-white pointer-events-auto rounded-full py-1";
   // Convert the rotation Euler angles to degrees and format them as strings
-  console.log(rotation.y);
   const rotationY = THREE.MathUtils.RAD2DEG * rotation.y;
-  console.log("rotationY", rotation);
   scaffoldRotation = rotation.y;
   labelDiv.textContent = `${rotationY.toFixed(2)}°`;
   labelDiv.contentEditable = "true";
@@ -320,7 +312,6 @@ function attachIndividualScaffoldLabelChangeHandler(
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
       updateScaffoldRotation(newValue, scaffold, scaffoldBoundingBox);
-      console.log(newValue);
     }
   });
 }
@@ -336,7 +327,6 @@ function updateScaffoldRotation(
   // Parse the new rotation value from the label text content
   if (newValue != null) {
     const parts = newValue.split("°");
-    console.log("new values", parts);
     if (parts.length > 1) {
       rotationAngleInDegrees = parseFloat(parts[0].trim());
       console.log(
@@ -350,8 +340,6 @@ function updateScaffoldRotation(
     THREE.MathUtils.RAD2DEG * rotationAngleInDegrees;
 
   scaffoldRotation = rotationAngleInRadians;
-  console.log("rotationAngleInRadians", rotationAngleInRadians);
-  console.log(scaffoldRotation);
 
   // Rotate the scaffold and bounding box instances
   scaffold.rotation.y = rotationAngleInRadians;
@@ -377,7 +365,6 @@ export function generateScaffoldOutline(
   blueprint: THREE.Mesh,
   scene: THREE.Scene
 ) {
-  console.log(blueprint.userData);
   const shape = blueprint.userData as THREE.Shape; // Assuming the shape is stored in userData
 
   const extrudeSettings = {
@@ -393,7 +380,6 @@ export function generateScaffoldOutline(
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   const mesh = new THREE.Mesh(geometry, material);
-  console.log(mesh);
   mesh.rotateX(Math.PI / 2);
 
   // Access the vertices of the extruded geometry
@@ -407,8 +393,6 @@ export function generateScaffoldOutline(
     boundingBox.max,
     new THREE.Vector3(boundingBox.min.x, 0, boundingBox.max.z),
   ];
-
-  console.log(vertices);
 
   // Create line segments from the vertices of the bounding box
   for (let i = 0; i < vertices.length; i++) {

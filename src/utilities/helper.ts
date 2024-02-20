@@ -116,9 +116,15 @@ export function createArrowHelper(
 // const midpointLine = new THREE.Vector3(0,  0,  0); // Example origin
 // createArrowHelper(scene, edgeDirection, midpointLine,  10,  0x000000);
 
-export function resetScene(scene: THREE.Scene) {
+export function resetScene(
+  scene: THREE.Scene,
+  components: OBC.Components,
+  shadows: OBC.ShadowDropper
+) {
   const objectsToRemove: any = [];
+  const objectsToRemoveUUID: any = [];
   scene.traverse((child) => {
+    objectsToRemoveUUID.push(child.uuid);
     if (child instanceof CSS2DObject) {
       child.visible = false;
       child.element.style.pointerEvents = "none";
@@ -143,6 +149,15 @@ export function resetScene(scene: THREE.Scene) {
   objectsToRemove.forEach((object: any) => {
     scene.remove(object);
   });
+
+  objectsToRemoveUUID.forEach((uuid: any) => {
+    try {
+      shadows.deleteShadow(uuid);
+    } catch (error) {
+      console.error("Error: ", error);
+    }
+  });
+  console.log(scene, components, shadows);
 }
 
 // helper function to measure line length
@@ -191,4 +206,13 @@ export function deleteObject(intersects: any) {
       }
     });
   }
+}
+
+export function hideAllCSS2DObjects(scene: THREE.Scene) {
+  scene.traverse(function (child) {
+    if (child instanceof CSS2DObject) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
 }

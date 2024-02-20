@@ -35,8 +35,9 @@ import {
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   calculateTransformedBoundingBox,
-  deleteObject,
+  // deleteObject,
   disableOrbitControls,
+  resetScene,
   // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -156,6 +157,7 @@ export const createModelView = async () => {
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
+    clearSceneButton
   ] = createToolbar(components, scene);
 
   const mousePosition = new THREE.Vector2();
@@ -834,6 +836,10 @@ export const createModelView = async () => {
       }
     });
   });
+
+  clearSceneButton.domElement.addEventListener("mousedown", () => {
+    resetScene(scene, components, shadows)
+  })
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
