@@ -157,7 +157,7 @@ export const createModelView = async () => {
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    clearSceneButton
+    clearSceneButton,
   ] = createToolbar(components, scene);
 
   const mousePosition = new THREE.Vector2();
@@ -190,14 +190,19 @@ export const createModelView = async () => {
           intersectedObject.name !== "ground"
         ) {
           if (lastHighlightedObject) {
-            (lastHighlightedObject.material as THREE.MeshStandardMaterial).color.setHex(lastHighlightedObjectColor);
-            (lastHighlightedObject.material as THREE.MeshStandardMaterial).needsUpdate = true;
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).color.setHex(lastHighlightedObjectColor);
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).needsUpdate = true;
             lastHighlightedObject = null;
           }
           // Apply the glow to the new intersected object
-          lastHighlightedObjectColor = intersectedObject.material.color.getHex()
-          intersectedObject.material.color.set(0xff0000)
-          intersectedObject.material.needsUpdate = true
+          lastHighlightedObjectColor =
+            intersectedObject.material.color.getHex();
+          intersectedObject.material.color.set(0xff0000);
+          intersectedObject.material.needsUpdate = true;
           // applyGlow(intersectedObject);
           lastHighlightedObject = intersectedObject;
         } else if (
@@ -205,8 +210,12 @@ export const createModelView = async () => {
           intersectedObject.name === "ground"
         ) {
           if (lastHighlightedObject) {
-            (lastHighlightedObject.material as THREE.MeshStandardMaterial).color.setHex(lastHighlightedObjectColor);
-            (lastHighlightedObject.material as THREE.MeshStandardMaterial).needsUpdate = true;
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).color.setHex(lastHighlightedObjectColor);
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).needsUpdate = true;
             lastHighlightedObject = null;
           }
         }
@@ -689,7 +698,11 @@ export const createModelView = async () => {
     generateScaffolding();
   });
   async function generateScaffolding() {
-    const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57, 2.00, 0.73);
+    const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(
+      1.57,
+      2.0,
+      0.73
+    );
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
         placeScaffoldModelsAlongLine(
@@ -805,7 +818,8 @@ export const createModelView = async () => {
   const shadows = new OBC.ShadowDropper(components);
   shadows.shadowExtraScaleFactor = 15;
   shadows.darkness = 5;
-  shadows.shadowOffset = 0.25;
+  shadows.shadowOffset = 0.5;
+  shadows.resolution = 7.5
   // Collect all meshes in the scene that you want to have shadows
 
   const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
@@ -839,8 +853,8 @@ export const createModelView = async () => {
   });
 
   clearSceneButton.domElement.addEventListener("mousedown", () => {
-    resetScene(scene, components, shadows)
-  })
+    resetScene(scene, components, shadows);
+  });
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);

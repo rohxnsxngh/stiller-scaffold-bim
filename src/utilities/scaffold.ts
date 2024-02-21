@@ -65,6 +65,7 @@ export async function placeScaffoldModelsAlongLine(
   const lineLength = line.userData.length;
   const startPoint = line.userData.first_point;
   const endPoint = line.userData.last_point;
+  const midPoint = new THREE.Vector3().lerpVectors(startPoint, endPoint,  0.5);
   const numSegments = Math.ceil(lineLength / 1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
   try {
     for (let i = 0; i < numSegments; i++) {
@@ -114,7 +115,7 @@ export async function placeScaffoldModelsAlongLine(
 
   const { label, buttonAdd, buttonMinus } = attachScaffoldStackingLabel(
     scene,
-    line.userData.first_point
+    midPoint
   );
   label.userData = {
     level: 0,
@@ -467,14 +468,14 @@ function attachScaffoldStackingLabel(
   // Create Add button element
   const buttonAdd = document.createElement("button");
   buttonAdd.className =
-    "material-icons btn btn-sm btn-ghost rounded-full hover:bg-red-400 hover:text-black";
+    "material-icons btn btn-xs btn-ghost rounded-full hover:bg-red-600 hover:text-black";
   buttonAdd.textContent = "add";
   buttonAdd.contentEditable = "false";
 
   // Create minus button element
   const buttonMinus = document.createElement("button");
   buttonMinus.className =
-    "material-icons btn btn-sm btn-ghost rounded-full hover:bg-red-400 hover:text-black";
+    "material-icons btn btn-xs btn-ghost rounded-full hover:bg-red-600 hover:text-black";
   buttonMinus.textContent = "remove";
   buttonMinus.contentEditable = "false";
 
@@ -614,6 +615,10 @@ function removeScaffoldingLevel(
   const numSegments = Math.ceil(lineLength / 1.57);
   try {
     for (let i = 0; i < numSegments; i++) {
+      if (startPoint.y === 0 || endPoint.y === 0) {
+        console.log("level cannot be lower than 0")
+        return
+      }
       // Calculate the interpolated position along the line
       const t = i / numSegments; // Parameter for interpolation along the line
       const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);

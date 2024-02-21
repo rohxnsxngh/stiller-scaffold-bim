@@ -241,11 +241,13 @@ function updateExtrusionGeometry(
   const newGeometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   meshExtrude.geometry.dispose();
   meshExtrude.geometry = newGeometryExtrude;
+  
 
   // Since the geometry has changed, you may need to adjust the mesh position or rotation
   meshExtrude.rotation.set(0, 0, 0);
   meshExtrude.rotateX(Math.PI / 2);
   label.userData = meshExtrude;
+  label.position.y = updatedDepth / 2
 
   return meshExtrude;
 }
