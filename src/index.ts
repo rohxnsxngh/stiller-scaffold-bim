@@ -42,12 +42,14 @@ import {
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
+import { DragControls } from "three/addons/controls/DragControls.js";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
 let labels: any;
 let roofToggleState: number = 0;
-let controls: any;
+let controls: OrbitControls;
+let dragControls: DragControls;
 let viewHelper: any;
 
 const stats = new Stats();
@@ -69,6 +71,14 @@ export const createModelView = async () => {
 
   // Orbit Controls
   controls = new OrbitControls(
+    // @ts-ignore
+    components.camera.activeCamera,
+    // @ts-ignore
+    components.renderer._renderer.domElement
+  );
+  const draggableObjects: any = [];
+  dragControls = new DragControls(
+    draggableObjects,
     // @ts-ignore
     components.camera.activeCamera,
     // @ts-ignore
@@ -372,6 +382,54 @@ export const createModelView = async () => {
   // Move Blueprint
   moveBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("move blueprint");
+    // Array to hold objects that can be dragged
+    scene.traverse((child: any) => {
+      if (child instanceof THREE.Mesh && child.name === "blueprint") {
+        // console.log(child);
+        // Add draggable objects to the scene and DragControls
+        // For example:
+        const object1 = new THREE.Mesh(
+          new THREE.BoxGeometry(1, 1, 1),
+          new THREE.MeshBasicMaterial({ color: "white" })
+        );
+        object1.position.set(1,1,1)
+        scene.add(object1);
+        draggableObjects.push(object1);
+
+        const object2 = new THREE.Mesh(
+          new THREE.BoxGeometry(1, 1, 1),
+          new THREE.MeshBasicMaterial({ color: "white" })
+        );
+        object2.position.set(-1,-1,-1)
+        scene.add(object2);
+        draggableObjects.push(object2);
+
+        // if (!dragControls.enabled) {
+        //   // Enable DragControls
+        //   dragControls.activate();
+
+        //   // Add draggable objects to the scene and DragControls
+        //   // For example:
+        //   const object1 = new THREE.Mesh(
+        //     new THREE.BoxGeometry(),
+        //     new THREE.MeshBasicMaterial()
+        //   );
+        //   scene.add(object1);
+        //   draggableObjects.push(object1);
+
+        //   const object2 = new THREE.Mesh(
+        //     new THREE.SphereGeometry(),
+        //     new THREE.MeshBasicMaterial()
+        //   );
+        //   scene.add(object2);
+        //   draggableObjects.push(object2);
+
+        // } else {
+        //   // Disable DragControls
+        //   dragControls.deactivate();
+        // }
+      }
+    });
   });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
@@ -819,7 +877,7 @@ export const createModelView = async () => {
   shadows.shadowExtraScaleFactor = 15;
   shadows.darkness = 5;
   shadows.shadowOffset = 0.5;
-  shadows.resolution = 7.75
+  shadows.resolution = 7.75;
   // Collect all meshes in the scene that you want to have shadows
 
   const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
