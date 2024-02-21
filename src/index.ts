@@ -819,7 +819,7 @@ export const createModelView = async () => {
   shadows.shadowExtraScaleFactor = 15;
   shadows.darkness = 5;
   shadows.shadowOffset = 0.5;
-  shadows.resolution = 7.5
+  shadows.resolution = 7.75
   // Collect all meshes in the scene that you want to have shadows
 
   const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
