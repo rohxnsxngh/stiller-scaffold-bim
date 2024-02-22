@@ -3,7 +3,14 @@ import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { distanceFromPointToLine, measureLineLength } from "./helper";
 import { rectMaterial } from "./material";
-import { setDrawingInProgress } from "./toolbar";
+import {
+  setDeletionInProgress,
+  setDrawingInProgress,
+  setDrawingScaffoldingInProgress,
+} from "./toolbar";
+import { DragControls } from "three/addons/controls/DragControls.js";
+import { cameraDisableOrbitalFunctionality } from "./camera";
+import { gsap } from "gsap";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -241,13 +248,12 @@ function updateExtrusionGeometry(
   const newGeometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   meshExtrude.geometry.dispose();
   meshExtrude.geometry = newGeometryExtrude;
-  
 
   // Since the geometry has changed, you may need to adjust the mesh position or rotation
   meshExtrude.rotation.set(0, 0, 0);
   meshExtrude.rotateX(Math.PI / 2);
   label.userData = meshExtrude;
-  label.position.y = updatedDepth / 2
+  label.position.y = updatedDepth / 2;
 
   return meshExtrude;
 }
@@ -1382,4 +1388,63 @@ function updateShedRoofGeometry(
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
   scene.add(extrudedMesh);
+}
+
+// move blueprint
+export function moveBlueprint(
+  blueprints: any[],
+  components: OBC.Components,
+  scene: THREE.Scene,
+  shadows: OBC.ShadowDropper
+) {
+  document.body.style.cursor = "grab";
+  setDrawingInProgress(false);
+  setDeletionInProgress(false);
+  setDrawingScaffoldingInProgress(false);
+  cameraDisableOrbitalFunctionality(gsap, components.camera);
+  const dragControls: DragControls = new DragControls(
+    blueprints,
+    // @ts-ignore
+    components.camera.activeCamera,
+    // @ts-ignore
+    components.renderer._renderer.domElement
+  );
+
+  dragControls.addEventListener("dragstart", (event) => {
+    shadows.deleteShadow(event.object.uuid);
+    console.log("dragging started", event.object);
+  });
+
+  dragControls.addEventListener("dragend", (event) => {
+    if (event.object instanceof THREE.Mesh) {
+      shadows.renderShadow([event.object], event.object.uuid);
+      event.object.position.y = 0.025;
+    }
+
+    event.object.updateMatrix();
+    console.log("dragging ended", event.object);
+  });
+
+  // if (!dragControls.enabled) {
+  //   //   // Enable DragControls
+  //   dragControls.activate();
+  // } else {
+  //   //   // Disable DragControls
+  //   dragControls.deactivate();
+  // }
+
+  dragControls.addEventListener("hoveron", (event) => {
+    if (event.object instanceof THREE.Mesh) {
+      console.log("hovering");
+      event.object.material.color.set(0xb72c2c);
+    }
+  });
+
+  dragControls.addEventListener("hoveroff", (event) => {
+    if (event.object instanceof THREE.Mesh) {
+      console.log("hover off");
+      event.object.material.color.set(0x7f1d1d);
+      console.log(event.object.position);
+    }
+  });
 }
