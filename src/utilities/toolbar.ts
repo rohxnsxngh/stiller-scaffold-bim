@@ -12,6 +12,8 @@ import { createTabs, createTimeline } from "./tab";
 export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
+import LabelVue from "../components/Label.vue";
+import { createApp } from "vue";
 
 export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
@@ -638,9 +640,28 @@ export const createToolbar = (
   drawer.domElement.appendChild(timeline);
 
   // TabList
-  const tablist = createTabs();
+  // const tablist = createTabs();
   // Append the tablist to the drawer
-  drawer.domElement.appendChild(tablist);
+  // drawer.domElement.appendChild(tablist);
+
+  // Assuming `vuecomponent` is your Vue component
+  // const vueComponentInstance = new Vue({
+  //   render: (h) => h(LabelVue),
+  // });
+  const vueComponentInstance = createApp(LabelVue);
+
+  // Optionally, if you want to append it as a child of the drawer's DOM element
+  // you can use the following:
+  // drawer.domElement.appendChild(vueComponentInstance);
+
+  // Create a new DOM element to serve as the mounting point for the Vue component
+  const mountPoint = document.createElement("div");
+
+  // Mount the Vue component instance to the new DOM element
+  vueComponentInstance.mount(mountPoint);
+
+  // Append the new DOM element to drawer.domElement
+  drawer.domElement.appendChild(mountPoint);
 
   ////////////////////////////////////////////////
   return [

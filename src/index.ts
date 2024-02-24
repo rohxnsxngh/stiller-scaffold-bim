@@ -43,7 +43,6 @@ import {
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
-import { render } from "vue";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
