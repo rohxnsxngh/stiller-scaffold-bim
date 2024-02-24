@@ -513,12 +513,12 @@ function attachScaffoldRowLabelChangeHandler(
 
   buttonAdd.addEventListener("mousedown", () => {
     console.log("add button");
-    // addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox);
+    addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox);
   });
 
   buttonMinus.addEventListener("mousedown", () => {
     console.log("minus button");
-    // removeScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox);
+    removeScaffoldingLevel(label, scene);
   });
 }
 
@@ -596,8 +596,6 @@ function addScaffoldingLevel(
 function removeScaffoldingLevel(
   label: CSS2DObject,
   scene: THREE.Scene,
-  scaffold: THREE.Object3D,
-  scaffoldBoundingBox: any
 ) {
   console.log(label.userData);
   const lineLength = label.userData.length;

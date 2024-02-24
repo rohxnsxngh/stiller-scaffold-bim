@@ -223,7 +223,7 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
-    extrusionButton.closeMenus()
+    extrusionButton.closeMenus();
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -253,7 +253,7 @@ export const createToolbar = (
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
   });
-  blueprintButton.addChild(editBlueprintButton)
+  blueprintButton.addChild(editBlueprintButton);
   editBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
   editBlueprintButton.domElement.classList.add("hover:bg-red-600");
 
@@ -275,7 +275,7 @@ export const createToolbar = (
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
   });
-  blueprintButton.addChild(moveBlueprintButton)
+  blueprintButton.addChild(moveBlueprintButton);
   moveBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
   moveBlueprintButton.domElement.classList.add("hover:bg-red-600");
 
@@ -286,7 +286,7 @@ export const createToolbar = (
   extrusionButton.id = "extrusion-button";
   sideToolBar.addChild(extrusionButton);
   extrusionButton.onClick.add(() => {
-    blueprintButton.closeMenus()
+    blueprintButton.closeMenus();
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     document.body.style.cursor = "auto";
@@ -341,7 +341,7 @@ export const createToolbar = (
   roofButton.id = "roof-button";
   sideToolBar.addChild(roofButton);
   roofButton.onClick.add(() => {
-    blueprintButton.closeMenus()
+    blueprintButton.closeMenus();
     extrusionButton.closeMenus();
     scaffoldButton.closeMenus();
     document.body.style.cursor = "auto";
@@ -413,7 +413,7 @@ export const createToolbar = (
   scaffoldButton.id = "scaffold-button";
   sideToolBar.addChild(scaffoldButton);
   scaffoldButton.onClick.add(() => {
-    blueprintButton.closeMenus()
+    blueprintButton.closeMenus();
     roofButton.closeMenus();
     extrusionButton.closeMenus();
     setDrawingInProgress(false);
@@ -544,14 +544,14 @@ export const createToolbar = (
   removeLabelsButton.id = "scaffold-button";
   sideToolBar.addChild(removeLabelsButton);
   removeLabelsButton.onClick.add(() => {
-    blueprintButton.closeMenus()
+    blueprintButton.closeMenus();
     roofButton.closeMenus();
     extrusionButton.closeMenus();
-    scaffoldButton.closeMenus()
+    scaffoldButton.closeMenus();
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
-    hideAllCSS2DObjects(scene)
+    hideAllCSS2DObjects(scene);
   });
   removeLabelsButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -659,6 +659,6 @@ export const createToolbar = (
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    clearSceneButton
+    clearSceneButton,
   ];
 };

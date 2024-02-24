@@ -51,10 +51,10 @@ class OrbitViewHelper {
       if (this.lock) return;
 
       camera.updateMatrix();
-      invRotMat.extractRotation(camera.matrix).invert();
+      inverseRotationMatrix.extractRotation(camera.matrix).invert();
 
       for (let i = 0, length = axes.length; i < length; i++)
-        setAxisPosition(axes[i], invRotMat);
+        setAxisPosition(axes[i], inverseRotationMatrix);
 
       // Sort the layers where the +Z position is last so its drawn on top of anything below it
       axes.sort((a, b) => (a.position.z > b.position.z ? 1 : -1));
@@ -89,7 +89,7 @@ class OrbitViewHelper {
     const scoped = this;
     const orbit = orbitControls;
     const camera = orbitControls.object;
-    const invRotMat = new THREE.Matrix4();
+    const inverseRotationMatrix = new THREE.Matrix4();
     const mouse = new THREE.Vector3();
     const rotateStart = new THREE.Vector2();
     const rotateEnd = new THREE.Vector2();
@@ -186,7 +186,7 @@ class OrbitViewHelper {
       return canvas;
     }
 
-    function onPointerDown(e: { clientX: number; clientY: number; }) {
+    function onPointerDown(e: { clientX: number; clientY: number }) {
       rotateStart.set(e.clientX, e.clientY);
       orbitState = orbit.enabled;
       orbit.enabled = false;
@@ -206,7 +206,9 @@ class OrbitViewHelper {
       rect = scoped.domElement.getBoundingClientRect();
     }
 
-    function onPointerMove(e: { clientX: number; clientY: number; } | undefined) {
+    function onPointerMove(
+      e: { clientX: number; clientY: number } | undefined
+    ) {
       if (isDragging || scoped.lock) return;
 
       const currentAxis = selectedAxis;
@@ -224,7 +226,7 @@ class OrbitViewHelper {
       if (currentAxis !== selectedAxis) drawLayers(true);
     }
 
-    function onDrag(e: { clientX: number; clientY: number; }) {
+    function onDrag(e: { clientX: number; clientY: number }) {
       if (scoped.lock) return;
 
       if (!isDragging) scoped.domElement.classList.add("dragging");
@@ -288,7 +290,12 @@ class OrbitViewHelper {
       context.closePath();
     }
 
-    function drawLine(p1: THREE.Vector3, p2: THREE.Vector3, width = 1, color = "#FF0000") {
+    function drawLine(
+      p1: THREE.Vector3,
+      p2: THREE.Vector3,
+      width = 1,
+      color = "#FF0000"
+    ) {
       context.beginPath();
       context.moveTo(p1.x, p1.y);
       context.lineTo(p2.x, p2.y);
@@ -340,15 +347,17 @@ class OrbitViewHelper {
       }
     }
 
-    function setAxisPosition(axis: any, invRotMat: THREE.Matrix4) {
-        const position = axis.direction.clone().applyMatrix4(invRotMat);
-        const size = axis.size;
-        axis.position.set(
-          position.x * (center.x - size /  2 - options.padding) + center.x,
-          center.y - position.y * (center.y - size /  2 - options.padding),
-          position.z
-        );
-      }
+    function setAxisPosition(axis: any, inverseRotationMatrix: THREE.Matrix4) {
+      const position = axis.direction
+        .clone()
+        .applyMatrix4(inverseRotationMatrix);
+      const size = axis.size;
+      axis.position.set(
+        position.x * (center.x - size / 2 - options.padding) + center.x,
+        center.y - position.y * (center.y - size / 2 - options.padding),
+        position.z
+      );
+    }
 
     // Initialization
     this.domElement = createCanvas();
