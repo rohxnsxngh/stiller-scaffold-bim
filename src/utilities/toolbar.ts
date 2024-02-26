@@ -11,7 +11,7 @@ import { hideAllCSS2DObjects } from "./helper";
 export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
-import MountPoint from "../components/MountPoint.vue";;
+import MountPoint from "../components/MountPoint.vue";
 import { createApp } from "vue";
 
 export const setDrawingInProgress = (value: boolean) => {
@@ -50,6 +50,14 @@ export const createToolbar = (
     // setDrawingInProgress(false);
   });
 
+  // top tool bar
+  const topToolBar = new OBC.Toolbar(components);
+  topToolBar.position = "top";
+  components.ui.addToolbar(topToolBar);
+  topToolBar.domElement.addEventListener("mouseleave", () => {
+    // setDrawingInProgress(false);
+  });
+
   const alertButton = new OBC.Button(components);
   alertButton.materialIcon = "info";
   alertButton.tooltip = "Information";
@@ -57,9 +65,80 @@ export const createToolbar = (
   mainToolbar.addChild(alertButton);
   alertButton.onClick.add(() => {
     alert("I've been clicked!");
+    console.log(alertButton);
   });
   alertButton.domElement.classList.remove("hover:bg-ifcjs-200");
   alertButton.domElement.classList.add("hover:bg-red-600");
+
+  const generalMenuButton = new OBC.Button(components, {
+    name: "General",
+  });
+  generalMenuButton.id = "general-button";
+  topToolBar.addChild(generalMenuButton);
+  generalMenuButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    if (titleElement) {
+      titleElement.textContent = "General";
+    }
+  });
+  generalMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  generalMenuButton.domElement.classList.add("hover:bg-red-600");
+
+  const blueprintMenuButton = new OBC.Button(components, {
+    name: "Blueprint",
+  });
+  blueprintMenuButton.id = "general-button";
+  topToolBar.addChild(blueprintMenuButton);
+  blueprintMenuButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    if (titleElement) {
+      titleElement.textContent = "Blueprint";
+    }
+  });
+  blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  blueprintMenuButton.domElement.classList.add("hover:bg-red-600");
+
+  const roofMenuButton = new OBC.Button(components, {
+    name: "Roof",
+  });
+  roofMenuButton.id = "general-button";
+  topToolBar.addChild(roofMenuButton);
+  roofMenuButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    if (titleElement) {
+      titleElement.textContent = "Roof";
+    }
+  });
+  roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  roofMenuButton.domElement.classList.add("hover:bg-red-600");
+
+  const scaffoldMenuButton = new OBC.Button(components, {
+    name: "Scaffold",
+  });
+  scaffoldMenuButton.id = "general-button";
+  topToolBar.addChild(scaffoldMenuButton);
+  scaffoldMenuButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    if (titleElement) {
+      titleElement.textContent = "Scaffolding";
+    }
+  });
+  scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  scaffoldMenuButton.domElement.classList.add("hover:bg-red-600");
+
+  const suppliesMenuButton = new OBC.Button(components, {
+    name: "Supplies",
+  });
+  suppliesMenuButton.id = "general-button";
+  topToolBar.addChild(suppliesMenuButton);
+  suppliesMenuButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    if (titleElement) {
+      titleElement.textContent = "Supply";
+    }
+  });
+  suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  suppliesMenuButton.domElement.classList.add("hover:bg-red-600");
 
   console.log(components.camera);
 
@@ -569,8 +648,9 @@ export const createToolbar = (
   removeLabelsButton.domElement.classList.add("hover:bg-red-600");
 
   // Function to update the title
+  let titleElement;
   const updateTitle = () => {
-    const titleElement = drawer.domElement.querySelector(
+    titleElement = drawer.domElement.querySelector(
       "h3.text-3xl.text-ifcjs-200.font-medium.my-0"
     );
     if (titleElement) {
