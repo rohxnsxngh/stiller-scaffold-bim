@@ -8,11 +8,10 @@ import {
   cameraTopView,
 } from "./camera";
 import { hideAllCSS2DObjects } from "./helper";
-import { createTabs, createTimeline } from "./tab";
 export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
-import LabelVue from "../components/Label.vue";
+import MountPoint from "../components/MountPoint.vue";;
 import { createApp } from "vue";
 
 export const setDrawingInProgress = (value: boolean) => {
@@ -636,19 +635,8 @@ export const createToolbar = (
   components.ui.add(drawer);
   console.log(drawer);
 
-  const timeline = createTimeline();
-  drawer.domElement.appendChild(timeline);
-
-  // TabList
-  // const tablist = createTabs();
-  // Append the tablist to the drawer
-  // drawer.domElement.appendChild(tablist);
-
-  // Assuming `vuecomponent` is your Vue component
-  // const vueComponentInstance = new Vue({
-  //   render: (h) => h(LabelVue),
-  // });
-  const vueComponentInstance = createApp(LabelVue);
+  // Vue instance inside of drawer
+  const vueComponentInstance = createApp(MountPoint);
 
   // Optionally, if you want to append it as a child of the drawer's DOM element
   // you can use the following:

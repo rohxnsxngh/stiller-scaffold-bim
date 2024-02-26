@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { useNavbarStore } from './store/index'
-const store = useNavbarStore()
+import { useNavbarStore } from "./store/index";
+const store = useNavbarStore();
 </script>
 
 <template>
- <div>
-    <Navbar v-if="store.showNavbar"/>
-    <!-- <Drawer v-if="!store.showNavbar"/> -->
+  <div>
+    <Navbar v-if="store.showNavbar" />
     <router-view />
- </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -16,12 +15,12 @@ import Navbar from "./components/Navbar.vue";
 import Drawer from "./components/Drawer.vue";
 
 export default {
- components: {
+  components: {
     Navbar,
     Drawer,
- },
- data() {
+  },
+  data() {
     return {};
- },
+  },
 };
 </script>
