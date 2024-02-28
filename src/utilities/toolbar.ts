@@ -12,6 +12,7 @@ export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
 import MountPoint from "../components/MountPoint.vue";
+import Timeline from "../components/Timeline.vue";
 import { createApp } from "vue";
 
 export const setDrawingInProgress = (value: boolean) => {
@@ -58,6 +59,19 @@ export const createToolbar = (
     // setDrawingInProgress(false);
   });
 
+  // Vue instance inside of top tool bar
+  const vueComponentTimeline = createApp(Timeline);
+
+  // Create a new DOM element to serve as the mounting point for the Vue component
+  const mountPointTimeline = document.createElement("div");
+  mountPointTimeline.style.height = '0%';
+
+  // Mount the Vue component instance to the new DOM element
+  vueComponentTimeline.mount(mountPointTimeline);
+
+  // Append the new DOM element to topToolBar.domElement
+  topToolBar.domElement.appendChild(mountPointTimeline);
+
   const alertButton = new OBC.Button(components);
   alertButton.materialIcon = "info";
   alertButton.tooltip = "Information";
@@ -85,6 +99,7 @@ export const createToolbar = (
   });
   generalMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   generalMenuButton.domElement.classList.add("hover:bg-red-600");
+  generalMenuButton.domElement.classList.add("mt-2");
 
   const blueprintMenuButton = new OBC.Button(components, {
     name: "Blueprint",
@@ -101,6 +116,7 @@ export const createToolbar = (
   });
   blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintMenuButton.domElement.classList.add("hover:bg-red-600");
+  blueprintMenuButton.domElement.classList.add("mt-2");
 
   const roofMenuButton = new OBC.Button(components, {
     name: "Roof",
@@ -117,6 +133,7 @@ export const createToolbar = (
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-red-600");
+  roofMenuButton.domElement.classList.add("mt-2");
 
   const scaffoldMenuButton = new OBC.Button(components, {
     name: "Scaffold",
@@ -133,6 +150,7 @@ export const createToolbar = (
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-red-600");
+  scaffoldMenuButton.domElement.classList.add("mt-2");
 
   const suppliesMenuButton = new OBC.Button(components, {
     name: "Supplies",
@@ -149,6 +167,7 @@ export const createToolbar = (
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-red-600");
+  suppliesMenuButton.domElement.classList.add("mt-2");
 
   console.log(components.camera);
 
