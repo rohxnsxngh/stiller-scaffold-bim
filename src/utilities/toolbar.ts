@@ -80,6 +80,8 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "General";
     }
+    // @ts-ignore
+    window.setActiveSection("general");
   });
   generalMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   generalMenuButton.domElement.classList.add("hover:bg-red-600");
@@ -87,13 +89,15 @@ export const createToolbar = (
   const blueprintMenuButton = new OBC.Button(components, {
     name: "Blueprint",
   });
-  blueprintMenuButton.id = "general-button";
+  blueprintMenuButton.id = "blueprint-button";
   topToolBar.addChild(blueprintMenuButton);
   blueprintMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
       titleElement.textContent = "Blueprint";
     }
+    // @ts-ignore
+    window.setActiveSection("blueprint");
   });
   blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintMenuButton.domElement.classList.add("hover:bg-red-600");
@@ -101,13 +105,15 @@ export const createToolbar = (
   const roofMenuButton = new OBC.Button(components, {
     name: "Roof",
   });
-  roofMenuButton.id = "general-button";
+  roofMenuButton.id = "roof-button";
   topToolBar.addChild(roofMenuButton);
   roofMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
       titleElement.textContent = "Roof";
     }
+    // @ts-ignore
+    window.setActiveSection("roof");
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-red-600");
@@ -115,13 +121,15 @@ export const createToolbar = (
   const scaffoldMenuButton = new OBC.Button(components, {
     name: "Scaffold",
   });
-  scaffoldMenuButton.id = "general-button";
+  scaffoldMenuButton.id = "scaffold-button";
   topToolBar.addChild(scaffoldMenuButton);
   scaffoldMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
       titleElement.textContent = "Scaffolding";
     }
+    // @ts-ignore
+    window.setActiveSection("scaffold");
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-red-600");
@@ -129,13 +137,15 @@ export const createToolbar = (
   const suppliesMenuButton = new OBC.Button(components, {
     name: "Supplies",
   });
-  suppliesMenuButton.id = "general-button";
+  suppliesMenuButton.id = "supplies-button";
   topToolBar.addChild(suppliesMenuButton);
   suppliesMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
       titleElement.textContent = "Supply";
     }
+    // @ts-ignore
+    window.setActiveSection("supply");
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-red-600");
@@ -648,7 +658,7 @@ export const createToolbar = (
   removeLabelsButton.domElement.classList.add("hover:bg-red-600");
 
   // Function to update the title
-  let titleElement;
+  let titleElement: Element | null;
   const updateTitle = () => {
     titleElement = drawer.domElement.querySelector(
       "h3.text-3xl.text-ifcjs-200.font-medium.my-0"
