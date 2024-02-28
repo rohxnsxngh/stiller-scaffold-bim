@@ -667,7 +667,7 @@ export const createToolbar = (
       titleElement.textContent = "General";
       // @ts-ignore
       titleElement.classList =
-        "text-3xl text-red-500 font-medium my-0 btn btn-ghost";
+        "text-3xl text-[#DEDEDE] font-medium my-0 btn btn-ghost";
       titleElement.id = "drawerTitle";
       titleElement.addEventListener("mousedown", () => {
         window.location.href = "/home";
@@ -682,7 +682,7 @@ export const createToolbar = (
     if (closeDrawerElement) {
       // @ts-ignore
       closeDrawerElement.classList =
-        "material-icons text-2xl ml-4 text-gray-400 z-20 hover:cursor-pointer hover:text-red-500";
+        "material-icons text-2xl ml-4 text-gray-400 z-20 hover:cursor-pointer hover:text-white";
       closeDrawerElement.id = "drawerCloseButton";
     }
   };
