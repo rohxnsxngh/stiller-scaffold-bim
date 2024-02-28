@@ -664,7 +664,7 @@ export const createToolbar = (
       "h3.text-3xl.text-ifcjs-200.font-medium.my-0"
     );
     if (titleElement) {
-      titleElement.textContent = "Stiller";
+      titleElement.textContent = "General";
       // @ts-ignore
       titleElement.classList =
         "text-3xl text-red-500 font-medium my-0 btn btn-ghost";
