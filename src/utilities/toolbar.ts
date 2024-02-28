@@ -99,7 +99,6 @@ export const createToolbar = (
   });
   generalMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   generalMenuButton.domElement.classList.add("hover:bg-red-600");
-  generalMenuButton.domElement.classList.add("mt-2");
 
   const blueprintMenuButton = new OBC.Button(components, {
     name: "Blueprint",
@@ -116,7 +115,6 @@ export const createToolbar = (
   });
   blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintMenuButton.domElement.classList.add("hover:bg-red-600");
-  blueprintMenuButton.domElement.classList.add("mt-2");
 
   const roofMenuButton = new OBC.Button(components, {
     name: "Roof",
@@ -133,7 +131,6 @@ export const createToolbar = (
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-red-600");
-  roofMenuButton.domElement.classList.add("mt-2");
 
   const scaffoldMenuButton = new OBC.Button(components, {
     name: "Scaffold",
@@ -150,7 +147,6 @@ export const createToolbar = (
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-red-600");
-  scaffoldMenuButton.domElement.classList.add("mt-2");
 
   const suppliesMenuButton = new OBC.Button(components, {
     name: "Supplies",
@@ -167,7 +163,6 @@ export const createToolbar = (
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-red-600");
-  suppliesMenuButton.domElement.classList.add("mt-2");
 
   console.log(components.camera);
 
@@ -640,7 +635,7 @@ export const createToolbar = (
   drawerToolBar.position = "right";
   components.ui.addToolbar(drawerToolBar);
   drawerToolBar.domElement.style.position = "absolute";
-  drawerToolBar.domElement.style.top = "40px";
+  drawerToolBar.domElement.style.top = "20px";
   drawerToolBar.domElement.style.right = "10px";
   drawerToolBar.domElement.addEventListener("mouseleave", () => {
     document.body.style.cursor = "auto";
@@ -709,7 +704,6 @@ export const createToolbar = (
   //Drawer Menu Button
   const drawerMenuButton = new OBC.Button(components);
   drawerMenuButton.materialIcon = "menu";
-  drawerMenuButton.tooltip = "Menu";
   drawerMenuButton.id = "menu-button";
   drawerToolBar.addChild(drawerMenuButton);
   drawerMenuButton.onClick.add(() => {
