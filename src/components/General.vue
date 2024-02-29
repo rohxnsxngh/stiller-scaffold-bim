@@ -97,14 +97,33 @@
       </div>
 
       <div>
-        <p class="text-sm">Skal stillaset benyttes av minimum to personer samtidig?</p>
+        <p class="text-sm">
+          Skal stillaset benyttes av minimum to personer samtidig?
+        </p>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Ja</div>
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Nei</div>
+        </div>
+      </div>
+
+      <div>
+        Stillas som er høyere enn 5 m og lengre enn 10 m som blir benyttet av
+        flere enn to personer samtidig - må ha separate oppganger og trappetårn
+      </div>
+
+      <div>
+        <h2 class="text-sm">Hva slags underlag skal stillaset stå på?</h2>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
-            Ja
+            <img src="../assets/images//Terrainblock.png" class="object-contain"/>
+            Grus og stein
           </div>
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
-            Nei
-          </div>
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Asfalt</div>
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Grov sand</div>
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Fin sand</div>
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Leire</div>
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Gress</div>
+          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Blandet</div>
         </div>
       </div>
 
