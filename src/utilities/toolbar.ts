@@ -711,7 +711,7 @@ export const createToolbar = (
     drawer.visible = !drawer.visible;
   });
   drawerMenuButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(true);
+    setDrawingInProgress(false);
   });
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawerMenuButton.domElement.classList.add("hover:bg-red-600");
