@@ -1,7 +1,7 @@
 <template>
   <div
     id="label-component"
-    class="bg-black text-white p-2 flex pointer-events-auto rounded"
+    class="bg-black text-white px-2 flex pointer-events-auto rounded"
     @click="clicktest"
   >
     <General v-if="activeSection === 'general'" />

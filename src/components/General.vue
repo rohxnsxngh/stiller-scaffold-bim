@@ -2,8 +2,8 @@
   <div class="card w-full h-screen bg-black shadow-xl">
     <div class="card-body p-2">
       <div>
-        <p class="text-sm">Add general information about the project</p>
-        <h2 class="text-sm">What kind of work is to be done?</h2>
+        <p class="text-sm">Tilføy generell informasjon om prosjektet</p>
+        <h2 class="text-sm">Hva slags jobb skal gjøres?</h2>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
             Fasadearbeid
@@ -114,21 +114,62 @@
       <div>
         <h2 class="text-sm">Hva slags underlag skal stillaset stå på?</h2>
         <div class="grid grid-cols-3 gap-3">
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
-            <img src="../assets/images//Terrainblock.png" class="object-contain"/>
-            Grus og stein
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/TerrainBlock.png"
+              class="object-contain"
+            />
+            <p>Grus og stein</p>
           </div>
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Asfalt</div>
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Grov sand</div>
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Fin sand</div>
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Leire</div>
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Gress</div>
-          <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Blandet</div>
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/TerrainBlockAsphalt.png"
+              class="object-contain"
+            />Asfalt
+          </div>
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/TerrainBlockSand.png"
+              class="object-contain"
+            />
+            Grov sand
+          </div>
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/TerrainBlockFineSand.png"
+              class="object-contain"
+            />
+            Fin sand
+          </div>
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/TerrainBlockClay.png"
+              class="object-contain"
+            />
+            Leire
+          </div>
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/TerrainBlockGrass.png"
+              class="object-contain"
+            />
+            Gress
+          </div>
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/TerrainBlockMixed.png"
+              class="object-contain"
+            />
+            Blandet
+          </div>
         </div>
       </div>
 
       <div class="card-actions justify-end">
-        <button class="btn btn-primary">Buy Now</button>
+        <div class="m-4">
+          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">Avslutt</div>
+          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1]">Neste</div>
+        </div>
       </div>
     </div>
   </div>
