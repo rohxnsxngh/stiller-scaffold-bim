@@ -14,6 +14,7 @@ export let deletionInProgress = false;
 import MountPoint from "../components/MountPoint.vue";
 import Timeline from "../components/Timeline.vue";
 import { createApp } from "vue";
+import { setPlaceScaffoldIndividually } from "./scaffold";
 
 export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
@@ -43,20 +44,26 @@ export const createToolbar = (
   const mainToolbar = new OBC.Toolbar(components);
   mainToolbar.position = "bottom";
   components.ui.addToolbar(mainToolbar);
+  mainToolbar.domElement.addEventListener("mousedown", () => {
+    setDrawingInProgress(false);
+    setPlaceScaffoldIndividually(false);
+  });
   // side tool bar
   const sideToolBar = new OBC.Toolbar(components);
   sideToolBar.position = "right";
   components.ui.addToolbar(sideToolBar);
-  sideToolBar.domElement.addEventListener("mouseleave", () => {
-    // setDrawingInProgress(false);
+  sideToolBar.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+    setPlaceScaffoldIndividually(false);
   });
 
   // top tool bar
   const topToolBar = new OBC.Toolbar(components);
   topToolBar.position = "top";
   components.ui.addToolbar(topToolBar);
-  topToolBar.domElement.addEventListener("mouseleave", () => {
-    // setDrawingInProgress(false);
+  topToolBar.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+    setPlaceScaffoldIndividually(false);
   });
 
   // Vue instance inside of top tool bar
@@ -64,7 +71,7 @@ export const createToolbar = (
 
   // Create a new DOM element to serve as the mounting point for the Vue component
   const mountPointTimeline = document.createElement("div");
-  mountPointTimeline.style.height = '0%';
+  mountPointTimeline.style.height = "0%";
 
   // Mount the Vue component instance to the new DOM element
   vueComponentTimeline.mount(mountPointTimeline);
@@ -671,6 +678,28 @@ export const createToolbar = (
   removeLabelsButton.domElement.classList.remove("hover:bg-ifcjs-200");
   removeLabelsButton.domElement.classList.add("hover:bg-red-600");
 
+  //Solidify Blueprint
+  const testButton = new OBC.Button(components);
+  testButton.materialIcon = "quiz";
+  testButton.tooltip = "Blueprint";
+  testButton.id = "blueprint-button";
+  sideToolBar.addChild(testButton);
+  testButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    roofButton.closeMenus();
+    scaffoldButton.closeMenus();
+    extrusionButton.closeMenus();
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  testButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+  testButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  testButton.domElement.classList.add("hover:bg-red-600");
+
   // Function to update the title
   let titleElement: Element | null;
   const updateTitle = () => {
@@ -772,5 +801,6 @@ export const createToolbar = (
     generateScaffoldOutlineButton,
     createExtrusionButton,
     clearSceneButton,
+    testButton,
   ];
 };

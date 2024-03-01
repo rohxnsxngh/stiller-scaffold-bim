@@ -642,3 +642,7 @@ function removeScaffoldingLevel(
   }
   label.userData.level--;
 }
+
+function removeIndividualScaffold() {
+  
+}

@@ -159,6 +159,7 @@ export const createModelView = async () => {
     generateScaffoldOutlineButton,
     createExtrusionButton,
     clearSceneButton,
+    testButton,
   ] = createToolbar(components, scene);
 
   const mousePosition = new THREE.Vector2();
@@ -203,6 +204,7 @@ export const createModelView = async () => {
           lastHighlightedObjectColor =
             intersectedObject.material.color.getHex();
           intersectedObject.material.color.set(0xff0000);
+          console.log(intersectedObject)
           intersectedObject.material.needsUpdate = true;
           // applyGlow(intersectedObject);
           lastHighlightedObject = intersectedObject;
@@ -333,15 +335,15 @@ export const createModelView = async () => {
       );
     }
     if (placeScaffoldIndividually) {
-      // const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57, 2.00, 0.73);
-      // //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
-      // createIndividualScaffoldOnClick(
-      //   intersects,
-      //   highlightMesh,
-      //   scene,
-      //   scaffoldModeling,
-      //   bboxWireframe
-      // );
+      const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57, 2.00, 0.73);
+      //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
+      createIndividualScaffoldOnClick(
+        intersects,
+        highlightMesh,
+        scene,
+        scaffoldModeling,
+        bboxWireframe
+      );
     }
     if (deletionInProgress && !drawingInProgress) {
       console.log("delete");
@@ -373,16 +375,15 @@ export const createModelView = async () => {
   // Move Blueprint
   moveBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("move blueprint");
-    const blueprints: any[] = []
-    isDrawingBlueprint = false
+    const blueprints: any[] = [];
+    isDrawingBlueprint = false;
     // Array to hold objects that can be dragged
     scene.traverse((child: any) => {
       if (child instanceof THREE.Mesh && child.name === "blueprint") {
-        blueprints.push(child)
+        blueprints.push(child);
       }
     });
-    moveBlueprint(blueprints, components, scene, shadows)
-
+    moveBlueprint(blueprints, components, scene, shadows);
   });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
@@ -865,6 +866,13 @@ export const createModelView = async () => {
 
   clearSceneButton.domElement.addEventListener("mousedown", () => {
     resetScene(scene, components, shadows);
+
+    scaffoldPoints = []
+    points = []
+  });
+
+  testButton.domElement.addEventListener("mousedown", () => {
+    console.log("testing button");
   });
 
   // @ts-ignore
