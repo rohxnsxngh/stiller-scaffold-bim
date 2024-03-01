@@ -1,5 +1,5 @@
 <template>
-  <div class="card w-full h-screen bg-black shadow-xl">
+  <div class="card w-full h-screen bg-inherit shadow-xl">
     <div class="card-body p-2">
       <div>
         <p class="text-sm">Tilføy generell informasjon om prosjektet</p>
@@ -21,8 +21,8 @@
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Blanding</div>
         </div>
       </div>
-      <div class="bg-black">
-        We recommend spire heavy scaffolding for your area of ​​use
+      <div class="">
+        Vi anbefaler spir tungstillas til ditt bruksområde
       </div>
 
       <div>
