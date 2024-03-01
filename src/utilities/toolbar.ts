@@ -11,8 +11,8 @@ import { hideAllCSS2DObjects } from "./helper";
 export let drawingInProgress = false;
 export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
-import MountPoint from "../components/MountPoint.vue";
-import Timeline from "../components/Timeline.vue";
+import MountPoint from "../pages/MountPoint.vue";
+import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
 

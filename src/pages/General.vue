@@ -54,8 +54,15 @@
         </div>
       </div>
 
-      <div class="text-sm mb-2">
-        Tungstillas passer til jobber som krever tyngre belastningsklasse
+      <div class="bg-[#24242F] rounded flex flex-row my-4">
+        <div>
+          <img src="../assets/images/GeneralSection/Lightbulb.png" alt="" />
+        </div>
+        <div>
+          <p class="text-sm mt-3 text-[#9E9E9E]">
+            Tungstillas passer til jobber som krever tyngre belastningsklasse
+          </p>
+        </div>
       </div>
 
       <div>
@@ -106,9 +113,21 @@
         </div>
       </div>
 
-      <div class="text-sm mb-2">
-        Stillas som er høyere enn 5 m og lengre enn 10 m som blir benyttet av
-        flere enn to personer samtidig - må ha separate oppganger og trappetårn
+      <div class="bg-[#24242F] rounded flex flex-row my-4">
+        <div>
+          <img
+            src="../assets/images/GeneralSection/Clipboard.png"
+            alt="Clipboard"
+            class="w-32 mt-8 mx-2"
+          />
+        </div>
+        <div>
+          <p class="text-sm text-[#9E9E9E] m-4">
+            Stillas som er høyere enn 5 m og lengre enn 10 m som blir benyttet
+            av flere enn to personer samtidig - må ha separate oppganger og
+            trappetårn
+          </p>
+        </div>
       </div>
 
       <div>
@@ -116,48 +135,48 @@
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/GeneralSection/TerrainBlock.png"
+              src="../assets/images/GeneralSection/TerrainBlock.svg"
               class="object-contain"
             />
-            <p>Grus og stein</p>
+            <p class="">Grus og stein</p>
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/GeneralSection/TerrainBlockAsphalt.png"
+              src="../assets/images/GeneralSection/TerrainBlockAsphalt.svg"
               class="object-contain"
             />Asfalt
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/GeneralSection/TerrainBlockSand.png"
+              src="../assets/images/GeneralSection/TerrainBlockSand.svg"
               class="object-contain"
             />
             Grov sand
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/GeneralSection/TerrainBlockFineSand.png"
+              src="../assets/images/GeneralSection/TerrainBlockFineSand.svg"
               class="object-contain"
             />
             Fin sand
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/GeneralSection/TerrainBlockClay.png"
+              src="../assets/images/GeneralSection/TerrainBlockClay.svg"
               class="object-contain"
             />
             Leire
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/GeneralSection/TerrainBlockGrass.png"
+              src="../assets/images/GeneralSection/TerrainBlockGrass.svg"
               class="object-contain"
             />
             Gress
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/GeneralSection/TerrainBlockMixed.png"
+              src="../assets/images/GeneralSection/TerrainBlockMixed.svg"
               class="object-contain"
             />
             Blandet
@@ -167,7 +186,9 @@
 
       <div class="card-actions justify-end">
         <div class="m-4">
-          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">Avslutt</div>
+          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">
+            Avslutt
+          </div>
           <div class="btn btn-sm btn-outline hover:bg-[#23E6A1]">Neste</div>
         </div>
       </div>
