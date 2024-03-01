@@ -2,8 +2,8 @@
   <div class="card w-full h-screen bg-inherit shadow-xl">
     <div class="card-body p-2">
       <div>
-        <p class="text-sm">Tilføy generell informasjon om prosjektet</p>
-        <h2 class="text-sm">Hva slags jobb skal gjøres?</h2>
+        <p class="text-sm mb-2">Tilføy generell informasjon om prosjektet</p>
+        <h2 class="text-sm mb-2">Hva slags jobb skal gjøres?</h2>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
             Fasadearbeid
@@ -21,12 +21,12 @@
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Blanding</div>
         </div>
       </div>
-      <div class="">
+      <div class="text-sm mb-2">
         Vi anbefaler spir tungstillas til ditt bruksområde
       </div>
 
       <div>
-        <p class="text-sm">Velg Stillas</p>
+        <p class="text-sm mb-2">Velg Stillas</p>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
             Spir stillas
@@ -38,7 +38,7 @@
       </div>
 
       <div>
-        <p class="text-sm">Leverandør</p>
+        <p class="text-sm mb-2">Leverandør</p>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Layher</div>
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Haki</div>
@@ -47,14 +47,14 @@
       </div>
 
       <div>
-        <p class="text-sm">Type</p>
+        <p class="text-sm mb-2">Type</p>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Lett</div>
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Tung</div>
         </div>
       </div>
 
-      <div>
+      <div class="text-sm mb-2">
         Tungstillas passer til jobber som krever tyngre belastningsklasse
       </div>
 
@@ -97,7 +97,7 @@
       </div>
 
       <div>
-        <p class="text-sm">
+        <p class="text-sm mb-2">
           Skal stillaset benyttes av minimum to personer samtidig?
         </p>
         <div class="grid grid-cols-3 gap-3">
@@ -106,58 +106,58 @@
         </div>
       </div>
 
-      <div>
+      <div class="text-sm mb-2">
         Stillas som er høyere enn 5 m og lengre enn 10 m som blir benyttet av
         flere enn to personer samtidig - må ha separate oppganger og trappetårn
       </div>
 
       <div>
-        <h2 class="text-sm">Hva slags underlag skal stillaset stå på?</h2>
+        <h2 class="text-sm mb-2">Hva slags underlag skal stillaset stå på?</h2>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/TerrainBlock.png"
+              src="../assets/images/GeneralSection/TerrainBlock.png"
               class="object-contain"
             />
             <p>Grus og stein</p>
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/TerrainBlockAsphalt.png"
+              src="../assets/images/GeneralSection/TerrainBlockAsphalt.png"
               class="object-contain"
             />Asfalt
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/TerrainBlockSand.png"
+              src="../assets/images/GeneralSection/TerrainBlockSand.png"
               class="object-contain"
             />
             Grov sand
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/TerrainBlockFineSand.png"
+              src="../assets/images/GeneralSection/TerrainBlockFineSand.png"
               class="object-contain"
             />
             Fin sand
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/TerrainBlockClay.png"
+              src="../assets/images/GeneralSection/TerrainBlockClay.png"
               class="object-contain"
             />
             Leire
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/TerrainBlockGrass.png"
+              src="../assets/images/GeneralSection/TerrainBlockGrass.png"
               class="object-contain"
             />
             Gress
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/TerrainBlockMixed.png"
+              src="../assets/images/GeneralSection/TerrainBlockMixed.png"
               class="object-contain"
             />
             Blandet
