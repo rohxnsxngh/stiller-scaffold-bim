@@ -56,7 +56,7 @@
 
       <div class="bg-[#24242F] rounded flex flex-row my-4">
         <div>
-          <img src="../assets/images/GeneralSection/Lightbulb.png" alt="" />
+          <img src="../assets/images/GeneralSection/Lightbulb.svg" alt="Lightbulb" />
         </div>
         <div>
           <p class="text-sm mt-3 text-[#9E9E9E]">
@@ -116,7 +116,7 @@
       <div class="bg-[#24242F] rounded flex flex-row my-4">
         <div>
           <img
-            src="../assets/images/GeneralSection/Clipboard.png"
+            src="../assets/images/GeneralSection/Clipboard.svg"
             alt="Clipboard"
             class="w-32 mt-8 mx-2"
           />

@@ -7,7 +7,7 @@
             class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
           >
             <img
-              src="../assets/images/Select.png"
+              src="../assets/images/Select.svg"
               alt="Select"
               class="scale-150"
             />
@@ -19,12 +19,32 @@
             class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
           >
             <img
-              src="../assets/images/Delete.png"
+              src="../assets/images/Delete.svg"
               alt="Select"
               class="scale-150"
             />
           </div>
           <div><p class="text-xs text-center mt-2">Delete</p></div>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-sm mb-2 mt-8">Velg et alternativ</p>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/BlueprintSection/Blueprint.svg"
+              class="object-contain"
+            />
+            <p class="">Tegne selv</p>
+          </div>
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+            <img
+              src="../assets/images/BlueprintSection/UploadBlueprint.svg"
+              class="object-contain"
+            />
+            <p>Opplastning</p>
+          </div>
         </div>
       </div>
 

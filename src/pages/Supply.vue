@@ -7,7 +7,7 @@
             class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
           >
             <img
-              src="../assets/images/Select.png"
+              src="../assets/images/Select.svg"
               alt="Select"
               class="scale-150"
             />
@@ -19,7 +19,7 @@
             class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
           >
             <img
-              src="../assets/images/Delete.png"
+              src="../assets/images/Delete.svg"
               alt="Select"
               class="scale-150"
             />
