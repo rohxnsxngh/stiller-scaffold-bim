@@ -189,7 +189,7 @@
           <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">
             Avslutt
           </div>
-          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1]">Neste</div>
+          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]">Neste</div>
         </div>
       </div>
     </div>
