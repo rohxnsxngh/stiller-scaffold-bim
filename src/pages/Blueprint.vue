@@ -1,6 +1,7 @@
 <template>
   <div class="card w-full h-screen bg-inherit shadow-xl">
     <div class="card-body p-2">
+      <div>Oppgi byggets ytre mål</div>
       <div class="bg-[#14141C] grid grid-cols-4 gap-4 rounded">
         <div class="flex flex-col m-4">
           <div
@@ -65,8 +66,8 @@
 </template>
 
 <script lang="ts">
-import DrawBlueprint from "../components/DrawBlueprint.vue";
-import UploadBlueprint from "../components/UploadBlueprint.vue";
+import DrawBlueprint from "../components/DrawBlueprintComponent.vue";
+import UploadBlueprint from "../components/UploadBlueprintComponent.vue";
 
 export default {
   components: {
