@@ -27,7 +27,7 @@
         <input
           type="text"
           placeholder="Antall meter"
-          class="input input-bordered w-full max-w-xs"
+          class="input input-md input-bordered w-full max-w-xs"
         />
         <div class="label"></div>
       </label>
@@ -41,7 +41,7 @@
         <input
           type="text"
           placeholder="Antall meter"
-          class="input input-bordered w-full max-w-xs"
+          class="input input-md input-bordered w-full max-w-xs"
         />
         <div class="label"></div>
       </label>
@@ -55,7 +55,7 @@
         <input
           type="text"
           placeholder="Antall meter"
-          class="input input-bordered w-full max-w-xs"
+          class="input input-md input-bordered w-full max-w-xs"
         />
         <div class="label"></div>
       </label>

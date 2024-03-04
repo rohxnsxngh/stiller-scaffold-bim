@@ -8,7 +8,7 @@
         <input
           type="text"
           placeholder="Antall meter"
-          class="input input-bordered w-full max-w-xs"
+          class="input input-sm input-bordered w-full max-w-xs"
         />
         <div class="label">
           <span class="label-text-alt text-[#623CEA]"
@@ -24,12 +24,12 @@
           <span class="label-text">Roter tak</span>
         </div>
         <div
-          class="btn btn-md w-1/2 bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
+          class="btn btn-md w-1/3 bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
         >
           <img
             src="../assets/images/RoofSection/Rotate.svg"
             alt="Select"
-            class="scale-25"
+            class="w-6"
           />
         </div>
         <div class="label">
@@ -40,7 +40,7 @@
   </div>
 
   <div>
-    <p class="text-sm mb-2">Stikker taket ut fra fasaden (overheng)?</p>
+    <p class="text-sm my-2">Stikker taket ut fra fasaden (overheng)?</p>
     <div class="grid grid-cols-3 gap-3">
       <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Ja</div>
       <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Nei</div>
@@ -56,7 +56,7 @@
         <input
           type="text"
           placeholder="Antall meter"
-          class="input input-bordered w-full max-w-xs"
+          class="input input-sm input-bordered w-full max-w-xs"
         />
         <div class="label"></div>
       </label>

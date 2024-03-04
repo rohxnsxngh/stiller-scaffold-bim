@@ -32,21 +32,30 @@
       <div class="mb-8">
         <p class="text-sm mb-2 mt-8">Velg et alternativ</p>
         <div class="grid grid-cols-3 gap-3">
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+          <div
+            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
+            @click="showFlatRoof"
+          >
             <img
               src="../assets/images/RoofSection/FlatRoof.svg"
               class="object-contain"
             />
             <p class="">Flatt</p>
           </div>
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+          <div
+            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
+            @click="showGableRoof"
+          >
             <img
               src="../assets/images/RoofSection/GableRoof.svg"
               class="object-contain"
             />
             <p>Saltak</p>
           </div>
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+          <div
+            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
+            @click="showShedRoof"
+          >
             <img
               src="../assets/images/RoofSection/ShedRoof.svg"
               class="object-contain"
@@ -56,7 +65,9 @@
         </div>
       </div>
 
-      <ShedRoofComponent/>
+      <ShedRoofComponent v-if="showShed" />
+      <GableRoofComponent v-if="showGable" />
+      <FlatRoofComponent v-if="showFlat" />
 
       <div class="card-actions justify-end">
         <div class="m-4">
@@ -75,11 +86,15 @@
 </template>
 
 <script lang="ts">
-import ShedRoofComponent from '../components/ShedRoofComponent.vue';
+import ShedRoofComponent from "../components/ShedRoofComponent.vue";
+import FlatRoofComponent from "../components/FlatRoofComponent.vue";
+import GableRoofComponent from "../components/GableRoofComponent.vue";
 
 export default {
   components: {
-    ShedRoofComponent
+    ShedRoofComponent,
+    FlatRoofComponent,
+    GableRoofComponent,
   },
   data() {
     return {
