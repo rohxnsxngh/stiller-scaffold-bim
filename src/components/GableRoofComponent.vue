@@ -24,7 +24,7 @@
           <span class="label-text">Roter tak</span>
         </div>
         <div
-          class="btn btn-sm w-1/3 bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
+          class="btn btn-md w-1/3 bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
         >
           <img
             src="../assets/images/RoofSection/Rotate.svg"

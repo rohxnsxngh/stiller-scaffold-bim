@@ -3,7 +3,7 @@
     <div class="card-body p-2">
       <div>
         <p class="text-sm mb-2">Tilføy generell informasjon om prosjektet</p>
-        <h2 class="text-sm mb-2">Hva slags jobb skal gjøres?</h2>
+        <h2 class="text-sm mb-4">Hva slags jobb skal gjøres?</h2>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
             Fasadearbeid
@@ -26,7 +26,7 @@
       </div>
 
       <div>
-        <p class="text-sm mb-2">Velg Stillas</p>
+        <p class="text-sm mb-4">Velg Stillas</p>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">
             Spir stillas
@@ -38,7 +38,7 @@
       </div>
 
       <div>
-        <p class="text-sm mb-2">Leverandør</p>
+        <p class="text-sm mb-4">Leverandør</p>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Layher</div>
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Haki</div>
@@ -47,14 +47,14 @@
       </div>
 
       <div>
-        <p class="text-sm mb-2">Type</p>
+        <p class="text-sm mb-4">Type</p>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Lett</div>
           <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Tung</div>
         </div>
       </div>
 
-      <div class="bg-[#24242F] rounded flex flex-row my-4">
+      <div class="bg-[#24242F] rounded flex flex-row my-8">
         <div>
           <img src="../assets/images/GeneralSection/Lightbulb.svg" alt="Lightbulb" />
         </div>
@@ -104,7 +104,7 @@
       </div>
 
       <div>
-        <p class="text-sm mb-2">
+        <p class="text-sm mb-4">
           Skal stillaset benyttes av minimum to personer samtidig?
         </p>
         <div class="grid grid-cols-3 gap-3">

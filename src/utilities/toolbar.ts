@@ -61,6 +61,9 @@ export const createToolbar = (
   const topToolBar = new OBC.Toolbar(components);
   topToolBar.position = "top";
   components.ui.addToolbar(topToolBar);
+  topToolBar.domElement.style.position = "fixed";
+  topToolBar.domElement.style.top = "20px";
+  topToolBar.domElement.style.right = "100px";
   topToolBar.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
     setPlaceScaffoldIndividually(false);
@@ -89,87 +92,103 @@ export const createToolbar = (
     console.log(alertButton);
   });
   alertButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  alertButton.domElement.classList.add("hover:bg-red-600");
+  alertButton.domElement.classList.add("hover:bg-slate-300");
 
   const generalMenuButton = new OBC.Button(components, {
-    name: "General",
+    name: "Generelt",
   });
   generalMenuButton.id = "general-button";
   topToolBar.addChild(generalMenuButton);
   generalMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
-      titleElement.textContent = "General";
+      titleElement.textContent = "Generelt";
     }
     // @ts-ignore
     window.setActiveSection("general");
   });
   generalMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  generalMenuButton.domElement.classList.add("hover:bg-red-600");
+  generalMenuButton.domElement.classList.add("hover:bg-slate-300");
 
   const blueprintMenuButton = new OBC.Button(components, {
-    name: "Blueprint",
+    name: "Plantegning og bygg",
   });
   blueprintMenuButton.id = "blueprint-button";
   topToolBar.addChild(blueprintMenuButton);
   blueprintMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
-      titleElement.textContent = "Blueprint";
+      titleElement.textContent = "Plantegning og bygg";
     }
     // @ts-ignore
     window.setActiveSection("blueprint");
   });
   blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  blueprintMenuButton.domElement.classList.add("hover:bg-red-600");
+  blueprintMenuButton.domElement.classList.add("hover:bg-slate-300");
 
   const roofMenuButton = new OBC.Button(components, {
-    name: "Roof",
+    name: "Tak",
   });
   roofMenuButton.id = "roof-button";
   topToolBar.addChild(roofMenuButton);
   roofMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
-      titleElement.textContent = "Roof";
+      titleElement.textContent = "Tak";
     }
     // @ts-ignore
     window.setActiveSection("roof");
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  roofMenuButton.domElement.classList.add("hover:bg-red-600");
+  roofMenuButton.domElement.classList.add("hover:bg-slate-300");
 
   const scaffoldMenuButton = new OBC.Button(components, {
-    name: "Scaffold",
+    name: "Stillas",
   });
   scaffoldMenuButton.id = "scaffold-button";
   topToolBar.addChild(scaffoldMenuButton);
   scaffoldMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
-      titleElement.textContent = "Scaffolding";
+      titleElement.textContent = "Stillas";
     }
     // @ts-ignore
     window.setActiveSection("scaffold");
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  scaffoldMenuButton.domElement.classList.add("hover:bg-red-600");
+  scaffoldMenuButton.domElement.classList.add("hover:bg-slate-300");
 
   const suppliesMenuButton = new OBC.Button(components, {
-    name: "Supplies",
+    name: "Tillegg",
   });
   suppliesMenuButton.id = "supplies-button";
   topToolBar.addChild(suppliesMenuButton);
   suppliesMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
-      titleElement.textContent = "Supply";
+      titleElement.textContent = "Tillegg";
     }
     // @ts-ignore
     window.setActiveSection("supply");
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  suppliesMenuButton.domElement.classList.add("hover:bg-red-600");
+  suppliesMenuButton.domElement.classList.add("hover:bg-slate-300");
+
+  const orderMenuButton = new OBC.Button(components, {
+    name: "Prisforespørsel",
+  });
+  orderMenuButton.id = "supplies-button";
+  topToolBar.addChild(orderMenuButton);
+  orderMenuButton.onClick.add(() => {
+    setDrawingInProgress(false);
+    // if (titleElement) {
+    //   titleElement.textContent = "Prisforespørsel";
+    // }
+    // @ts-ignore
+    // window.setActiveSection("supply");
+  });
+  orderMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  orderMenuButton.domElement.classList.add("hover:bg-slate-300");
 
   console.log(components.camera);
 
@@ -194,7 +213,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   topViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  topViewButton.domElement.classList.add("hover:bg-red-600");
+  topViewButton.domElement.classList.add("hover:bg-slate-300");
 
   const createBlueprintRectangleButton = new OBC.Button(components, {
     materialIconName: "square",
@@ -212,7 +231,7 @@ export const createToolbar = (
   createBlueprintRectangleButton.domElement.classList.remove(
     "hover:bg-ifcjs-200"
   );
-  createBlueprintRectangleButton.domElement.classList.add("hover:bg-red-600");
+  createBlueprintRectangleButton.domElement.classList.add("hover:bg-slate-300");
 
   // Move camera to perspective view button
   const perspectiveViewButton = new OBC.Button(components);
@@ -240,7 +259,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   perspectiveViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  perspectiveViewButton.domElement.classList.add("hover:bg-red-600");
+  perspectiveViewButton.domElement.classList.add("hover:bg-slate-300");
 
   // Allow panning and rotating button
   const freeRotateButton = new OBC.Button(components);
@@ -260,7 +279,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  freeRotateButton.domElement.classList.add("hover:bg-red-600");
+  freeRotateButton.domElement.classList.add("hover:bg-slate-300");
 
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
@@ -275,7 +294,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   drawingButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  drawingButton.domElement.classList.add("hover:bg-red-600");
+  drawingButton.domElement.classList.add("hover:bg-slate-300");
 
   const deleteObjectButton = new OBC.Button(components);
   deleteObjectButton.materialIcon = "delete_forever";
@@ -298,7 +317,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  deleteObjectButton.domElement.classList.add("hover:bg-red-600");
+  deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
 
   // Start Drawing Blueprint
   const clearSceneButton = new OBC.Button(components);
@@ -322,7 +341,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  clearSceneButton.domElement.classList.add("hover:bg-red-600");
+  clearSceneButton.domElement.classList.add("hover:bg-slate-300");
 
   //Solidify Blueprint
   const blueprintButton = new OBC.Button(components);
@@ -344,7 +363,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   blueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  blueprintButton.domElement.classList.add("hover:bg-red-600");
+  blueprintButton.domElement.classList.add("hover:bg-slate-300");
 
   // create blueprint from outline
   const editBlueprintButton = new OBC.Button(components, {
@@ -366,7 +385,7 @@ export const createToolbar = (
   });
   blueprintButton.addChild(editBlueprintButton);
   editBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  editBlueprintButton.domElement.classList.add("hover:bg-red-600");
+  editBlueprintButton.domElement.classList.add("hover:bg-slate-300");
 
   // move blueprint
   const moveBlueprintButton = new OBC.Button(components, {
@@ -388,7 +407,7 @@ export const createToolbar = (
   });
   blueprintButton.addChild(moveBlueprintButton);
   moveBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  moveBlueprintButton.domElement.classList.add("hover:bg-red-600");
+  moveBlueprintButton.domElement.classList.add("hover:bg-slate-300");
 
   // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
@@ -410,7 +429,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   extrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  extrusionButton.domElement.classList.add("hover:bg-red-600");
+  extrusionButton.domElement.classList.add("hover:bg-slate-300");
 
   const createExtrusionButton = new OBC.Button(components, {
     materialIconName: "expand",
@@ -426,7 +445,7 @@ export const createToolbar = (
   });
   extrusionButton.addChild(createExtrusionButton);
   createExtrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createExtrusionButton.domElement.classList.add("hover:bg-red-600");
+  createExtrusionButton.domElement.classList.add("hover:bg-slate-300");
 
   const createEditExtrusionButton = new OBC.Button(components, {
     materialIconName: "unfold_less",
@@ -442,7 +461,7 @@ export const createToolbar = (
   });
   extrusionButton.addChild(createEditExtrusionButton);
   createEditExtrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createEditExtrusionButton.domElement.classList.add("hover:bg-red-600");
+  createEditExtrusionButton.domElement.classList.add("hover:bg-slate-300");
 
   const roofButton = new OBC.Button(components, {
     closeOnClick: true,
@@ -465,7 +484,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  roofButton.domElement.classList.add("hover:bg-red-600");
+  roofButton.domElement.classList.add("hover:bg-slate-300");
 
   const createGableRoofButton = new OBC.Button(components, {
     materialIconName: "change_history",
@@ -482,7 +501,7 @@ export const createToolbar = (
   });
   roofButton.addChild(createGableRoofButton);
   createGableRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createGableRoofButton.domElement.classList.add("hover:bg-red-600");
+  createGableRoofButton.domElement.classList.add("hover:bg-slate-300");
 
   const createShedRoofButton = new OBC.Button(components, {
     materialIconName: "details",
@@ -499,7 +518,7 @@ export const createToolbar = (
   });
   roofButton.addChild(createShedRoofButton);
   createShedRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  createShedRoofButton.domElement.classList.add("hover:bg-red-600");
+  createShedRoofButton.domElement.classList.add("hover:bg-slate-300");
 
   const rotateRoofOrientationButton = new OBC.Button(components, {
     materialIconName: "360",
@@ -516,7 +535,7 @@ export const createToolbar = (
   });
   roofButton.addChild(rotateRoofOrientationButton);
   roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  roofButton.domElement.classList.add("hover:bg-red-600");
+  roofButton.domElement.classList.add("hover:bg-slate-300");
 
   const scaffoldButton = new OBC.Button(components);
   scaffoldButton.materialIcon = "foundation";
@@ -543,7 +562,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   scaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  scaffoldButton.domElement.classList.add("hover:bg-red-600");
+  scaffoldButton.domElement.classList.add("hover:bg-slate-300");
 
   // draw scaffolding outline
   const drawScaffoldButton = new OBC.Button(components, {
@@ -565,7 +584,7 @@ export const createToolbar = (
   });
   scaffoldButton.addChild(drawScaffoldButton);
   drawScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  drawScaffoldButton.domElement.classList.add("hover:bg-red-600");
+  drawScaffoldButton.domElement.classList.add("hover:bg-slate-300");
 
   // generate scaffolding outline
   const generateScaffoldOutlineButton = new OBC.Button(components, {
@@ -592,7 +611,7 @@ export const createToolbar = (
   generateScaffoldOutlineButton.domElement.classList.remove(
     "hover:bg-ifcjs-200"
   );
-  generateScaffoldOutlineButton.domElement.classList.add("hover:bg-red-600");
+  generateScaffoldOutlineButton.domElement.classList.add("hover:bg-slate-300");
 
   // generate scaffolding outline
   const placeScaffoldButton = new OBC.Button(components, {
@@ -614,7 +633,7 @@ export const createToolbar = (
   });
   scaffoldButton.addChild(placeScaffoldButton);
   placeScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  placeScaffoldButton.domElement.classList.add("hover:bg-red-600");
+  placeScaffoldButton.domElement.classList.add("hover:bg-slate-300");
 
   // generate scaffolding
   const generateScaffoldButton = new OBC.Button(components, {
@@ -636,7 +655,7 @@ export const createToolbar = (
   });
   scaffoldButton.addChild(generateScaffoldButton);
   generateScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  generateScaffoldButton.domElement.classList.add("hover:bg-red-600");
+  generateScaffoldButton.domElement.classList.add("hover:bg-slate-300");
 
   const drawerToolBar = new OBC.Toolbar(components);
   drawerToolBar.position = "right";
@@ -676,7 +695,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   removeLabelsButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  removeLabelsButton.domElement.classList.add("hover:bg-red-600");
+  removeLabelsButton.domElement.classList.add("hover:bg-slate-300");
 
   //Solidify Blueprint
   const testButton = new OBC.Button(components);
@@ -698,7 +717,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   testButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  testButton.domElement.classList.add("hover:bg-red-600");
+  testButton.domElement.classList.add("hover:bg-slate-300");
 
   // Function to update the title
   let titleElement: Element | null;
@@ -707,7 +726,7 @@ export const createToolbar = (
       "h3.text-3xl.text-ifcjs-200.font-medium.my-0"
     );
     if (titleElement) {
-      titleElement.textContent = "General";
+      titleElement.textContent = "Generelt";
       // @ts-ignore
       titleElement.classList =
         "text-3xl text-[#DEDEDE] font-medium my-0 btn btn-ghost";
@@ -743,7 +762,7 @@ export const createToolbar = (
     setDrawingInProgress(false);
   });
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  drawerMenuButton.domElement.classList.add("hover:bg-red-600");
+  drawerMenuButton.domElement.classList.add("hover:bg-slate-300");
   /////////////////////////////////////////////////////////
   // drawer element
   const drawer = new OBC.FloatingWindow(components);
@@ -754,7 +773,7 @@ export const createToolbar = (
   drawer.domElement.style.height = "100vh";
   drawer.domElement.style.left = "0";
   drawer.domElement.style.top = "0";
-  drawer.domElement.style.zIndex = "1000";
+  drawer.domElement.style.zIndex = "50";
   drawer.domElement.style.backgroundColor = "#111115";
   drawer.domElement.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
   drawer.visible = false; // change this to true to make the drawer open on mount
