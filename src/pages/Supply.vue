@@ -72,14 +72,17 @@
               børkryssforankres for hver tredje feste
             </p>
 
-            <span class="font-semibold text-[#623CEA]"> Stillas dekket med netting</span>
+            <span class="font-semibold text-[#623CEA]">
+              Stillas dekket med netting</span
+            >
             <p class="my-2">
               Anbefalt forankring hver 4m i høyden/vertikal. Kryssforankes
               forhvert tredje feste
             </p>
 
-            <span class="font-semibold text-[#623CEA]"> Stillas dekket med presenning </span
-            >
+            <span class="font-semibold text-[#623CEA]">
+              Stillas dekket med presenning
+            </span>
             <p class="mt-2">
               Må forankret hver 2m i høyden/vertikal. Kryssforankes forhvert
               femte feste
@@ -106,6 +109,8 @@
         </label>
       </div>
 
+      <BillOfMaterialsModalComponent/>
+
       <div class="card-actions justify-end">
         <div class="m-4">
           <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">
@@ -121,3 +126,13 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import BillOfMaterialsModalComponent from "../components/BillOfMaterialsModalComponent.vue";
+
+export default {
+  components: {
+    BillOfMaterialsModalComponent,
+  },
+};
+</script>

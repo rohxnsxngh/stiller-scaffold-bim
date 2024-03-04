@@ -131,23 +131,21 @@
         </div>
       </div>
 
-
-        <!-- Drawer element -->
-        <div
-          v-if="showDrawer"
-          class="fixed inset-48 rounded w-64 bg-white bg-[#111115] overflow-y-auto shadow-lg z-55                     "
-        > 
-          <!-- <div class="card-body p-2">
+      <!-- Drawer element -->
+      <div
+        v-if="showDrawer"
+        class="fixed inset-48 rounded w-64 bg-white bg-[#111115] overflow-y-auto shadow-lg z-55"
+      >
+        <!-- <div class="card-body p-2">
             <div>
               Tegn området rundt bygget der stillaset skal stå, eller bruk
               Autostillas-funksjonen til å generere stillas rundt hele bygget 
             </div>
             <div class="divider"></div>
           </div> -->
-          <!-- Scrollable content -->
-          <!-- Add your content here -->
-        </div>
-
+        <!-- Scrollable content -->
+        <!-- Add your content here -->
+      </div>
 
       <div class="card-actions justify-end">
         <div class="m-4">

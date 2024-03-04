@@ -181,14 +181,17 @@ export const createToolbar = (
   topToolBar.addChild(orderMenuButton);
   orderMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
-    // if (titleElement) {
-    //   titleElement.textContent = "Prisforespørsel";
-    // }
-    // @ts-ignore
-    // window.setActiveSection("supply");
+    const modalElement = document.getElementById("my_modal_1");
+    if (modalElement && modalElement instanceof HTMLDialogElement) {
+      modalElement.showModal();
+    } else {
+      console.error("Modal element not found or not an HTMLDialogElement");
+    }
   });
   orderMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   orderMenuButton.domElement.classList.add("hover:bg-slate-300");
+  orderMenuButton.domElement.classList.add("btn");
+  orderMenuButton.domElement.classList.add("btn-sm");
 
   console.log(components.camera);
 
