@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useNavbarStore } from "./store/index";
-const store = useNavbarStore();
+import { useStore } from "./store/index";
+const store = useStore();
 </script>
 
 <template>

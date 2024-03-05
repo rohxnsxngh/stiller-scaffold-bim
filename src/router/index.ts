@@ -4,7 +4,7 @@ import RegisterPage from "../views/RegisterPage.vue";
 import SignInPage from "../views/SignInPage.vue";
 import ModelPage from "../views/ModelPage.vue";
 import ProjectsPage from "../views/ProjectsPage.vue";
-import { useNavbarStore } from '../store/index'
+import { useStore } from '../store/index'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -45,7 +45,7 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   if (to.path === '/model') {
-     useNavbarStore().toggleNavbar();
+    useStore().toggleNavbar();
   }
   next();
  })

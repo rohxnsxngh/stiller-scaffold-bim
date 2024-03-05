@@ -43,6 +43,7 @@ import {
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
+import { useStore } from "./store/index";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -67,6 +68,7 @@ export const createModelView = async () => {
   components.camera = new OBC.SimpleCamera(components);
   components.raycaster = new OBC.SimpleRaycaster(components);
   components.init();
+
 
   // Orbit Controls
   controls = new OrbitControls(
@@ -204,7 +206,7 @@ export const createModelView = async () => {
           lastHighlightedObjectColor =
             intersectedObject.material.color.getHex();
           intersectedObject.material.color.set(0xff0000);
-          console.log(intersectedObject)
+          console.log(intersectedObject);
           intersectedObject.material.needsUpdate = true;
           // applyGlow(intersectedObject);
           lastHighlightedObject = intersectedObject;
@@ -335,7 +337,11 @@ export const createModelView = async () => {
       );
     }
     if (placeScaffoldIndividually) {
-      const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(1.57, 2.00, 0.73);
+      const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(
+        1.57,
+        2.0,
+        0.73
+      );
       //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
       createIndividualScaffoldOnClick(
         intersects,
@@ -744,6 +750,35 @@ export const createModelView = async () => {
   let markupStartPoint: THREE.Vector2 | null = null;
   let markup: any = null;
 
+  const addEventListenerToDrawRect = () => {
+    const drawRect = document.getElementById("startDrawingRectangle");
+    if (drawRect) {
+       console.log("Element found, adding event listener");
+       drawRect.addEventListener("mousedown", () => {
+         console.log("hello world");
+         isDrawingBlueprint = true;
+         if (!isDragging) {
+          console.log("hello world 2");
+           window.addEventListener("mousedown", handleMouseDown);
+           window.addEventListener("mousemove", handleMouseMove);
+           window.addEventListener("mouseup", handleMouseUp);
+         }
+       });
+       observer.disconnect(); // Stop observing once the element is found
+    } else {
+       console.log("Element not found yet");
+    }
+   };
+  
+    // Create a MutationObserver to watch for changes in the DOM
+    const observer = new MutationObserver(addEventListenerToDrawRect);
+  
+    // Start observing the document with the configured callback
+    observer.observe(document, { childList: true, subtree: true });
+  
+    // Call the function once to check if the element is already in the DOM
+    addEventListenerToDrawRect();
+
   createBlueprintRectangleButton.domElement.addEventListener(
     "mousedown",
     () => {
@@ -758,6 +793,7 @@ export const createModelView = async () => {
 
   function handleMouseDown(event: MouseEvent) {
     if (!drawingInProgress && isDrawingBlueprint) {
+      console.log("started")
       isDragging = true;
       getMousePointer({ event });
       oldLabels.forEach((label) => {
@@ -780,6 +816,7 @@ export const createModelView = async () => {
   function handleMouseMove(event: MouseEvent) {
     if (!drawingInProgress && isDrawingBlueprint) {
       if (isDragging) {
+        console.log("started 2")
         getMousePointer({ event });
         // Remove old labels from the scene
         oldLabels.forEach((label) => {
@@ -806,6 +843,7 @@ export const createModelView = async () => {
   }
 
   function handleMouseUp() {
+    console.log("started 3")
     isDragging = false;
   }
 
@@ -867,8 +905,8 @@ export const createModelView = async () => {
   clearSceneButton.domElement.addEventListener("mousedown", () => {
     resetScene(scene, components, shadows);
 
-    scaffoldPoints = []
-    points = []
+    scaffoldPoints = [];
+    points = [];
   });
 
   testButton.domElement.addEventListener("mousedown", () => {
@@ -881,6 +919,9 @@ export const createModelView = async () => {
   function animate() {
     stats.begin();
     requestAnimationFrame(animate);
+
+    const componentsStore = useStore(); // Get the store instance
+    componentsStore.setComponents(components); // Set the components object in the store
 
     controls.update();
 

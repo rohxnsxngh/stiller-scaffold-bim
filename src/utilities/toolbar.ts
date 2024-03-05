@@ -784,7 +784,7 @@ export const createToolbar = (
     setDrawingInProgress(false);
   });
   drawer.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
+    setDrawingInProgress(false);
   });
   components.ui.add(drawer);
   console.log(drawer);
@@ -804,6 +804,35 @@ export const createToolbar = (
 
   // Append the new DOM element to drawer.domElement
   drawer.domElement.appendChild(mountPoint);
+
+  //////////////////////////////////////////
+  // Create a function to add the event listener
+  let drawRect
+  const addEventListenerToDrawRect = () => {
+     drawRect = document.getElementById("startDrawingRectangle");
+    if (drawRect) {
+      drawRect.addEventListener("mousedown", () => {
+        // console.log("hello world");
+        document.body.style.cursor = "crosshair";
+        setDrawingInProgress(false);
+        setDeletionInProgress(false);
+        setDrawingScaffoldingInProgress(false);
+        cameraTopView(gsap, components.camera);
+        cameraDisableOrbitalFunctionality(gsap, components.camera);
+      });
+      // Stop observing once the element is found
+      observer.disconnect();
+    }
+  };
+
+  // Create a MutationObserver to watch for changes in the DOM
+  const observer = new MutationObserver(addEventListenerToDrawRect);
+
+  // Start observing the document with the configured callback
+  observer.observe(document, { childList: true, subtree: true });
+
+  // Call the function once to check if the element is already in the DOM
+  addEventListenerToDrawRect();
 
   ////////////////////////////////////////////////
   return [

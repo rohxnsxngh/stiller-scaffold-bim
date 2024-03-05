@@ -5,14 +5,26 @@
 
   <div class="bg-[#14141C] grid grid-cols-4 gap-4 rounded">
     <div class="flex flex-col m-4">
-      <div class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]">
-        <img src="../assets/images/Select.svg" alt="Select" class="scale-150" />
+      <div
+        class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
+        id="startDrawingRectangle"
+        @click="startDrawingRectangle"
+      >
+        <img
+          src="../assets/images/Select.svg"
+          alt="Rectangle"
+          class="scale-150"
+        />
       </div>
       <div><p class="text-xs text-center mt-2">Rektangel</p></div>
     </div>
     <div class="flex flex-col m-4">
       <div class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]">
-        <img src="../assets/images/Delete.svg" alt="Select" class="scale-150" />
+        <img
+          src="../assets/images/Delete.svg"
+          alt="Polygon"
+          class="scale-150"
+        />
       </div>
       <div><p class="text-xs text-center mt-2">Polygon</p></div>
     </div>
@@ -62,3 +74,49 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { gsap } from "gsap";
+import {
+  setDeletionInProgress,
+  setDrawingInProgress,
+  setDrawingScaffoldingInProgress,
+} from "../utilities/toolbar";
+import { cameraDisableOrbitalFunctionality } from "../utilities/camera";
+import { useStore } from "../store";
+
+export default {
+  components: {},
+  setup() {
+    const store = useStore(); // Get the store instance
+
+    return {
+      components: store.components, // Access the components object from the store
+    };
+  },
+  data() {
+    return {
+      showDraw: false,
+      showUpload: false,
+    };
+  },
+  methods: {
+    showDrawBlueprint() {
+      this.showDraw = true;
+      this.showUpload = false;
+    },
+    startDrawingRectangle() {
+      // document.body.style.cursor = "crosshair";
+      // setDrawingInProgress(false);
+      // setDeletionInProgress(false);
+      // setDrawingScaffoldingInProgress(false);
+      // console.log(this.components)
+      // @ts-ignore
+      // if (this.components && this.components.camera) {
+      //   //@ts-ignore
+      //   cameraDisableOrbitalFunctionality(gsap, this.components.camera);
+      // }
+    },
+  },
+};
+</script>
