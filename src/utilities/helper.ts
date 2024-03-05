@@ -189,27 +189,50 @@ export function disableOrbitControls(controls: any) {
 // delete an object when raycast intersects with object
 export function deleteObject(object: any, scene: THREE.Scene) {
   // const parentObject = object.parent.children;
-  if (object.parent) {
+  if (object.parent.type === "Object3D") {
     const parent = object.parent;
-
+    console.log(parent)
     // Remove the parent recursively
     removeFromScene(parent, scene);
   } else {
     // Remove the parent recursively
-    console.log("object with no parent", object)
+    object.material.dispose()
+    scene.remove(object);
   }
 }
 
 // Function to remove object from the scene recursively
+// this helper function is meant specifically for gltf that contain a tree of objects
 function removeFromScene(object: any, scene: THREE.Scene) {
   if (object.parent) {
-    object.parent.remove(object);
-    removeFromScene(object.parent, scene); // Recursively remove parent
+      // Dispose of materials
+      if (object.material) {
+          if (Array.isArray(object.material)) {
+              object.material.forEach((material: { dispose: () => void; }) => {
+                  material.dispose();
+              });
+          } else {
+              object.material.dispose();
+          }
+      }
+      
+      object.parent.remove(object);
+      removeFromScene(object.parent, scene); // Recursively remove parent
   } else {
-    scene.remove(object); // If no parent, remove from scene
+      // Dispose of materials
+      if (object.material) {
+          if (Array.isArray(object.material)) {
+              object.material.forEach((material: { dispose: () => void; }) => {
+                  material.dispose();
+              });
+          } else {
+              object.material.dispose();
+          }
+      }
+
+      scene.remove(object); // If no parent, remove from scene
   }
 }
-
 export function hideAllCSS2DObjects(scene: THREE.Scene) {
   scene.traverse(function (child) {
     if (child instanceof CSS2DObject) {

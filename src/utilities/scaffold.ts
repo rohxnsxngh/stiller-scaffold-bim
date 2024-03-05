@@ -600,6 +600,26 @@ function addScaffoldingLevel(
         modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
         boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
+                // this model instance allows me to select a scaffolding individually
+        // even though they are being placed in a line almost like a cohesive object
+        // Create a new material for the model instance
+        const material = new THREE.MeshStandardMaterial({ color: 0xffffff }); // Adjust the color as needed
+        modelInstance.traverse((child: any) => {
+          if (child instanceof THREE.Mesh) {
+            child.material = material;
+          }
+        });
+
+        // Create a new material for the bounding box instance
+        const boundBoxMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+        }); // Adjust the color as needed
+        boundBoxInstance.traverse((child: any) => {
+          if (child instanceof THREE.Mesh) {
+            child.material = boundBoxMaterial;
+          }
+        });
+
         scene.add(modelInstance);
         scene.add(boundBoxInstance);
       } else {
