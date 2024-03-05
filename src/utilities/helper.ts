@@ -187,24 +187,26 @@ export function disableOrbitControls(controls: any) {
 }
 
 // delete an object when raycast intersects with object
-export function deleteObject(intersects: any) {
-  if (Array.isArray(intersects)) {
-    intersects.forEach(function (intersect: any) {
-      switch (intersect.object.name) {
-        // case "ground":
-        //   console.log("ground");
-        //   break;
-        case "extrusion":
-          console.log("extrusion");
-          break;
-        case "roof":
-          console.log("roof");
-          break;
-        case "blueprint":
-          console.log("blueprint");
-          break;
-      }
-    });
+export function deleteObject(object: any, scene: THREE.Scene) {
+  // const parentObject = object.parent.children;
+  if (object.parent) {
+    const parent = object.parent;
+
+    // Remove the parent recursively
+    removeFromScene(parent, scene);
+  } else {
+    // Remove the parent recursively
+    console.log("object with no parent", object)
+  }
+}
+
+// Function to remove object from the scene recursively
+function removeFromScene(object: any, scene: THREE.Scene) {
+  if (object.parent) {
+    object.parent.remove(object);
+    removeFromScene(object.parent, scene); // Recursively remove parent
+  } else {
+    scene.remove(object); // If no parent, remove from scene
   }
 }
 

@@ -98,9 +98,10 @@ export function createBlueprintFromShapeOutline(
     points[0].x === points[points.length - 1].x &&
     points[0].z === points[points.length - 1].z
   ) {
+    let highlightedMesh: THREE.Mesh<any, any, any>[] = [];
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        scene.remove(child);
+        highlightedMesh.push(child)
       }
       if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
         // console.log(child)
@@ -108,6 +109,10 @@ export function createBlueprintFromShapeOutline(
         child.visible = false;
       }
     });
+
+    highlightedMesh.forEach((mesh) => {
+      scene.remove(mesh)
+    })
 
     // Create shape
     if (points.length >= 3) {

@@ -65,7 +65,7 @@ export async function placeScaffoldModelsAlongLine(
   const lineLength = line.userData.length;
   const startPoint = line.userData.first_point;
   const endPoint = line.userData.last_point;
-  const midPoint = new THREE.Vector3().lerpVectors(startPoint, endPoint,  0.5);
+  const midPoint = new THREE.Vector3().lerpVectors(startPoint, endPoint, 0.5);
   const numSegments = Math.ceil(lineLength / 1.57); // Assuming each GLB model fits exactly  1.57 meters along the line
   try {
     for (let i = 0; i < numSegments; i++) {
@@ -102,6 +102,26 @@ export async function placeScaffoldModelsAlongLine(
 
         modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
         boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+
+        // this model instance allows me to select a scaffolding individually
+        // even though they are being placed in a line almost like a cohesive object
+        // Create a new material for the model instance
+        const material = new THREE.MeshStandardMaterial({ color: 0xffffff }); // Adjust the color as needed
+        modelInstance.traverse((child: any) => {
+          if (child instanceof THREE.Mesh) {
+            child.material = material;
+          }
+        });
+
+        // Create a new material for the bounding box instance
+        const boundBoxMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+        }); // Adjust the color as needed
+        boundBoxInstance.traverse((child: any) => {
+          if (child instanceof THREE.Mesh) {
+            child.material = boundBoxMaterial;
+          }
+        });
 
         scene.add(modelInstance);
         scene.add(boundBoxInstance);
@@ -593,10 +613,7 @@ function addScaffoldingLevel(
 }
 
 // remove a level of scaffolding from the selected side
-function removeScaffoldingLevel(
-  label: CSS2DObject,
-  scene: THREE.Scene,
-) {
+function removeScaffoldingLevel(label: CSS2DObject, scene: THREE.Scene) {
   console.log(label.userData);
   const lineLength = label.userData.length;
   const lineLevel = label.userData.level;
@@ -614,14 +631,15 @@ function removeScaffoldingLevel(
   try {
     for (let i = 0; i < numSegments; i++) {
       if (startPoint.y === 0 || endPoint.y === 0) {
-        console.log("level cannot be lower than 0")
-        return
+        console.log("level cannot be lower than 0");
+        return;
       }
       // Calculate the interpolated position along the line
       const t = i / numSegments; // Parameter for interpolation along the line
       const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
 
-      const scaffoldingLevelToBeRemoved: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+      const scaffoldingLevelToBeRemoved: THREE.Object3D<THREE.Object3DEventMap>[] =
+        [];
       scene.children.some((child) => {
         if (
           child instanceof THREE.Object3D &&
@@ -632,17 +650,12 @@ function removeScaffoldingLevel(
       });
 
       scaffoldingLevelToBeRemoved.forEach((scaffold: THREE.Object3D) => {
-        console.log(scaffold)
-        scene.remove(scaffold)
-      })
-
+        console.log(scaffold);
+        scene.remove(scaffold);
+      });
     }
   } catch (error) {
     console.error("Error creating scaffold model:", error);
   }
   label.userData.level--;
-}
-
-function removeIndividualScaffold() {
-  
 }

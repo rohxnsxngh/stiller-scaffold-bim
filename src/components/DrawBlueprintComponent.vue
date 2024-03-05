@@ -8,7 +8,6 @@
       <div
         class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
         id="startDrawingRectangle"
-        @click="startDrawingRectangle"
       >
         <img
           src="../assets/images/Select.svg"
@@ -76,24 +75,8 @@
 </template>
 
 <script lang="ts">
-import { gsap } from "gsap";
-import {
-  setDeletionInProgress,
-  setDrawingInProgress,
-  setDrawingScaffoldingInProgress,
-} from "../utilities/toolbar";
-import { cameraDisableOrbitalFunctionality } from "../utilities/camera";
-import { useStore } from "../store";
-
 export default {
   components: {},
-  setup() {
-    const store = useStore(); // Get the store instance
-
-    return {
-      components: store.components, // Access the components object from the store
-    };
-  },
   data() {
     return {
       showDraw: false,
@@ -104,18 +87,6 @@ export default {
     showDrawBlueprint() {
       this.showDraw = true;
       this.showUpload = false;
-    },
-    startDrawingRectangle() {
-      // document.body.style.cursor = "crosshair";
-      // setDrawingInProgress(false);
-      // setDeletionInProgress(false);
-      // setDrawingScaffoldingInProgress(false);
-      // console.log(this.components)
-      // @ts-ignore
-      // if (this.components && this.components.camera) {
-      //   //@ts-ignore
-      //   cameraDisableOrbitalFunctionality(gsap, this.components.camera);
-      // }
     },
   },
 };

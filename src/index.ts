@@ -36,6 +36,7 @@ import {
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   calculateTransformedBoundingBox,
+  deleteObject,
   // deleteObject,
   disableOrbitControls,
   resetScene,
@@ -68,7 +69,6 @@ export const createModelView = async () => {
   components.camera = new OBC.SimpleCamera(components);
   components.raycaster = new OBC.SimpleRaycaster(components);
   components.init();
-
 
   // Orbit Controls
   controls = new OrbitControls(
@@ -206,7 +206,11 @@ export const createModelView = async () => {
           lastHighlightedObjectColor =
             intersectedObject.material.color.getHex();
           intersectedObject.material.color.set(0xff0000);
-          console.log(intersectedObject);
+          console.log(
+            "highlight intersected object",
+            intersectedObject.name,
+            intersectedObject.material
+          );
           intersectedObject.material.needsUpdate = true;
           // applyGlow(intersectedObject);
           lastHighlightedObject = intersectedObject;
@@ -228,10 +232,10 @@ export const createModelView = async () => {
         // If there is no intersection, revert the material of the last highlighted object
         if (lastHighlightedObject) {
           // revertMaterial(lastHighlightedObject);
-          console.log(
-            lastHighlightedObject.material,
-            lastHighlightedObject.userData
-          );
+          // console.log(
+          //   lastHighlightedObject.material,
+          //   lastHighlightedObject.userData
+          // );
           // lastHighlightedObject.material = lastHighlightedObject.userData
           lastHighlightedObject = null;
         }
@@ -321,7 +325,7 @@ export const createModelView = async () => {
   let scaffoldPoints: THREE.Vector3[] = [];
   let drawingInProgressSwitch: boolean = true;
 
-  document.addEventListener("mousedown", async () => {
+  window.addEventListener("mousedown", async () => {
     if (drawingInProgress && drawingInProgressSwitch) {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
@@ -351,12 +355,13 @@ export const createModelView = async () => {
         bboxWireframe
       );
     }
+    // delete singular object from scene based on raycasting intersection
     if (deletionInProgress && !drawingInProgress) {
       console.log("delete");
-      // deleteObject(intersects);
-      intersects.forEach(function (intersect: any) {
-        console.log(intersect.object.name);
-      });
+      const objectToRemove = intersects[0].object
+      console.log(objectToRemove);
+
+      deleteObject(objectToRemove, scene);
     }
   });
 
@@ -750,34 +755,38 @@ export const createModelView = async () => {
   let markupStartPoint: THREE.Vector2 | null = null;
   let markup: any = null;
 
+  //////////////////////////////////////////
+  // work around to bring functionality to the drawer section
+  // TODO: figure out more efficient method to do this or a simpler method to accomplish this
   const addEventListenerToDrawRect = () => {
     const drawRect = document.getElementById("startDrawingRectangle");
     if (drawRect) {
-       console.log("Element found, adding event listener");
-       drawRect.addEventListener("mousedown", () => {
-         console.log("hello world");
-         isDrawingBlueprint = true;
-         if (!isDragging) {
+      console.log("Element found, adding event listener");
+      drawRect.addEventListener("mousedown", () => {
+        console.log("hello world");
+        isDrawingBlueprint = true;
+        if (!isDragging) {
           console.log("hello world 2");
-           window.addEventListener("mousedown", handleMouseDown);
-           window.addEventListener("mousemove", handleMouseMove);
-           window.addEventListener("mouseup", handleMouseUp);
-         }
-       });
-       observer.disconnect(); // Stop observing once the element is found
+          window.addEventListener("mousedown", handleMouseDown);
+          window.addEventListener("mousemove", handleMouseMove);
+          window.addEventListener("mouseup", handleMouseUp);
+        }
+      });
+      observer.disconnect(); // Stop observing once the element is found
     } else {
-       console.log("Element not found yet");
+      console.log("Element not found yet");
     }
-   };
-  
-    // Create a MutationObserver to watch for changes in the DOM
-    const observer = new MutationObserver(addEventListenerToDrawRect);
-  
-    // Start observing the document with the configured callback
-    observer.observe(document, { childList: true, subtree: true });
-  
-    // Call the function once to check if the element is already in the DOM
-    addEventListenerToDrawRect();
+  };
+
+  // Create a MutationObserver to watch for changes in the DOM
+  const observer = new MutationObserver(addEventListenerToDrawRect);
+
+  // Start observing the document with the configured callback
+  observer.observe(document, { childList: true, subtree: true });
+
+  // Call the function once to check if the element is already in the DOM
+  addEventListenerToDrawRect();
+  /////////////////////////////////////
 
   createBlueprintRectangleButton.domElement.addEventListener(
     "mousedown",
@@ -793,7 +802,6 @@ export const createModelView = async () => {
 
   function handleMouseDown(event: MouseEvent) {
     if (!drawingInProgress && isDrawingBlueprint) {
-      console.log("started")
       isDragging = true;
       getMousePointer({ event });
       oldLabels.forEach((label) => {
@@ -816,7 +824,6 @@ export const createModelView = async () => {
   function handleMouseMove(event: MouseEvent) {
     if (!drawingInProgress && isDrawingBlueprint) {
       if (isDragging) {
-        console.log("started 2")
         getMousePointer({ event });
         // Remove old labels from the scene
         oldLabels.forEach((label) => {
@@ -843,7 +850,6 @@ export const createModelView = async () => {
   }
 
   function handleMouseUp() {
-    console.log("started 3")
     isDragging = false;
   }
 
