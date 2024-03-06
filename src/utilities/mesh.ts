@@ -1,7 +1,11 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { distanceFromPointToLine, measureLineLength } from "./helper";
+import {
+  distanceFromPointToLine,
+  measureLineLength,
+  resetSceneExceptBlueprints,
+} from "./helper";
 import { rectMaterial } from "./material";
 import {
   setDeletionInProgress,
@@ -9,7 +13,7 @@ import {
   setDrawingScaffoldingInProgress,
 } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
-import { cameraDisableOrbitalFunctionality } from "./camera";
+import { cameraDisableOrbitalFunctionality, cameraTopView } from "./camera";
 import { gsap } from "gsap";
 
 // Create Shape Outline
@@ -104,7 +108,6 @@ export function createBlueprintFromShapeOutline(
         highlightedMesh.push(child);
       }
       if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
-        // console.log(child)
         child.element.style.pointerEvents = "none";
         child.visible = false;
       }
@@ -1402,6 +1405,13 @@ export function moveBlueprint(
   scene: THREE.Scene,
   shadows: OBC.ShadowDropper
 ) {
+  cameraTopView(gsap, components.camera);
+  cameraDisableOrbitalFunctionality(gsap, components.camera);
+
+  // remove all objects before moving the blueprint
+  // since you are literally moving the foundation of the building
+  resetSceneExceptBlueprints(scene);
+
   document.body.style.cursor = "grab";
   setDrawingInProgress(false);
   setDeletionInProgress(false);
@@ -1421,7 +1431,6 @@ export function moveBlueprint(
   dragControls.addEventListener("dragstart", (event) => {
     shadows.deleteShadow(event.object.uuid);
     originalLocation = event.object.position.clone(); // Create a copy of the position vector
-    console.log("original location", originalLocation);
   });
 
   dragControls.addEventListener("dragend", (event) => {
@@ -1429,20 +1438,11 @@ export function moveBlueprint(
       shadows.renderShadow([event.object], event.object.uuid);
       event.object.position.y = 0.025;
       newLocation = event.object.position; // Update newLocation here
-      console.log("new location", newLocation);
 
       const xDisplacement = newLocation.x - originalLocation.x;
       const yDisplacement = newLocation.z - originalLocation.z;
-      console.log(
-        "x displacement",
-        xDisplacement,
-        "y displacement",
-        yDisplacement
-      );
       const previousShape = event.object.userData;
       if (previousShape instanceof THREE.Shape) {
-        console.log("previous shape", previousShape);
-
         const newShape = new THREE.Shape();
         previousShape.curves.forEach((curve) => {
           if (curve instanceof THREE.LineCurve) {
@@ -1457,8 +1457,6 @@ export function moveBlueprint(
           }
         });
 
-        console.log("new shape", newShape);
-
         event.object.userData = newShape;
       }
     }
@@ -1466,24 +1464,14 @@ export function moveBlueprint(
     event.object.updateMatrix();
   });
 
-  // if (!dragControls.enabled) {
-  //   //   // Enable DragControls
-  //   dragControls.activate();
-  // } else {
-  //   //   // Disable DragControls
-  //   dragControls.deactivate();
-  // }
-
   dragControls.addEventListener("hoveron", (event) => {
     if (event.object instanceof THREE.Mesh) {
-      console.log("hovering");
       event.object.material.color.set(0xb72c2c);
     }
   });
 
   dragControls.addEventListener("hoveroff", (event) => {
     if (event.object instanceof THREE.Mesh) {
-      console.log("hover off");
       event.object.material.color.set(0x7f1d1d);
     }
   });

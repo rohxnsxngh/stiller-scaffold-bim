@@ -191,12 +191,12 @@ export function deleteObject(object: any, scene: THREE.Scene) {
   // const parentObject = object.parent.children;
   if (object.parent.type === "Object3D") {
     const parent = object.parent;
-    console.log(parent)
+    console.log(parent);
     // Remove the parent recursively
     removeFromScene(parent, scene);
   } else {
     // Remove the parent recursively
-    object.material.dispose()
+    object.material.dispose();
     scene.remove(object);
   }
 }
@@ -205,32 +205,32 @@ export function deleteObject(object: any, scene: THREE.Scene) {
 // this helper function is meant specifically for gltf that contain a tree of objects
 function removeFromScene(object: any, scene: THREE.Scene) {
   if (object.parent) {
-      // Dispose of materials
-      if (object.material) {
-          if (Array.isArray(object.material)) {
-              object.material.forEach((material: { dispose: () => void; }) => {
-                  material.dispose();
-              });
-          } else {
-              object.material.dispose();
-          }
+    // Dispose of materials
+    if (object.material) {
+      if (Array.isArray(object.material)) {
+        object.material.forEach((material: { dispose: () => void }) => {
+          material.dispose();
+        });
+      } else {
+        object.material.dispose();
       }
-      
-      object.parent.remove(object);
-      removeFromScene(object.parent, scene); // Recursively remove parent
-  } else {
-      // Dispose of materials
-      if (object.material) {
-          if (Array.isArray(object.material)) {
-              object.material.forEach((material: { dispose: () => void; }) => {
-                  material.dispose();
-              });
-          } else {
-              object.material.dispose();
-          }
-      }
+    }
 
-      scene.remove(object); // If no parent, remove from scene
+    object.parent.remove(object);
+    removeFromScene(object.parent, scene); // Recursively remove parent
+  } else {
+    // Dispose of materials
+    if (object.material) {
+      if (Array.isArray(object.material)) {
+        object.material.forEach((material: { dispose: () => void }) => {
+          material.dispose();
+        });
+      } else {
+        object.material.dispose();
+      }
+    }
+
+    scene.remove(object); // If no parent, remove from scene
   }
 }
 export function hideAllCSS2DObjects(scene: THREE.Scene) {
@@ -239,5 +239,31 @@ export function hideAllCSS2DObjects(scene: THREE.Scene) {
       child.element.style.pointerEvents = "none";
       child.visible = false;
     }
+  });
+}
+
+export function resetSceneExceptBlueprints(scene: THREE.Scene) {
+  const objectsToRemove: any = [];
+  scene.traverse((child: any) => {
+    if (child.name !== "rectangleLabel" && child instanceof CSS2DObject) {
+      objectsToRemove.push(child);
+    }
+    if (
+      child.name !== "ground" &&
+      child.name !== "blueprint" &&
+      (child instanceof THREE.Mesh ||
+        child instanceof THREE.Points ||
+        child instanceof THREE.Line) &&
+      !(child.geometry instanceof THREE.PlaneGeometry)
+    ) {
+      objectsToRemove.push(child);
+    }
+    if (child.name === "scaffoldingModel") {
+      objectsToRemove.push(child);
+    }
+  });
+
+  objectsToRemove.forEach((child: THREE.Object3D<THREE.Object3DEventMap>) => {
+    scene.remove(child);
   });
 }

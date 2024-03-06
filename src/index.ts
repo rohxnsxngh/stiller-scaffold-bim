@@ -105,7 +105,9 @@ export const createModelView = async () => {
   createLighting(scene);
 
   // Grid
-  new CustomGrid(components, new THREE.Color("#FF0000")); // Red color
+  const grid = new CustomGrid(components, new THREE.Color("#FF0000")); // Red color
+  console.log("grid", grid)
+  // grid.name = "grid"
 
   // Add some elements to the scene
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -358,7 +360,7 @@ export const createModelView = async () => {
     // delete singular object from scene based on raycasting intersection
     if (deletionInProgress && !drawingInProgress) {
       console.log("delete");
-      const objectToRemove = intersects[0].object
+      const objectToRemove = intersects[0].object;
       console.log(objectToRemove);
 
       deleteObject(objectToRemove, scene);
@@ -380,7 +382,17 @@ export const createModelView = async () => {
 
   // Edit Blueprint
   editBlueprintButton.domElement.addEventListener("mousedown", () => {
-    console.log("drag blueprint");
+    console.log("edit blueprint");
+    const blueprintLabels: CSS2DObject[] = []
+    scene.traverse((child) => {
+      if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
+        // console.log(child)
+        // child.element.style.pointerEvents = "auto";
+        // child.visible = true;
+        blueprintLabels.push(child)
+      }
+    });
+    console.log(blueprintLabels)
   });
 
   // Move Blueprint
