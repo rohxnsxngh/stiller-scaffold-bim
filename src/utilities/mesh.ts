@@ -4,7 +4,7 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   distanceFromPointToLine,
   measureLineLength,
-  resetSceneExceptBlueprints,
+  resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial } from "./material";
 import {
@@ -1410,7 +1410,7 @@ export function moveBlueprint(
 
   // remove all objects before moving the blueprint
   // since you are literally moving the foundation of the building
-  resetSceneExceptBlueprints(scene);
+  resetSceneExceptSingularObject(scene, "blueprint");
 
   document.body.style.cursor = "grab";
   setDrawingInProgress(false);
@@ -1475,4 +1475,83 @@ export function moveBlueprint(
       event.object.material.color.set(0x7f1d1d);
     }
   });
+}
+
+export let editingBlueprint = false;
+
+export const setEditingBlueprint = (value: boolean) => {
+  editingBlueprint = value;
+};
+
+// edit blueprint
+export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {
+  console.log("editing blueprint", blueprint.userData);
+
+  const shape = blueprint.userData as THREE.Shape;
+  const currentPosition = shape.currentPoint;
+  scene.remove(blueprint);
+
+  const curve = shape.curves[0];
+  if (curve instanceof THREE.LineCurve) {
+    const startPoint = curve.v1;
+    const endPoint = curve.v2;
+    const height = startPoint.distanceTo(endPoint);
+    const width = shape.curves[1].v1.distanceTo(shape.curves[1].v2);
+
+    const centerZ = startPoint.x + height / 2;
+    const centerX = startPoint.y + width / 2;
+  
+    const geometry = new THREE.ShapeGeometry(shape);
+    const mesh = new THREE.Mesh(
+      geometry,
+      rectMaterial
+    );
+    mesh.position.set(centerX, -0.025, centerZ);
+    mesh.rotation.x = Math.PI / 2;
+    scene.add(mesh);
+  }
+
+
+
+  //  // Calculate the lengths of the sides
+  //  const width = pointStartMinY.distanceTo(pointStartMaxY);
+  //  const height = pointStartMaxY.distanceTo(pointEndMaxY);
+
+  //  const rectanglePoints = [
+  //    pointStartMinY,
+  //    pointStartMaxY,
+  //    pointEndMaxY,
+  //    pointEndMinY,
+  //    pointStartMinY,
+  //  ];
+
+  //  const centerX = startPoint.point.x + height / 2;
+  //  const centerZ = startPoint.point.z + width / 2;
+
+  //  //For each side of the rectangle, calculate the midpoint and create a label
+  //  const labels = createLabels(rectanglePoints);
+  //  currentLabels.forEach((label) => {
+  //    attachLabelChangeHandler(
+  //      label,
+  //      markupGroup,
+  //      width,
+  //      height,
+  //      centerX,
+  //      centerZ
+  //    );
+  //  });
+
+  //  const geometry = new THREE.PlaneGeometry(height, width);
+  //  markup = new THREE.Mesh(geometry, rectMaterial);
+  //  markup.position.set(centerX, -0.025, centerZ);
+  //  markup.rotation.x = Math.PI / 2;
+  //  markup.name = "rectanglePlane";
+  //  markup.userData = {
+  //    rectanglePoints: rectanglePoints,
+  //    width: width,
+  //    height: height,
+  //  };
+  //  markupGroup.add(markup);
+
+  //  return [markup, labels];
 }

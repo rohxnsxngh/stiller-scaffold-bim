@@ -242,7 +242,7 @@ export function hideAllCSS2DObjects(scene: THREE.Scene) {
   });
 }
 
-export function resetSceneExceptBlueprints(scene: THREE.Scene) {
+export function resetSceneExceptSingularObject(scene: THREE.Scene, objectName: string) {
   const objectsToRemove: any = [];
   scene.traverse((child: any) => {
     if (child.name !== "rectangleLabel" && child instanceof CSS2DObject) {
@@ -250,7 +250,7 @@ export function resetSceneExceptBlueprints(scene: THREE.Scene) {
     }
     if (
       child.name !== "ground" &&
-      child.name !== "blueprint" &&
+      child.name !== `${objectName}` &&
       (child instanceof THREE.Mesh ||
         child instanceof THREE.Points ||
         child instanceof THREE.Line) &&
@@ -265,5 +265,31 @@ export function resetSceneExceptBlueprints(scene: THREE.Scene) {
 
   objectsToRemove.forEach((child: THREE.Object3D<THREE.Object3DEventMap>) => {
     scene.remove(child);
+  });
+}
+
+export function setInvisibleExceptSingularObject(scene: THREE.Scene, objectName: string) {
+  const objectsToRemove: any = [];
+  scene.traverse((child: any) => {
+    if (child.name !== "rectangleLabel" && child instanceof CSS2DObject) {
+      objectsToRemove.push(child);
+    }
+    if (
+      child.name !== "ground" &&
+      child.name !== `${objectName}` &&
+      (child instanceof THREE.Mesh ||
+        child instanceof THREE.Points ||
+        child instanceof THREE.Line) &&
+      !(child.geometry instanceof THREE.PlaneGeometry)
+    ) {
+      objectsToRemove.push(child);
+    }
+    if (child.name === "scaffoldingModel") {
+      objectsToRemove.push(child);
+    }
+  });
+
+  objectsToRemove.forEach((child: THREE.Object3D<THREE.Object3DEventMap>) => {
+    child.visible = false
   });
 }

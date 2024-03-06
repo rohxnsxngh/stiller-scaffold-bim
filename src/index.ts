@@ -9,6 +9,9 @@ import {
   createRoof,
   createShedRoof,
   moveBlueprint,
+  editBlueprint,
+  setEditingBlueprint,
+  editingBlueprint,
 } from "./utilities/mesh";
 import {
   createIndividualScaffoldOnClick,
@@ -40,6 +43,7 @@ import {
   // deleteObject,
   disableOrbitControls,
   resetScene,
+  setInvisibleExceptSingularObject,
   // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -106,7 +110,7 @@ export const createModelView = async () => {
 
   // Grid
   const grid = new CustomGrid(components, new THREE.Color("#FF0000")); // Red color
-  console.log("grid", grid)
+  console.log("grid", grid);
   // grid.name = "grid"
 
   // Add some elements to the scene
@@ -181,7 +185,7 @@ export const createModelView = async () => {
 
   // highlight object whens deletion is in progress
   window.addEventListener("mousemove", function (e) {
-    if (deletionInProgress && !drawingInProgress) {
+    if ((deletionInProgress || editingBlueprint) && !drawingInProgress) {
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
       // @ts-ignore
@@ -359,11 +363,12 @@ export const createModelView = async () => {
     }
     // delete singular object from scene based on raycasting intersection
     if (deletionInProgress && !drawingInProgress) {
-      console.log("delete");
       const objectToRemove = intersects[0].object;
-      console.log(objectToRemove);
-
       deleteObject(objectToRemove, scene);
+    }
+    if(editingBlueprint && !drawingInProgress) {
+      const blueprintToEdit = intersects[0].object
+      editBlueprint(scene, blueprintToEdit);
     }
   });
 
@@ -383,16 +388,10 @@ export const createModelView = async () => {
   // Edit Blueprint
   editBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("edit blueprint");
-    const blueprintLabels: CSS2DObject[] = []
-    scene.traverse((child) => {
-      if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
-        // console.log(child)
-        // child.element.style.pointerEvents = "auto";
-        // child.visible = true;
-        blueprintLabels.push(child)
-      }
-    });
-    console.log(blueprintLabels)
+    setEditingBlueprint(true)
+    setDrawingInProgress(false)
+    setDeletionInProgress(false)
+    setInvisibleExceptSingularObject(scene, "blueprint")
   });
 
   // Move Blueprint
