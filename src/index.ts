@@ -347,13 +347,13 @@ export const createModelView = async () => {
         0.73
       );
       //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
-      createIndividualScaffoldOnClick(
-        intersects,
-        highlightMesh,
-        scene,
-        scaffoldModeling,
-        bboxWireframe
-      );
+      // createIndividualScaffoldOnClick(
+      //   intersects,
+      //   highlightMesh,
+      //   scene,
+      //   scaffoldModeling,
+      //   bboxWireframe
+      // );
     }
     // delete singular object from scene based on raycasting intersection
     if (deletionInProgress && !drawingInProgress) {

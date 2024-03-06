@@ -101,7 +101,7 @@ export function createBlueprintFromShapeOutline(
     let highlightedMesh: THREE.Mesh<any, any, any>[] = [];
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        highlightedMesh.push(child)
+        highlightedMesh.push(child);
       }
       if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
         // console.log(child)
@@ -111,8 +111,8 @@ export function createBlueprintFromShapeOutline(
     });
 
     highlightedMesh.forEach((mesh) => {
-      scene.remove(mesh)
-    })
+      scene.remove(mesh);
+    });
 
     // Create shape
     if (points.length >= 3) {
@@ -1415,19 +1415,55 @@ export function moveBlueprint(
     components.renderer._renderer.domElement
   );
 
+  let originalLocation: THREE.Vector3;
+  let newLocation: THREE.Vector3;
+
   dragControls.addEventListener("dragstart", (event) => {
     shadows.deleteShadow(event.object.uuid);
-    console.log("dragging started", event.object);
+    originalLocation = event.object.position.clone(); // Create a copy of the position vector
+    console.log("original location", originalLocation);
   });
 
   dragControls.addEventListener("dragend", (event) => {
     if (event.object instanceof THREE.Mesh) {
       shadows.renderShadow([event.object], event.object.uuid);
       event.object.position.y = 0.025;
+      newLocation = event.object.position; // Update newLocation here
+      console.log("new location", newLocation);
+
+      const xDisplacement = newLocation.x - originalLocation.x;
+      const yDisplacement = newLocation.z - originalLocation.z;
+      console.log(
+        "x displacement",
+        xDisplacement,
+        "y displacement",
+        yDisplacement
+      );
+      const previousShape = event.object.userData;
+      if (previousShape instanceof THREE.Shape) {
+        console.log("previous shape", previousShape);
+
+        const newShape = new THREE.Shape();
+        previousShape.curves.forEach((curve) => {
+          if (curve instanceof THREE.LineCurve) {
+            const startPoint = curve.v1
+              .clone()
+              .add(new THREE.Vector2(xDisplacement, yDisplacement));
+            const endPoint = curve.v2
+              .clone()
+              .add(new THREE.Vector2(xDisplacement, yDisplacement));
+            newShape.moveTo(startPoint.x, startPoint.y);
+            newShape.lineTo(endPoint.x, endPoint.y);
+          }
+        });
+
+        console.log("new shape", newShape);
+
+        event.object.userData = newShape;
+      }
     }
 
     event.object.updateMatrix();
-    console.log("dragging ended", event.object);
   });
 
   // if (!dragControls.enabled) {
@@ -1449,7 +1485,6 @@ export function moveBlueprint(
     if (event.object instanceof THREE.Mesh) {
       console.log("hover off");
       event.object.material.color.set(0x7f1d1d);
-      console.log(event.object.position);
     }
   });
 }
