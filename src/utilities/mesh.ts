@@ -1417,7 +1417,6 @@ export function moveBlueprint(
   let newLocation: THREE.Vector3;
 
   dragControls.addEventListener("dragstart", (event) => {
-    shadows.deleteShadow(event.object.uuid);
     originalLocation = event.object.position.clone(); // Create a copy of the position vector
   });
 
@@ -1455,6 +1454,7 @@ export function moveBlueprint(
   dragControls.addEventListener("hoveron", (event) => {
     if (event.object instanceof THREE.Mesh) {
       event.object.material.color.set(0xb72c2c);
+      shadows.deleteShadow(event.object.uuid);
     }
   });
 
