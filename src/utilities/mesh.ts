@@ -1405,18 +1405,10 @@ export function moveBlueprint(
   scene: THREE.Scene,
   shadows: OBC.ShadowDropper
 ) {
-  cameraTopView(gsap, components.camera);
-  cameraDisableOrbitalFunctionality(gsap, components.camera);
-
   // remove all objects before moving the blueprint
   // since you are literally moving the foundation of the building
   resetSceneExceptSingularObject(scene, "blueprint");
 
-  document.body.style.cursor = "grab";
-  setDrawingInProgress(false);
-  setDeletionInProgress(false);
-  setDrawingScaffoldingInProgress(false);
-  cameraDisableOrbitalFunctionality(gsap, components.camera);
   const dragControls: DragControls = new DragControls(
     blueprints,
     // @ts-ignore
@@ -1475,6 +1467,8 @@ export function moveBlueprint(
       event.object.material.color.set(0x7f1d1d);
     }
   });
+
+  return dragControls
 }
 
 export let editingBlueprint = false;
@@ -1484,11 +1478,10 @@ export const setEditingBlueprint = (value: boolean) => {
 };
 
 // edit blueprint
-export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {
+export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh, components: OBC.Components) {
   console.log("editing blueprint", blueprint.userData);
 
   const shape = blueprint.userData as THREE.Shape;
-  const currentPosition = shape.currentPoint;
   scene.remove(blueprint);
 
   const curve = shape.curves[0];

@@ -15,6 +15,7 @@ import MountPoint from "../pages/MountPoint.vue";
 import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
+import { setEditingBlueprint } from "./mesh";
 
 export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
@@ -378,9 +379,12 @@ export const createToolbar = (
   sideToolBar.addChild(editBlueprintButton);
   editBlueprintButton.onClick.add(() => {
     document.body.style.cursor = "auto";
+    setEditingBlueprint(true)
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    cameraTopView(gsap, components.camera);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   editBlueprintButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -403,6 +407,8 @@ export const createToolbar = (
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    cameraTopView(gsap, components.camera);
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   moveBlueprintButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);

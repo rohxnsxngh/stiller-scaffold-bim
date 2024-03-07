@@ -10,8 +10,8 @@ import {
   createShedRoof,
   moveBlueprint,
   editBlueprint,
-  setEditingBlueprint,
   editingBlueprint,
+  setEditingBlueprint,
 } from "./utilities/mesh";
 import {
   createIndividualScaffoldOnClick,
@@ -49,6 +49,7 @@ import {
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
 import { useStore } from "./store/index";
+import { DragControls } from "three/examples/jsm/Addons.js";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -60,6 +61,7 @@ let viewHelper: any;
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
+
 
 export const createModelView = async () => {
   const container = document.getElementById("model") as HTMLCanvasElement;
@@ -93,6 +95,7 @@ export const createModelView = async () => {
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
     setDeletionInProgress(false);
+    setEditingBlueprint(false)
   });
 
   // Call the function to disable OrbitControls
@@ -368,7 +371,7 @@ export const createModelView = async () => {
     }
     if(editingBlueprint && !drawingInProgress) {
       const blueprintToEdit = intersects[0].object
-      editBlueprint(scene, blueprintToEdit);
+      editBlueprint(scene, blueprintToEdit, components);
     }
   });
 
@@ -388,9 +391,6 @@ export const createModelView = async () => {
   // Edit Blueprint
   editBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("edit blueprint");
-    setEditingBlueprint(true)
-    setDrawingInProgress(false)
-    setDeletionInProgress(false)
     setInvisibleExceptSingularObject(scene, "blueprint")
   });
 
@@ -405,7 +405,7 @@ export const createModelView = async () => {
         blueprints.push(child);
       }
     });
-    moveBlueprint(blueprints, components, scene, shadows);
+    const dragControls = moveBlueprint(blueprints, components, scene, shadows);
   });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
