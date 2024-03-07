@@ -8,13 +8,9 @@ import {
 } from "./helper";
 import { rectMaterial } from "./material";
 import {
-  setDeletionInProgress,
   setDrawingInProgress,
-  setDrawingScaffoldingInProgress,
 } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
-import { cameraDisableOrbitalFunctionality, cameraTopView } from "./camera";
-import { gsap } from "gsap";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -1468,7 +1464,7 @@ export function moveBlueprint(
     }
   });
 
-  return dragControls
+  return dragControls;
 }
 
 export let editingBlueprint = false;
@@ -1478,33 +1474,98 @@ export const setEditingBlueprint = (value: boolean) => {
 };
 
 // edit blueprint
-export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh, components: OBC.Components) {
+export function editBlueprint(
+  scene: THREE.Scene,
+  blueprint: THREE.Mesh,
+) {
   console.log("editing blueprint", blueprint.userData);
 
   const shape = blueprint.userData as THREE.Shape;
   scene.remove(blueprint);
 
-  const curve = shape.curves[0];
-  if (curve instanceof THREE.LineCurve) {
-    const startPoint = curve.v1;
-    const endPoint = curve.v2;
-    const height = startPoint.distanceTo(endPoint);
-    const width = shape.curves[1].v1.distanceTo(shape.curves[1].v2);
+  const firstCurve = shape.curves[0];
+  const secondCurve = shape.curves[1];
+  if (
+    firstCurve instanceof THREE.LineCurve &&
+    secondCurve instanceof THREE.LineCurve
+  ) {
+    const startPoint = firstCurve.v1;
+    const endPoint = secondCurve.v2;
 
-    const centerZ = startPoint.x + height / 2;
-    const centerX = startPoint.y + width / 2;
-  
-    const geometry = new THREE.ShapeGeometry(shape);
-    const mesh = new THREE.Mesh(
-      geometry,
-      rectMaterial
+    const pointStartMinY = new THREE.Vector3(
+      startPoint.x,
+      0,
+      startPoint.y
     );
-    mesh.position.set(centerX, -0.025, centerZ);
-    mesh.rotation.x = Math.PI / 2;
-    scene.add(mesh);
+    const pointStartMaxY = new THREE.Vector3(
+      startPoint.x,
+      0,
+      endPoint.y
+    );
+    const pointEndMinY = new THREE.Vector3(
+      endPoint.x,
+      0,
+      startPoint.y
+    );
+    const pointEndMaxY = new THREE.Vector3(
+      endPoint.x,
+      0,
+      endPoint.y
+    );
+
+       // Calculate the lengths of the sides
+   const width = pointStartMinY.distanceTo(pointStartMaxY);
+   const height = pointStartMaxY.distanceTo(pointEndMaxY);
+
+     const rectanglePoints = [
+     pointStartMinY,
+     pointStartMaxY,
+     pointEndMaxY,
+     pointEndMinY,
+     pointStartMinY,
+   ];
+
+   const centerX = startPoint.x + height / 2;
+   const centerZ = startPoint.y + width / 2;
+
+   //For each side of the rectangle, calculate the midpoint and create a label
+   const labels = createLabels(rectanglePoints);
+   labels.forEach((label) => {
+    scene.add(label)
+   })
+
+   const geometry = new THREE.PlaneGeometry(height, width);
+   const newBlueprint = new THREE.Mesh(geometry, rectMaterial);
+   newBlueprint.position.set(centerZ, -0.025, centerX);
+   newBlueprint.rotation.x = Math.PI / 2;
+   newBlueprint.name = "rectanglePlane";
+   newBlueprint.userData = {
+     rectanglePoints: rectanglePoints,
+     width: width,
+     height: height,
+   };
+   scene.add(newBlueprint)
+  //  markupGroup.add(markup);
+
+  //  return [markup, labels];
   }
 
-
+  // const pointStartMinY = new THREE.Vector3(
+  //   startPoint.point.x,
+  //   0,
+  //   startPoint.point.z
+  // );
+  // const pointStartMaxY = new THREE.Vector3(
+  //   startPoint.point.x,
+  //   0,
+  //   endPoint.point.z
+  // );
+  // const pointEndMinY = new THREE.Vector3(
+  //   endPoint.point.x,
+  //   0,
+  //   startPoint.point.z
+  // );
+  // const pointEndMaxY = new THREE.Vector3(endPoint.point.x, 0, endPoint.point.z);
 
   //  // Calculate the lengths of the sides
   //  const width = pointStartMinY.distanceTo(pointStartMaxY);

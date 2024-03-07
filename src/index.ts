@@ -371,7 +371,9 @@ export const createModelView = async () => {
     }
     if(editingBlueprint && !drawingInProgress) {
       const blueprintToEdit = intersects[0].object
-      editBlueprint(scene, blueprintToEdit, components);
+      if (blueprintToEdit.name === "blueprint") {
+        editBlueprint(scene, blueprintToEdit);
+      }
     }
   });
 
