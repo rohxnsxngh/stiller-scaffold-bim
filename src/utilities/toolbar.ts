@@ -8,14 +8,21 @@ import {
   cameraTopView,
 } from "./camera";
 import { hideAllCSS2DObjects } from "./helper";
-export let drawingInProgress = false;
-export let drawingScaffoldingInProgress = false;
-export let deletionInProgress = false;
 import MountPoint from "../pages/MountPoint.vue";
 import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
 import { setEditingBlueprint } from "./mesh";
+
+export let drawingInProgress = false;
+export let drawingScaffoldingInProgress = false;
+export let deletionInProgress = false;
+export let drawingInProgressSwitch = false;
+export let isDrawingBlueprint = false;
+
+export const setIsDrawingBlueprint = (value: boolean) => {
+  isDrawingBlueprint = value;
+};
 
 export const setDrawingInProgress = (value: boolean) => {
   drawingInProgress = value;
@@ -27,6 +34,10 @@ export const setDrawingScaffoldingInProgress = (value: boolean) => {
 
 export const setDeletionInProgress = (value: boolean) => {
   deletionInProgress = value;
+};
+
+export const setDrawingInProgressSwitch = (value: boolean) => {
+  drawingInProgressSwitch = value;
 };
 
 export const createToolbar = (
@@ -379,7 +390,7 @@ export const createToolbar = (
   sideToolBar.addChild(editBlueprintButton);
   editBlueprintButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    setEditingBlueprint(true)
+    setEditingBlueprint(true);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -790,7 +801,9 @@ export const createToolbar = (
     setDrawingInProgress(false);
   });
   drawer.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
+    if (startDrawing) {
+      setDrawingInProgress(true);
+    }
   });
   components.ui.add(drawer);
   console.log(drawer);
@@ -813,13 +826,12 @@ export const createToolbar = (
 
   //////////////////////////////////////////
   // Create a function to add the event listener
-  let drawRect
   const addEventListenerToDrawRect = () => {
-     drawRect = document.getElementById("startDrawingRectangle");
+    const drawRect = document.getElementById("startDrawingRectangle");
     if (drawRect) {
       drawRect.addEventListener("mousedown", () => {
-        // console.log("hello world");
         document.body.style.cursor = "crosshair";
+        startDrawing = false
         setDrawingInProgress(false);
         setDeletionInProgress(false);
         setDrawingScaffoldingInProgress(false);
@@ -827,18 +839,50 @@ export const createToolbar = (
         cameraDisableOrbitalFunctionality(gsap, components.camera);
       });
       // Stop observing once the element is found
-      observer.disconnect();
+      observerDrawRect.disconnect();
+    }
+  };
+
+  let startDrawing = false;
+  const addEventListenerToDrawPolygon = () => {
+    const drawPolygon = document.getElementById("startDrawingPolygon");
+    if (drawPolygon) {
+      drawPolygon.addEventListener("mousedown", () => {
+        startDrawing = true;
+        console.log("draw polygon");
+        document.body.style.cursor = "auto";
+        setDeletionInProgress(false);
+        setDrawingScaffoldingInProgress(false);
+        setDrawingInProgress(false);
+        setDrawingInProgressSwitch(false);
+        cameraPerspectiveView(gsap, components.camera);
+      });
+      drawPolygon.addEventListener("mouseleave", () => {
+        if (startDrawing) {
+          console.log("polygon drawing start");
+          setDrawingInProgressSwitch(true);
+          setDrawingInProgress(true);
+          setIsDrawingBlueprint(false);
+        }
+      });
+      // Stop observing once the element is found
+      observerDrawPolygon.disconnect();
     }
   };
 
   // Create a MutationObserver to watch for changes in the DOM
-  const observer = new MutationObserver(addEventListenerToDrawRect);
+  const observerDrawRect = new MutationObserver(addEventListenerToDrawRect);
+  const observerDrawPolygon = new MutationObserver(
+    addEventListenerToDrawPolygon
+  );
 
   // Start observing the document with the configured callback
-  observer.observe(document, { childList: true, subtree: true });
+  observerDrawRect.observe(document, { childList: true, subtree: true });
+  observerDrawPolygon.observe(document, { childList: true, subtree: true });
 
   // Call the function once to check if the element is already in the DOM
   addEventListenerToDrawRect();
+  addEventListenerToDrawPolygon();
 
   ////////////////////////////////////////////////
   return [
