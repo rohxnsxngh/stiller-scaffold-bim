@@ -5,9 +5,9 @@
   >
     <General v-if="activeSection === 'general'" />
     <Blueprint v-if="activeSection === 'blueprint'" />
-    <Scaffold v-if="activeSection === 'scaffold'" />
+    <!-- <Scaffold v-if="activeSection === 'scaffold'" />
     <Roof v-if="activeSection === 'roof'" />
-    <Supply v-if="activeSection === 'supply'" />
+    <Supply v-if="activeSection === 'supply'" /> -->
   </div>
 </template>
 

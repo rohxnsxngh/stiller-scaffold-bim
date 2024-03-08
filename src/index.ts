@@ -30,10 +30,6 @@ import {
   deletionInProgress,
   setDrawingScaffoldingInProgress,
   setDeletionInProgress,
-  setDrawingInProgressSwitch,
-  drawingInProgressSwitch,
-  setIsDrawingBlueprint,
-  isDrawingBlueprint,
 } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
@@ -336,6 +332,7 @@ export const createModelView = async () => {
 
   let points: THREE.Vector3[] = [];
   let scaffoldPoints: THREE.Vector3[] = [];
+  let drawingInProgressSwitch: boolean = true;
 
   window.addEventListener("mousedown", async () => {
     if (drawingInProgress && drawingInProgressSwitch) {
@@ -403,7 +400,7 @@ export const createModelView = async () => {
   moveBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("move blueprint");
     const blueprints: any[] = [];
-    setIsDrawingBlueprint(false)
+    isDrawingBlueprint = false;
     // Array to hold objects that can be dragged
     scene.traverse((child: any) => {
       if (child instanceof THREE.Mesh && child.name === "blueprint") {
@@ -709,7 +706,7 @@ export const createModelView = async () => {
 
   // handles roof rotation, snap the roof to a different rotation.
   rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
-    setDrawingInProgressSwitch(false)
+    drawingInProgressSwitch = false;
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
@@ -766,7 +763,7 @@ export const createModelView = async () => {
   // this section pertains to creating the rectangle from the top view by clicking and dragging
   // need to organize and abstract the way this section is handled
   let isDragging = false;
-  // let isDrawingBlueprint = false;
+  let isDrawingBlueprint = false;
   let markupMouse = new THREE.Vector2();
   let markupStartPoint: THREE.Vector2 | null = null;
   let markup: any = null;
@@ -779,8 +776,10 @@ export const createModelView = async () => {
     if (drawRect) {
       console.log("Element found, adding event listener");
       drawRect.addEventListener("mousedown", () => {
-        setIsDrawingBlueprint(true)
+        console.log("hello world");
+        isDrawingBlueprint = true;
         if (!isDragging) {
+          console.log("hello world 2");
           window.addEventListener("mousedown", handleMouseDown);
           window.addEventListener("mousemove", handleMouseMove);
           window.addEventListener("mouseup", handleMouseUp);
@@ -805,7 +804,7 @@ export const createModelView = async () => {
   createBlueprintRectangleButton.domElement.addEventListener(
     "mousedown",
     () => {
-      setIsDrawingBlueprint(true)
+      isDrawingBlueprint = true;
       if (!isDragging) {
         window.addEventListener("mousedown", handleMouseDown);
         window.addEventListener("mousemove", handleMouseMove);
@@ -873,12 +872,12 @@ export const createModelView = async () => {
   }
 
   freeRotateButton.domElement.addEventListener("mousedown", () => {
-    setIsDrawingBlueprint(false)
+    isDrawingBlueprint = false;
   });
 
   drawingButton.domElement.addEventListener("mousedown", () => {
-    setIsDrawingBlueprint(false)
-    setDrawingInProgressSwitch(true)
+    isDrawingBlueprint = false;
+    drawingInProgressSwitch = true;
   });
 
   /////////////////////
