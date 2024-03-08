@@ -18,7 +18,10 @@
       <div><p class="text-xs text-center mt-2">Rektangel</p></div>
     </div>
     <div class="flex flex-col m-4">
-      <div class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]" id="startDrawingPolygon">
+      <div
+        class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
+        id="startDrawingPolygon"
+      >
         <img
           src="../assets/images/Delete.svg"
           alt="Polygon"
@@ -37,8 +40,10 @@
         </div>
         <input
           type="text"
+          id="rectangle-length"
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
+          v-model="length"
         />
         <div class="label"></div>
       </label>
@@ -51,8 +56,10 @@
         </div>
         <input
           type="text"
+          id="rectangle-width"
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
+          v-model="width"
         />
         <div class="label"></div>
       </label>
@@ -65,6 +72,7 @@
         </div>
         <input
           type="text"
+          id="extrusion-height"
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
         />
@@ -75,19 +83,34 @@
 </template>
 
 <script lang="ts">
+import { ref, computed } from 'vue';
+import { useStore } from '../store';
+
 export default {
-  components: {},
-  data() {
-    return {
-      showDraw: false,
-      showUpload: false,
+  setup() {
+    const componentStore = useStore();
+
+    // Define reactive state using ref
+    const showDraw = ref(false);
+    const showUpload = ref(false);
+
+    // Use computed properties to reactively access store state
+    const length = computed(() => componentStore.length);
+    const width = computed(() => componentStore.width);
+
+    // Define methods
+    const showDrawBlueprint = () => {
+      showDraw.value = true;
+      showUpload.value = false;
     };
-  },
-  methods: {
-    showDrawBlueprint() {
-      this.showDraw = true;
-      this.showUpload = false;
-    },
-  },
+
+    return {
+      showDraw,
+      showUpload,
+      length,
+      width,
+      showDrawBlueprint,
+    };
+ },
 };
 </script>

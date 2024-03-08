@@ -44,7 +44,6 @@ import {
 import {
   calculateTransformedBoundingBox,
   deleteObject,
-  // deleteObject,
   disableOrbitControls,
   resetScene,
   setInvisibleExceptSingularObject,
@@ -52,8 +51,7 @@ import {
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
-import { useStore } from "./store/index";
-import { DragControls } from "three/examples/jsm/Addons.js";
+import { useStore } from "./store";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -65,7 +63,6 @@ let viewHelper: any;
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
-
 
 export const createModelView = async () => {
   const container = document.getElementById("model") as HTMLCanvasElement;
@@ -99,7 +96,7 @@ export const createModelView = async () => {
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
     setDeletionInProgress(false);
-    setEditingBlueprint(false)
+    setEditingBlueprint(false);
   });
 
   // Call the function to disable OrbitControls
@@ -372,8 +369,8 @@ export const createModelView = async () => {
       const objectToRemove = intersects[0].object;
       deleteObject(objectToRemove, scene);
     }
-    if(editingBlueprint && !drawingInProgress) {
-      const blueprintToEdit = intersects[0].object
+    if (editingBlueprint && !drawingInProgress) {
+      const blueprintToEdit = intersects[0].object;
       if (blueprintToEdit.name === "blueprint") {
         editBlueprint(scene, blueprintToEdit);
       }
@@ -396,14 +393,14 @@ export const createModelView = async () => {
   // Edit Blueprint
   editBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("edit blueprint");
-    setInvisibleExceptSingularObject(scene, "blueprint")
+    setInvisibleExceptSingularObject(scene, "blueprint");
   });
 
   // Move Blueprint
   moveBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("move blueprint");
     const blueprints: any[] = [];
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
     // Array to hold objects that can be dragged
     scene.traverse((child: any) => {
       if (child instanceof THREE.Mesh && child.name === "blueprint") {
@@ -709,7 +706,7 @@ export const createModelView = async () => {
 
   // handles roof rotation, snap the roof to a different rotation.
   rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
-    setDrawingInProgressSwitch(false)
+    setDrawingInProgressSwitch(false);
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
@@ -779,7 +776,7 @@ export const createModelView = async () => {
     if (drawRect) {
       console.log("Element found, adding event listener");
       drawRect.addEventListener("mousedown", () => {
-        setIsDrawingBlueprint(true)
+        setIsDrawingBlueprint(true);
         if (!isDragging) {
           window.addEventListener("mousedown", handleMouseDown);
           window.addEventListener("mousemove", handleMouseMove);
@@ -805,7 +802,7 @@ export const createModelView = async () => {
   createBlueprintRectangleButton.domElement.addEventListener(
     "mousedown",
     () => {
-      setIsDrawingBlueprint(true)
+      setIsDrawingBlueprint(true);
       if (!isDragging) {
         window.addEventListener("mousedown", handleMouseDown);
         window.addEventListener("mousemove", handleMouseMove);
@@ -821,6 +818,7 @@ export const createModelView = async () => {
       oldLabels.forEach((label) => {
         scene.remove(label);
       });
+      updatedDimensions = [];
       markupStartPoint = markupMouse.clone();
       createRectangle(
         { start: markupMouse, end: markupMouse },
@@ -843,6 +841,7 @@ export const createModelView = async () => {
         oldLabels.forEach((label) => {
           scene.remove(label);
         });
+        updatedDimensions = [];
         const result = createRectangle(
           { start: markupStartPoint, end: markupMouse },
           markupGroup,
@@ -863,8 +862,19 @@ export const createModelView = async () => {
     }
   }
 
+  const componentStore = useStore();
+  let updatedDimensions: number[] = [];
   function handleMouseUp() {
     isDragging = false;
+    updatedDimensions = [];
+    oldLabels.forEach((label, index) => {
+      if (index < 2) {
+        updatedDimensions.push(parseFloat(label.element.textContent));
+      }
+    });
+    console.log(updatedDimensions);
+    componentStore.updateLength(updatedDimensions[0]);
+    componentStore.updateWidth(updatedDimensions[1]);
   }
 
   function getMousePointer({ event }: { event: MouseEvent }) {
@@ -873,12 +883,12 @@ export const createModelView = async () => {
   }
 
   freeRotateButton.domElement.addEventListener("mousedown", () => {
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
   });
 
   drawingButton.domElement.addEventListener("mousedown", () => {
-    setIsDrawingBlueprint(false)
-    setDrawingInProgressSwitch(true)
+    setIsDrawingBlueprint(false);
+    setDrawingInProgressSwitch(true);
   });
 
   /////////////////////
@@ -939,9 +949,6 @@ export const createModelView = async () => {
   function animate() {
     stats.begin();
     requestAnimationFrame(animate);
-
-    const componentsStore = useStore(); // Get the store instance
-    componentsStore.setComponents(components); // Set the components object in the store
 
     controls.update();
 
