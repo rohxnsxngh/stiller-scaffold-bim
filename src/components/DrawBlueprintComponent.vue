@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-7 gap-4">
+  <div class="grid grid-cols-8 gap-4">
     <div class="col-span-3">
       <label class="form-control w-full max-w-xs">
         <div class="label">
@@ -65,7 +65,7 @@
       </label>
     </div>
 
-    <div class="col-span-1">
+    <div class="col-span-2">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text text-sm">blåkopi</span>
@@ -75,10 +75,8 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-3 gap-8">
-   
-
-    <div>
+  <div class="grid grid-cols-6 gap-4">
+    <div class="col-span-4">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text">Høyde (m)</span>
@@ -88,8 +86,18 @@
           id="extrusion-height"
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
+          v-model="depth"
         />
         <div class="label"></div>
+      </label>
+    </div>
+
+    <div class="col-span-2">
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text text-sm">ekstrudere</span>
+        </div>
+        <div class="btn w-full" id="create-extrusion"> <i class="material-icons">expand</i></div>
       </label>
     </div>
   </div>
@@ -112,6 +120,11 @@ export default {
     // Use computed properties to reactively access store state
     const length = computed(() => componentStore.length);
     const width = computed(() => componentStore.width);
+    // const depth = computed(() => componentStore.depth);
+    const depth = computed({ // Make depth a computed property
+      get: () => componentStore.depth,
+      set: (value) => componentStore.updateDepth(value),
+    });
 
     // Define methods
     const showDrawBlueprint = () => {
@@ -124,6 +137,7 @@ export default {
       showUpload,
       length,
       width,
+      depth,
       showDrawBlueprint,
     };
  },

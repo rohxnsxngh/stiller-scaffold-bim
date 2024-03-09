@@ -463,6 +463,8 @@ export const createModelView = async () => {
         Object.is(blueprint.userData, extrusion.userData)
       );
       if (!hasExtrusion) {
+        // const depthValue = componentStore.depth;
+        // console.log(depthValue)
         createExtrusionFromBlueprint(blueprint.userData, scene, 12);
       }
     });
@@ -470,6 +472,58 @@ export const createModelView = async () => {
     blueprints = [];
     extrusions = [];
   });
+
+  // drawer solidify blueprint
+  const addEventListenerToCreateExtrusion = () => {
+    const createExtrusion = document.getElementById("create-extrusion");
+    if (createExtrusion) {
+      createExtrusion.addEventListener("mousedown", () => {
+        let blueprints: THREE.Mesh[] = [];
+        let extrusions: THREE.Mesh[] = [];
+
+        scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.name === "blueprint") {
+              blueprints.push(child);
+            } else if (child.name === "extrusion") {
+              extrusions.push(child);
+            }
+          }
+        });
+
+        blueprints.forEach((blueprint) => {
+          let hasExtrusion = extrusions.some((extrusion) =>
+            Object.is(blueprint.userData, extrusion.userData)
+          );
+          if (!hasExtrusion) {
+            const depthValue = componentStore.depth;
+            console.log(depthValue);
+            if (depthValue !== 0) {
+              console.log("depth", depthValue)
+              createExtrusionFromBlueprint(blueprint.userData, scene, depthValue);
+            }
+          }
+        });
+
+        blueprints = [];
+        extrusions = [];
+      });
+
+      // Stop observing once the element is found
+      observerCreateExtrusion.disconnect();
+    }
+  };
+
+  // Create a MutationObserver to watch for changes in the DOM
+  const observerCreateExtrusion = new MutationObserver(
+    addEventListenerToCreateExtrusion
+  );
+
+  // Start observing the document with the configured callback
+  observerCreateExtrusion.observe(document, { childList: true, subtree: true });
+
+  // Call the function once to check if the element is already in the DOM
+  addEventListenerToCreateExtrusion();
 
   createGableRoofButton.domElement.addEventListener("mousedown", () => {
     let extrusions: THREE.Mesh[] = [];
