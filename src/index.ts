@@ -45,6 +45,7 @@ import {
   calculateTransformedBoundingBox,
   deleteObject,
   disableOrbitControls,
+  observeElementAndAddEventListener,
   resetScene,
   setInvisibleExceptSingularObject,
   // createBoundingBoxVisualizationFromBox,
@@ -390,38 +391,18 @@ export const createModelView = async () => {
     }
   });
 
-  // drawer solidify blueprint
-  const addEventListenerToCreateBlueprint = () => {
-    const createBlueprint = document.getElementById("create-blueprint");
-    if (createBlueprint) {
-      createBlueprint.addEventListener("mousedown", () => {
-        if (!drawingInProgress && points.length > 1) {
-          // create extrusion from the blueprint after it has been created
-          points = createBlueprintFromShapeOutline(points, scene);
-        }
-        if (rectangleBlueprint) {
-          points = createBlueprintFromShapeOutline(
-            markupGroup.children[0].userData.rectanglePoints,
-            scene
-          );
-        }
-      });
-
-      // Stop observing once the element is found
-      observerCreateBlueprint.disconnect();
+  observeElementAndAddEventListener("create-blueprint", "mousedown", () => {
+    if (!drawingInProgress && points.length > 1) {
+      // create extrusion from the blueprint after it has been created
+      points = createBlueprintFromShapeOutline(points, scene);
     }
-  };
-
-  // Create a MutationObserver to watch for changes in the DOM
-  const observerCreateBlueprint = new MutationObserver(
-    addEventListenerToCreateBlueprint
-  );
-
-  // Start observing the document with the configured callback
-  observerCreateBlueprint.observe(document, { childList: true, subtree: true });
-
-  // Call the function once to check if the element is already in the DOM
-  addEventListenerToCreateBlueprint();
+    if (rectangleBlueprint) {
+      points = createBlueprintFromShapeOutline(
+        markupGroup.children[0].userData.rectanglePoints,
+        scene
+      );
+    }
+  });
 
   // Edit Blueprint
   editBlueprintButton.domElement.addEventListener("mousedown", () => {
@@ -473,57 +454,37 @@ export const createModelView = async () => {
     extrusions = [];
   });
 
-  // drawer solidify blueprint
-  const addEventListenerToCreateExtrusion = () => {
-    const createExtrusion = document.getElementById("create-extrusion");
-    if (createExtrusion) {
-      createExtrusion.addEventListener("mousedown", () => {
-        let blueprints: THREE.Mesh[] = [];
-        let extrusions: THREE.Mesh[] = [];
+  observeElementAndAddEventListener("create-extrusion", "mousedown", () => {
+    let blueprints: THREE.Mesh[] = [];
+    let extrusions: THREE.Mesh[] = [];
 
-        scene.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            if (child.name === "blueprint") {
-              blueprints.push(child);
-            } else if (child.name === "extrusion") {
-              extrusions.push(child);
-            }
-          }
-        });
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.name === "blueprint") {
+          blueprints.push(child);
+        } else if (child.name === "extrusion") {
+          extrusions.push(child);
+        }
+      }
+    });
 
-        blueprints.forEach((blueprint) => {
-          let hasExtrusion = extrusions.some((extrusion) =>
-            Object.is(blueprint.userData, extrusion.userData)
-          );
-          if (!hasExtrusion) {
-            const depthValue = componentStore.depth;
-            console.log(depthValue);
-            if (depthValue !== 0) {
-              console.log("depth", depthValue)
-              createExtrusionFromBlueprint(blueprint.userData, scene, depthValue);
-            }
-          }
-        });
+    blueprints.forEach((blueprint) => {
+      let hasExtrusion = extrusions.some((extrusion) =>
+        Object.is(blueprint.userData, extrusion.userData)
+      );
+      if (!hasExtrusion) {
+        const depthValue = componentStore.depth;
+        console.log(depthValue);
+        if (depthValue !== 0) {
+          console.log("depth", depthValue);
+          createExtrusionFromBlueprint(blueprint.userData, scene, depthValue);
+        }
+      }
+    });
 
-        blueprints = [];
-        extrusions = [];
-      });
-
-      // Stop observing once the element is found
-      observerCreateExtrusion.disconnect();
-    }
-  };
-
-  // Create a MutationObserver to watch for changes in the DOM
-  const observerCreateExtrusion = new MutationObserver(
-    addEventListenerToCreateExtrusion
-  );
-
-  // Start observing the document with the configured callback
-  observerCreateExtrusion.observe(document, { childList: true, subtree: true });
-
-  // Call the function once to check if the element is already in the DOM
-  addEventListenerToCreateExtrusion();
+    blueprints = [];
+    extrusions = [];
+  });
 
   createGableRoofButton.domElement.addEventListener("mousedown", () => {
     let extrusions: THREE.Mesh[] = [];
@@ -858,32 +819,18 @@ export const createModelView = async () => {
   //////////////////////////////////////////
   // work around to bring functionality to the drawer section
   // TODO: figure out more efficient method to do this or a simpler method to accomplish this
-  const addEventListenerToDrawRect = () => {
-    const drawRect = document.getElementById("startDrawingRectangle");
-    if (drawRect) {
-      console.log("Element found, adding event listener");
-      drawRect.addEventListener("mousedown", () => {
-        setIsDrawingBlueprint(true);
-        if (!isDragging) {
-          window.addEventListener("mousedown", handleMouseDown);
-          window.addEventListener("mousemove", handleMouseMove);
-          window.addEventListener("mouseup", handleMouseUp);
-        }
-      });
-      observer.disconnect(); // Stop observing once the element is found
-    } else {
-      console.log("Element not found yet");
+  observeElementAndAddEventListener(
+    "startDrawingRectangle",
+    "mousedown",
+    () => {
+      setIsDrawingBlueprint(true);
+      if (!isDragging) {
+        window.addEventListener("mousedown", handleMouseDown);
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+      }
     }
-  };
-
-  // Create a MutationObserver to watch for changes in the DOM
-  const observer = new MutationObserver(addEventListenerToDrawRect);
-
-  // Start observing the document with the configured callback
-  observer.observe(document, { childList: true, subtree: true });
-
-  // Call the function once to check if the element is already in the DOM
-  addEventListenerToDrawRect();
+  );
   /////////////////////////////////////
 
   createBlueprintRectangleButton.domElement.addEventListener(

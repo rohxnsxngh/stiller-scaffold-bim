@@ -233,6 +233,7 @@ function removeFromScene(object: any, scene: THREE.Scene) {
     scene.remove(object); // If no parent, remove from scene
   }
 }
+
 export function hideAllCSS2DObjects(scene: THREE.Scene) {
   scene.traverse(function (child) {
     if (child instanceof CSS2DObject) {
@@ -293,3 +294,30 @@ export function setInvisibleExceptSingularObject(scene: THREE.Scene, objectName:
     child.visible = false
   });
 }
+
+// 
+export function observeElementAndAddEventListener(
+  elementId: string,
+  eventType: string,
+  eventHandler: (event: Event) => void
+ ) {
+  const addEventListenerToElement = () => {
+     const element = document.getElementById(elementId);
+     if (element) {
+       console.log(`Element ${elementId} found, adding event listener`);
+       element.addEventListener(eventType, eventHandler);
+       observer.disconnect(); // Stop observing once the element is found
+     } else {
+       console.log(`Element ${elementId} not found yet`);
+     }
+  };
+ 
+  // Create a MutationObserver to watch for changes in the DOM
+  const observer = new MutationObserver(addEventListenerToElement);
+ 
+  // Start observing the document with the configured callback
+  observer.observe(document, { childList: true, subtree: true });
+ 
+  // Call the function once to check if the element is already in the DOM
+  addEventListenerToElement();
+ }
