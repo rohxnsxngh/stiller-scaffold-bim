@@ -380,6 +380,34 @@ export const createToolbar = (
   blueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintButton.domElement.classList.add("hover:bg-slate-300");
 
+  // drawer solidify blueprint
+  const addEventListenerToCreateBlueprint = () => {
+    const createBlueprint = document.getElementById("create-blueprint");
+    if (createBlueprint) {
+      createBlueprint.addEventListener("mousedown", () => {
+        document.body.style.cursor = "auto";
+        setDrawingInProgress(false);
+        setDeletionInProgress(false);
+        setDrawingScaffoldingInProgress(false);
+      });
+      createBlueprint.addEventListener("mouseover", () => {
+        setDrawingInProgress(false);
+        setDrawingScaffoldingInProgress(false);
+      });
+      // Stop observing once the element is found
+      observerCreateBlueprint.disconnect();
+    }
+  };
+
+  // Create a MutationObserver to watch for changes in the DOM
+  const observerCreateBlueprint = new MutationObserver(addEventListenerToCreateBlueprint);
+
+  // Start observing the document with the configured callback
+  observerCreateBlueprint.observe(document, { childList: true, subtree: true });
+
+  // Call the function once to check if the element is already in the DOM
+  addEventListenerToCreateBlueprint();
+
   // create blueprint from outline
   const editBlueprintButton = new OBC.Button(components, {
     materialIconName: "category",

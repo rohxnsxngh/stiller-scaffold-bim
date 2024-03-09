@@ -32,8 +32,8 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-2 gap-8">
-    <div>
+  <div class="grid grid-cols-7 gap-4">
+    <div class="col-span-3">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text">Lengde (m)</span>
@@ -49,7 +49,7 @@
       </label>
     </div>
 
-    <div>
+    <div class="col-span-3">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text">Bredde (m)</span>
@@ -64,6 +64,19 @@
         <div class="label"></div>
       </label>
     </div>
+
+    <div class="col-span-1">
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text text-sm">blåkopi</span>
+        </div>
+        <div class="btn w-full" id="create-blueprint"> <i class="material-icons">dashboard</i></div>
+      </label>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-8">
+   
 
     <div>
       <label class="form-control w-full max-w-xs">
@@ -80,6 +93,8 @@
       </label>
     </div>
   </div>
+
+  
 </template>
 
 <script lang="ts">

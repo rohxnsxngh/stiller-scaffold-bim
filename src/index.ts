@@ -390,6 +390,39 @@ export const createModelView = async () => {
     }
   });
 
+  // drawer solidify blueprint
+  const addEventListenerToCreateBlueprint = () => {
+    const createBlueprint = document.getElementById("create-blueprint");
+    if (createBlueprint) {
+      createBlueprint.addEventListener("mousedown", () => {
+        if (!drawingInProgress && points.length > 1) {
+          // create extrusion from the blueprint after it has been created
+          points = createBlueprintFromShapeOutline(points, scene);
+        }
+        if (rectangleBlueprint) {
+          points = createBlueprintFromShapeOutline(
+            markupGroup.children[0].userData.rectanglePoints,
+            scene
+          );
+        }
+      });
+
+      // Stop observing once the element is found
+      observerCreateBlueprint.disconnect();
+    }
+  };
+
+  // Create a MutationObserver to watch for changes in the DOM
+  const observerCreateBlueprint = new MutationObserver(
+    addEventListenerToCreateBlueprint
+  );
+
+  // Start observing the document with the configured callback
+  observerCreateBlueprint.observe(document, { childList: true, subtree: true });
+
+  // Call the function once to check if the element is already in the DOM
+  addEventListenerToCreateBlueprint();
+
   // Edit Blueprint
   editBlueprintButton.domElement.addEventListener("mousedown", () => {
     console.log("edit blueprint");
@@ -430,7 +463,7 @@ export const createModelView = async () => {
         Object.is(blueprint.userData, extrusion.userData)
       );
       if (!hasExtrusion) {
-        createExtrusionFromBlueprint(blueprint.userData, scene);
+        createExtrusionFromBlueprint(blueprint.userData, scene, 12);
       }
     });
 
@@ -869,7 +902,10 @@ export const createModelView = async () => {
     updatedDimensions = [];
     oldLabels.forEach((label, index) => {
       if (index < 2) {
-        updatedDimensions.push(parseFloat(label.element.textContent));
+        const textContent = (label as CSS2DObject).element.textContent;
+        if (textContent !== null) {
+          updatedDimensions.push(parseFloat(textContent));
+        }
       }
     });
     console.log(updatedDimensions);

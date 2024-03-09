@@ -144,10 +144,10 @@ export function createBlueprintFromShapeOutline(
   }
 }
 
-export function createExtrusionFromBlueprint(blueprintShape: any, scene: any) {
+export function createExtrusionFromBlueprint(blueprintShape: any, scene: any, extrude: number) {
   let shape = blueprintShape;
 
-  const depth = -12;
+  const depth = -extrude;
 
   const extrudeSettings = {
     depth: depth,

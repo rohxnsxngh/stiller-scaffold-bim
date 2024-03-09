@@ -21,8 +21,8 @@ export const navStore = defineStore("navbar", {
 
 export const useStore = defineStore("component", {
   state: () => ({
-    length: 0,
-    width: 0,
+    length: "Antall meter",
+    width: "Antall meter",
   }),
   actions: {
     updateLength(value: any) {
