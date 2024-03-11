@@ -9,6 +9,7 @@
           type="text"
           placeholder="Antall meter"
           class="input input-sm input-bordered w-full max-w-xs mt-3"
+          v-model="height"
         />
         <div class="label">
           <span class="label-text-alt text-[#623CEA]"
@@ -77,3 +78,25 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { computed } from "vue";
+import { useStore } from "../store";
+
+export default {
+  setup() {
+    const componentStore = useStore();
+
+    // const depth = computed(() => componentStore.depth);
+    const height = computed({
+      // Make depth a computed property
+      get: () => componentStore.shedHeight,
+      set: (value) => componentStore.updateShedRoofHeight(value),
+    });
+
+    return {
+      height,
+    };
+  },
+};
+</script>

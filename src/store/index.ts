@@ -25,6 +25,7 @@ export const useStore = defineStore("component", {
     width: 0,
     depth: 0,
     height: 0,
+    shedHeight: 0,
   }),
   actions: {
     updateLength(value: any) {
@@ -38,6 +39,9 @@ export const useStore = defineStore("component", {
     },
     updateRoofHeight(value: any) {
       this.height = value;
+    },
+    updateShedRoofHeight(value: any) {
+      this.shedHeight = value;
     },
   },
 });

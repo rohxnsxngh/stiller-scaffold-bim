@@ -723,6 +723,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number, height
   const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
   let extrusionSettings;
+  console.error("blueprint state", blueprintHasBeenUpdated)
   if (blueprintHasBeenUpdated) {
     extrusionSettings = {
       bevelEnabled: true,
@@ -774,7 +775,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number, height
     extrudedMesh,
     blueprintState
   );
-  // blueprintHasBeenUpdated = false;
+  blueprintHasBeenUpdated = false;
 }
 
 function createRoofLabel(
@@ -990,8 +991,8 @@ function updateRoofGeometry(
   scene.add(extrudedMesh);
 }
 
-export function createShedRoof(child: any, scene: THREE.Scene, index: number) {
-  const height = 3;
+// TODO: fix rotation bug
+export function createShedRoof(child: any, scene: THREE.Scene, index: number, height: number) {
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   if (!blueprintHasBeenUpdated) {
     if (index == 0) {
