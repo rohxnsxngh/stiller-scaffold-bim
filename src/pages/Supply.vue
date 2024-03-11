@@ -33,21 +33,21 @@
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/RoofSection/FlatRoof.svg"
+              src="../assets/images/SupplySection/Tablecloth.svg"
               class="object-contain"
             />
             <p class="">Duk</p>
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/RoofSection/GableRoof.svg"
+              src="../assets/images/SupplySection/Presenting.svg"
               class="object-contain"
             />
             <p>Presenning</p>
           </div>
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
             <img
-              src="../assets/images/RoofSection/ShedRoof.svg"
+              src="../assets/images/SupplySection/ShrinkPlastic.svg"
               class="object-contain"
             />
             <p>Krympeplast</p>
