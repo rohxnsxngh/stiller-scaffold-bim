@@ -149,11 +149,15 @@
 
       <div class="card-actions justify-end">
         <div class="m-4">
-          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">
+          <div
+            class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
+            @click="goToPreviousPage"
+          >
             Tilbake
           </div>
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
+            @click="goToNextPage"
           >
             Neste
           </div>
@@ -182,6 +186,14 @@ export default {
     },
     toggleDrawer() {
       this.showDrawer = !this.showDrawer;
+    },
+    goToNextPage() {
+      // @ts-ignore
+      window.setActiveSection("supply");
+    },
+    goToPreviousPage() {
+      // @ts-ignore
+      window.setActiveSection("roof");
     },
   },
 };

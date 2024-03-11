@@ -56,7 +56,10 @@
 
       <div class="bg-[#24242F] rounded flex flex-row my-8">
         <div>
-          <img src="../assets/images/GeneralSection/Lightbulb.svg" alt="Lightbulb" />
+          <img
+            src="../assets/images/GeneralSection/Lightbulb.svg"
+            alt="Lightbulb"
+          />
         </div>
         <div>
           <p class="text-sm mt-3 text-[#9E9E9E]">
@@ -189,9 +192,29 @@
           <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">
             Avslutt
           </div>
-          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]">Neste</div>
+          <div
+            class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
+            @click="goToNextPage"
+          >
+            Neste
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  components: {},
+  data() {
+    return {};
+  },
+  methods: {
+    goToNextPage() {
+      // @ts-ignore
+      window.setActiveSection("blueprint");
+    },
+  },
+};
+</script>
