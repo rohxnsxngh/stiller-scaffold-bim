@@ -70,7 +70,7 @@
         <div class="label">
           <span class="label-text text-sm">blåkopi</span>
         </div>
-        <div class="btn w-full" id="create-blueprint"> <i class="material-icons">dashboard</i></div>
+        <div class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]" id="create-blueprint"> <i class="material-icons">dashboard</i></div>
       </label>
     </div>
   </div>
@@ -97,7 +97,7 @@
         <div class="label">
           <span class="label-text text-sm">ekstrudere</span>
         </div>
-        <div class="btn w-full" id="create-extrusion"> <i class="material-icons">expand</i></div>
+        <div class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]" id="create-extrusion"> <i class="material-icons">expand</i></div>
       </label>
     </div>
   </div>

@@ -517,7 +517,50 @@ export const createModelView = async () => {
           extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
       );
       if (!hasRoof) {
-        createRoof(extrusion, scene, 0);
+        createRoof(extrusion, scene, 0, 3);
+      }
+    });
+
+    roofs = [];
+    extrusions = [];
+  });
+
+  observeElementAndAddEventListener("create-gable-roof", "mousedown", () => {
+    let extrusions: THREE.Mesh[] = [];
+    let roofs: THREE.Mesh[] = [];
+
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.name === "roof" || child.name === "shedRoof") {
+          roofs.push(child);
+        } else if (child.name === "extrusion") {
+          extrusions.push(child);
+        }
+      }
+      if (
+        child.name === "rectangleExtrusionLabel" &&
+        child instanceof CSS2DObject
+      ) {
+        child.element.style.pointerEvents = "none";
+        child.visible = false;
+      }
+    });
+
+    console.log("roofs", roofs);
+    console.log("extrusions", extrusions);
+
+    extrusions.forEach((extrusion) => {
+      let hasRoof = roofs.some(
+        (roof) =>
+          extrusion.userData.currentPoint.x === roof.userData.currentPoint.x ||
+          extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
+      );
+      if (!hasRoof) {
+        const heightValue = componentStore.height;
+        console.log(heightValue);
+        if (heightValue !== 0) {
+          createRoof(extrusion, scene, 0, heightValue);
+        }
       }
     });
 
@@ -696,7 +739,7 @@ export const createModelView = async () => {
               extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
           );
           if (!hasRoof) {
-            createRoof(extrusion, scene, roofToggleState);
+            createRoof(extrusion, scene, roofToggleState, 3);
           }
         });
 

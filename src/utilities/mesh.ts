@@ -4,13 +4,18 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   distanceFromPointToLine,
   measureLineLength,
+  observeElementAndAddEventListener,
   resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial } from "./material";
 import {
+  setDeletionInProgress,
   setDrawingInProgress,
+  setDrawingScaffoldingInProgress,
 } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
+import { cameraEnableOrbitalFunctionality } from "./camera";
+import { gsap } from "gsap";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -409,7 +414,9 @@ function attachLabelChangeHandler(
 
   labelElement.addEventListener("mouseenter", () => {
     document.body.style.cursor = "grab";
+    // setDeletionInProgress(false);
     setDrawingInProgress(false);
+    // setDrawingScaffoldingInProgress(false);
   });
 
   labelElement.addEventListener("mouseleave", () => {
@@ -606,7 +613,7 @@ function updateRectangleBlueprintGeometry(
 }
 
 // create roof from extrusion shape
-export function createRoof(child: any, scene: THREE.Scene, index: number) {
+export function createRoof(child: any, scene: THREE.Scene, index: number, height: number) {
   // Calculate the midpoint between the two points
   const midpoint = new THREE.Vector2();
   midpoint
@@ -629,7 +636,7 @@ export function createRoof(child: any, scene: THREE.Scene, index: number) {
   const perpendicular = new THREE.Vector2(-direction.y, direction.x);
 
   // Scale the perpendicular vector by the desired distance (10 units)
-  const scaledPerpendicular = perpendicular.clone().multiplyScalar(-3);
+  const scaledPerpendicular = perpendicular.clone().multiplyScalar(-height);
 
   // Add the scaled perpendicular vector to the midpoint to get the third point
   const thirdPoint = midpoint.clone().add(scaledPerpendicular);
