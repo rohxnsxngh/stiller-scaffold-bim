@@ -190,10 +190,26 @@ export default {
     goToNextPage() {
       // @ts-ignore
       window.setActiveSection("supply");
+      const svgElement = document.getElementById("scaffold-svg");
+      const svgElementLine = document.getElementById("scaffold-svg-line");
+      if (svgElement && svgElementLine) {
+        svgElement.style.stroke = "#23E6A1";
+        svgElementLine.style.stroke = "#23E6A1";
+      } else {
+        console.error("timeline not found");
+      }
     },
     goToPreviousPage() {
       // @ts-ignore
       window.setActiveSection("roof");
+      const svgElement = document.getElementById("roof-svg");
+      const svgElementLine = document.getElementById("roof-svg-line");
+      if (svgElement && svgElementLine) {
+        svgElement.style.stroke = "white";
+        svgElementLine.style.stroke = "white";
+      } else {
+        console.error("timeline not found");
+      }
     },
   },
 };

@@ -214,6 +214,14 @@ export default {
     goToNextPage() {
       // @ts-ignore
       window.setActiveSection("blueprint");
+      const svgElement = document.getElementById("general-svg");
+      const svgElementLine = document.getElementById("general-svg-line");
+      if (svgElement && svgElementLine) {
+        svgElement.style.stroke = "#23E6A1";
+        svgElementLine.style.stroke = "#23E6A1";
+      } else {
+        console.error("timeline not found");
+      }
     },
   },
 };

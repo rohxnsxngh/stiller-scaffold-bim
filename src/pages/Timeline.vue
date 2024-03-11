@@ -10,6 +10,7 @@
               class="w-5 h-5"
               stroke="white"
               stroke-width="1"
+              id="general-svg"
             >
               <path
                 fill="none"
@@ -25,14 +26,15 @@
               viewBox="0 0 100 10"
               width="200"
               height="10"
+              id="general-svg-line"
+              stroke="white"
+              stroke-width="2"
             >
               <line
                 x1="-32"
                 y1="0"
                 x2="100"
                 y2="0"
-                stroke="white"
-                stroke-width="2"
               />
             </svg>
           </div>
@@ -49,6 +51,7 @@
               class="w-5 h-5"
               stroke="white"
               stroke-width="1"
+              id="blueprint-svg"
             >
               <path
                 fill="none"
@@ -64,14 +67,15 @@
               viewBox="0 0 100 10"
               width="102"
               height="10"
+              stroke="white"
+              stroke-width="2"
+              id="blueprint-svg-line"
             >
               <line
                 x1="18"
                 y1="0"
                 x2="102"
                 y2="0"
-                stroke="white"
-                stroke-width="2"
               />
             </svg>
           </div>
@@ -88,6 +92,7 @@
               class="w-5 h-5"
               stroke="white"
               stroke-width="1"
+              id="roof-svg"
             >
               <path
                 fill="none"
@@ -103,14 +108,15 @@
               viewBox="0 0 100 10"
               width="100"
               height="10"
+              stroke="white"
+              stroke-width="2"
+              id="roof-svg-line"
             >
               <line
                 x1="18"
                 y1="0"
                 x2="64"
                 y2="0"
-                stroke="white"
-                stroke-width="2"
               />
             </svg>
           </div>
@@ -127,6 +133,7 @@
               class="w-5 h-5"
               stroke="white"
               stroke-width="1"
+              id="scaffold-svg"
             >
               <path
                 fill="none"
@@ -142,14 +149,15 @@
               viewBox="0 0 100 10"
               width="100"
               height="10"
+              stroke="white"
+              stroke-width="2"
+              id="scaffold-svg-line"
             >
               <line
                 x1="18"
                 y1="0"
                 x2="86"
                 y2="0"
-                stroke="white"
-                stroke-width="2"
               />
             </svg>
           </div>
@@ -166,6 +174,7 @@
               class="w-5 h-5"
               stroke="white"
               stroke-width="1"
+              id="supply-svg"
             >
               <path
                 fill="none"
