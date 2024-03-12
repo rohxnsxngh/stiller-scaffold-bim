@@ -4,18 +4,13 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   distanceFromPointToLine,
   measureLineLength,
-  observeElementAndAddEventListener,
   resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial } from "./material";
 import {
-  setDeletionInProgress,
   setDrawingInProgress,
-  setDrawingScaffoldingInProgress,
 } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
-import { cameraEnableOrbitalFunctionality } from "./camera";
-import { gsap } from "gsap";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -1478,7 +1473,7 @@ export function moveBlueprint(
 
       const xDisplacement = newLocation.x - originalLocation.x;
       const yDisplacement = newLocation.z - originalLocation.z;
-      const previousShape = event.object.userData;
+      const previousShape = event.object.userData.shape;
       if (previousShape instanceof THREE.Shape) {
         const newShape = new THREE.Shape();
         previousShape.curves.forEach((curve) => {
@@ -1494,7 +1489,7 @@ export function moveBlueprint(
           }
         });
 
-        event.object.userData = newShape;
+        event.object.userData.shape = newShape;
       }
     }
 

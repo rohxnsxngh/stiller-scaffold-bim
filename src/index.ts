@@ -446,8 +446,6 @@ export const createModelView = async () => {
         Object.is(blueprint.userData, extrusion.userData)
       );
       if (!hasExtrusion) {
-        // const depthValue = componentStore.depth;
-        // console.log(depthValue)
         createExtrusionFromBlueprint(blueprint.userData, scene, 12);
       }
     });
@@ -642,8 +640,8 @@ export const createModelView = async () => {
           extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
       );
       if (!hasRoof) {
-        const heightValue = componentStore.shedHeight;
-        console.log(typeof heightValue);
+        const heightValue = parseFloat(componentStore.shedHeight as unknown as string);
+        console.warn(heightValue, typeof heightValue);
         if (heightValue !== 0) {
           createShedRoof(extrusion, scene, 0, heightValue);
         }
