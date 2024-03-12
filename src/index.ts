@@ -13,6 +13,7 @@ import {
   editingBlueprint,
   setEditingBlueprint,
   createBlueprintFromMarkup,
+  createFlatRoof,
 } from "./utilities/mesh";
 import {
   createIndividualScaffoldOnClick,
@@ -568,6 +569,45 @@ export const createModelView = async () => {
     extrusions = [];
   });
 
+  observeElementAndAddEventListener("create-flat-roof", "mousedown", () => {
+    let extrusions: THREE.Mesh[] = [];
+    let roofs: THREE.Mesh[] = [];
+
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.name === "roof" || child.name === "shedRoof") {
+          roofs.push(child);
+        } else if (child.name === "extrusion") {
+          extrusions.push(child);
+        }
+      }
+      if (
+        child.name === "rectangleExtrusionLabel" &&
+        child instanceof CSS2DObject
+      ) {
+        child.element.style.pointerEvents = "none";
+        child.visible = false;
+      }
+    });
+
+    console.log("roofs", roofs);
+    console.log("extrusions", extrusions);
+
+    extrusions.forEach((extrusion) => {
+      let hasRoof = roofs.some(
+        (roof) =>
+          extrusion.userData.currentPoint.x === roof.userData.currentPoint.x ||
+          extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
+      );
+      if (!hasRoof) {
+        createFlatRoof(extrusion, scene);
+      }
+    });
+
+    roofs = [];
+    extrusions = [];
+  });
+
   createShedRoofButton.domElement.addEventListener("mousedown", () => {
     let extrusions: THREE.Mesh[] = [];
     let roofs: THREE.Mesh[] = [];
@@ -640,7 +680,9 @@ export const createModelView = async () => {
           extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
       );
       if (!hasRoof) {
-        const heightValue = parseFloat(componentStore.shedHeight as unknown as string);
+        const heightValue = parseFloat(
+          componentStore.shedHeight as unknown as string
+        );
         console.warn(heightValue, typeof heightValue);
         if (heightValue !== 0) {
           createShedRoof(extrusion, scene, 0, heightValue);

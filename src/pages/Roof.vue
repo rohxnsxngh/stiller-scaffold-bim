@@ -35,6 +35,7 @@
           <div
             class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
             @click="showFlatRoof"
+            id="create-flat-roof"
           >
             <img
               src="../assets/images/RoofSection/FlatRoof.svg"

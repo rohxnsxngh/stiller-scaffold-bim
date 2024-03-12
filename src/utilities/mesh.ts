@@ -7,9 +7,7 @@ import {
   resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial } from "./material";
-import {
-  setDrawingInProgress,
-} from "./toolbar";
+import { setDrawingInProgress } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
 
 // Create Shape Outline
@@ -1273,7 +1271,7 @@ function updateShedRoofGeometry(
   label: CSS2DObject
 ) {
   const height = parseFloat(triangleHeightOffsetDistance as unknown as string);
-  const rectShape = child.userData.shape
+  const rectShape = child.userData.shape;
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   if (!child.userData.blueprintHasBeenUpdated) {
     if (index == 0) {
@@ -1345,19 +1343,10 @@ function updateShedRoofGeometry(
 
   // Create a triangle using these three points
   const shape = new THREE.Shape();
-  shape.moveTo(
-    rectShape.curves[index].v1.x,
-    rectShape.curves[index].v1.y
-  );
-  shape.lineTo(
-    rectShape.curves[index].v2.x,
-    rectShape.curves[index].v2.y
-  );
+  shape.moveTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
+  shape.lineTo(rectShape.curves[index].v2.x, rectShape.curves[index].v2.y);
   shape.lineTo(thirdPoint.x, thirdPoint.y);
-  shape.lineTo(
-    rectShape.curves[index].v1.x,
-    rectShape.curves[index].v1.y
-  ); // close the shape
+  shape.lineTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y); // close the shape
 
   const edgeDirection = new THREE.Vector3()
     .subVectors(endPoint, startPoint)
@@ -1437,6 +1426,38 @@ function updateShedRoofGeometry(
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
   scene.add(extrudedMesh);
+}
+
+export function createFlatRoof(child: any, scene: THREE.Scene) {
+  console.log("create flat roof", child.userData);
+  const extrudeHeight = -1 * child.geometry.parameters.options.depth;
+  const shape = child.userData.shape;
+
+  // Create a new geometry from the shape
+  const geometry = new THREE.ShapeGeometry(shape);
+
+  // Create a material for the roof
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff, // You can change the color as needed
+    side: THREE.DoubleSide,
+  });
+
+  // Create a mesh using the geometry and material
+  const roofMesh = new THREE.Mesh(geometry, material);
+
+  // Position the roof mesh above the child object
+  roofMesh.position.y = extrudeHeight + 0.025;
+  roofMesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+
+  // Add the roof mesh to the scene
+  scene.add(roofMesh);
+
+  // You can also set the name and userData if needed
+  roofMesh.name = "flatRoof";
+  roofMesh.userData = {
+    shape: shape,
+    blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
+  };
 }
 
 // move blueprint
