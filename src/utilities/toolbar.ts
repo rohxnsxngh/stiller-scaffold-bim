@@ -388,12 +388,12 @@ export const createToolbar = (
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
-  })
+  });
 
   observeElementAndAddEventListener("create-blueprint", "mouseover", () => {
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
-  })
+  });
 
   // create blueprint from outline
   const editBlueprintButton = new OBC.Button(components, {
@@ -846,12 +846,18 @@ export const createToolbar = (
     "startDrawingRectangle",
     "mousedown",
     () => {
+      console.error("drawiong blueprint")
       document.body.style.cursor = "crosshair";
       startDrawing = false;
+      scene.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+          scene.remove(child);
+        }
+      });
+      cameraTopView(gsap, components.camera);
       setDrawingInProgress(false);
       setDeletionInProgress(false);
       setDrawingScaffoldingInProgress(false);
-      cameraTopView(gsap, components.camera);
       cameraDisableOrbitalFunctionality(gsap, components.camera);
     }
   );

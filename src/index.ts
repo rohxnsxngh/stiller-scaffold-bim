@@ -12,6 +12,7 @@ import {
   editBlueprint,
   editingBlueprint,
   setEditingBlueprint,
+  createBlueprintFromMarkup,
 } from "./utilities/mesh";
 import {
   createIndividualScaffoldOnClick,
@@ -384,8 +385,9 @@ export const createModelView = async () => {
       points = createBlueprintFromShapeOutline(points, scene);
     }
     if (rectangleBlueprint) {
-      points = createBlueprintFromShapeOutline(
+      points = createBlueprintFromMarkup(
         markupGroup.children[0].userData.rectanglePoints,
+        markupGroup.children[0].userData.blueprintHasBeenUpdated,
         scene
       );
     }

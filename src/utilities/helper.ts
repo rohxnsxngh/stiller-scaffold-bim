@@ -306,7 +306,8 @@ export function observeElementAndAddEventListener(
      if (element) {
        console.log(`Element ${elementId} found, adding event listener`);
        element.addEventListener(eventType, eventHandler);
-       observer.disconnect(); // Stop observing once the element is found
+      // optional I am disconnecting observer. this should be used when an element will never be used again
+      //  observer.disconnect(); // Stop observing once the element is found
      } else {
        console.log(`Element ${elementId} not found yet`);
      }
