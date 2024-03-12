@@ -137,7 +137,7 @@ export function createBlueprintFromShapeOutline(
       meshShape.rotateX(Math.PI / 2);
       meshShape.position.y = 0.025;
       meshShape.name = "blueprint";
-      meshShape.userData = shape;
+      meshShape.userData = { shape: shape, blueprintHasBeenUpdated: false };
       scene.add(meshShape);
     }
 
@@ -223,8 +223,6 @@ export function createExtrusionFromBlueprint(
 
   // Create extruded geometry
   const geometryExtrude = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
-  console.log(shape);
 
   // Material for the extruded mesh
   const materialExtrude = new THREE.MeshStandardMaterial({
@@ -818,7 +816,6 @@ export function createRoof(
     shape: shape,
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
   };
-  const blueprintState = blueprintHasBeenUpdated;
   scene.add(extrudedMesh);
 
   const label = createRoofLabel(
@@ -835,8 +832,7 @@ export function createRoof(
     midpoint,
     scene,
     triangle,
-    extrudedMesh,
-    blueprintState
+    extrudedMesh
   );
   blueprintHasBeenUpdated = false;
 }
@@ -880,8 +876,7 @@ function attachRoofLabelChangeHandler(
   midpoint: THREE.Vector2,
   scene: THREE.Scene,
   triangleMesh: THREE.Mesh,
-  extrudedRoofMesh: THREE.Mesh,
-  blueprintState: boolean
+  extrudedRoofMesh: THREE.Mesh
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
@@ -906,7 +901,6 @@ function attachRoofLabelChangeHandler(
         scene,
         triangleMesh,
         extrudedRoofMesh,
-        blueprintState,
         label
       );
     }
@@ -921,7 +915,6 @@ function updateRoofGeometry(
   scene: THREE.Scene,
   triangleMesh: THREE.Mesh,
   extrudedRoofMesh: THREE.Mesh,
-  blueprintState: boolean,
   label: CSS2DObject
 ) {
   // Calculate the offset based on the desired triangle height
@@ -929,14 +922,11 @@ function updateRoofGeometry(
     triangleHeightOffsetDistance as unknown as string
   );
 
-  const rectShape = child.userData.shape
+  const rectShape = child.userData.shape;
 
   // Recalculate the third point with the new offset factor
   const direction = new THREE.Vector2();
-  direction.subVectors(
-    rectShape.curves[index].v2,
-    rectShape.curves[index].v1
-  );
+  direction.subVectors(rectShape.curves[index].v2, rectShape.curves[index].v1);
   // Normalize the direction vector to get the unit vector
   direction.normalize();
 
@@ -971,19 +961,10 @@ function updateRoofGeometry(
 
   // Create a triangle using these three points
   const shape = new THREE.Shape();
-  shape.moveTo(
-    rectShape.curves[index].v1.x,
-    rectShape.curves[index].v1.y
-  );
-  shape.lineTo(
-    rectShape.curves[index].v2.x,
-    rectShape.curves[index].v2.y
-  );
+  shape.moveTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
+  shape.lineTo(rectShape.curves[index].v2.x, rectShape.curves[index].v2.y);
   shape.lineTo(thirdPoint.x, thirdPoint.y);
-  shape.lineTo(
-    rectShape.curves[index].v1.x,
-    rectShape.curves[index].v1.y
-  ); // close the shape
+  shape.lineTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y); // close the shape
 
   const edgeDirection = new THREE.Vector3()
     .subVectors(endPoint, startPoint)
@@ -1064,65 +1045,66 @@ export function createShedRoof(
   height: number
 ) {
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
-  if (!blueprintHasBeenUpdated) {
+  const rectShape = child.userData.shape;
+  if (!child.userData.blueprintHasBeenUpdated) {
     if (index == 0) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x + height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x + height,
+        rectShape.curves[index].v1.y
       );
     }
     if (index == 1) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y - height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y - height
       );
     }
     if (index == 2) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x - height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x - height,
+        rectShape.curves[index].v1.y
       );
     }
     if (index == 3) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y + height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y + height
       );
     }
   }
   if (blueprintHasBeenUpdated) {
     if (index == 0) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y - height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y - height
       );
     }
     if (index == 1) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x + height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x + height,
+        rectShape.curves[index].v1.y
       );
     }
     if (index == 2) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y + height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y + height
       );
     }
     if (index == 3) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x - height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x - height,
+        rectShape.curves[index].v1.y
       );
     }
   }
 
   const triangleHeightOffsetDistance = Math.round(
     distanceFromPointToLine(
-      child.userData.curves[index].v1.x,
-      child.userData.curves[index].v1.y,
-      child.userData.curves[index].v2.x,
-      child.userData.curves[index].v2.y,
+      rectShape.curves[index].v1.x,
+      rectShape.curves[index].v1.y,
+      rectShape.curves[index].v2.x,
+      rectShape.curves[index].v2.y,
       thirdPoint.x,
       thirdPoint.y
     )
@@ -1130,21 +1112,12 @@ export function createShedRoof(
 
   // Create a right triangle using the two points and the third point
   const shape = new THREE.Shape();
-  shape.moveTo(
-    child.userData.curves[index].v1.x,
-    child.userData.curves[index].v1.y
-  );
-  shape.lineTo(
-    child.userData.curves[index].v2.x,
-    child.userData.curves[index].v2.y
-  );
+  shape.moveTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
+  shape.lineTo(rectShape.curves[index].v2.x, rectShape.curves[index].v2.y);
   shape.lineTo(thirdPoint.x, thirdPoint.y);
-  shape.lineTo(
-    child.userData.curves[index].v1.x,
-    child.userData.curves[index].v1.y
-  ); // close the shape
+  shape.lineTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y); // close the shape
 
-  console.log("child", child.userData);
+  console.log("child", rectShape);
   console.log("shape", shape);
   console.log("third point", thirdPoint);
   console.log("height of the third point", triangleHeightOffsetDistance);
@@ -1152,14 +1125,14 @@ export function createShedRoof(
   const extrudeHeight = -1 * child.geometry.parameters.options.depth;
 
   const startPoint = new THREE.Vector3(
-    child.userData.curves[index].v1.x,
+    rectShape.curves[index].v1.x,
     extrudeHeight,
-    child.userData.curves[index].v1.y
+    rectShape.curves[index].v1.y
   );
   const endPoint = new THREE.Vector3(
-    child.userData.curves[index].v2.x,
+    rectShape.curves[index].v2.x,
     extrudeHeight,
-    child.userData.curves[index].v2.y
+    rectShape.curves[index].v2.y
   );
 
   const edgeDirection = new THREE.Vector3()
@@ -1191,22 +1164,23 @@ export function createShedRoof(
   let nextPoint: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
   if (index == 3) {
     nextPoint = new THREE.Vector3(
-      child.userData.curves[0].v2.x,
+      rectShape.curves[0].v2.x,
       extrudeHeight,
-      child.userData.curves[0].v2.y
+      rectShape.curves[0].v2.y
     );
   } else {
     nextPoint = new THREE.Vector3(
-      child.userData.curves[index + 1].v2.x,
+      rectShape.curves[index + 1].v2.x,
       extrudeHeight,
-      child.userData.curves[index + 1].v2.y
+      rectShape.curves[index + 1].v2.y
     );
   }
 
   const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
   let extrusionSettings;
-  if (blueprintHasBeenUpdated) {
+  console.error("blueprint state", blueprintHasBeenUpdated);
+  if (child.userData.blueprintHasBeenUpdated) {
     extrusionSettings = {
       bevelEnabled: true,
       depth: -extrusionDistance,
@@ -1236,8 +1210,10 @@ export function createShedRoof(
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "shedRoof";
-  extrudedMesh.userData = shape;
-  const blueprintState = blueprintHasBeenUpdated;
+  extrudedMesh.userData = {
+    shape: shape,
+    blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
+  };
   scene.add(extrudedMesh);
 
   const label = createRoofLabel(
@@ -1252,8 +1228,7 @@ export function createShedRoof(
     index,
     scene,
     triangle,
-    extrudedMesh,
-    blueprintState
+    extrudedMesh
   );
 }
 
@@ -1263,8 +1238,7 @@ function attachShedRoofLabelChangeHandler(
   index: number,
   scene: THREE.Scene,
   triangleMesh: THREE.Mesh,
-  extrudedRoofMesh: THREE.Mesh,
-  blueprintState: boolean
+  extrudedRoofMesh: THREE.Mesh
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
@@ -1288,7 +1262,6 @@ function attachShedRoofLabelChangeHandler(
         scene,
         triangleMesh,
         extrudedRoofMesh,
-        blueprintState,
         label
       );
     }
@@ -1302,60 +1275,59 @@ function updateShedRoofGeometry(
   scene: THREE.Scene,
   triangleMesh: THREE.Mesh,
   extrudedRoofMesh: THREE.Mesh,
-  blueprintState: boolean,
   label: CSS2DObject
 ) {
   const height = parseFloat(triangleHeightOffsetDistance as unknown as string);
+  const rectShape = child.userData.shape
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
-  if (!blueprintState) {
+  if (!child.userData.blueprintHasBeenUpdated) {
     if (index == 0) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x + height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x + height,
+        rectShape.curves[index].v1.y
       );
     }
     if (index == 1) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y - height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y - height
       );
     }
     if (index == 2) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x - height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x - height,
+        rectShape.curves[index].v1.y
       );
     }
     if (index == 3) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y + height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y + height
       );
     }
-  }
-  if (blueprintState) {
+  } else {
     if (index == 0) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y - height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y - height
       );
     }
     if (index == 1) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x + height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x + height,
+        rectShape.curves[index].v1.y
       );
     }
     if (index == 2) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x,
-        child.userData.curves[index].v1.y + height
+        rectShape.curves[index].v1.x,
+        rectShape.curves[index].v1.y + height
       );
     }
     if (index == 3) {
       thirdPoint = new THREE.Vector2(
-        child.userData.curves[index].v1.x - height,
-        child.userData.curves[index].v1.y
+        rectShape.curves[index].v1.x - height,
+        rectShape.curves[index].v1.y
       );
     }
   }
@@ -1366,30 +1338,30 @@ function updateShedRoofGeometry(
   const extrudeHeight = -1 * child.geometry.parameters.options.depth;
 
   const startPoint = new THREE.Vector3(
-    child.userData.curves[index].v1.x,
+    rectShape.curves[index].v1.x,
     extrudeHeight,
-    child.userData.curves[index].v1.y
+    rectShape.curves[index].v1.y
   );
   const endPoint = new THREE.Vector3(
-    child.userData.curves[index].v2.x,
+    rectShape.curves[index].v2.x,
     extrudeHeight,
-    child.userData.curves[index].v2.y
+    rectShape.curves[index].v2.y
   );
 
   // Create a triangle using these three points
   const shape = new THREE.Shape();
   shape.moveTo(
-    child.userData.curves[index].v1.x,
-    child.userData.curves[index].v1.y
+    rectShape.curves[index].v1.x,
+    rectShape.curves[index].v1.y
   );
   shape.lineTo(
-    child.userData.curves[index].v2.x,
-    child.userData.curves[index].v2.y
+    rectShape.curves[index].v2.x,
+    rectShape.curves[index].v2.y
   );
   shape.lineTo(thirdPoint.x, thirdPoint.y);
   shape.lineTo(
-    child.userData.curves[index].v1.x,
-    child.userData.curves[index].v1.y
+    rectShape.curves[index].v1.x,
+    rectShape.curves[index].v1.y
   ); // close the shape
 
   const edgeDirection = new THREE.Vector3()
@@ -1422,22 +1394,23 @@ function updateShedRoofGeometry(
   let nextPoint: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
   if (index == 3) {
     nextPoint = new THREE.Vector3(
-      child.userData.curves[0].v2.x,
+      rectShape.curves[0].v2.x,
       extrudeHeight,
-      child.userData.curves[0].v2.y
+      rectShape.curves[0].v2.y
     );
   } else {
     nextPoint = new THREE.Vector3(
-      child.userData.curves[index + 1].v2.x,
+      rectShape.curves[index + 1].v2.x,
       extrudeHeight,
-      child.userData.curves[index + 1].v2.y
+      rectShape.curves[index + 1].v2.y
     );
   }
 
   const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
   let extrusionSettings;
-  if (blueprintState) {
+  console.error("blueprint state", blueprintHasBeenUpdated);
+  if (child.userData.blueprintHasBeenUpdated) {
     extrusionSettings = {
       bevelEnabled: true,
       depth: -extrusionDistance,
@@ -1452,7 +1425,6 @@ function updateShedRoofGeometry(
       path: extrusionPath,
     };
   }
-
   const extrudeGeometry = new THREE.ExtrudeGeometry(
     shape, // The shape to extrude
     extrusionSettings // Extrusion settings
