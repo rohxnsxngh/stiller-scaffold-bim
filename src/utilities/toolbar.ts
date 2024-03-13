@@ -10,6 +10,7 @@ import {
 import {
   hideAllCSS2DObjects,
   observeElementAndAddEventListener,
+  removeHighlightMesh,
 } from "./helper";
 import MountPoint from "../pages/MountPoint.vue";
 import Timeline from "../pages/Timeline.vue";
@@ -82,6 +83,7 @@ export const createToolbar = (
   topToolBar.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
     setPlaceScaffoldIndividually(false);
+    setDrawingScaffoldingInProgress(false);
   });
 
   // Vue instance inside of top tool bar
@@ -621,6 +623,22 @@ export const createToolbar = (
   drawScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawScaffoldButton.domElement.classList.add("hover:bg-slate-300");
 
+  observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
+    document.body.style.cursor = "auto";
+    removeHighlightMesh(scene)
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
+  observeElementAndAddEventListener("draw-scaffold", "mouseover", () => {
+    document.body.style.cursor = "auto";
+    removeHighlightMesh(scene)
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(true);
+  });
+
   // generate scaffolding outline
   const generateScaffoldOutlineButton = new OBC.Button(components, {
     materialIconName: "aspect_ratio",
@@ -791,10 +809,23 @@ export const createToolbar = (
   drawerToolBar.addChild(drawerMenuButton);
   drawerMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
+    setPlaceScaffoldIndividually(false);
+    setDrawingScaffoldingInProgress(false);
+    setDrawingInProgressSwitch(false);
     drawer.visible = !drawer.visible;
   });
   drawerMenuButton.domElement.addEventListener("mouseover", () => {
+    removeHighlightMesh(scene);
     setDrawingInProgress(false);
+    setPlaceScaffoldIndividually(false);
+    setDrawingScaffoldingInProgress(false);
+    setDrawingInProgressSwitch(false);
+  });
+  drawerMenuButton.domElement.addEventListener("mouseleave", () => {
+    setDrawingInProgress(false);
+    setPlaceScaffoldIndividually(false);
+    setDrawingScaffoldingInProgress(false);
+    setDrawingInProgressSwitch(false);
   });
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawerMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -846,7 +877,7 @@ export const createToolbar = (
     "startDrawingRectangle",
     "mousedown",
     () => {
-      console.error("drawiong blueprint")
+      console.error("drawiong blueprint");
       document.body.style.cursor = "crosshair";
       startDrawing = false;
       scene.traverse((child) => {

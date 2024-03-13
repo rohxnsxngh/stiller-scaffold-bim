@@ -33,41 +33,6 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-8">
-        <div>
-          <label class="form-control w-full max-w-xs">
-            <div class="label">
-              <span class="label-text"
-                >Tast inn avstand fra vegg
-                <span class="label-text text-xs"
-                  >(19 cm - 29 cm er standard)
-                </span>
-              </span>
-            </div>
-            <input
-              type="text"
-              placeholder="Antall meter"
-              class="input input-sm input-bordered w-full max-w-xs"
-            />
-            <div class="label"></div>
-          </label>
-        </div>
-
-        <div>
-          <label class="form-control w-full max-w-xs">
-            <div class="label">
-              <span class="label-text">Antall stillas etasjer</span>
-            </div>
-            <div class="flex flex-row gap-1 border-black">
-              <div class="btn text-2xl w-1/12" @click="decrement">-</div>
-              <div class="btn text-2xl">{{ count }}</div>
-              <div class="btn text-2xl w-1/12" @click="increment">+</div>
-            </div>
-            <div class="label"></div>
-          </label>
-        </div>
-      </div>
-
       <div class="bg-[#24242F] rounded flex flex-row my-4">
         <div>
           <img
@@ -86,11 +51,12 @@
 
       <div class="card-actions justify-end">
         <div class="m-4">
-          <div class="btn btn-sm mr-4 border-1 border-white text-white">
+          <div class="btn btn-sm mr-4 border-1 border-white text-white"  id="reset-scaffolding">
             Reset
           </div>
           <div
             class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin"
+            id="autogenerate-scaffolding"
           >
             <img
               src="../assets/images/ScaffoldSection/MagicWand.svg"
@@ -104,7 +70,7 @@
 
       <div class="bg-[#24242F] rounded my-4">
         <div class="grid grid-cols-3">
-          <div class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2">
+          <div class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2" id="draw-scaffold">
             <img
               src="../assets/images/ScaffoldSection/DrawScaffoldingOutline.svg"
               class="object-contain"
@@ -145,6 +111,41 @@
           </div> -->
         <!-- Scrollable content -->
         <!-- Add your content here -->
+      </div>
+
+      <div class="grid grid-cols-2 gap-8">
+        <div>
+          <label class="form-control w-full max-w-xs">
+            <div class="label">
+              <span class="label-text"
+                >Tast inn avstand fra vegg
+                <span class="label-text text-xs"
+                  >(19 cm - 29 cm er standard)
+                </span>
+              </span>
+            </div>
+            <input
+              type="text"
+              placeholder="Antall meter"
+              class="input input-sm input-bordered w-full max-w-xs"
+            />
+            <div class="label"></div>
+          </label>
+        </div>
+
+        <div>
+          <label class="form-control w-full max-w-xs">
+            <div class="label">
+              <span class="label-text">Antall stillas etasjer</span>
+            </div>
+            <div class="flex flex-row gap-1 border-black">
+              <div class="btn text-2xl w-1/12" @click="decrement">-</div>
+              <div class="btn text-2xl">{{ count }}</div>
+              <div class="btn text-2xl w-1/12" @click="increment">+</div>
+            </div>
+            <div class="label"></div>
+          </label>
+        </div>
       </div>
 
       <div class="card-actions justify-end">

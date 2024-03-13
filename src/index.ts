@@ -47,7 +47,9 @@ import {
   calculateTransformedBoundingBox,
   deleteObject,
   disableOrbitControls,
+  hideAllCSS2DObjects,
   observeElementAndAddEventListener,
+  removeHighlightMesh,
   resetScene,
   setInvisibleExceptSingularObject,
   // createBoundingBoxVisualizationFromBox,
@@ -901,6 +903,22 @@ export const createModelView = async () => {
     }
   });
 
+  observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
+    console.log("draw scaffolding")
+    setPlaceScaffoldIndividually(false);
+    if (drawingScaffoldingInProgress) {
+      // create blueprint on screen after the shape has been outlined by the user
+      console.log("creating scaffolding", scene);
+      createScaffoldingShapeIsOutlined(
+        intersects,
+        points,
+        highlightMesh,
+        scene,
+        cube
+      );
+    }
+  })
+
   placeScaffoldButton.domElement.addEventListener("mousedown", async () => {
     console.log("place scaffold individually");
     setPlaceScaffoldIndividually(true);
@@ -910,6 +928,7 @@ export const createModelView = async () => {
     console.log("generate scaffolding");
     generateScaffolding();
   });
+
   async function generateScaffolding() {
     const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(
       1.57,
@@ -934,6 +953,42 @@ export const createModelView = async () => {
         generateScaffoldOutline(child, scene);
       }
     });
+  });
+
+  // autogenerate scaffolding
+  observeElementAndAddEventListener(
+    "autogenerate-scaffolding",
+    "mousedown",
+    () => {
+      scene.traverse((child: any) => {
+        if (child instanceof THREE.Mesh && child.name === "blueprint") {
+          generateScaffoldOutline(child, scene);
+        }
+      });
+      console.log("generate scaffolding");
+      generateScaffolding();
+    }
+  );
+
+  // reset all scaffolding
+  observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
+    const scaffoldingObjectsToRemove: THREE.Object3D<THREE.Object3DEventMap>[] =
+      [];
+    scene.traverse((child) => {
+      if (
+        child.name === "scaffoldLine" ||
+        child.name === "scaffoldingModel" ||
+        child.name === "scaffoldingWireframe" ||
+        child.name === "scaffoldLabel"
+      ) {
+        scaffoldingObjectsToRemove.push(child);
+      }
+    });
+
+    scaffoldingObjectsToRemove.forEach((scaffold) => {
+      scene.remove(scaffold);
+    });
+    hideAllCSS2DObjects(scene);
   });
 
   //////////////////////////////////

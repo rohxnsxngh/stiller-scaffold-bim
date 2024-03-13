@@ -323,6 +323,7 @@ function createIndividualScaffoldLabel(
 
   // Create a button element
   const button = document.createElement("button");
+  button.name = "scaffoldButton"
   button.className = "material-icons btn btn-sm btn-ghost mx-2";
   button.textContent = "rotate_right";
   button.contentEditable = "false";
@@ -418,7 +419,7 @@ export function generateScaffoldOutline(
   blueprint: THREE.Mesh,
   scene: THREE.Scene
 ) {
-  const shape = blueprint.userData as THREE.Shape; // Assuming the shape is stored in userData
+  const shape = blueprint.userData.shape as THREE.Shape; // Assuming the shape is stored in userData
 
   const extrudeSettings = {
     steps: 0,

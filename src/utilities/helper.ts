@@ -243,7 +243,10 @@ export function hideAllCSS2DObjects(scene: THREE.Scene) {
   });
 }
 
-export function resetSceneExceptSingularObject(scene: THREE.Scene, objectName: string) {
+export function resetSceneExceptSingularObject(
+  scene: THREE.Scene,
+  objectName: string
+) {
   const objectsToRemove: any = [];
   scene.traverse((child: any) => {
     if (child.name !== "rectangleLabel" && child instanceof CSS2DObject) {
@@ -269,7 +272,10 @@ export function resetSceneExceptSingularObject(scene: THREE.Scene, objectName: s
   });
 }
 
-export function setInvisibleExceptSingularObject(scene: THREE.Scene, objectName: string) {
+export function setInvisibleExceptSingularObject(
+  scene: THREE.Scene,
+  objectName: string
+) {
   const objectsToRemove: any = [];
   scene.traverse((child: any) => {
     if (child.name !== "rectangleLabel" && child instanceof CSS2DObject) {
@@ -291,34 +297,47 @@ export function setInvisibleExceptSingularObject(scene: THREE.Scene, objectName:
   });
 
   objectsToRemove.forEach((child: THREE.Object3D<THREE.Object3DEventMap>) => {
-    child.visible = false
+    child.visible = false;
   });
 }
 
-// 
+//
 export function observeElementAndAddEventListener(
   elementId: string,
   eventType: string,
   eventHandler: (event: Event) => void
- ) {
+) {
   const addEventListenerToElement = () => {
-     const element = document.getElementById(elementId);
-     if (element) {
+    const element = document.getElementById(elementId);
+    if (element) {
       //  console.log(`Element ${elementId} found, adding event listener`);
-       element.addEventListener(eventType, eventHandler);
+      element.addEventListener(eventType, eventHandler);
       // optional I am disconnecting observer. this should be used when an element will never be used again
       //  observer.disconnect(); // Stop observing once the element is found
-     } else {
+    } else {
       //  console.log(`Element ${elementId} not found yet`);
-     }
+    }
   };
- 
+
   // Create a MutationObserver to watch for changes in the DOM
   const observer = new MutationObserver(addEventListenerToElement);
- 
+
   // Start observing the document with the configured callback
   observer.observe(document, { childList: true, subtree: true });
- 
+
   // Call the function once to check if the element is already in the DOM
   addEventListenerToElement();
- }
+}
+
+export function removeHighlightMesh(scene: THREE.Scene) {
+  const objects: THREE.Mesh<any, any, any>[] = []
+  scene.traverse(function (child) {
+    if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+      objects.push(child)
+    }
+  });
+
+  objects.forEach((child) => {
+    scene.remove(child);
+  })
+}

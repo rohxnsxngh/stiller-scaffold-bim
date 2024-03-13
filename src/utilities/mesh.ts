@@ -1438,7 +1438,7 @@ export function createFlatRoof(child: any, scene: THREE.Scene) {
 
   // Create a material for the roof
   const material = new THREE.MeshBasicMaterial({
-    color: 0xffffff, // You can change the color as needed
+    color: 0xffffff,
     side: THREE.DoubleSide,
   });
 
@@ -1446,13 +1446,11 @@ export function createFlatRoof(child: any, scene: THREE.Scene) {
   const roofMesh = new THREE.Mesh(geometry, material);
 
   // Position the roof mesh above the child object
+  // add offset to avoid z-fighting
   roofMesh.position.y = extrudeHeight + 0.025;
   roofMesh.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-
-  // Add the roof mesh to the scene
   scene.add(roofMesh);
 
-  // You can also set the name and userData if needed
   roofMesh.name = "flatRoof";
   roofMesh.userData = {
     shape: shape,
