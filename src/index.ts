@@ -979,7 +979,7 @@ export const createModelView = async () => {
         child.name === "scaffoldLine" ||
         child.name === "scaffoldingModel" ||
         child.name === "scaffoldingWireframe" ||
-        child.name === "scaffoldLabel"
+        child.name === "scaffoldingStackingLabel"
       ) {
         scaffoldingObjectsToRemove.push(child);
       }
@@ -988,7 +988,6 @@ export const createModelView = async () => {
     scaffoldingObjectsToRemove.forEach((scaffold) => {
       scene.remove(scaffold);
     });
-    hideAllCSS2DObjects(scene);
   });
 
   //////////////////////////////////

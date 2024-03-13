@@ -51,7 +51,10 @@
 
       <div class="card-actions justify-end">
         <div class="m-4">
-          <div class="btn btn-sm mr-4 border-1 border-white text-white"  id="reset-scaffolding">
+          <div
+            class="btn btn-sm mr-4 border-1 border-white text-white"
+            id="reset-scaffolding"
+          >
             Reset
           </div>
           <div
@@ -70,7 +73,10 @@
 
       <div class="bg-[#24242F] rounded my-4">
         <div class="grid grid-cols-3">
-          <div class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2" id="draw-scaffold">
+          <div
+            class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2"
+            id="draw-scaffold"
+          >
             <img
               src="../assets/images/ScaffoldSection/DrawScaffoldingOutline.svg"
               class="object-contain"
@@ -139,9 +145,11 @@
               <span class="label-text">Antall stillas etasjer</span>
             </div>
             <div class="flex flex-row gap-1 border-black">
-              <div class="btn text-2xl w-1/12" @click="decrement">-</div>
-              <div class="btn text-2xl">{{ count }}</div>
-              <div class="btn text-2xl w-1/12" @click="increment">+</div>
+              <div class="btn text-2xl w-1/12" @click="decrement" id="remove-scaffolding-level">-</div>
+              <div class="btn text-2xl">
+                <input type="text" v-model="level" class="w-6 bg-inherit" readonly disabled/>
+              </div>
+              <div class="btn text-2xl w-1/12" @click="increment" id="add-scaffolding-level">+</div>
             </div>
             <div class="label"></div>
           </label>
@@ -169,20 +177,36 @@
 </template>
 
 <script lang="ts">
+import { computed } from "vue";
+import { useStore } from "../store";
+
 export default {
+  setup() {
+    const componentStore = useStore();
+
+    // const depth = computed(() => componentStore.depth);
+    const level = computed({
+      // Make depth a computed property
+      get: () => componentStore.level,
+      set: (value) => componentStore.updateScaffoldLevel(value),
+    });
+
+    return {
+      level,
+    };
+  },
   data() {
     return {
-      count: 3,
       showDrawer: false,
     };
   },
   methods: {
     increment() {
-      this.count++;
+      this.level++;
     },
     decrement() {
-      if (this.count > 0) {
-        this.count--;
+      if (this.level > 0) {
+        this.level--;
       }
     },
     toggleDrawer() {
