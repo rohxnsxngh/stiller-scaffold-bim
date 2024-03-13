@@ -551,11 +551,11 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       console.log("add button");
-      addScaffoldingLevelForAllScaffolding(
-        scene,
-        scaffold,
-        scaffoldBoundingBox,
-      );
+      // addScaffoldingLevelForAllScaffolding(
+      //   scene,
+      //   scaffold,
+      //   scaffoldBoundingBox,
+      // );
     }
   );
 
@@ -570,7 +570,7 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       console.log("minus button");
-      removeScaffoldingLevelForAllScaffolding(scene);
+      // removeScaffoldingLevelForAllScaffolding(scene);
     }
   );
 }
