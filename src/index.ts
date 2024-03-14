@@ -785,103 +785,104 @@ export const createModelView = async () => {
     });
   });
 
+  // TODO Add a rotation state so that this does not interfere with the deletion event
   // Add a mousedown event listener to the window or a specific element
-  window.addEventListener("mousedown", () => {
-    if (!drawingInProgressSwitch) {
-      // Check if the click is on the roof
-      if (intersects.length > 0 && intersects[0].object.name === "roof") {
-        console.log("rotating roof");
-        scene.remove(intersects[0].object);
-        let extrusions: THREE.Mesh[] = [];
-        let roofs: THREE.Mesh[] = [];
+  // window.addEventListener("mousedown", () => {
+  //   if (!drawingInProgressSwitch) {
+  //     // Check if the click is on the roof
+  //     if (intersects.length > 0 && intersects[0].object.name === "roof") {
+  //       console.log("rotating roof");
+  //       scene.remove(intersects[0].object);
+  //       let extrusions: THREE.Mesh[] = [];
+  //       let roofs: THREE.Mesh[] = [];
 
-        // Toggle the roofToggleState between  0 and  1
-        roofToggleState = roofToggleState === 0 ? 1 : 0;
+  //       // Toggle the roofToggleState between  0 and  1
+  //       roofToggleState = roofToggleState === 0 ? 1 : 0;
 
-        scene.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            if (child.name === "roof") {
-              roofs.push(child);
-            }
-            if (child.name === "extrusion") {
-              extrusions.push(child);
-            }
-          }
-          if (
-            child instanceof CSS2DObject &&
-            child.name === "rectangleRoofLabel"
-          ) {
-            child.element.style.pointerEvents = "none";
-            child.visible = false;
-          }
-        });
+  //       scene.traverse((child) => {
+  //         if (child instanceof THREE.Mesh) {
+  //           if (child.name === "roof") {
+  //             roofs.push(child);
+  //           }
+  //           if (child.name === "extrusion") {
+  //             extrusions.push(child);
+  //           }
+  //         }
+  //         if (
+  //           child instanceof CSS2DObject &&
+  //           child.name === "rectangleRoofLabel"
+  //         ) {
+  //           child.element.style.pointerEvents = "none";
+  //           child.visible = false;
+  //         }
+  //       });
 
-        console.log("roofs", roofs);
-        console.log("extrusions", extrusions);
+  //       console.log("roofs", roofs);
+  //       console.log("extrusions", extrusions);
 
-        extrusions.forEach((extrusion) => {
-          let hasRoof = roofs.some(
-            (roof) =>
-              extrusion.userData.currentPoint.x ===
-                roof.userData.currentPoint.x ||
-              extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
-          );
-          if (!hasRoof) {
-            createRoof(extrusion, scene, roofToggleState, 3);
-          }
-        });
+  //       extrusions.forEach((extrusion) => {
+  //         let hasRoof = roofs.some(
+  //           (roof) =>
+  //             extrusion.userData.currentPoint.x ===
+  //               roof.userData.currentPoint.x ||
+  //             extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
+  //         );
+  //         if (!hasRoof) {
+  //           createRoof(extrusion, scene, roofToggleState, 3);
+  //         }
+  //       });
 
-        roofs = [];
-        extrusions = [];
-      }
-      if (intersects.length > 0 && intersects[0].object.name === "shedRoof") {
-        console.log("rotating shed roof");
-        scene.remove(intersects[0].object);
-        let extrusions: THREE.Mesh[] = [];
-        let roofs: THREE.Mesh[] = [];
+  //       roofs = [];
+  //       extrusions = [];
+  //     }
+  //     if (intersects.length > 0 && intersects[0].object.name === "shedRoof") {
+  //       console.log("rotating shed roof");
+  //       scene.remove(intersects[0].object);
+  //       let extrusions: THREE.Mesh[] = [];
+  //       let roofs: THREE.Mesh[] = [];
 
-        // Toggle the roofToggleState between  0,  1,  2, and  3
-        roofToggleState = (roofToggleState + 1) % 4;
-        console.log(roofToggleState);
+  //       // Toggle the roofToggleState between  0,  1,  2, and  3
+  //       roofToggleState = (roofToggleState + 1) % 4;
+  //       console.log(roofToggleState);
 
-        scene.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            if (child.name === "shedRoof") {
-              roofs.push(child);
-            }
-            if (child.name === "extrusion") {
-              extrusions.push(child);
-            }
-          }
-          if (
-            child instanceof CSS2DObject &&
-            child.name === "rectangleRoofLabel"
-          ) {
-            child.element.style.pointerEvents = "none";
-            child.visible = false;
-          }
-        });
+  //       scene.traverse((child) => {
+  //         if (child instanceof THREE.Mesh) {
+  //           if (child.name === "shedRoof") {
+  //             roofs.push(child);
+  //           }
+  //           if (child.name === "extrusion") {
+  //             extrusions.push(child);
+  //           }
+  //         }
+  //         if (
+  //           child instanceof CSS2DObject &&
+  //           child.name === "rectangleRoofLabel"
+  //         ) {
+  //           child.element.style.pointerEvents = "none";
+  //           child.visible = false;
+  //         }
+  //       });
 
-        console.log("roofs", roofs);
-        console.log("extrusions", extrusions);
+  //       console.log("roofs", roofs);
+  //       console.log("extrusions", extrusions);
 
-        extrusions.forEach((extrusion) => {
-          let hasRoof = roofs.some(
-            (roof) =>
-              extrusion.userData.currentPoint.x ===
-                roof.userData.currentPoint.x ||
-              extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
-          );
-          if (!hasRoof) {
-            createShedRoof(extrusion, scene, roofToggleState, 3);
-          }
-        });
+  //       extrusions.forEach((extrusion) => {
+  //         let hasRoof = roofs.some(
+  //           (roof) =>
+  //             extrusion.userData.currentPoint.x ===
+  //               roof.userData.currentPoint.x ||
+  //             extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
+  //         );
+  //         if (!hasRoof) {
+  //           createShedRoof(extrusion, scene, roofToggleState, 3);
+  //         }
+  //       });
 
-        roofs = [];
-        extrusions = [];
-      }
-    }
-  });
+  //       roofs = [];
+  //       extrusions = [];
+  //     }
+  //   }
+  // });
 
   // handles roof rotation, snap the roof to a different rotation.
   rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
