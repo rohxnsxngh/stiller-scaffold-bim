@@ -83,7 +83,10 @@
             />
             <p class="">Tegn omriss rundt bygning</p>
           </div>
-          <div class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2" id="generate-scaffolding">
+          <div
+            class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2"
+            id="generate-scaffolding"
+          >
             <img
               src="../assets/images/ScaffoldSection/GenerateScaffolding.svg"
               class="object-contain"
@@ -106,17 +109,73 @@
       <!-- Drawer element -->
       <div
         v-if="showDrawer"
-        class="fixed inset-48 rounded w-64 bg-white bg-[#111115] overflow-y-auto shadow-lg z-55"
+        class="fixed rounded-lg w-48 bg-[#111115] overflow-y-auto shadow-lg z-55 top-10 right-0"
       >
-        <!-- <div class="card-body p-2">
-            <div>
-              Tegn området rundt bygget der stillaset skal stå, eller bruk
-              Autostillas-funksjonen til å generere stillas rundt hele bygget 
-            </div>
-            <div class="divider"></div>
-          </div> -->
-        <!-- Scrollable content -->
-        <!-- Add your content here -->
+        <div class="">
+          <button class="btn btn-circle bg-inherit ml-32" @click="toggleDrawer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="flex flex-col">
+          <div
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
+            id="draw-scaffold"
+          >
+            <img
+              src="../assets/images/ScaffoldSection/PlaceIndividualScaffolding.svg"
+              class="object-contain"
+            />
+          </div>
+          <div
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
+            id="draw-scaffold"
+          >
+            <img
+              src="../assets/images/ScaffoldSection/Staircase.svg"
+              class="object-contain"
+            />
+          </div>
+          <div
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
+            id="draw-scaffold"
+          >
+            <img
+              src="../assets/images/ScaffoldSection/Railing.svg"
+              class="object-contain"
+            />
+          </div>
+          <div
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
+            id="draw-scaffold"
+          >
+            <img
+              src="../assets/images/ScaffoldSection/Banister.svg"
+              class="object-contain"
+            />
+          </div>
+          <div
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
+            id="draw-scaffold"
+          >
+            <img
+              src="../assets/images/ScaffoldSection/Rudder.svg"
+              class="object-contain"
+            />
+          </div>
+        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-8">
@@ -145,11 +204,29 @@
               <span class="label-text">Antall stillas etasjer</span>
             </div>
             <div class="flex flex-row gap-1 border-black">
-              <div class="btn text-2xl w-1/12" @click="decrement" id="remove-scaffolding-level">-</div>
-              <div class="btn text-2xl">
-                <input type="text" v-model="level" class="w-6 bg-inherit" readonly disabled/>
+              <div
+                class="btn text-2xl w-1/12"
+                @click="decrement"
+                id="remove-scaffolding-level"
+              >
+                -
               </div>
-              <div class="btn text-2xl w-1/12" @click="increment" id="add-scaffolding-level">+</div>
+              <div class="btn text-2xl">
+                <input
+                  type="text"
+                  v-model="level"
+                  class="w-6 bg-inherit"
+                  readonly
+                  disabled
+                />
+              </div>
+              <div
+                class="btn text-2xl w-1/12"
+                @click="increment"
+                id="add-scaffolding-level"
+              >
+                +
+              </div>
             </div>
             <div class="label"></div>
           </label>
