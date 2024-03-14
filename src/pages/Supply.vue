@@ -141,12 +141,19 @@ export default {
   methods: {
     goToNextPage() {
       // @ts-ignore
-      // open modal
       const svgElement = document.getElementById("supply-svg");
       if (svgElement) {
         svgElement.style.stroke = "#23E6A1";
       } else {
         console.error("timeline not found");
+      }
+
+      // Open the modal
+      const modalElement = document.getElementById("my_modal_1");
+      if (modalElement && modalElement instanceof HTMLDialogElement) {
+        modalElement.showModal();
+      } else {
+        console.error("Modal element not found or not an HTMLDialogElement");
       }
     },
     goToPreviousPage() {

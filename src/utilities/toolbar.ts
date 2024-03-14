@@ -666,6 +666,13 @@ export const createToolbar = (
   );
   generateScaffoldOutlineButton.domElement.classList.add("hover:bg-slate-300");
 
+  observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
+    document.body.style.cursor = "auto";
+    setDrawingInProgress(false);
+    setDeletionInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
   // generate scaffolding outline
   const placeScaffoldButton = new OBC.Button(components, {
     materialIconName: "domain_add",
@@ -844,6 +851,7 @@ export const createToolbar = (
   drawer.domElement.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
   drawer.visible = false; // change this to true to make the drawer open on mount
   drawer.domElement.addEventListener("mouseover", () => {
+    removeHighlightMesh(scene);
     setDrawingInProgress(false);
   });
   drawer.domElement.addEventListener("mouseleave", () => {

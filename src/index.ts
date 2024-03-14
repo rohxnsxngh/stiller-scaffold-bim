@@ -904,7 +904,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
-    console.log("draw scaffolding")
+    console.log("draw scaffolding");
     setPlaceScaffoldIndividually(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
@@ -917,7 +917,7 @@ export const createModelView = async () => {
         cube
       );
     }
-  })
+  });
 
   placeScaffoldButton.domElement.addEventListener("mousedown", async () => {
     console.log("place scaffold individually");
@@ -953,6 +953,10 @@ export const createModelView = async () => {
         generateScaffoldOutline(child, scene);
       }
     });
+  });
+
+  observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
+    generateScaffolding();
   });
 
   // autogenerate scaffolding

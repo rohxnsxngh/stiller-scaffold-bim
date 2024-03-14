@@ -83,7 +83,7 @@
             />
             <p class="">Tegn omriss rundt bygning</p>
           </div>
-          <div class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2">
+          <div class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2" id="generate-scaffolding">
             <img
               src="../assets/images/ScaffoldSection/GenerateScaffolding.svg"
               class="object-contain"
