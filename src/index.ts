@@ -23,6 +23,7 @@ import {
   setPlaceScaffoldIndividually,
   placeScaffoldIndividually,
   generateScaffoldOutline,
+  createScaffoldingSheeting,
 } from "./utilities/scaffold";
 import {
   createToolbar,
@@ -1166,6 +1167,14 @@ export const createModelView = async () => {
 
   testButton.domElement.addEventListener("mousedown", () => {
     console.log("testing button");
+    const scaffoldOutline: (THREE.Mesh<any, any, any> | THREE.Line<any, any>)[] = [];
+    scene.traverse((child) => {
+      if (child instanceof THREE.Line && child.name === "scaffoldLine") {
+        scaffoldOutline.push(child);
+      }
+    });
+    console.log(scaffoldOutline)
+    createScaffoldingSheeting(scaffoldOutline, scene);
   });
 
   // @ts-ignore

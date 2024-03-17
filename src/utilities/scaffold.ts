@@ -526,7 +526,7 @@ function attachScaffoldRowLabelChangeHandler(
 ) {
   // TODO in the future this level should come from the store which is currently storing the
   // value that is being displayed on the frontend
-  let levels = 0
+  let levels = 0;
   const labelElement = label.element as HTMLDivElement;
   labelElement.addEventListener("mouseenter", () => {
     setPlaceScaffoldIndividually(false);
@@ -551,11 +551,11 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       console.log("add button");
-      // addScaffoldingLevelForAllScaffolding(
-      //   scene,
-      //   scaffold,
-      //   scaffoldBoundingBox,
-      // );
+      addScaffoldingLevelForAllScaffolding(
+        scene,
+        scaffold,
+        scaffoldBoundingBox
+      );
     }
   );
 
@@ -570,7 +570,7 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       console.log("minus button");
-      // removeScaffoldingLevelForAllScaffolding(scene);
+      removeScaffoldingLevelForAllScaffolding(scene);
     }
   );
 }
@@ -578,7 +578,7 @@ function attachScaffoldRowLabelChangeHandler(
 function addScaffoldingLevelForAllScaffolding(
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
-  scaffoldBoundingBox: any,
+  scaffoldBoundingBox: any
 ) {
   const scaffoldingLabels: CSS2DObject[] = [];
   scene.traverse((child) => {
@@ -591,16 +591,14 @@ function addScaffoldingLevelForAllScaffolding(
   });
 
   const componentStore = useStore();
-  const level = componentStore.level
+  const level = componentStore.level;
 
   scaffoldingLabels.forEach((label) => {
     addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox, level);
   });
 }
 
-function removeScaffoldingLevelForAllScaffolding(
-  scene: THREE.Scene,
-) {
+function removeScaffoldingLevelForAllScaffolding(scene: THREE.Scene) {
   const scaffoldingLabels: CSS2DObject[] = [];
   scene.traverse((child) => {
     if (
@@ -612,7 +610,7 @@ function removeScaffoldingLevelForAllScaffolding(
   });
 
   const componentStore = useStore();
-  const level = componentStore.level
+  const level = componentStore.level;
 
   scaffoldingLabels.forEach((label) => {
     removeScaffoldingLevel(label, scene, level);
@@ -654,6 +652,25 @@ function addScaffoldingLevel(
           child instanceof THREE.Object3D && child.position.equals(position)
         );
       });
+
+      // add scaffolding line
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        endPoint,
+        startPoint,
+      ]);
+      const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+      const line = new THREE.Line(geometry, material);
+      line.name = "scaffoldLine";
+      const [length, lastPoint, firstPoint] = measureLineLength([
+        endPoint,
+        startPoint,
+      ]);
+      line.userData = {
+        length: length,
+        first_point: firstPoint,
+        last_point: lastPoint,
+      };
+      scene.add(line);
 
       if (!isModelAlreadyPlaced) {
         // Instantiate the GLB model
@@ -746,10 +763,17 @@ function removeScaffoldingLevel(
 
       const scaffoldingLevelToBeRemoved: THREE.Object3D<THREE.Object3DEventMap>[] =
         [];
-      scene.children.some((child) => {
+      scene.traverse((child) => {
         if (
           child instanceof THREE.Object3D &&
           child.position.equals(position)
+        ) {
+          scaffoldingLevelToBeRemoved.push(child);
+        }
+        if (
+          child instanceof THREE.Line &&
+          child.name === "scaffoldLine" &&
+          child.userData.first_point.y === position.y
         ) {
           scaffoldingLevelToBeRemoved.push(child);
         }
@@ -764,4 +788,61 @@ function removeScaffoldingLevel(
     console.error("Error creating scaffold model:", error);
   }
   label.userData.level = level;
+}
+
+export function createScaffoldingSheeting(
+  scaffoldOutline: (THREE.Mesh<any, any, any> | THREE.Line<any, any>)[],
+  scene: THREE.Scene
+) {
+  scaffoldOutline.forEach((scaffold) => {
+    console.log(scaffold);
+    const firstPoint = scaffold.userData.first_point as THREE.Vector3;
+    const lastPoint = scaffold.userData.last_point as THREE.Vector3;
+    const length = scaffold.userData.length;
+    const midPoint = new THREE.Vector3().lerpVectors(
+      firstPoint,
+      lastPoint,
+      0.5
+    );
+
+    // Calculate the direction vector of the line
+    const direction = new THREE.Vector3()
+      .subVectors(lastPoint, firstPoint)
+      .normalize();
+
+    // Choose a normal vector for the plane
+    // For simplicity, we'll use the cross product of the direction vector and the up vector (0, 1, 0)
+    const normal = new THREE.Vector3()
+      .crossVectors(direction, new THREE.Vector3(0, 1, 0))
+      .normalize();
+
+    // Create a plane using the normal vector and a point on the plane (the first point of the line)
+    // const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(
+    //   normal,
+    //   firstPoint
+    // );
+
+    // Create a mesh with a PlaneGeometry and a MeshBasicMaterial
+    const planeGeometry = new THREE.PlaneGeometry(length, 2); // Adjust the size as needed
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.5,
+    }); // Adjust the material properties as needed
+    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+
+    // Position the plane mesh at the first point of the line
+    planeMesh.position.copy(midPoint);
+
+    // Rotate the plane mesh to align with the plane
+    planeMesh.lookAt(midPoint.clone().add(normal));
+    planeMesh.position.y = firstPoint.y + 1; //half of the height
+
+    // Add the plane mesh to the scene
+    scene.add(planeMesh);
+
+    // Now you have a plane that is perpendicular to the line and passes through the first point of the line
+    // You can use this plane for further calculations or visualizations
+  });
 }
