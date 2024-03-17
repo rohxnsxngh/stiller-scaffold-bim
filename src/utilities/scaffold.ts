@@ -795,7 +795,6 @@ export function createScaffoldingSheeting(
   scene: THREE.Scene
 ) {
   scaffoldOutline.forEach((scaffold) => {
-    console.log(scaffold);
     const firstPoint = scaffold.userData.first_point as THREE.Vector3;
     const lastPoint = scaffold.userData.last_point as THREE.Vector3;
     const length = scaffold.userData.length;
@@ -839,10 +838,25 @@ export function createScaffoldingSheeting(
     planeMesh.lookAt(midPoint.clone().add(normal));
     planeMesh.position.y = firstPoint.y + 1; //half of the height
 
-    // Add the plane mesh to the scene
-    scene.add(planeMesh);
+    planeMesh.userData = {
+      first_point: firstPoint,
+      last_point: lastPoint,
+      length: length,
+    };
+    planeMesh.name = "scaffoldingSheet";
 
-    // Now you have a plane that is perpendicular to the line and passes through the first point of the line
-    // You can use this plane for further calculations or visualizations
+    // Check if there is already a planeMesh at the same location
+    const isMeshAlreadyPlaced = scene.children.some((child) => {
+      return (
+        child instanceof THREE.Mesh &&
+        child.name === "scaffoldingSheet" &&
+        child.position.equals(planeMesh.position)
+      );
+    });
+
+    if (!isMeshAlreadyPlaced) {
+      // Add the plane mesh to the scene
+      scene.add(planeMesh);
+    }
   });
 }
