@@ -70,7 +70,12 @@
         <div class="label">
           <span class="label-text text-sm">blåkopi</span>
         </div>
-        <div class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]" id="create-blueprint"> <i class="material-icons">dashboard</i></div>
+        <div
+          class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
+          id="create-blueprint"
+        >
+          <i class="material-icons">dashboard</i>
+        </div>
       </label>
     </div>
   </div>
@@ -97,17 +102,20 @@
         <div class="label">
           <span class="label-text text-sm">ekstrudere</span>
         </div>
-        <div class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]" id="create-extrusion"> <i class="material-icons">expand</i></div>
+        <div
+          class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
+          id="create-extrusion"
+        >
+          <i class="material-icons">expand</i>
+        </div>
       </label>
     </div>
   </div>
-
-  
 </template>
 
 <script lang="ts">
-import { ref, computed } from 'vue';
-import { useStore } from '../store';
+import { ref, computed } from "vue";
+import { useStore } from "../store";
 
 export default {
   setup() {
@@ -118,10 +126,20 @@ export default {
     const showUpload = ref(false);
 
     // Use computed properties to reactively access store state
-    const length = computed(() => componentStore.length);
-    const width = computed(() => componentStore.width);
-    // const depth = computed(() => componentStore.depth);
-    const depth = computed({ // Make depth a computed property
+    const length = computed({
+      // Make length a computed property
+      get: () => componentStore.length,
+      set: (value) => componentStore.updateLength(value),
+    });
+
+    const width = computed({
+      // Make width a computed property
+      get: () => componentStore.width,
+      set: (value) => componentStore.updateWidth(value),
+    });
+
+    const depth = computed({
+      // Make depth a computed property
       get: () => componentStore.depth,
       set: (value) => componentStore.updateDepth(value),
     });
@@ -140,6 +158,6 @@ export default {
       depth,
       showDrawBlueprint,
     };
- },
+  },
 };
 </script>

@@ -4,11 +4,13 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   distanceFromPointToLine,
   measureLineLength,
+  observeElementAndAddEventListener,
   resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial } from "./material";
-import { setDrawingInProgress } from "./toolbar";
+import { setDrawingInProgress, setIsDrawingBlueprint } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
+import { useStore } from "../store";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -507,6 +509,91 @@ function attachLabelChangeHandler(
       return currentLabels;
     }
   });
+
+  observeElementAndAddEventListener("rectangle-length", "mouseenter", () => {
+    document.body.style.cursor = "grab";
+    setDrawingInProgress(false);
+    setIsDrawingBlueprint(false)
+  })
+  observeElementAndAddEventListener("rectangle-width", "mouseenter", () => {
+    document.body.style.cursor = "grab";
+    setDrawingInProgress(false);
+    setIsDrawingBlueprint(false)
+  })
+
+  observeElementAndAddEventListener("rectangle-length", "mouseleave", () => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+  })
+  observeElementAndAddEventListener("rectangle-width", "mouseleave", () => {
+    document.body.style.cursor = "crosshair";
+    setDrawingInProgress(false);
+  })
+
+  observeElementAndAddEventListener("rectangle-length", "focus", (event) => {
+    setDrawingInProgress(false);
+    setDrawingInProgress(false);
+    const element = event.target as HTMLInputElement;
+    const textContent = element.value;
+    oldValue = textContent
+    console.log(oldValue)
+  })
+  observeElementAndAddEventListener("rectangle-width", "focus", (event) => {
+    setDrawingInProgress(false);
+    setDrawingInProgress(false);
+
+    const element = event.target as HTMLInputElement;
+    const textContent = element.value;
+    oldValue = textContent
+  })
+
+  observeElementAndAddEventListener("rectangle-length", "blur", (event) => {
+    const element = event.target as HTMLInputElement;
+    const textContent = element.value;
+    const newValue = textContent
+    console.log("old value:", oldValue, "new value:", newValue)
+    if (oldValue !== newValue) {
+      // create new plane based on inputs
+      const newRectangleVertices = updateRectangleBlueprintGeometry(
+        newValue,
+        oldValue,
+        markupGroup,
+        width,
+        height,
+        centerX,
+        centerZ
+      );
+
+      // create new labels based on vertices
+      updateLabelsForNewDimensions(newRectangleVertices);
+
+      return currentLabels;
+    }
+  })
+  observeElementAndAddEventListener("rectangle-width", "blur", (event) => {
+
+    const element = event.target as HTMLInputElement;
+    const textContent = element.value;
+    const newValue = textContent
+    console.log("old value:", oldValue, "new value:", newValue)
+    if (oldValue !== newValue) {
+      // create new plane based on inputs
+      const newRectangleVertices = updateRectangleBlueprintGeometry(
+        newValue,
+        oldValue,
+        markupGroup,
+        width,
+        height,
+        centerX,
+        centerZ
+      );
+
+      // create new labels based on vertices
+      updateLabelsForNewDimensions(newRectangleVertices);
+
+      return currentLabels;
+    }
+  })
 }
 
 // cast point for top view rectangle tool
