@@ -1165,15 +1165,25 @@ export const createModelView = async () => {
     points = [];
   });
 
+  observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    resetScene(scene, components, shadows);
+
+    scaffoldPoints = [];
+    points = [];
+  });
+
   testButton.domElement.addEventListener("mousedown", () => {
     console.log("testing button");
-    const scaffoldOutline: (THREE.Mesh<any, any, any> | THREE.Line<any, any>)[] = [];
+    const scaffoldOutline: (
+      | THREE.Mesh<any, any, any>
+      | THREE.Line<any, any>
+    )[] = [];
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
         scaffoldOutline.push(child);
       }
     });
-    console.log(scaffoldOutline)
+    console.log(scaffoldOutline);
     createScaffoldingSheeting(scaffoldOutline, scene);
   });
 

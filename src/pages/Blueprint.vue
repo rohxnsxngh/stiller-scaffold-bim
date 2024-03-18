@@ -5,27 +5,39 @@
       <div class="bg-[#14141C] grid grid-cols-4 gap-4 rounded">
         <div class="flex flex-col m-4">
           <div
-            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
+            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
+            id="top-view"
           >
-            <img
-              src="../assets/images/Select.svg"
-              alt="Select"
-              class="scale-150"
-            />
+          <i class="material-icons">fullscreen</i>
           </div>
-          <div><p class="text-xs text-center mt-2">Select</p></div>
+          <div><p class="text-xs text-center mt-2">Top View</p></div>
         </div>
         <div class="flex flex-col m-4">
           <div
-            class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
+            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
+            id="pan-tool"
           >
-            <img
-              src="../assets/images/Delete.svg"
-              alt="Select"
-              class="scale-150"
-            />
+          <i class="material-icons">pan_tool</i>
           </div>
-          <div><p class="text-xs text-center mt-2">Delete</p></div>
+          <div><p class="text-xs text-center mt-2">Free Rotate</p></div>
+        </div>
+        <div class="flex flex-col m-4">
+          <div
+            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
+            id="delete-objects"
+          >
+            <i class="material-icons">delete</i>
+          </div>
+          <div><p class="text-xs text-center mt-2">Delete Object</p></div>
+        </div>
+        <div class="flex flex-col m-4">
+          <div
+            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
+            id="reset-scene"
+          >
+          <i class="material-icons">reset_tv</i>
+          </div>
+          <div><p class="text-xs text-center mt-2">Reset Scene</p></div>
         </div>
       </div>
 

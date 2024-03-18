@@ -363,6 +363,22 @@ export const createToolbar = (
   clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
   clearSceneButton.domElement.classList.add("hover:bg-slate-300");
 
+  observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    setDeletionInProgress(false);
+    setDrawingInProgress(true);
+    setDrawingScaffoldingInProgress(false);
+  });
+
+  observeElementAndAddEventListener("reset-scene", "mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
+  observeElementAndAddEventListener("reset-scene", "mouseleave", () => {
+    setDrawingInProgress(true);
+    setDrawingScaffoldingInProgress(false);
+  });
+
   //Solidify Blueprint
   const blueprintButton = new OBC.Button(components);
   blueprintButton.materialIcon = "dashboard";
@@ -625,7 +641,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
     document.body.style.cursor = "auto";
-    removeHighlightMesh(scene)
+    removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -633,7 +649,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("draw-scaffold", "mouseover", () => {
     document.body.style.cursor = "auto";
-    removeHighlightMesh(scene)
+    removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(true);
