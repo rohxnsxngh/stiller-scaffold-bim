@@ -26,7 +26,7 @@ export const useStore = defineStore("component", {
     depth: 0,
     height: 0,
     shedHeight: 0,
-    level: 0
+    level: 1
   }),
   actions: {
     updateLength(value: any) {

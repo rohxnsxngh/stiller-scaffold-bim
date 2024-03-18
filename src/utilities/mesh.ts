@@ -541,10 +541,10 @@ function attachLabelChangeHandler(
   observeElementAndAddEventListener("rectangle-width", "focus", (event) => {
     setDrawingInProgress(false);
     setDrawingInProgress(false);
-
     const element = event.target as HTMLInputElement;
     const textContent = element.value;
     oldValue = textContent
+    console.log(oldValue)
   })
 
   observeElementAndAddEventListener("rectangle-length", "blur", (event) => {
@@ -571,7 +571,6 @@ function attachLabelChangeHandler(
     }
   })
   observeElementAndAddEventListener("rectangle-width", "blur", (event) => {
-
     const element = event.target as HTMLInputElement;
     const textContent = element.value;
     const newValue = textContent
@@ -668,6 +667,7 @@ function updateRectangleBlueprintGeometry(
 
     const geometry = new THREE.PlaneGeometry(Number(newDistance), width);
     const newRectangleBlueprint = new THREE.Mesh(geometry, rectMaterial);
+    console.log(centerX, centerZ)
     newRectangleBlueprint.position.set(centerX, -0.125, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
@@ -719,6 +719,7 @@ function updateRectangleBlueprintGeometry(
 
     const geometry = new THREE.PlaneGeometry(height, Number(newDistance));
     const newRectangleBlueprint = new THREE.Mesh(geometry, rectMaterial);
+    console.log(centerX, centerZ)
     newRectangleBlueprint.position.set(centerX, -0.125, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;

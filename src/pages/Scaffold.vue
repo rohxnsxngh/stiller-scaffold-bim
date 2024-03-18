@@ -261,7 +261,7 @@ export default {
       this.level++;
     },
     decrement() {
-      if (this.level > 0) {
+      if (this.level > 1) {
         this.level--;
       }
     },

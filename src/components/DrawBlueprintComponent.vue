@@ -44,6 +44,7 @@
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
           v-model="length"
+          disabled 
         />
         <div class="label"></div>
       </label>
@@ -60,6 +61,7 @@
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
           v-model="width"
+          disabled 
         />
         <div class="label"></div>
       </label>

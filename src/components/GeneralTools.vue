@@ -16,7 +16,7 @@
       >
         <i class="material-icons text-[#E14767]">pan_tool</i>
       </div>
-      <div><p class="text-xs text-center mt-2">Free Rotate</p></div>
+      <div><p class="text-xs text-center mt-2">Edit Labels</p></div>
     </div>
     <div class="flex flex-col m-4">
       <div
