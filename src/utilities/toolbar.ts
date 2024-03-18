@@ -309,7 +309,6 @@ export const createToolbar = (
     setDeletionInProgress(false);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
-    setIsDrawingBlueprint(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
     setDrawingInProgress(false);
@@ -318,18 +317,18 @@ export const createToolbar = (
   freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
   freeRotateButton.domElement.classList.add("hover:bg-slate-300");
 
-  observeElementAndAddEventListener("free-rotate", "mousedown", () => {
-    document.body.style.cursor = "grab";
-    cameraEnableOrbitalFunctionality(gsap, components.camera);
-    setDeletionInProgress(false);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
+  // observeElementAndAddEventListener("free-rotate", "mousedown", () => {
+  //   document.body.style.cursor = "grab";
+  //   cameraEnableOrbitalFunctionality(gsap, components.camera);
+  //   setDeletionInProgress(false);
+  //   setDrawingInProgress(false);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
 
-  observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
+  // observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
+  //   setDrawingInProgress(false);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
 
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);

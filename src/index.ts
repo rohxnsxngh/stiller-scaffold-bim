@@ -120,7 +120,6 @@ export const createModelView = async () => {
 
   // Grid
   const grid = new CustomGrid(components, new THREE.Color("#FF0000")); // Red color
-  console.log("grid", grid);
   // grid.name = "grid"
 
   // Add some elements to the scene
@@ -165,6 +164,7 @@ export const createModelView = async () => {
     editBlueprintButton,
     moveBlueprintButton,
     createBlueprintRectangleButton,
+    freeRotateButton,
     drawingButton,
     createGableRoofButton,
     createShedRoofButton,
@@ -221,11 +221,6 @@ export const createModelView = async () => {
           lastHighlightedObjectColor =
             intersectedObject.material.color.getHex();
           intersectedObject.material.color.set(0xff0000);
-          console.log(
-            "highlight intersected object",
-            intersectedObject.name,
-            intersectedObject.material
-          );
           intersectedObject.material.needsUpdate = true;
           // applyGlow(intersectedObject);
           lastHighlightedObject = intersectedObject;
@@ -247,10 +242,6 @@ export const createModelView = async () => {
         // If there is no intersection, revert the material of the last highlighted object
         if (lastHighlightedObject) {
           // revertMaterial(lastHighlightedObject);
-          // console.log(
-          //   lastHighlightedObject.material,
-          //   lastHighlightedObject.userData
-          // );
           // lastHighlightedObject.material = lastHighlightedObject.userData
           lastHighlightedObject = null;
         }
@@ -411,13 +402,11 @@ export const createModelView = async () => {
 
   // Edit Blueprint
   editBlueprintButton.domElement.addEventListener("mousedown", () => {
-    console.log("edit blueprint");
     setInvisibleExceptSingularObject(scene, "blueprint");
   });
 
   // Move Blueprint
   moveBlueprintButton.domElement.addEventListener("mousedown", () => {
-    console.log("move blueprint");
     const blueprints: any[] = [];
     setIsDrawingBlueprint(false);
     // Array to hold objects that can be dragged
@@ -479,7 +468,6 @@ export const createModelView = async () => {
         const depthValue = componentStore.depth;
         console.log(depthValue);
         if (depthValue !== 0) {
-          console.log("depth", depthValue);
           createExtrusionFromBlueprint(blueprint.userData, scene, depthValue);
         }
       }
@@ -509,9 +497,6 @@ export const createModelView = async () => {
         child.visible = false;
       }
     });
-
-    console.log("roofs", roofs);
-    console.log("extrusions", extrusions);
 
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
@@ -549,9 +534,6 @@ export const createModelView = async () => {
       }
     });
 
-    console.log("roofs", roofs);
-    console.log("extrusions", extrusions);
-
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
@@ -560,7 +542,6 @@ export const createModelView = async () => {
       );
       if (!hasRoof) {
         const heightValue = componentStore.height;
-        console.log(heightValue);
         if (heightValue !== 0) {
           createRoof(extrusion, scene, 0, heightValue);
         }
@@ -591,9 +572,6 @@ export const createModelView = async () => {
         child.visible = false;
       }
     });
-
-    console.log("roofs", roofs);
-    console.log("extrusions", extrusions);
 
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
@@ -632,9 +610,6 @@ export const createModelView = async () => {
       }
     });
 
-    console.log("roofs", roofs);
-    console.log("extrusions", extrusions);
-
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
@@ -672,9 +647,6 @@ export const createModelView = async () => {
       }
     });
 
-    console.log("roofs", roofs);
-    console.log("extrusions", extrusions);
-
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
@@ -685,7 +657,6 @@ export const createModelView = async () => {
         const heightValue = parseFloat(
           componentStore.shedHeight as unknown as string
         );
-        console.warn(heightValue, typeof heightValue);
         if (heightValue !== 0) {
           createShedRoof(extrusion, scene, 0, heightValue);
         }
@@ -716,17 +687,13 @@ export const createModelView = async () => {
             originalExtrusionHeight = parseFloat(
               child.element.textContent as unknown as string
             );
-            console.log(originalExtrusionHeight);
           });
           child.element.addEventListener("blur", () => {
             editedExtrusionHeight = parseFloat(
               child.element.textContent as unknown as string
             );
             const mesh = child.userData;
-            console.log(roofs);
             roofs.forEach((roof) => {
-              console.log(mesh.userData.currentPoint);
-              console.log(roof.userData.currentPoint);
               if (
                 mesh.userData.currentPoint.x === roof.userData.currentPoint.x ||
                 mesh.userData.currentPoint.y === roof.userData.currentPoint.y
@@ -748,15 +715,15 @@ export const createModelView = async () => {
                   const deltaY = roof.position.y - roofBottomVertex.y;
                   const differenceDeltaY = deltaY + editedExtrusionHeight;
 
-                  console.log("deltaY", deltaY);
-                  console.log("roof position", roof.position);
-                  console.log(
-                    "roof current position",
-                    roof.userData.currentPoint
-                  );
-                  console.log("roof bottom vertex", roofBottomVertex);
-                  console.log("edited extrusion", editedExtrusionHeight);
-                  console.log("difference delta Y", differenceDeltaY);
+                  // console.log("deltaY", deltaY);
+                  // console.log("roof position", roof.position);
+                  // console.log(
+                  //   "roof current position",
+                  //   roof.userData.currentPoint
+                  // );
+                  // console.log("roof bottom vertex", roofBottomVertex);
+                  // console.log("edited extrusion", editedExtrusionHeight);
+                  // console.log("difference delta Y", differenceDeltaY);
 
                   roof.position.y = differenceDeltaY;
                 } else {
@@ -893,7 +860,6 @@ export const createModelView = async () => {
     setPlaceScaffoldIndividually(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
-      console.log("creating scaffolding", scene);
       createScaffoldingShapeIsOutlined(
         intersects,
         points,
@@ -905,11 +871,9 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
-    console.log("draw scaffolding");
     setPlaceScaffoldIndividually(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
-      console.log("creating scaffolding", scene);
       createScaffoldingShapeIsOutlined(
         intersects,
         points,
@@ -921,12 +885,10 @@ export const createModelView = async () => {
   });
 
   placeScaffoldButton.domElement.addEventListener("mousedown", async () => {
-    console.log("place scaffold individually");
     setPlaceScaffoldIndividually(true);
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
-    console.log("generate scaffolding");
     generateScaffolding();
   });
 
@@ -970,7 +932,6 @@ export const createModelView = async () => {
           generateScaffoldOutline(child, scene);
         }
       });
-      console.log("generate scaffolding");
       generateScaffolding();
     }
   );
@@ -1097,7 +1058,6 @@ export const createModelView = async () => {
         }
       }
     });
-    console.log(updatedDimensions);
     componentStore.updateLength(updatedDimensions[0]);
     componentStore.updateWidth(updatedDimensions[1]);
   }
@@ -1106,6 +1066,14 @@ export const createModelView = async () => {
     markupMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     markupMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   }
+
+  freeRotateButton.domElement.addEventListener("mousedown", () => {
+    setIsDrawingBlueprint(false);
+  });
+
+  // observeElementAndAddEventListener("top-view", "mousedown", () => {
+  //   setIsDrawingBlueprint(false);
+  // })
 
   drawingButton.domElement.addEventListener("mousedown", () => {
     setIsDrawingBlueprint(false);
@@ -1168,7 +1136,6 @@ export const createModelView = async () => {
   });
 
   testButton.domElement.addEventListener("mousedown", () => {
-    console.log("testing button");
     const scaffoldOutline: (
       | THREE.Mesh<any, any, any>
       | THREE.Line<any, any>
