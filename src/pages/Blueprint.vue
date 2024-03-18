@@ -2,44 +2,7 @@
   <div class="card w-full h-screen bg-inherit shadow-xl">
     <div class="card-body p-2">
       <div>Oppgi byggets ytre mål</div>
-      <div class="bg-[#14141C] grid grid-cols-4 gap-4 rounded">
-        <div class="flex flex-col m-4">
-          <div
-            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
-            id="top-view"
-          >
-          <i class="material-icons">fullscreen</i>
-          </div>
-          <div><p class="text-xs text-center mt-2">Top View</p></div>
-        </div>
-        <div class="flex flex-col m-4">
-          <div
-            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
-            id="pan-tool"
-          >
-          <i class="material-icons">pan_tool</i>
-          </div>
-          <div><p class="text-xs text-center mt-2">Free Rotate</p></div>
-        </div>
-        <div class="flex flex-col m-4">
-          <div
-            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
-            id="delete-objects"
-          >
-            <i class="material-icons">delete</i>
-          </div>
-          <div><p class="text-xs text-center mt-2">Delete Object</p></div>
-        </div>
-        <div class="flex flex-col m-4">
-          <div
-            class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#23E6A1]"
-            id="reset-scene"
-          >
-          <i class="material-icons">reset_tv</i>
-          </div>
-          <div><p class="text-xs text-center mt-2">Reset Scene</p></div>
-        </div>
-      </div>
+      <GeneralTools />
 
       <div class="mb-8">
         <p class="text-sm mb-2 mt-8">Velg et alternativ</p>
@@ -94,11 +57,13 @@
 <script lang="ts">
 import DrawBlueprint from "../components/DrawBlueprintComponent.vue";
 import UploadBlueprint from "../components/UploadBlueprintComponent.vue";
+import GeneralTools from "../components/GeneralTools.vue";
 
 export default {
   components: {
     DrawBlueprint,
     UploadBlueprint,
+    GeneralTools,
   },
   data() {
     return {

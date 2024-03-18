@@ -165,7 +165,6 @@ export const createModelView = async () => {
     editBlueprintButton,
     moveBlueprintButton,
     createBlueprintRectangleButton,
-    freeRotateButton,
     drawingButton,
     createGableRoofButton,
     createShedRoofButton,
@@ -1107,10 +1106,6 @@ export const createModelView = async () => {
     markupMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     markupMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   }
-
-  freeRotateButton.domElement.addEventListener("mousedown", () => {
-    setIsDrawingBlueprint(false);
-  });
 
   drawingButton.domElement.addEventListener("mousedown", () => {
     setIsDrawingBlueprint(false);

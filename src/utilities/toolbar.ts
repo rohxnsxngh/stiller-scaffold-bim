@@ -235,6 +235,22 @@ export const createToolbar = (
   topViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
   topViewButton.domElement.classList.add("hover:bg-slate-300");
 
+  observeElementAndAddEventListener("top-view", "mousedown", () => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+        scene.remove(child);
+      }
+    });
+    cameraTopView(gsap, components.camera);
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
+  observeElementAndAddEventListener("top-view", "mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
   const createBlueprintRectangleButton = new OBC.Button(components, {
     materialIconName: "square",
     name: "Layout",
@@ -293,6 +309,7 @@ export const createToolbar = (
     setDeletionInProgress(false);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setIsDrawingBlueprint(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
     setDrawingInProgress(false);
@@ -300,6 +317,19 @@ export const createToolbar = (
   });
   freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
   freeRotateButton.domElement.classList.add("hover:bg-slate-300");
+
+  observeElementAndAddEventListener("free-rotate", "mousedown", () => {
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setDeletionInProgress(false);
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
+  observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
 
   // Start Drawing Blueprint
   const drawingButton = new OBC.Button(components);
@@ -338,6 +368,23 @@ export const createToolbar = (
   });
   deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
   deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
+
+  observeElementAndAddEventListener("delete-object", "mousedown", () => {
+    document.body.style.cursor = "auto";
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+        scene.remove(child);
+      }
+    });
+    setDeletionInProgress(true);
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
+
+  observeElementAndAddEventListener("delete-object", "mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
+  });
 
   // Start Drawing Blueprint
   const clearSceneButton = new OBC.Button(components);
@@ -942,7 +989,6 @@ export const createToolbar = (
     editBlueprintButton,
     moveBlueprintButton,
     createBlueprintRectangleButton,
-    freeRotateButton,
     drawingButton,
     createGableRoofButton,
     createShedRoofButton,
