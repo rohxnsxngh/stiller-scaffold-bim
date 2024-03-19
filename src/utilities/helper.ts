@@ -145,6 +145,12 @@ export function resetScene(
     if (child.name === "scaffoldingModel") {
       objectsToRemove.push(child);
     }
+    if (child.name === "scaffoldingSheet") {
+      objectsToRemove.push(child)
+    }
+    if (child.name === "rectanglePlane") {
+      objectsToRemove.push(child)
+    }
   });
   objectsToRemove.forEach((object: any) => {
     scene.remove(object);
@@ -301,7 +307,8 @@ export function setInvisibleExceptSingularObject(
   });
 }
 
-//
+// very important for listening to elements are not in th DOM
+// elements in the drawer/sidebar
 export function observeElementAndAddEventListener(
   elementId: string,
   eventType: string,
@@ -330,14 +337,22 @@ export function observeElementAndAddEventListener(
 }
 
 export function removeHighlightMesh(scene: THREE.Scene) {
-  const objects: THREE.Mesh<any, any, any>[] = []
+  const objects: THREE.Mesh<any, any, any>[] = [];
   scene.traverse(function (child) {
     if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-      objects.push(child)
+      objects.push(child);
     }
   });
 
   objects.forEach((child) => {
     scene.remove(child);
-  })
+  });
+}
+
+export function calculateTotalSquareFootageForScaffolding() {
+  console.log("calculate square footage for scaffolding");
+}
+
+export function calculateTotalAmountScaffoldingInScene() {
+  console.log("total amount of scaffolding in scene");
 }
