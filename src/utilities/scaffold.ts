@@ -537,7 +537,8 @@ function attachScaffoldRowLabelChangeHandler(
 ) {
   // TODO in the future this level should come from the store which is currently storing the
   // value that is being displayed on the frontend
-  let levels = 0;
+  let level = 0;
+  let levels = 0
   const labelElement = label.element as HTMLDivElement;
   labelElement.addEventListener("mouseenter", () => {
     setPlaceScaffoldIndividually(false);
@@ -553,8 +554,9 @@ function attachScaffoldRowLabelChangeHandler(
 
   buttonAdd.addEventListener("mousedown", () => {
     console.log("add button");
-    levels++;
-    addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox, levels);
+    level++;
+    console.log(level)
+    addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox, level);
   });
 
   observeElementAndAddEventListener(
@@ -562,18 +564,25 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       console.log("add button");
+      levels++;
+      console.log(levels)
       addScaffoldingLevelForAllScaffolding(
         scene,
         scaffold,
-        scaffoldBoundingBox
+        scaffoldBoundingBox,
+        levels
       );
     }
   );
 
   buttonMinus.addEventListener("mousedown", () => {
     console.log("minus button");
-    levels--;
-    removeScaffoldingLevel(label, scene, levels);
+    removeScaffoldingLevel(label, scene, level);
+    level--;
+    if (level < 0) {
+      level = 0
+    }
+    console.log(level)
   });
 
   observeElementAndAddEventListener(
@@ -581,7 +590,12 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       console.log("minus button");
-      removeScaffoldingLevelForAllScaffolding(scene);
+      removeScaffoldingLevelForAllScaffolding(scene, levels);
+      levels--;
+      if (levels < 0) {
+        levels = 0
+      }
+      console.log(levels)
     }
   );
 }
@@ -589,7 +603,8 @@ function attachScaffoldRowLabelChangeHandler(
 function addScaffoldingLevelForAllScaffolding(
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
-  scaffoldBoundingBox: any
+  scaffoldBoundingBox: any,
+  level: number
 ) {
   const scaffoldingLabels: CSS2DObject[] = [];
   scene.traverse((child) => {
@@ -601,15 +616,17 @@ function addScaffoldingLevelForAllScaffolding(
     }
   });
 
-  const componentStore = useStore();
-  const level = componentStore.level;
+  // const componentStore = useStore();
+  // const level = componentStore.level;
+
+
 
   scaffoldingLabels.forEach((label) => {
     addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox, level);
   });
 }
 
-function removeScaffoldingLevelForAllScaffolding(scene: THREE.Scene) {
+function removeScaffoldingLevelForAllScaffolding(scene: THREE.Scene, level: number) {
   const scaffoldingLabels: CSS2DObject[] = [];
   scene.traverse((child) => {
     if (
@@ -620,8 +637,8 @@ function removeScaffoldingLevelForAllScaffolding(scene: THREE.Scene) {
     }
   });
 
-  const componentStore = useStore();
-  const level = componentStore.level;
+  // const componentStore = useStore();
+  // const level = componentStore.level;
 
   scaffoldingLabels.forEach((label) => {
     removeScaffoldingLevel(label, scene, level);
@@ -639,7 +656,8 @@ function addScaffoldingLevel(
   console.log(label.userData);
   label.userData.level = level;
   const lineLength = label.userData.length;
-  const lineLevel = label.userData.level;
+  // const lineLevel = label.userData.level;
+  const lineLevel = level;
   const startPoint = new THREE.Vector3(
     label.userData.first_point.x,
     lineLevel * 2,
@@ -750,7 +768,8 @@ function removeScaffoldingLevel(
 ) {
   console.log(label.userData);
   const lineLength = label.userData.length;
-  const lineLevel = label.userData.level;
+  // const lineLevel = label.userData.level;
+  const lineLevel = level
   const startPoint = new THREE.Vector3(
     label.userData.first_point.x,
     lineLevel * 2,
