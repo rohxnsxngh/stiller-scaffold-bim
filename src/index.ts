@@ -45,6 +45,8 @@ import {
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
+  calculateTotalAmountScaffoldingInScene,
+  calculateTotalSquareFootageForScaffolding,
   calculateTransformedBoundingBox,
   deleteObject,
   disableOrbitControls,
@@ -1154,6 +1156,9 @@ export const createModelView = async () => {
 
   testButton.domElement.addEventListener("mousedown", () => {
     console.log("test button");
+    calculateTotalAmountScaffoldingInScene(scene)
+
+    calculateTotalSquareFootageForScaffolding(scene)
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {

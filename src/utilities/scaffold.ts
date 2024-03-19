@@ -171,7 +171,12 @@ export function createScaffoldModel(
       (gltf: any) => {
         const scaffoldModel = gltf.scene;
         scaffoldModel.name = "scaffoldingModel";
-        scaffoldModel.userData.name = "scaffoldingModel";
+        scaffoldModel.userData = {
+          name: "scaffoldingModel",
+          length: length,
+          height: height,
+          width: width,
+        };
         // Calculate bounding box
         const bbox = new THREE.Box3().setFromObject(scaffoldModel);
         // Get the dimensions of the bounding box
@@ -226,6 +231,12 @@ export function createScaffoldModel(
           bboxMaterial
         );
         bboxWireframe.name = "scaffoldingWireframe";
+        bboxWireframe.userData = {
+          name: "scaffoldingWireframe",
+          length: length,
+          height: height,
+          width: width,
+        };
 
         // Traverse the scaffoldModel and remove non-Mesh children
         const scaffoldingModelChildren = scaffoldModel.children[0];

@@ -349,10 +349,29 @@ export function removeHighlightMesh(scene: THREE.Scene) {
   });
 }
 
-export function calculateTotalSquareFootageForScaffolding() {
-  console.log("calculate square footage for scaffolding");
+export function calculateTotalSquareFootageForScaffolding(scene: THREE.Scene) {
+  let totalSquareFootage = 0
+
+  scene.traverse((child) => {
+    if (child.name === "scaffoldingModel") {
+      const length = child.userData.length
+      const width = child.userData.width
+      const sqCoverage = length * width
+      totalSquareFootage += sqCoverage
+    }
+  })
+
+  console.log("total square footage or whatever meter", totalSquareFootage)
+
 }
 
-export function calculateTotalAmountScaffoldingInScene() {
-  console.log("total amount of scaffolding in scene");
+export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
+  let scaffoldingModelCount = 0;
+  scene.traverse((child) => {
+    if (child.name === "scaffoldingModel") {
+      scaffoldingModelCount++
+    }
+  });
+  
+  console.log(`There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`);
 }
