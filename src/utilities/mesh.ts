@@ -8,7 +8,7 @@ import {
   resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial } from "./material";
-import { setDrawingInProgress, setIsDrawingBlueprint } from "./toolbar";
+import { setDeletionInProgress, setDrawingInProgress, setDrawingScaffoldingInProgress, setIsDrawingBlueprint } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
 import { useStore } from "../store";
 
@@ -471,21 +471,31 @@ function attachLabelChangeHandler(
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
+  let blurTriggered: boolean = false;
 
   labelElement.addEventListener("mouseenter", () => {
     document.body.style.cursor = "grab";
     // setDeletionInProgress(false);
     setDrawingInProgress(false);
+    setIsDrawingBlueprint(false)
     // setDrawingScaffoldingInProgress(false);
   });
 
   labelElement.addEventListener("mouseleave", () => {
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
+    if (!blurTriggered) {
+      setIsDrawingBlueprint(true)
+    } else {
+      setIsDrawingBlueprint(false)
+    }
   });
 
   labelElement.addEventListener("focus", () => {
+    blurTriggered = true
+    setDeletionInProgress(false);
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
     oldValue = labelElement.textContent;
   });
 
@@ -510,89 +520,89 @@ function attachLabelChangeHandler(
     }
   });
 
-  observeElementAndAddEventListener("rectangle-length", "mouseenter", () => {
-    document.body.style.cursor = "grab";
-    setDrawingInProgress(false);
-    setIsDrawingBlueprint(false)
-  })
-  observeElementAndAddEventListener("rectangle-width", "mouseenter", () => {
-    document.body.style.cursor = "grab";
-    setDrawingInProgress(false);
-    setIsDrawingBlueprint(false)
-  })
+  // observeElementAndAddEventListener("rectangle-length", "mouseenter", () => {
+  //   document.body.style.cursor = "grab";
+  //   setDrawingInProgress(false);
+  //   setIsDrawingBlueprint(false)
+  // })
+  // observeElementAndAddEventListener("rectangle-width", "mouseenter", () => {
+  //   document.body.style.cursor = "grab";
+  //   setDrawingInProgress(false);
+  //   setIsDrawingBlueprint(false)
+  // })
 
-  observeElementAndAddEventListener("rectangle-length", "mouseleave", () => {
-    document.body.style.cursor = "crosshair";
-    setDrawingInProgress(false);
-  })
-  observeElementAndAddEventListener("rectangle-width", "mouseleave", () => {
-    document.body.style.cursor = "crosshair";
-    setDrawingInProgress(false);
-  })
+  // observeElementAndAddEventListener("rectangle-length", "mouseleave", () => {
+  //   document.body.style.cursor = "crosshair";
+  //   setDrawingInProgress(false);
+  // })
+  // observeElementAndAddEventListener("rectangle-width", "mouseleave", () => {
+  //   document.body.style.cursor = "crosshair";
+  //   setDrawingInProgress(false);
+  // })
 
-  observeElementAndAddEventListener("rectangle-length", "focus", (event) => {
-    setDrawingInProgress(false);
-    setDrawingInProgress(false);
-    const element = event.target as HTMLInputElement;
-    const textContent = element.value;
-    oldValue = textContent
-    console.log(oldValue)
-  })
-  observeElementAndAddEventListener("rectangle-width", "focus", (event) => {
-    setDrawingInProgress(false);
-    setDrawingInProgress(false);
-    const element = event.target as HTMLInputElement;
-    const textContent = element.value;
-    oldValue = textContent
-    console.log(oldValue)
-  })
+  // observeElementAndAddEventListener("rectangle-length", "focus", (event) => {
+  //   setDrawingInProgress(false);
+  //   setDrawingInProgress(false);
+  //   const element = event.target as HTMLInputElement;
+  //   const textContent = element.value;
+  //   oldValue = textContent
+  //   console.log(oldValue)
+  // })
+  // observeElementAndAddEventListener("rectangle-width", "focus", (event) => {
+  //   setDrawingInProgress(false);
+  //   setDrawingInProgress(false);
+  //   const element = event.target as HTMLInputElement;
+  //   const textContent = element.value;
+  //   oldValue = textContent
+  //   console.log(oldValue)
+  // })
 
-  observeElementAndAddEventListener("rectangle-length", "blur", (event) => {
-    const element = event.target as HTMLInputElement;
-    const textContent = element.value;
-    const newValue = textContent
-    console.log("old value:", oldValue, "new value:", newValue)
-    if (oldValue !== newValue) {
-      // create new plane based on inputs
-      const newRectangleVertices = updateRectangleBlueprintGeometry(
-        newValue,
-        oldValue,
-        markupGroup,
-        width,
-        height,
-        centerX,
-        centerZ
-      );
+  // observeElementAndAddEventListener("rectangle-length", "blur", (event) => {
+  //   const element = event.target as HTMLInputElement;
+  //   const textContent = element.value;
+  //   const newValue = textContent
+  //   console.log("old value:", oldValue, "new value:", newValue)
+  //   if (oldValue !== newValue) {
+  //     // create new plane based on inputs
+  //     const newRectangleVertices = updateRectangleBlueprintGeometry(
+  //       newValue,
+  //       oldValue,
+  //       markupGroup,
+  //       width,
+  //       height,
+  //       centerX,
+  //       centerZ
+  //     );
 
-      // create new labels based on vertices
-      updateLabelsForNewDimensions(newRectangleVertices);
+  //     // create new labels based on vertices
+  //     updateLabelsForNewDimensions(newRectangleVertices);
 
-      return currentLabels;
-    }
-  })
-  observeElementAndAddEventListener("rectangle-width", "blur", (event) => {
-    const element = event.target as HTMLInputElement;
-    const textContent = element.value;
-    const newValue = textContent
-    console.log("old value:", oldValue, "new value:", newValue)
-    if (oldValue !== newValue) {
-      // create new plane based on inputs
-      const newRectangleVertices = updateRectangleBlueprintGeometry(
-        newValue,
-        oldValue,
-        markupGroup,
-        width,
-        height,
-        centerX,
-        centerZ
-      );
+  //     return currentLabels;
+  //   }
+  // })
+  // observeElementAndAddEventListener("rectangle-width", "blur", (event) => {
+  //   const element = event.target as HTMLInputElement;
+  //   const textContent = element.value;
+  //   const newValue = textContent
+  //   console.log("old value:", oldValue, "new value:", newValue)
+  //   if (oldValue !== newValue) {
+  //     // create new plane based on inputs
+  //     const newRectangleVertices = updateRectangleBlueprintGeometry(
+  //       newValue,
+  //       oldValue,
+  //       markupGroup,
+  //       width,
+  //       height,
+  //       centerX,
+  //       centerZ
+  //     );
 
-      // create new labels based on vertices
-      updateLabelsForNewDimensions(newRectangleVertices);
+  //     // create new labels based on vertices
+  //     updateLabelsForNewDimensions(newRectangleVertices);
 
-      return currentLabels;
-    }
-  })
+  //     return currentLabels;
+  //   }
+  // })
 }
 
 // cast point for top view rectangle tool
