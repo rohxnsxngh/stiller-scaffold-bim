@@ -374,6 +374,8 @@ export const createModelView = async () => {
   });
 
   blueprintButton.domElement.addEventListener("mousedown", function () {
+    setIsDrawingBlueprint(false)
+    document.body.style.cursor = "auto";
     if (!drawingInProgress && points.length > 1) {
       // create extrusion from the blueprint after it has been created
       points = createBlueprintFromShapeOutline(points, scene);
@@ -388,10 +390,19 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-blueprint", "mousedown", () => {
+    setIsDrawingBlueprint(false)
+    document.body.style.cursor = "auto";
     if (!drawingInProgress && points.length > 1) {
       // create extrusion from the blueprint after it has been created
       points = createBlueprintFromShapeOutline(points, scene);
     }
+    // if (rectangleBlueprint) {
+    //   points = createBlueprintFromMarkup(
+    //     markupGroup.children[0].userData.rectanglePoints,
+    //     markupGroup.children[0].userData.blueprintHasBeenUpdated,
+    //     scene
+    //   );
+    // }
     if (rectangleBlueprint) {
       points = createBlueprintFromShapeOutline(
         markupGroup.children[0].userData.rectanglePoints,
@@ -435,6 +446,7 @@ export const createModelView = async () => {
 
     blueprints.forEach((blueprint) => {
       let hasExtrusion = extrusions.some((extrusion) =>
+        // Object.is(blueprint.userData.shape, extrusion.userData.shape)
         Object.is(blueprint.userData, extrusion.userData)
       );
       if (!hasExtrusion) {
@@ -446,6 +458,7 @@ export const createModelView = async () => {
     extrusions = [];
   });
 
+    // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   observeElementAndAddEventListener("create-extrusion", "mousedown", () => {
     let blueprints: THREE.Mesh[] = [];
     let extrusions: THREE.Mesh[] = [];
@@ -462,6 +475,7 @@ export const createModelView = async () => {
 
     blueprints.forEach((blueprint) => {
       let hasExtrusion = extrusions.some((extrusion) =>
+        // Object.is(blueprint.userData.shape, extrusion.userData.shape)
         Object.is(blueprint.userData, extrusion.userData)
       );
       if (!hasExtrusion) {
@@ -498,11 +512,14 @@ export const createModelView = async () => {
       }
     });
 
+    console.log("extrusions", extrusions)
+    console.log("roofs", roofs)
+
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-          extrusion.userData.currentPoint.x === roof.userData.currentPoint.x ||
-          extrusion.userData.currentPoint.y === roof.userData.currentPoint.y
+          extrusion.userData.shape.currentPoint.x === roof.userData.shape.currentPoint.x ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.currentPoint.y
       );
       if (!hasRoof) {
         createRoof(extrusion, scene, 0, 3);
@@ -1136,6 +1153,10 @@ export const createModelView = async () => {
   });
 
   testButton.domElement.addEventListener("mousedown", () => {
+    console.log("test button");
+  });
+
+  observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
     const scaffoldOutline: (
       | THREE.Mesh<any, any, any>
       | THREE.Line<any, any>
@@ -1146,7 +1167,35 @@ export const createModelView = async () => {
       }
     });
     console.log(scaffoldOutline);
-    createScaffoldingSheeting(scaffoldOutline, scene);
+    createScaffoldingSheeting(scaffoldOutline, scene, 0x23e6a1);
+  });
+
+  observeElementAndAddEventListener("tarp-sheet", "mousedown", () => {
+    const scaffoldOutline: (
+      | THREE.Mesh<any, any, any>
+      | THREE.Line<any, any>
+    )[] = [];
+    scene.traverse((child) => {
+      if (child instanceof THREE.Line && child.name === "scaffoldLine") {
+        scaffoldOutline.push(child);
+      }
+    });
+    console.log(scaffoldOutline);
+    createScaffoldingSheeting(scaffoldOutline, scene, 0x0084ff);
+  });
+
+  observeElementAndAddEventListener("shrink-wrap-sheet", "mousedown", () => {
+    const scaffoldOutline: (
+      | THREE.Mesh<any, any, any>
+      | THREE.Line<any, any>
+    )[] = [];
+    scene.traverse((child) => {
+      if (child instanceof THREE.Line && child.name === "scaffoldLine") {
+        scaffoldOutline.push(child);
+      }
+    });
+    console.log(scaffoldOutline);
+    createScaffoldingSheeting(scaffoldOutline, scene, 0x9e9e9e);
   });
 
   // @ts-ignore

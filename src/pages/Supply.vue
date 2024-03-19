@@ -6,21 +6,21 @@
       <div class="mb-8">
         <p class="text-sm mb-4 mt-8">Tildekking av stillas</p>
         <div class="grid grid-cols-3 gap-3">
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]" id="cloth-sheet">
             <img
               src="../assets/images/SupplySection/Tablecloth.svg"
               class="object-contain"
             />
             <p class="">Duk</p>
           </div>
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]" id="tarp-sheet">
             <img
               src="../assets/images/SupplySection/Presenting.svg"
               class="object-contain"
             />
             <p>Presenning</p>
           </div>
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
+          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]" id="shrink-wrap-sheet">
             <img
               src="../assets/images/SupplySection/ShrinkPlastic.svg"
               class="object-contain"

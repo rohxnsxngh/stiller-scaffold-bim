@@ -792,7 +792,8 @@ function removeScaffoldingLevel(
 
 export function createScaffoldingSheeting(
   scaffoldOutline: (THREE.Mesh<any, any, any> | THREE.Line<any, any>)[],
-  scene: THREE.Scene
+  scene: THREE.Scene,
+  sheetColor: number
 ) {
   scaffoldOutline.forEach((scaffold) => {
     const firstPoint = scaffold.userData.first_point as THREE.Vector3;
@@ -824,7 +825,7 @@ export function createScaffoldingSheeting(
     // Create a mesh with a PlaneGeometry and a MeshBasicMaterial
     const planeGeometry = new THREE.PlaneGeometry(length, 2); // Adjust the size as needed
     const planeMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+      color: sheetColor,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 0.5,
