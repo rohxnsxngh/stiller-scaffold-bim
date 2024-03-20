@@ -3,7 +3,6 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import { measureLineLength, observeElementAndAddEventListener } from "./helper";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { useStore } from "../store";
 
 export let placeScaffoldIndividually = false;
 
@@ -129,7 +128,7 @@ export async function placeScaffoldModelsAlongLine(
         });
 
         scene.add(modelInstance);
-        scene.add(boundBoxInstance);
+        // scene.add(boundBoxInstance);
       } else {
         console.log("there are already children at this position");
       }
@@ -248,6 +247,9 @@ export function createScaffoldModel(
             }
           }
         );
+        // remove the orthographic camera at the end of the array
+        scaffoldModel.children[0].children.pop();
+        console.log("scaffold model", scaffoldModel.children[0]);
 
         resolve([bboxWireframe, scaffoldModel]);
       },
@@ -302,7 +304,7 @@ export function createIndividualScaffoldOnClick(
           scaffoldRotation
         );
         scene.add(modelInstance);
-        scene.add(boundBoxInstance);
+        // scene.add(boundBoxInstance);
         const { label, button } = createIndividualScaffoldLabel(
           scene,
           modelInstance,
@@ -648,13 +650,13 @@ function addScaffoldingLevel(
   // this logic needs tweaking
   if (level < label.userData.level) {
     console.log("level is less than userData level");
-    level = label.userData.level + 1
-    console.log("new level", level)
+    level = label.userData.level + 1;
+    console.log("new level", level);
   } else {
     label.userData.level = level;
   }
   // reset level
-  label.userData.level = level
+  label.userData.level = level;
   const lineLength = label.userData.length;
   const lineLevel = level;
   const startPoint = new THREE.Vector3(
@@ -748,7 +750,7 @@ function addScaffoldingLevel(
         });
 
         scene.add(modelInstance);
-        scene.add(boundBoxInstance);
+        // scene.add(boundBoxInstance);
       } else {
         console.log("there are already children at this position");
       }
@@ -774,7 +776,7 @@ function removeScaffoldingLevel(
   //   label.userData.level = level;
   // }
   // reset level
-  label.userData.level = level
+  label.userData.level = level;
   const lineLength = label.userData.length;
   const lineLevel = level;
   console.log("linelevel", lineLevel);
