@@ -398,16 +398,10 @@ export const createModelView = async () => {
       // create extrusion from the blueprint after it has been created
       points = createBlueprintFromShapeOutline(points, scene);
     }
-    // if (rectangleBlueprint) {
-    //   points = createBlueprintFromMarkup(
-    //     markupGroup.children[0].userData.rectanglePoints,
-    //     markupGroup.children[0].userData.blueprintHasBeenUpdated,
-    //     scene
-    //   );
-    // }
     if (rectangleBlueprint) {
-      points = createBlueprintFromShapeOutline(
+      points = createBlueprintFromMarkup(
         markupGroup.children[0].userData.rectanglePoints,
+        markupGroup.children[0].userData.blueprintHasBeenUpdated,
         scene
       );
     }
@@ -448,8 +442,7 @@ export const createModelView = async () => {
 
     blueprints.forEach((blueprint) => {
       let hasExtrusion = extrusions.some((extrusion) =>
-        // Object.is(blueprint.userData.shape, extrusion.userData.shape)
-        Object.is(blueprint.userData, extrusion.userData)
+        Object.is(blueprint.userData.shape, extrusion.userData.shape)
       );
       if (!hasExtrusion) {
         createExtrusionFromBlueprint(blueprint.userData, scene, 12);
@@ -477,8 +470,7 @@ export const createModelView = async () => {
 
     blueprints.forEach((blueprint) => {
       let hasExtrusion = extrusions.some((extrusion) =>
-        // Object.is(blueprint.userData.shape, extrusion.userData.shape)
-        Object.is(blueprint.userData, extrusion.userData)
+        Object.is(blueprint.userData.shape, extrusion.userData.shape)
       );
       if (!hasExtrusion) {
         const depthValue = componentStore.depth;
