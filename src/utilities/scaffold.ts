@@ -106,16 +106,16 @@ export async function placeScaffoldModelsAlongLine(
         // this model instance allows me to select a scaffolding individually
         // even though they are being placed in a line almost like a cohesive object
         // Create a new material for the model instance
-        // const material = new THREE.MeshPhongMaterial({
-        //   color: 0x404040,
-        //   emissive: 0x000000,
-        //   specular: 0x111111,
-        // }); // Adjust the color as needed
-        // modelInstance.traverse((child: any) => {
-        //   if (child instanceof THREE.Mesh) {
-        //     child.material = material;
-        //   }
-        // });
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x404040,
+          emissive: 0x000000,
+          specular: 0x111111,
+        }); // Adjust the color as needed
+        modelInstance.traverse((child: any) => {
+          if (child instanceof THREE.Mesh) {
+            child.material = material;
+          }
+        });
 
         // Create a new material for the bounding box instance
         const boundBoxMaterial = new THREE.MeshStandardMaterial({
