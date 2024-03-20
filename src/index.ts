@@ -167,7 +167,7 @@ export const createModelView = async () => {
     moveBlueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
-    drawingButton,
+    // drawingButton,
     createGableRoofButton,
     createShedRoofButton,
     createEditExtrusionButton,
@@ -1086,10 +1086,10 @@ export const createModelView = async () => {
   //   setIsDrawingBlueprint(false);
   // })
 
-  drawingButton.domElement.addEventListener("mousedown", () => {
-    setIsDrawingBlueprint(false);
-    setDrawingInProgressSwitch(true);
-  });
+  // drawingButton.domElement.addEventListener("mousedown", () => {
+  //   setIsDrawingBlueprint(false);
+  //   setDrawingInProgressSwitch(true);
+  // });
 
   /////////////////////
   console.log(components);

@@ -99,18 +99,6 @@ export const createToolbar = (
   // Append the new DOM element to topToolBar.domElement
   topToolBar.domElement.appendChild(mountPointTimeline);
 
-  const alertButton = new OBC.Button(components);
-  alertButton.materialIcon = "info";
-  alertButton.tooltip = "Information";
-  alertButton.id = "alert-button";
-  mainToolbar.addChild(alertButton);
-  alertButton.onClick.add(() => {
-    alert("I've been clicked!");
-    console.log(alertButton);
-  });
-  alertButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  alertButton.domElement.classList.add("hover:bg-slate-300");
-
   const generalMenuButton = new OBC.Button(components, {
     name: "Generelt",
   });
@@ -270,32 +258,32 @@ export const createToolbar = (
   createBlueprintRectangleButton.domElement.classList.add("hover:bg-slate-300");
 
   // Move camera to perspective view button
-  const perspectiveViewButton = new OBC.Button(components);
-  perspectiveViewButton.materialIcon = "fullscreen_exit";
-  perspectiveViewButton.tooltip = "Perspective View";
-  perspectiveViewButton.id = "perspective-button";
-  mainToolbar.addChild(perspectiveViewButton);
-  perspectiveViewButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        scene.remove(child);
-      }
-    });
-    cameraPerspectiveView(gsap, components.camera);
-    setDeletionInProgress(false);
-    setDrawingInProgress(false);
-  });
-  perspectiveViewButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  perspectiveViewButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false);
-  });
-  perspectiveViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  perspectiveViewButton.domElement.classList.add("hover:bg-slate-300");
+  // const perspectiveViewButton = new OBC.Button(components);
+  // perspectiveViewButton.materialIcon = "fullscreen_exit";
+  // perspectiveViewButton.tooltip = "Perspective View";
+  // perspectiveViewButton.id = "perspective-button";
+  // mainToolbar.addChild(perspectiveViewButton);
+  // perspectiveViewButton.onClick.add(() => {
+  //   document.body.style.cursor = "auto";
+  //   scene.traverse((child) => {
+  //     if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+  //       scene.remove(child);
+  //     }
+  //   });
+  //   cameraPerspectiveView(gsap, components.camera);
+  //   setDeletionInProgress(false);
+  //   setDrawingInProgress(false);
+  // });
+  // perspectiveViewButton.domElement.addEventListener("mouseover", () => {
+  //   setDrawingInProgress(false);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
+  // perspectiveViewButton.domElement.addEventListener("mouseleave", () => {
+  //   setDrawingInProgress(true);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
+  // perspectiveViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  // perspectiveViewButton.domElement.classList.add("hover:bg-slate-300");
 
   // Allow panning and rotating button
   const freeRotateButton = new OBC.Button(components);
@@ -333,19 +321,19 @@ export const createToolbar = (
   });
 
   // Start Drawing Blueprint
-  const drawingButton = new OBC.Button(components);
-  drawingButton.materialIcon = "polyline";
-  drawingButton.tooltip = "Polygon Sketch";
-  drawingButton.id = "drawing-button";
-  mainToolbar.addChild(drawingButton);
-  drawingButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    setDeletionInProgress(false);
-    setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false);
-  });
-  drawingButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  drawingButton.domElement.classList.add("hover:bg-slate-300");
+  // const drawingButton = new OBC.Button(components);
+  // drawingButton.materialIcon = "polyline";
+  // drawingButton.tooltip = "Polygon Sketch";
+  // drawingButton.id = "drawing-button";
+  // mainToolbar.addChild(drawingButton);
+  // drawingButton.onClick.add(() => {
+  //   document.body.style.cursor = "auto";
+  //   setDeletionInProgress(false);
+  //   setDrawingInProgress(true);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
+  // drawingButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  // drawingButton.domElement.classList.add("hover:bg-slate-300");
 
   const deleteObjectButton = new OBC.Button(components);
   deleteObjectButton.materialIcon = "delete_forever";
@@ -991,7 +979,7 @@ export const createToolbar = (
     moveBlueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
-    drawingButton,
+    // drawingButton,
     createGableRoofButton,
     createShedRoofButton,
     createEditExtrusionButton,

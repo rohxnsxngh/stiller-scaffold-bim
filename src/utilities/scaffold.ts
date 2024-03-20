@@ -106,16 +106,16 @@ export async function placeScaffoldModelsAlongLine(
         // this model instance allows me to select a scaffolding individually
         // even though they are being placed in a line almost like a cohesive object
         // Create a new material for the model instance
-        const material = new THREE.MeshPhongMaterial({
-          color: 0x404040,
-          emissive: 0x000000,
-          specular: 0x111111,
-        }); // Adjust the color as needed
-        modelInstance.traverse((child: any) => {
-          if (child instanceof THREE.Mesh) {
-            child.material = material;
-          }
-        });
+        // const material = new THREE.MeshPhongMaterial({
+        //   color: 0x404040,
+        //   emissive: 0x000000,
+        //   specular: 0x111111,
+        // }); // Adjust the color as needed
+        // modelInstance.traverse((child: any) => {
+        //   if (child instanceof THREE.Mesh) {
+        //     child.material = material;
+        //   }
+        // });
 
         // Create a new material for the bounding box instance
         const boundBoxMaterial = new THREE.MeshStandardMaterial({
@@ -580,7 +580,6 @@ function attachScaffoldRowLabelChangeHandler(
     if (level < 0) {
       level = 0;
     }
-    console.log(level);
   });
 
   observeElementAndAddEventListener(
@@ -593,7 +592,6 @@ function attachScaffoldRowLabelChangeHandler(
       if (levels < 0) {
         levels = 0;
       }
-      console.log(levels);
     }
   );
 }
@@ -648,13 +646,11 @@ function addScaffoldingLevel(
 ) {
   console.log(level, label.userData.level);
   // this logic needs tweaking
-  if (level < label.userData.level) {
-    console.log("level is less than userData level");
-    level = label.userData.level + 1;
-    console.log("new level", level);
-  } else {
-    label.userData.level = level;
-  }
+  // if (level < label.userData.level) {
+  //   level = label.userData.level + 1;
+  // } else {
+  //   label.userData.level = level;
+  // }
   // reset level
   label.userData.level = level;
   const lineLength = label.userData.length;
