@@ -106,26 +106,26 @@ export async function placeScaffoldModelsAlongLine(
         // this model instance allows me to select a scaffolding individually
         // even though they are being placed in a line almost like a cohesive object
         // Create a new material for the model instance
-        const material = new THREE.MeshPhongMaterial({
-          color: 0x404040,
-          emissive: 0x000000,
-          specular: 0x111111,
-        }); // Adjust the color as needed
-        modelInstance.traverse((child: any) => {
-          if (child instanceof THREE.Mesh) {
-            child.material = material;
-          }
-        });
+        // const material = new THREE.MeshPhongMaterial({
+        //   color: 0x404040,
+        //   emissive: 0x000000,
+        //   specular: 0x111111,
+        // }); // Adjust the color as needed
+        // modelInstance.traverse((child: any) => {
+        //   if (child instanceof THREE.Mesh) {
+        //     child.material = material;
+        //   }
+        // });
 
         // Create a new material for the bounding box instance
-        const boundBoxMaterial = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-        }); // Adjust the color as needed
-        boundBoxInstance.traverse((child: any) => {
-          if (child instanceof THREE.Mesh) {
-            child.material = boundBoxMaterial;
-          }
-        });
+        // const boundBoxMaterial = new THREE.MeshStandardMaterial({
+        //   color: 0xffffff,
+        // }); // Adjust the color as needed
+        // boundBoxInstance.traverse((child: any) => {
+        //   if (child instanceof THREE.Mesh) {
+        //     child.material = boundBoxMaterial;
+        //   }
+        // });
 
         scene.add(modelInstance);
         // scene.add(boundBoxInstance);
@@ -166,7 +166,7 @@ export function createScaffoldModel(
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
     loader.load(
-      "/models/scaffolding-home.glb",
+      "/models/scaffolding-home-uniform.glb",
       (gltf: any) => {
         const scaffoldModel = gltf.scene;
         scaffoldModel.name = "scaffoldingModel";
@@ -237,19 +237,15 @@ export function createScaffoldModel(
           width: width,
         };
 
-        // Traverse the scaffoldModel and remove non-Mesh children
-        const scaffoldingModelChildren = scaffoldModel.children[0];
-        // Remove non-Mesh children from scaffoldingModelChildren using a forEach loop
-        scaffoldingModelChildren.children.forEach(
-          (child: any, index: number) => {
-            if (!(child instanceof THREE.Mesh)) {
-              scaffoldingModelChildren.children.splice(index, 1);
-            }
-          }
-        );
-        // remove the orthographic camera at the end of the array
-        scaffoldModel.children[0].children.pop();
-        console.log("scaffold model", scaffoldModel.children[0]);
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x141414, // Dark gray color
+          shininess: 10, // Adjust shininess to your preference
+          specular: 0x000000, // Specular color, darker than the main color
+          emissive: 0x000000,
+        });
+        scaffoldModel.children[0].material = material;
+
+        console.log("scaffolding model", scaffoldModel);
 
         resolve([bboxWireframe, scaffoldModel]);
       },
@@ -720,30 +716,6 @@ function addScaffoldingLevel(
 
         modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
         boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
-
-        // this model instance allows me to select a scaffolding individually
-        // even though they are being placed in a line almost like a cohesive object
-        // Create a new material for the model instance
-        const material = new THREE.MeshPhongMaterial({
-          color: 0x404040,
-          emissive: 0x000000,
-          specular: 0x111111,
-        }); // Adjust the color as needed
-        modelInstance.traverse((child: any) => {
-          if (child instanceof THREE.Mesh) {
-            child.material = material;
-          }
-        });
-
-        // Create a new material for the bounding box instance
-        const boundBoxMaterial = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-        }); // Adjust the color as needed
-        boundBoxInstance.traverse((child: any) => {
-          if (child instanceof THREE.Mesh) {
-            child.material = boundBoxMaterial;
-          }
-        });
 
         scene.add(modelInstance);
         // scene.add(boundBoxInstance);
