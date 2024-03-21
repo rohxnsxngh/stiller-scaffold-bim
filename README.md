@@ -21,3 +21,5 @@ npm install
 ```
 npm run dev
 ```
+
+# Additional Information
