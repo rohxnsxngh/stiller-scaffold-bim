@@ -145,6 +145,12 @@ export function resetScene(
     if (child.name === "scaffoldingModel") {
       objectsToRemove.push(child);
     }
+    if (child.name === "scaffoldingSheet") {
+      objectsToRemove.push(child)
+    }
+    if (child.name === "rectanglePlane") {
+      objectsToRemove.push(child)
+    }
   });
   objectsToRemove.forEach((object: any) => {
     scene.remove(object);
@@ -187,24 +193,50 @@ export function disableOrbitControls(controls: any) {
 }
 
 // delete an object when raycast intersects with object
-export function deleteObject(intersects: any) {
-  if (Array.isArray(intersects)) {
-    intersects.forEach(function (intersect: any) {
-      switch (intersect.object.name) {
-        // case "ground":
-        //   console.log("ground");
-        //   break;
-        case "extrusion":
-          console.log("extrusion");
-          break;
-        case "roof":
-          console.log("roof");
-          break;
-        case "blueprint":
-          console.log("blueprint");
-          break;
+export function deleteObject(object: any, scene: THREE.Scene) {
+  // const parentObject = object.parent.children;
+  if (object.parent.type === "Object3D") {
+    const parent = object.parent;
+    console.log(parent);
+    // Remove the parent recursively
+    removeFromScene(parent, scene);
+  } else {
+    // Remove the parent recursively
+    object.material.dispose();
+    scene.remove(object);
+  }
+}
+
+// Function to remove object from the scene recursively
+// this helper function is meant specifically for gltf that contain a tree of objects
+function removeFromScene(object: any, scene: THREE.Scene) {
+  if (object.parent) {
+    // Dispose of materials
+    if (object.material) {
+      if (Array.isArray(object.material)) {
+        object.material.forEach((material: { dispose: () => void }) => {
+          material.dispose();
+        });
+      } else {
+        object.material.dispose();
       }
-    });
+    }
+
+    object.parent.remove(object);
+    removeFromScene(object.parent, scene); // Recursively remove parent
+  } else {
+    // Dispose of materials
+    if (object.material) {
+      if (Array.isArray(object.material)) {
+        object.material.forEach((material: { dispose: () => void }) => {
+          material.dispose();
+        });
+      } else {
+        object.material.dispose();
+      }
+    }
+
+    scene.remove(object); // If no parent, remove from scene
   }
 }
 
@@ -215,4 +247,131 @@ export function hideAllCSS2DObjects(scene: THREE.Scene) {
       child.visible = false;
     }
   });
+}
+
+export function resetSceneExceptSingularObject(
+  scene: THREE.Scene,
+  objectName: string
+) {
+  const objectsToRemove: any = [];
+  scene.traverse((child: any) => {
+    if (child.name !== "rectangleLabel" && child instanceof CSS2DObject) {
+      objectsToRemove.push(child);
+    }
+    if (
+      child.name !== "ground" &&
+      child.name !== `${objectName}` &&
+      (child instanceof THREE.Mesh ||
+        child instanceof THREE.Points ||
+        child instanceof THREE.Line) &&
+      !(child.geometry instanceof THREE.PlaneGeometry)
+    ) {
+      objectsToRemove.push(child);
+    }
+    if (child.name === "scaffoldingModel") {
+      objectsToRemove.push(child);
+    }
+  });
+
+  objectsToRemove.forEach((child: THREE.Object3D<THREE.Object3DEventMap>) => {
+    scene.remove(child);
+  });
+}
+
+export function setInvisibleExceptSingularObject(
+  scene: THREE.Scene,
+  objectName: string
+) {
+  const objectsToRemove: any = [];
+  scene.traverse((child: any) => {
+    if (child.name !== "rectangleLabel" && child instanceof CSS2DObject) {
+      objectsToRemove.push(child);
+    }
+    if (
+      child.name !== "ground" &&
+      child.name !== `${objectName}` &&
+      (child instanceof THREE.Mesh ||
+        child instanceof THREE.Points ||
+        child instanceof THREE.Line) &&
+      !(child.geometry instanceof THREE.PlaneGeometry)
+    ) {
+      objectsToRemove.push(child);
+    }
+    if (child.name === "scaffoldingModel") {
+      objectsToRemove.push(child);
+    }
+  });
+
+  objectsToRemove.forEach((child: THREE.Object3D<THREE.Object3DEventMap>) => {
+    child.visible = false;
+  });
+}
+
+// very important for listening to elements are not in th DOM
+// elements in the drawer/sidebar
+export function observeElementAndAddEventListener(
+  elementId: string,
+  eventType: string,
+  eventHandler: (event: Event) => void
+) {
+  const addEventListenerToElement = () => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      //  console.log(`Element ${elementId} found, adding event listener`);
+      element.addEventListener(eventType, eventHandler);
+      // optional I am disconnecting observer. this should be used when an element will never be used again
+      //  observer.disconnect(); // Stop observing once the element is found
+    } else {
+      //  console.log(`Element ${elementId} not found yet`);
+    }
+  };
+
+  // Create a MutationObserver to watch for changes in the DOM
+  const observer = new MutationObserver(addEventListenerToElement);
+
+  // Start observing the document with the configured callback
+  observer.observe(document, { childList: true, subtree: true });
+
+  // Call the function once to check if the element is already in the DOM
+  addEventListenerToElement();
+}
+
+export function removeHighlightMesh(scene: THREE.Scene) {
+  const objects: THREE.Mesh<any, any, any>[] = [];
+  scene.traverse(function (child) {
+    if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+      objects.push(child);
+    }
+  });
+
+  objects.forEach((child) => {
+    scene.remove(child);
+  });
+}
+
+export function calculateTotalSquareFootageForScaffolding(scene: THREE.Scene) {
+  let totalSquareFootage = 0
+
+  scene.traverse((child) => {
+    if (child.name === "scaffoldingModel") {
+      const length = child.userData.length
+      const width = child.userData.width
+      const sqCoverage = length * width
+      totalSquareFootage += sqCoverage
+    }
+  })
+
+  console.log("total square footage or whatever meter", totalSquareFootage)
+
+}
+
+export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
+  let scaffoldingModelCount = 0;
+  scene.traverse((child) => {
+    if (child.name === "scaffoldingModel") {
+      scaffoldingModelCount++
+    }
+  });
+  
+  console.log(`There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`);
 }

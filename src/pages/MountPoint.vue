@@ -1,8 +1,7 @@
 <template>
   <div
     id="label-component"
-    class="bg-black text-white p-2 flex pointer-events-auto rounded overflow-hidden"
-    @click="clicktest"
+    class="bg-[#111115] text-white px-2 flex pointer-events-auto rounded"
   >
     <General v-if="activeSection === 'general'" />
     <Blueprint v-if="activeSection === 'blueprint'" />
@@ -24,9 +23,6 @@ const setActiveSection = (section: string) => {
 // @ts-ignore
 window.setActiveSection = setActiveSection;
 
-const clicktest = () => {
-  console.log("clicked");
-};
 </script>
 
 <script lang="ts">

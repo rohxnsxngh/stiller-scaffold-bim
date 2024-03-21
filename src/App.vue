@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useNavbarStore } from "./store/index";
-const store = useNavbarStore();
+import { navStore } from "./store/index";
+const store = navStore();
 </script>
 
 <template>
@@ -11,8 +11,8 @@ const store = useNavbarStore();
 </template>
 
 <script lang="ts">
-import Navbar from "./components/Navbar.vue";
-import Drawer from "./components/Drawer.vue";
+import Navbar from "./pages/Navbar.vue";
+import Drawer from "./pages/Drawer.vue";
 
 export default {
   components: {

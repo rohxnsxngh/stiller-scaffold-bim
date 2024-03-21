@@ -9,3 +9,17 @@ downgrading a package might affect other parts of your project that rely on feat
 # Shapes
 
 Most build tools are based on the concept of blueprints with rectangular shapes.This is because most commercial designs are rectangular, or square, is because they are easier, faster and more economical to build out of ordinary materials – stone, concrete, brick or wood. Square and rectangular shapes are also exponentially easier to reconcile, and there's usually less waste.
+
+### Install dependencies
+
+```
+npm install
+```
+
+### Run Development
+
+```
+npm run dev
+```
+
+# Additional Information
