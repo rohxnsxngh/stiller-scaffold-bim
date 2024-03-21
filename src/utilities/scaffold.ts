@@ -106,26 +106,14 @@ export async function placeScaffoldModelsAlongLine(
         // this model instance allows me to select a scaffolding individually
         // even though they are being placed in a line almost like a cohesive object
         // Create a new material for the model instance
-        // const material = new THREE.MeshPhongMaterial({
-        //   color: 0x404040,
-        //   emissive: 0x000000,
-        //   specular: 0x111111,
-        // }); // Adjust the color as needed
-        // modelInstance.traverse((child: any) => {
-        //   if (child instanceof THREE.Mesh) {
-        //     child.material = material;
-        //   }
-        // });
-
-        // Create a new material for the bounding box instance
-        // const boundBoxMaterial = new THREE.MeshStandardMaterial({
-        //   color: 0xffffff,
-        // }); // Adjust the color as needed
-        // boundBoxInstance.traverse((child: any) => {
-        //   if (child instanceof THREE.Mesh) {
-        //     child.material = boundBoxMaterial;
-        //   }
-        // });
+        const material = new THREE.MeshPhysicalMaterial({
+          color: 0x222222, // Dark gray color
+        });
+        if (modelInstance.children[0] instanceof THREE.Mesh) {
+          modelInstance.children[0].material = material;
+        } else {
+          console.error("The first child of the model instance is not a Mesh.");
+        }
 
         scene.add(modelInstance);
         // scene.add(boundBoxInstance);
@@ -166,7 +154,7 @@ export function createScaffoldModel(
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
     loader.load(
-      "/models/scaffolding-home-uniform.glb",
+      "/models/scaffolding-home-experiment.glb",
       (gltf: any) => {
         const scaffoldModel = gltf.scene;
         scaffoldModel.name = "scaffoldingModel";
@@ -236,14 +224,6 @@ export function createScaffoldModel(
           height: height,
           width: width,
         };
-
-        const material = new THREE.MeshPhongMaterial({
-          color: 0x141414, // Dark gray color
-          shininess: 10, // Adjust shininess to your preference
-          specular: 0x000000, // Specular color, darker than the main color
-          emissive: 0x000000,
-        });
-        scaffoldModel.children[0].material = material;
 
         console.log("scaffolding model", scaffoldModel);
 
@@ -550,10 +530,10 @@ function attachScaffoldRowLabelChangeHandler(
     setPlaceScaffoldIndividually(false);
   });
 
-  buttonAdd.addEventListener("mousedown", () => {
-    level++;
-    addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox, level);
-  });
+  // buttonAdd.addEventListener("mousedown", () => {
+  //   level++;
+  //   addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox, level);
+  // });
 
   observeElementAndAddEventListener(
     "add-scaffolding-level",
@@ -569,14 +549,14 @@ function attachScaffoldRowLabelChangeHandler(
     }
   );
 
-  buttonMinus.addEventListener("mousedown", () => {
-    removeScaffoldingLevel(label, scene, level);
-    level--;
-    // make sure the level cannot go below 0
-    if (level < 0) {
-      level = 0;
-    }
-  });
+  // buttonMinus.addEventListener("mousedown", () => {
+  //   removeScaffoldingLevel(label, scene, level);
+  //   level--;
+  //   // make sure the level cannot go below 0
+  //   if (level < 0) {
+  //     level = 0;
+  //   }
+  // });
 
   observeElementAndAddEventListener(
     "remove-scaffolding-level",
@@ -713,6 +693,15 @@ function addScaffoldingLevel(
 
         modelInstance.rotation.copy(euler);
         boundBoxInstance.rotation.copy(euler);
+
+        const material = new THREE.MeshPhysicalMaterial({
+          color: 0x222222, // Dark gray color
+        });
+        if (modelInstance.children[0] instanceof THREE.Mesh) {
+          modelInstance.children[0].material = material;
+        } else {
+          console.error("The first child of the model instance is not a Mesh.");
+        }
 
         modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
         boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);

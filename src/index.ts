@@ -1202,6 +1202,11 @@ export const createModelView = async () => {
     stats.begin();
     requestAnimationFrame(animate);
 
+    // console.log("Scene Polycount:", components._renderer._renderer.info.render.triangles);
+    // console.log("Active Drawcalls:", components._renderer._renderer.info.render.calls);
+    // console.log("Textures in Memory", components._renderer._renderer.info.memory.textures);
+    // console.log("Geometries in Memory", components._renderer._renderer.info.memory.geometries);
+
     controls.update();
 
     stats.end();
