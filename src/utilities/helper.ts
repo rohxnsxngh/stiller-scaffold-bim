@@ -146,10 +146,10 @@ export function resetScene(
       objectsToRemove.push(child);
     }
     if (child.name === "scaffoldingSheet") {
-      objectsToRemove.push(child)
+      objectsToRemove.push(child);
     }
     if (child.name === "rectanglePlane") {
-      objectsToRemove.push(child)
+      objectsToRemove.push(child);
     }
   });
   objectsToRemove.forEach((object: any) => {
@@ -193,16 +193,22 @@ export function disableOrbitControls(controls: any) {
 }
 
 // delete an object when raycast intersects with object
+// TODO: make this method more efficient and more inclusive
 export function deleteObject(object: any, scene: THREE.Scene) {
   // const parentObject = object.parent.children;
-  if (object.parent.type === "Object3D") {
+  if (
+    object.parent.type === "Group" &&
+    object.parent instanceof THREE.Object3D
+  ) {
     const parent = object.parent;
     console.log(parent);
     // Remove the parent recursively
     removeFromScene(parent, scene);
   } else {
     // Remove the parent recursively
+    console.log(object);
     object.material.dispose();
+    object.geometry.dispose();
     scene.remove(object);
   }
 }
@@ -350,28 +356,35 @@ export function removeHighlightMesh(scene: THREE.Scene) {
 }
 
 export function calculateTotalSquareFootageForScaffolding(scene: THREE.Scene) {
-  let totalSquareFootage = 0
-
+  let totalSquareFootage = 0;
+  // TODO need to check the math in this section
   scene.traverse((child) => {
     if (child.name === "scaffoldingModel") {
-      const length = child.userData.length
-      const width = child.userData.width
-      const sqCoverage = length * width
-      totalSquareFootage += sqCoverage
+      const length = child.userData.length;
+      const height = child.userData.height;
+      const sqCoverage = length * height;
+      totalSquareFootage += sqCoverage;
     }
-  })
+  });
 
-  console.log("total square footage or whatever meter", totalSquareFootage)
-
+  console.log("total square footage or whatever meter", totalSquareFootage);
 }
 
 export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
   let scaffoldingModelCount = 0;
   scene.traverse((child) => {
     if (child.name === "scaffoldingModel") {
-      scaffoldingModelCount++
+      scaffoldingModelCount++;
     }
   });
-  
-  console.log(`There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`);
+
+  console.log(
+    `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
+  );
 }
+
+// TODO: IMPLEMENT
+function deleteRowOfScaffolding() {}
+
+// TODO: IMPLEMENT
+function deleteColumnOfScaffolding() {}

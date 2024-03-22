@@ -3,7 +3,7 @@ import * as THREE from "three";
 export const createLighting = (scene: THREE.Scene) => {
   const directionalLight = new THREE.DirectionalLight();
   directionalLight.name = "directionalLight";
-  directionalLight.position.set(5, 10, 3);
+  directionalLight.position.set(50, 100, 3);
   directionalLight.intensity = 0.5;
   scene.add(directionalLight);
 

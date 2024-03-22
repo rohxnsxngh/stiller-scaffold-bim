@@ -33,3 +33,8 @@ export const rectMaterial = new THREE.ShaderMaterial({
   fragmentShader: fragmentRectShader,
   side: THREE.DoubleSide,
 });
+
+export const roofMaterial = new THREE.MeshPhongMaterial({
+  color: 0x1a1a1c,
+  side: THREE.DoubleSide,
+});

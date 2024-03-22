@@ -7,7 +7,7 @@ import {
   observeElementAndAddEventListener,
   resetSceneExceptSingularObject,
 } from "./helper";
-import { rectMaterial } from "./material";
+import { rectMaterial, roofMaterial } from "./material";
 import { setDeletionInProgress, setDrawingInProgress, setDrawingScaffoldingInProgress, setIsDrawingBlueprint } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
 import { useStore } from "../store";
@@ -894,12 +894,7 @@ export function createRoof(
     extrusionSettings // Extrusion settings
   );
 
-  const extrudedMaterial = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  });
-
-  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
@@ -1114,12 +1109,7 @@ function updateRoofGeometry(
     extrusionSettings // Extrusion settings
   );
 
-  const extrudedMaterial = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  });
-
-  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
@@ -1292,12 +1282,7 @@ export function createShedRoof(
     extrusionSettings // Extrusion settings
   );
 
-  const extrudedMaterial = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  });
-
-  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "shedRoof";
@@ -1512,12 +1497,7 @@ function updateShedRoofGeometry(
     extrusionSettings // Extrusion settings
   );
 
-  const extrudedMaterial = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  });
-
-  const extrudedMesh = new THREE.Mesh(extrudeGeometry, extrudedMaterial);
+  const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "shedRoof";
@@ -1534,14 +1514,8 @@ export function createFlatRoof(child: any, scene: THREE.Scene) {
   // Create a new geometry from the shape
   const geometry = new THREE.ShapeGeometry(shape);
 
-  // Create a material for the roof
-  const material = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  });
-
   // Create a mesh using the geometry and material
-  const roofMesh = new THREE.Mesh(geometry, material);
+  const roofMesh = new THREE.Mesh(geometry, roofMaterial);
 
   // Position the roof mesh above the child object
   // add offset to avoid z-fighting
