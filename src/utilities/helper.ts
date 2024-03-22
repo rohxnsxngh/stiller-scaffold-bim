@@ -382,9 +382,3 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
     `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
   );
 }
-
-// TODO: IMPLEMENT
-function deleteRowOfScaffolding() {}
-
-// TODO: IMPLEMENT
-function deleteColumnOfScaffolding() {}

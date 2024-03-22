@@ -24,20 +24,10 @@ import {
   placeScaffoldIndividually,
   generateScaffoldOutline,
   createScaffoldingSheeting,
+  deleteRowOfScaffolding,
+  deleteColumnOfScaffolding,
 } from "./utilities/scaffold";
-import {
-  createToolbar,
-  drawingInProgress,
-  drawingScaffoldingInProgress,
-  setDrawingInProgress,
-  deletionInProgress,
-  setDrawingScaffoldingInProgress,
-  setDeletionInProgress,
-  setDrawingInProgressSwitch,
-  drawingInProgressSwitch,
-  setIsDrawingBlueprint,
-  isDrawingBlueprint,
-} from "./utilities/toolbar";
+import { createToolbar } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
 import { createLighting } from "./utilities/lighting";
 import {
@@ -60,6 +50,22 @@ import {
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
 import { useStore } from "./store";
+import {
+  deletionInProgress,
+  deletionScaffoldingColumnInProgress,
+  deletionScaffoldingRowInProgress,
+  drawingInProgress,
+  drawingInProgressSwitch,
+  drawingScaffoldingInProgress,
+  isDrawingBlueprint,
+  setDeletionInProgress,
+  setDeletionScaffoldingColumnInProgress,
+  setDeletionScaffoldingRowInProgress,
+  setDrawingInProgress,
+  setDrawingInProgressSwitch,
+  setDrawingScaffoldingInProgress,
+  setIsDrawingBlueprint,
+} from "./utilities/state";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -249,6 +255,112 @@ export const createModelView = async () => {
         }
       }
     }
+    if (deletionScaffoldingRowInProgress && !drawingInProgress) {
+      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      // @ts-ignore
+      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
+      intersects = raycaster.intersectObjects(scene.children);
+
+      // If there is an intersection, apply the glow to the intersected object
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object;
+        if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name !== "ground"
+        ) {
+          if (lastHighlightedObject) {
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).color.setHex(lastHighlightedObjectColor);
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).needsUpdate = true;
+            lastHighlightedObject = null;
+          }
+          // Apply the glow to the new intersected object
+          lastHighlightedObjectColor =
+            intersectedObject.material.color.getHex();
+          intersectedObject.material.color.set(0x000000);
+          intersectedObject.material.needsUpdate = true;
+          // applyGlow(intersectedObject);
+          lastHighlightedObject = intersectedObject;
+        } else if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name === "ground"
+        ) {
+          if (lastHighlightedObject) {
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).color.setHex(lastHighlightedObjectColor);
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).needsUpdate = true;
+            lastHighlightedObject = null;
+          }
+        }
+      } else {
+        // If there is no intersection, revert the material of the last highlighted object
+        if (lastHighlightedObject) {
+          // revertMaterial(lastHighlightedObject);
+          // lastHighlightedObject.material = lastHighlightedObject.userData
+          lastHighlightedObject = null;
+        }
+      }
+    }
+    if (deletionScaffoldingColumnInProgress && !drawingInProgress) {
+      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      // @ts-ignore
+      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
+      intersects = raycaster.intersectObjects(scene.children);
+
+      // If there is an intersection, apply the glow to the intersected object
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object;
+        if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name !== "ground"
+        ) {
+          if (lastHighlightedObject) {
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).color.setHex(lastHighlightedObjectColor);
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).needsUpdate = true;
+            lastHighlightedObject = null;
+          }
+          // Apply the glow to the new intersected object
+          lastHighlightedObjectColor =
+            intersectedObject.material.color.getHex();
+          intersectedObject.material.color.set(0xFFFFFF);
+          intersectedObject.material.needsUpdate = true;
+          // applyGlow(intersectedObject);
+          lastHighlightedObject = intersectedObject;
+        } else if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name === "ground"
+        ) {
+          if (lastHighlightedObject) {
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).color.setHex(lastHighlightedObjectColor);
+            (
+              lastHighlightedObject.material as THREE.MeshStandardMaterial
+            ).needsUpdate = true;
+            lastHighlightedObject = null;
+          }
+        }
+      } else {
+        // If there is no intersection, revert the material of the last highlighted object
+        if (lastHighlightedObject) {
+          // revertMaterial(lastHighlightedObject);
+          // lastHighlightedObject.material = lastHighlightedObject.userData
+          lastHighlightedObject = null;
+        }
+      }
+    }
   });
 
   // place scaffold individually
@@ -373,10 +485,22 @@ export const createModelView = async () => {
         editBlueprint(scene, blueprintToEdit);
       }
     }
+    if (deletionScaffoldingRowInProgress && !drawingInProgress) {
+      const scaffoldingRowToRemove = intersects[0].object
+      if (scaffoldingRowToRemove.parent.name === "scaffoldingModel") {
+        deleteRowOfScaffolding(scene, scaffoldingRowToRemove)
+      }
+    }
+    if (deletionScaffoldingColumnInProgress && !drawingInProgress) {
+      const scaffoldingColumnToRemove = intersects[0].object
+      if (scaffoldingColumnToRemove.parent.name === "scaffoldingModel") {
+        deleteColumnOfScaffolding(scene, scaffoldingColumnToRemove)
+      }
+    }
   });
 
   blueprintButton.domElement.addEventListener("mousedown", function () {
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
     document.body.style.cursor = "auto";
     if (!drawingInProgress && points.length > 1) {
       // create extrusion from the blueprint after it has been created
@@ -392,7 +516,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-blueprint", "mousedown", () => {
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
     document.body.style.cursor = "auto";
     if (!drawingInProgress && points.length > 1) {
       // create extrusion from the blueprint after it has been created
@@ -453,7 +577,7 @@ export const createModelView = async () => {
     extrusions = [];
   });
 
-    // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
+  // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   observeElementAndAddEventListener("create-extrusion", "mousedown", () => {
     let blueprints: THREE.Mesh[] = [];
     let extrusions: THREE.Mesh[] = [];
@@ -506,14 +630,16 @@ export const createModelView = async () => {
       }
     });
 
-    console.log("extrusions", extrusions)
-    console.log("roofs", roofs)
+    console.log("extrusions", extrusions);
+    console.log("roofs", roofs);
 
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-          extrusion.userData.shape.currentPoint.x === roof.userData.shape.currentPoint.x ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.currentPoint.y
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.currentPoint.x ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.currentPoint.y
       );
       if (!hasRoof) {
         createRoof(extrusion, scene, 0, 3);
@@ -1148,9 +1274,9 @@ export const createModelView = async () => {
 
   testButton.domElement.addEventListener("mousedown", () => {
     console.log("test button");
-    calculateTotalAmountScaffoldingInScene(scene)
+    calculateTotalAmountScaffoldingInScene(scene);
 
-    calculateTotalSquareFootageForScaffolding(scene)
+    calculateTotalSquareFootageForScaffolding(scene);
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
@@ -1194,6 +1320,34 @@ export const createModelView = async () => {
     console.log(scaffoldOutline);
     createScaffoldingSheeting(scaffoldOutline, scene, 0x9e9e9e);
   });
+
+  observeElementAndAddEventListener(
+    "delete-row-scaffolding",
+    "mousedown",
+    () => {
+      console.log("delete row of scaffolding");
+      setDeletionScaffoldingRowInProgress(true);
+      setDeletionScaffoldingColumnInProgress(false);
+      setDrawingInProgress(false)
+      setDeletionInProgress(false)
+      setEditingBlueprint(false)
+      setDrawingScaffoldingInProgress(false)
+    }
+  );
+
+  observeElementAndAddEventListener(
+    "delete-column-scaffolding",
+    "mousedown",
+    () => {
+      console.log("delete column of scaffolding");
+      setDeletionScaffoldingColumnInProgress(true);
+      setDeletionScaffoldingRowInProgress(false);
+      setDrawingInProgress(false)
+      setDeletionInProgress(false)
+      setEditingBlueprint(false)
+      setDrawingScaffoldingInProgress(false)
+    }
+  );
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);

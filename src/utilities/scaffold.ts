@@ -95,6 +95,8 @@ export async function placeScaffoldModelsAlongLine(
           lineDirection
         );
 
+        modelInstance.userData.position = modelInstance.position
+
         const euler = new THREE.Euler().setFromQuaternion(quaternion);
 
         modelInstance.rotation.copy(euler);
@@ -158,6 +160,7 @@ export function createScaffoldModel(
           length: length,
           height: height,
           width: width,
+          position: "position"
         };
         // Calculate bounding box
         const bbox = new THREE.Box3().setFromObject(scaffoldModel);
@@ -798,4 +801,16 @@ export function createScaffoldingSheeting(
       scene.add(planeMesh);
     }
   });
+}
+
+// delete a row of scaffolding
+export function deleteRowOfScaffolding(scene: THREE.Scene, scaffold: any) {
+  console.log("deleting row of scaffolding")
+  console.log(scaffold.parent);
+}
+
+// delete column of scaffolding
+export function deleteColumnOfScaffolding(scene: THREE.Scene, scaffold: any) {
+  console.log("deleting column of scaffolding")
+  console.log(scaffold);
 }

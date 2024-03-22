@@ -26,14 +26,28 @@
 
       <div class="card-actions justify-end">
         <div class="m-4">
-          <div
-            class="btn btn-sm mr-4 border-1 border-white text-white"
-            id="reset-scaffolding"
-          >
-            Reset
+          <div class="join join-horizontal my-2">
+            <button
+              class="btn btn-sm join-item order-1 border-white text-white"
+              id="delete-row-scaffolding"
+            >
+              Delete Row
+            </button>
+            <button
+              class="btn btn-sm join-item order-1 border-white text-white"
+              id="delete-column-scaffolding"
+            >
+              Delete Column
+            </button>
+            <button
+              class="btn btn-sm join-item order-1 border-white text-white"
+              id="reset-scaffolding"
+            >
+              Reset
+            </button>
           </div>
           <div
-            class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin"
+            class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin w-full mt-3"
             id="autogenerate-scaffolding"
           >
             <img

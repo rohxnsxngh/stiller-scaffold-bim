@@ -8,9 +8,9 @@ import {
   resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial, roofMaterial } from "./material";
-import { setDeletionInProgress, setDrawingInProgress, setDrawingScaffoldingInProgress, setIsDrawingBlueprint } from "./toolbar";
 import { DragControls } from "three/addons/controls/DragControls.js";
 import { useStore } from "../store";
+import { setDeletionInProgress, setDrawingInProgress, setDrawingScaffoldingInProgress, setIsDrawingBlueprint } from "./state";
 
 // Create Shape Outline
 export function createShapeIsOutlined(

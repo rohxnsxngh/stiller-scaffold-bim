@@ -17,32 +17,7 @@ import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
 import { setEditingBlueprint } from "./mesh";
-
-export let drawingInProgress = false;
-export let drawingScaffoldingInProgress = false;
-export let deletionInProgress = false;
-export let drawingInProgressSwitch = false;
-export let isDrawingBlueprint = false;
-
-export const setIsDrawingBlueprint = (value: boolean) => {
-  isDrawingBlueprint = value;
-};
-
-export const setDrawingInProgress = (value: boolean) => {
-  drawingInProgress = value;
-};
-
-export const setDrawingScaffoldingInProgress = (value: boolean) => {
-  drawingScaffoldingInProgress = value;
-};
-
-export const setDeletionInProgress = (value: boolean) => {
-  deletionInProgress = value;
-};
-
-export const setDrawingInProgressSwitch = (value: boolean) => {
-  drawingInProgressSwitch = value;
-};
+import { setDeletionInProgress, setDrawingInProgress, setDrawingInProgressSwitch, setDrawingScaffoldingInProgress, setIsDrawingBlueprint } from "./state";
 
 export const createToolbar = (
   components: OBC.Components,
