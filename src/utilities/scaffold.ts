@@ -125,10 +125,7 @@ export async function placeScaffoldModelsAlongLine(
     console.error("Error creating scaffold model:", error);
   }
 
-  const { label, buttonAdd, buttonMinus } = attachScaffoldStackingLabel(
-    scene,
-    midPoint
-  );
+  const { label } = attachScaffoldStackingLabel(scene, midPoint);
   label.userData = {
     level: 0,
     length: lineLength,
@@ -139,9 +136,7 @@ export async function placeScaffoldModelsAlongLine(
     label,
     scene,
     scaffoldModeling,
-    bboxWireframe,
-    buttonAdd,
-    buttonMinus
+    bboxWireframe
   );
 }
 
@@ -154,7 +149,7 @@ export function createScaffoldModel(
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
     loader.load(
-      "/models/scaffolding-home-experiment.glb",
+      "/models/scaffolding-home-uniform.glb",
       (gltf: any) => {
         const scaffoldModel = gltf.scene;
         scaffoldModel.name = "scaffoldingModel";
@@ -472,50 +467,28 @@ function attachScaffoldStackingLabel(
   position: THREE.Vector3
 ): {
   label: CSS2DObject;
-  buttonAdd: HTMLButtonElement;
-  buttonMinus: HTMLButtonElement;
 } {
   const labelDiv = document.createElement("div");
   labelDiv.className =
-    "label bg-black text-white pointer-events-auto rounded-full py-1";
+    "label bg-black text-white pointer-events-auto rounded-full py-1 hidden";
   labelDiv.contentEditable = "false";
-
-  // Create Add button element
-  const buttonAdd = document.createElement("button");
-  buttonAdd.className =
-    "material-icons btn btn-xs btn-ghost rounded-full hover:bg-red-600 hover:text-black";
-  buttonAdd.textContent = "add";
-  buttonAdd.contentEditable = "false";
-
-  // Create minus button element
-  const buttonMinus = document.createElement("button");
-  buttonMinus.className =
-    "material-icons btn btn-xs btn-ghost rounded-full hover:bg-red-600 hover:text-black";
-  buttonMinus.textContent = "remove";
-  buttonMinus.contentEditable = "false";
-
-  labelDiv.appendChild(buttonAdd);
-  labelDiv.appendChild(buttonMinus);
 
   const label = new CSS2DObject(labelDiv);
   label.name = "scaffoldingStackingLabel";
   label.position.copy(position);
   scene.add(label);
 
-  return { label, buttonAdd, buttonMinus };
+  return { label };
 }
 // label that controls how many levels of scaffolding exist
 function attachScaffoldRowLabelChangeHandler(
   label: CSS2DObject,
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
-  scaffoldBoundingBox: any,
-  buttonAdd: HTMLButtonElement,
-  buttonMinus: HTMLButtonElement
+  scaffoldBoundingBox: any
 ) {
   // TODO in the future this level should come from the store which is currently storing the
   // value that is being displayed on the frontend
-  let level = 0;
   let levels = 0;
   const labelElement = label.element as HTMLDivElement;
   labelElement.addEventListener("mouseenter", () => {
@@ -530,11 +503,6 @@ function attachScaffoldRowLabelChangeHandler(
     setPlaceScaffoldIndividually(false);
   });
 
-  // buttonAdd.addEventListener("mousedown", () => {
-  //   level++;
-  //   addScaffoldingLevel(label, scene, scaffold, scaffoldBoundingBox, level);
-  // });
-
   observeElementAndAddEventListener(
     "add-scaffolding-level",
     "mousedown",
@@ -548,15 +516,6 @@ function attachScaffoldRowLabelChangeHandler(
       );
     }
   );
-
-  // buttonMinus.addEventListener("mousedown", () => {
-  //   removeScaffoldingLevel(label, scene, level);
-  //   level--;
-  //   // make sure the level cannot go below 0
-  //   if (level < 0) {
-  //     level = 0;
-  //   }
-  // });
 
   observeElementAndAddEventListener(
     "remove-scaffolding-level",
@@ -620,14 +579,6 @@ function addScaffoldingLevel(
   scaffoldBoundingBox: any,
   level: number
 ) {
-  console.log(level, label.userData.level);
-  // this logic needs tweaking
-  // if (level < label.userData.level) {
-  //   level = label.userData.level + 1;
-  // } else {
-  //   label.userData.level = level;
-  // }
-  // reset level
   label.userData.level = level;
   const lineLength = label.userData.length;
   const lineLevel = level;
@@ -724,15 +675,6 @@ function removeScaffoldingLevel(
   scene: THREE.Scene,
   level: number
 ) {
-  console.log(level, label.userData.level);
-  // if (level > label.userData.level) {
-  //   console.log("level is less than userData level");
-  //   level = label.userData.level - 1
-  //   console.log("new level", level)
-  // } else {
-  //   label.userData.level = level;
-  // }
-  // reset level
   label.userData.level = level;
   const lineLength = label.userData.length;
   const lineLevel = level;
