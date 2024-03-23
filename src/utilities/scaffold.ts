@@ -117,7 +117,8 @@ export async function placeScaffoldModelsAlongLine(
         // even though they are being placed in a line almost like a cohesive object
         // Create a new material for the model instance
         const material = new THREE.MeshPhysicalMaterial({
-          color: 0x222222, // Dark gray color
+          color: 0x404141, // Dark gray color
+          emissive: 0x000000,
         });
         if (modelInstance.children[0] instanceof THREE.Mesh) {
           modelInstance.children[0].material = material;
@@ -664,7 +665,8 @@ function addScaffoldingLevel(
         modelInstance.userData.line_length = lineLength;
 
         const material = new THREE.MeshPhysicalMaterial({
-          color: 0x222222, // Dark gray color
+          color: 0x404141, // Dark gray color
+          emissive: 0x000000,
         });
         if (modelInstance.children[0] instanceof THREE.Mesh) {
           modelInstance.children[0].material = material;
@@ -883,5 +885,133 @@ export function deleteColumnOfScaffolding(scene: THREE.Scene, scaffold: any) {
 
   scaffoldingColumnToRemove.forEach((child) => {
     scene.remove(child);
+  });
+}
+
+// scaffolding model creation along with bounding box for respective scaffolding model
+export function createScaffoldExternalStaircaseModel(
+  length: number,
+  height: number,
+  width: number
+): Promise<[THREE.LineSegments, THREE.Object3D]> {
+  return new Promise((resolve, reject) => {
+    const loader = new GLTFLoader();
+    loader.load(
+      "/models/scaffolding-external-staircase-no-texture.glb",
+      (gltf: any) => {
+        const scaffoldExternalStaircaseModel = gltf.scene;
+        scaffoldExternalStaircaseModel.name =
+          "scaffoldingExternalStaircaseModel";
+        scaffoldExternalStaircaseModel.userData = {
+          name: "scaffoldingExternalStaircaseModel",
+          length: length,
+          height: height,
+          width: width,
+          position: null,
+          first_point: null,
+          last_point: null,
+          line_length: null,
+        };
+        // Calculate bounding box
+        const bbox = new THREE.Box3().setFromObject(
+          scaffoldExternalStaircaseModel
+        );
+        // Get the dimensions of the bounding box
+        const size = bbox.getSize(new THREE.Vector3());
+
+        // Calculate the scale factor for each dimension
+        const scaleX = (width * 2) / size.x;
+        const scaleY = (height) / size.y;
+        const scaleZ = length / size.z;
+
+        // THIS CODE CREATES THE MODEL AND MAINTAINS THE CORRECT RATIOS
+        // Choose the smallest scale factor to maintain aspect ratio
+        // const scaleFactor = Math.min(scaleX, scaleY, scaleZ);
+        // Apply the scale factor to the model
+        // scaffoldModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+        // Apply the scale factor to the model
+        scaffoldExternalStaircaseModel.scale.set(scaleX, scaleY, scaleZ);
+
+        // Define the new material you want to assign to the meshes
+        const newMaterial = new THREE.MeshPhysicalMaterial({
+          color: 0x404141, // Dark gray color
+          emissive: 0x000000,
+        });
+
+        // Traverse the model and find all meshes
+        scaffoldExternalStaircaseModel.traverse((object: any) => {
+          if (object instanceof THREE.Mesh) {
+            // Assign the new material to the mesh
+            object.material = newMaterial;
+          }
+        });
+
+        // Update the bounding box with the scaled model
+        scaffoldExternalStaircaseModel.updateMatrixWorld();
+        const newBBox = new THREE.Box3().setFromObject(
+          scaffoldExternalStaircaseModel
+        );
+
+        // Calculate and print the new bounding box dimensions
+        const newLength = newBBox.max.z - newBBox.min.z;
+        const newWidth = newBBox.max.x - newBBox.min.x;
+        const newHeight = newBBox.max.y - newBBox.min.y;
+        console.log("New bounding box dimensions:", {
+          length: newLength,
+          width: newWidth,
+          height: newHeight,
+        });
+
+        // Create wireframe geometry
+        const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
+          newBBox.min,
+          new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
+          newBBox.max,
+        ]);
+
+        // Create wireframe material
+        const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+
+        // Create wireframe
+        const bboxWireframe = new THREE.LineSegments(
+          new THREE.WireframeGeometry(bboxGeometry),
+          bboxMaterial
+        );
+        bboxWireframe.name = "scaffoldingWireframe";
+        bboxWireframe.userData = {
+          name: "scaffoldingWireframe",
+          length: length,
+          height: height,
+          width: width,
+        };
+
+        console.log(
+          "scaffolding external staircase model",
+          scaffoldExternalStaircaseModel
+        );
+
+        resolve([bboxWireframe, scaffoldExternalStaircaseModel]);
+      },
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      },
+      (error) => {
+        console.error("Error loading GLB model:", error);
+        // Check if the error is related to missing texture
+        if (error instanceof Error && error.message.includes("load texture")) {
+          // Ignore the error related to missing texture and resolve the promise
+          resolve([new THREE.LineSegments(), new THREE.Object3D()]);
+        } else {
+          // Reject the promise for other types of errors
+          reject(error);
+        }
+      }
+    );
   });
 }

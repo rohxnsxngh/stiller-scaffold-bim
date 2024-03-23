@@ -26,6 +26,7 @@ import {
   createScaffoldingSheeting,
   deleteRowOfScaffolding,
   deleteColumnOfScaffolding,
+  createScaffoldExternalStaircaseModel,
 } from "./utilities/scaffold";
 import { createToolbar } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
@@ -1272,11 +1273,28 @@ export const createModelView = async () => {
     points = [];
   });
 
-  testButton.domElement.addEventListener("mousedown", () => {
+  async function generateScaffoldExternalStaircaseModel() {
+    const [bboxWireframe, scaffoldExternalStaircaseModeling] = await createScaffoldExternalStaircaseModel(
+      1.57,
+      2.0,
+      0.73
+    );
+    return [bboxWireframe, scaffoldExternalStaircaseModeling]
+  }
+
+  testButton.domElement.addEventListener("mousedown", async () => {
     console.log("test button");
     calculateTotalAmountScaffoldingInScene(scene);
 
     calculateTotalSquareFootageForScaffolding(scene);
+
+    const [bboxWireframe, scaffoldExternalStaircaseModeling] = await generateScaffoldExternalStaircaseModel()
+    scaffoldExternalStaircaseModeling.position.set(0, 0, 0)
+    scene.add(scaffoldExternalStaircaseModeling)
+    
+
+
+
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
