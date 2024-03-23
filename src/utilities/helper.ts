@@ -382,3 +382,7 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
     `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
   );
 }
+
+export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {
+  return (vector1.x === vector2.x && vector1.y === vector2.y && vector1.z === vector2.z);
+}

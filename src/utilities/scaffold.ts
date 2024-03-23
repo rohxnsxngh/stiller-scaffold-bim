@@ -1,7 +1,11 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
-import { measureLineLength, observeElementAndAddEventListener } from "./helper";
+import {
+  isVectorEqual,
+  measureLineLength,
+  observeElementAndAddEventListener,
+} from "./helper";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 export let placeScaffoldIndividually = false;
@@ -95,12 +99,16 @@ export async function placeScaffoldModelsAlongLine(
           lineDirection
         );
 
-        modelInstance.userData.position = modelInstance.position
-
         const euler = new THREE.Euler().setFromQuaternion(quaternion);
 
         modelInstance.rotation.copy(euler);
         boundBoxInstance.rotation.copy(euler);
+
+        // update position userData
+        modelInstance.userData.position = position;
+        modelInstance.userData.first_point = startPoint;
+        modelInstance.userData.last_point = endPoint;
+        modelInstance.userData.line_length = lineLength;
 
         modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
         boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
@@ -160,7 +168,10 @@ export function createScaffoldModel(
           length: length,
           height: height,
           width: width,
-          position: "position"
+          position: null,
+          first_point: null,
+          last_point: null,
+          line_length: null,
         };
         // Calculate bounding box
         const bbox = new THREE.Box3().setFromObject(scaffoldModel);
@@ -411,7 +422,7 @@ export function generateScaffoldOutline(
   blueprint: THREE.Mesh,
   scene: THREE.Scene
 ) {
-  const shape = blueprint.userData.shape as THREE.Shape; // Assuming the shape is stored in userData
+  const shape = blueprint.userData.shape as THREE.Shape;
 
   const extrudeSettings = {
     steps: 0,
@@ -647,6 +658,10 @@ function addScaffoldingLevel(
 
         modelInstance.rotation.copy(euler);
         boundBoxInstance.rotation.copy(euler);
+        modelInstance.userData.position = position;
+        modelInstance.userData.first_point = startPoint;
+        modelInstance.userData.last_point = endPoint;
+        modelInstance.userData.line_length = lineLength;
 
         const material = new THREE.MeshPhysicalMaterial({
           color: 0x222222, // Dark gray color
@@ -757,12 +772,6 @@ export function createScaffoldingSheeting(
       .crossVectors(direction, new THREE.Vector3(0, 1, 0))
       .normalize();
 
-    // Create a plane using the normal vector and a point on the plane (the first point of the line)
-    // const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(
-    //   normal,
-    //   firstPoint
-    // );
-
     // Create a mesh with a PlaneGeometry and a MeshBasicMaterial
     const planeGeometry = new THREE.PlaneGeometry(length, 2); // Adjust the size as needed
     const planeMaterial = new THREE.MeshBasicMaterial({
@@ -805,12 +814,74 @@ export function createScaffoldingSheeting(
 
 // delete a row of scaffolding
 export function deleteRowOfScaffolding(scene: THREE.Scene, scaffold: any) {
-  console.log("deleting row of scaffolding")
-  console.log(scaffold.parent);
+  console.log("deleting row of scaffolding");
+  console.log(scaffold.parent.userData);
+
+  const lineLength = scaffold.parent.userData.line_length;
+  const startPoint = scaffold.parent.userData.first_point;
+  const endPoint = scaffold.parent.userData.last_point;
+  const numSegments = Math.ceil(lineLength / 1.57);
+  try {
+    for (let i = 0; i < numSegments; i++) {
+      if (startPoint.y === 0 || endPoint.y === 0) {
+        console.log("level cannot be lower than 0");
+        return;
+      }
+      // Calculate the interpolated position along the line
+      const t = i / numSegments; // Parameter for interpolation along the line
+      const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);
+
+      const scaffoldingLevelToBeRemoved: THREE.Object3D<THREE.Object3DEventMap>[] =
+        [];
+      scene.traverse((child) => {
+        if (
+          child instanceof THREE.Object3D &&
+          child.position.equals(position)
+        ) {
+          scaffoldingLevelToBeRemoved.push(child);
+        }
+        if (
+          child instanceof THREE.Line &&
+          child.name === "scaffoldLine" &&
+          child.userData.first_point.y === position.y &&
+          isVectorEqual(
+            child.userData.first_point,
+            scaffold.parent.userData.last_point
+          ) &&
+          isVectorEqual(
+            child.userData.last_point,
+            scaffold.parent.userData.first_point
+          )
+        ) {
+          scaffoldingLevelToBeRemoved.push(child);
+        } else {
+        }
+      });
+
+      scaffoldingLevelToBeRemoved.forEach((scaffold: THREE.Object3D) => {
+        scene.remove(scaffold);
+      });
+    }
+  } catch (error) {
+    console.error("Error creating scaffold model:", error);
+  }
 }
 
 // delete column of scaffolding
 export function deleteColumnOfScaffolding(scene: THREE.Scene, scaffold: any) {
-  console.log("deleting column of scaffolding")
-  console.log(scaffold);
+  let scaffoldingColumnToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+  scene.traverse((child) => {
+    if (child.name === "scaffoldingModel") {
+      if (
+        child.userData.position.x === scaffold.parent.userData.position.x &&
+        child.userData.position.z === scaffold.parent.userData.position.z
+      ) {
+        scaffoldingColumnToRemove.push(child);
+      }
+    }
+  });
+
+  scaffoldingColumnToRemove.forEach((child) => {
+    scene.remove(child);
+  });
 }
