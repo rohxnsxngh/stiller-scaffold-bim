@@ -7,6 +7,7 @@ import {
   observeElementAndAddEventListener,
 } from "./helper";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { useStore } from "../store";
 
 export let placeScaffoldIndividually = false;
 
@@ -921,7 +922,7 @@ export function createScaffoldExternalStaircaseModel(
 
         // Calculate the scale factor for each dimension
         const scaleX = (width * 2) / size.x;
-        const scaleY = (height) / size.y;
+        const scaleY = height / size.y;
         const scaleZ = length / size.z;
 
         // THIS CODE CREATES THE MODEL AND MAINTAINS THE CORRECT RATIOS
@@ -1014,4 +1015,31 @@ export function createScaffoldExternalStaircaseModel(
       }
     );
   });
+}
+
+export function replaceScaffoldingWithExternalStaircase(
+  scene: THREE.Scene,
+  scaffold: any,
+  scaffoldExternalStaircase: any
+) {
+  console.log("replace scaffolding with external staircase");
+  console.log(scaffold.parent.userData.position);
+  const scaffoldPositionX = scaffold.parent.userData.position.x;
+  const scaffoldPositionZ = scaffold.parent.userData.position.z;
+  console.log(scaffoldPositionX, scaffoldPositionZ);
+
+  const store = useStore();
+  const level = store.level;
+  console.log(level);
+  for (let lvl = 0; lvl < level; lvl++) {
+    const externalStaircaseInstance = SkeletonUtils.clone(
+      scaffoldExternalStaircase
+    );
+    externalStaircaseInstance.position.set(
+      scaffoldPositionX,
+      lvl * 2,
+      scaffoldPositionZ
+    );
+    scene.add(externalStaircaseInstance);
+  }
 }

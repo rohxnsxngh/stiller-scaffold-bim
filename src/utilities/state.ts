@@ -5,6 +5,7 @@ export let drawingInProgressSwitch = false;
 export let isDrawingBlueprint = false;
 export let deletionScaffoldingRowInProgress = false;
 export let deletionScaffoldingColumnInProgress = false;
+export let replaceScaffoldingColumnInProgress =  false
 
 export const setIsDrawingBlueprint = (value: boolean) => {
   isDrawingBlueprint = value;
@@ -32,4 +33,8 @@ export const setDeletionScaffoldingRowInProgress = (value: boolean) => {
 
 export const setDeletionScaffoldingColumnInProgress = (value: boolean) => {
   deletionScaffoldingColumnInProgress = value;
+};
+
+export const setReplaceScaffoldingColumnInProgress = (value: boolean) => {
+  replaceScaffoldingColumnInProgress = value;
 };

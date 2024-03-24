@@ -98,7 +98,7 @@
       <!-- Drawer element -->
       <div
         v-if="showDrawer"
-        class="fixed rounded-lg w-48 bg-[#111115] overflow-y-auto shadow-lg z-55 top-10 right-0"
+        class="fixed rounded-lg w-48 bg-[#111115] overflow-y-auto shadow-lg z-55 top-15 right-0 border border-white"
       >
         <div class="">
           <button class="btn btn-circle bg-inherit ml-32" @click="toggleDrawer">
@@ -120,8 +120,8 @@
         </div>
         <div class="flex flex-col">
           <div
-            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
-            id="draw-scaffold"
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-8 mb-2 bg-[#14141C]"
+            id="scaffold-external-staircase"
           >
             <img
               src="../assets/images/ScaffoldSection/PlaceIndividualScaffolding.svg"
@@ -129,8 +129,7 @@
             />
           </div>
           <div
-            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
-            id="draw-scaffold"
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-8 mb-2 bg-[#14141C]"
           >
             <img
               src="../assets/images/ScaffoldSection/Staircase.svg"
@@ -138,8 +137,7 @@
             />
           </div>
           <div
-            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
-            id="draw-scaffold"
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-8 mb-2 bg-[#14141C]"
           >
             <img
               src="../assets/images/ScaffoldSection/Railing.svg"
@@ -147,15 +145,14 @@
             />
           </div>
           <div
-            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
-            id="draw-scaffold"
+            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-8 mb-2 bg-[#14141C]"
           >
             <img
               src="../assets/images/ScaffoldSection/Banister.svg"
               class="object-contain"
             />
           </div>
-          <div
+          <!-- <div
             class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
             id="draw-scaffold"
           >
@@ -163,7 +160,7 @@
               src="../assets/images/ScaffoldSection/Rudder.svg"
               class="object-contain"
             />
-          </div>
+          </div> -->
         </div>
       </div>
 
