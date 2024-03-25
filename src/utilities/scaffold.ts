@@ -818,6 +818,7 @@ export function createScaffoldingSheeting(
   });
 }
 
+// remove individual instance of scaffolding
 export function deleteIndividualScaffolding(scene: THREE.Scene, scaffold: any) {
   console.log("deleting individual scaffolding from scene", scaffold);
   let scaffoldingColumnToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];

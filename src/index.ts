@@ -73,6 +73,7 @@ import {
   setIsDrawingBlueprint,
   setReplaceScaffoldingColumnInProgress,
 } from "./utilities/state";
+import { loadSymbol } from "./utilities/base";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -1107,7 +1108,8 @@ export const createModelView = async () => {
         child.name === "scaffoldLine" ||
         child.name === "scaffoldingModel" ||
         child.name === "scaffoldingWireframe" ||
-        child.name === "scaffoldingStackingLabel"
+        child.name === "scaffoldingStackingLabel" ||
+        child.name === "scaffoldingExternalStaircaseModel"
       ) {
         scaffoldingObjectsToRemove.push(child);
       }
@@ -1307,6 +1309,7 @@ export const createModelView = async () => {
     console.log("test button");
     calculateTotalAmountScaffoldingInScene(scene);
     calculateTotalSquareFootageForScaffolding(scene);
+    loadSymbol(scene)
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
