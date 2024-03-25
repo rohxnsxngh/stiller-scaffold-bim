@@ -1290,13 +1290,7 @@ export const createModelView = async () => {
   testButton.domElement.addEventListener("mousedown", async () => {
     console.log("test button");
     calculateTotalAmountScaffoldingInScene(scene);
-
     calculateTotalSquareFootageForScaffolding(scene);
-
-    const [bboxWireframe, scaffoldExternalStaircaseModeling] =
-      await generateScaffoldExternalStaircaseModel();
-    scaffoldExternalStaircaseModeling.position.set(0, 0, 0);
-    scene.add(scaffoldExternalStaircaseModeling); 
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {

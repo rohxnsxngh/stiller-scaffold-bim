@@ -110,6 +110,7 @@ export async function placeScaffoldModelsAlongLine(
         modelInstance.userData.first_point = startPoint;
         modelInstance.userData.last_point = endPoint;
         modelInstance.userData.line_length = lineLength;
+        modelInstance.userData.line_direction = lineDirection;
 
         modelInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
         boundBoxInstance.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
@@ -174,6 +175,7 @@ export function createScaffoldModel(
           first_point: null,
           last_point: null,
           line_length: null,
+          line_direction: null,
         };
         // Calculate bounding box
         const bbox = new THREE.Box3().setFromObject(scaffoldModel);
@@ -664,6 +666,7 @@ function addScaffoldingLevel(
         modelInstance.userData.first_point = startPoint;
         modelInstance.userData.last_point = endPoint;
         modelInstance.userData.line_length = lineLength;
+        modelInstance.userData.line_direction = lineDirection;
 
         const material = new THREE.MeshPhysicalMaterial({
           color: 0x404141, // Dark gray color
@@ -1026,6 +1029,7 @@ export function replaceScaffoldingWithExternalStaircase(
   console.log(scaffold.parent.userData.position);
   const scaffoldPositionX = scaffold.parent.userData.position.x;
   const scaffoldPositionZ = scaffold.parent.userData.position.z;
+  const scaffoldDirectionOrientation = scaffold.parent.userData.line_direction
   console.log(scaffoldPositionX, scaffoldPositionZ);
 
   const store = useStore();
@@ -1040,6 +1044,13 @@ export function replaceScaffoldingWithExternalStaircase(
       lvl * 2,
       scaffoldPositionZ
     );
+    const quaternion = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, 0, 1),
+      scaffoldDirectionOrientation
+    );
+
+    const euler = new THREE.Euler().setFromQuaternion(quaternion);
+    externalStaircaseInstance.rotation.copy(euler);
     scene.add(externalStaircaseInstance);
   }
 }
