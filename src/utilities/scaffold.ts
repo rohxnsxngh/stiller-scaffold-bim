@@ -818,6 +818,26 @@ export function createScaffoldingSheeting(
   });
 }
 
+export function deleteIndividualScaffolding(scene: THREE.Scene, scaffold: any) {
+  console.log("deleting individual scaffolding from scene", scaffold);
+  let scaffoldingColumnToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+  scene.traverse((child) => {
+    if (child.name === "scaffoldingModel") {
+      if (
+        child.userData.position.x === scaffold.parent.userData.position.x &&
+        child.userData.position.z === scaffold.parent.userData.position.z &&
+        child.userData.position.y === scaffold.parent.userData.position.y
+      ) {
+        scaffoldingColumnToRemove.push(child);
+      }
+    }
+  });
+
+  scaffoldingColumnToRemove.forEach((child) => {
+    scene.remove(child);
+  });
+}
+
 // delete a row of scaffolding
 export function deleteRowOfScaffolding(scene: THREE.Scene, scaffold: any) {
   console.log("deleting row of scaffolding");
@@ -937,19 +957,19 @@ export function createScaffoldExternalStaircaseModel(
         // Apply the scale factor to the model
         scaffoldExternalStaircaseModel.scale.set(scaleX, scaleY, scaleZ);
 
-        // Define the new material you want to assign to the meshes
-        const newMaterial = new THREE.MeshPhysicalMaterial({
-          color: 0x404141, // Dark gray color
-          emissive: 0x000000,
-        });
+        // // Define the new material you want to assign to the meshes
+        // const newMaterial = new THREE.MeshPhysicalMaterial({
+        //   color: 0x404141, // Dark gray color
+        //   emissive: 0x000000,
+        // });
 
-        // Traverse the model and find all meshes
-        scaffoldExternalStaircaseModel.traverse((object: any) => {
-          if (object instanceof THREE.Mesh) {
-            // Assign the new material to the mesh
-            object.material = newMaterial;
-          }
-        });
+        // // Traverse the model and find all meshes
+        // scaffoldExternalStaircaseModel.traverse((object: any) => {
+        //   if (object instanceof THREE.Mesh) {
+        //     // Assign the new material to the mesh
+        //     object.material = newMaterial;
+        //   }
+        // });
 
         // Update the bounding box with the scaled model
         scaffoldExternalStaircaseModel.updateMatrixWorld();
@@ -1029,7 +1049,7 @@ export function replaceScaffoldingWithExternalStaircase(
   console.log(scaffold.parent.userData.position);
   const scaffoldPositionX = scaffold.parent.userData.position.x;
   const scaffoldPositionZ = scaffold.parent.userData.position.z;
-  const scaffoldDirectionOrientation = scaffold.parent.userData.line_direction
+  const scaffoldDirectionOrientation = scaffold.parent.userData.line_direction;
   console.log(scaffoldPositionX, scaffoldPositionZ);
 
   const store = useStore();
@@ -1039,6 +1059,19 @@ export function replaceScaffoldingWithExternalStaircase(
     const externalStaircaseInstance = SkeletonUtils.clone(
       scaffoldExternalStaircase
     );
+    // Define the new material you want to assign to the meshes
+    const newMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x404141, // Dark gray color
+      emissive: 0x000000,
+    });
+
+    // Traverse the model and find all meshes
+    externalStaircaseInstance.traverse((object: any) => {
+      if (object instanceof THREE.Mesh) {
+        // Assign the new material to the mesh
+        object.material = newMaterial;
+      }
+    });
     externalStaircaseInstance.position.set(
       scaffoldPositionX,
       lvl * 2,

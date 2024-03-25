@@ -17,7 +17,17 @@ import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
 import { setEditingBlueprint } from "./mesh";
-import { setDeletionInProgress, setDrawingInProgress, setDrawingInProgressSwitch, setDrawingScaffoldingInProgress, setIsDrawingBlueprint } from "./state";
+import {
+  setDeletionInProgress,
+  setDeletionIndividualScaffoldingInProgress,
+  setDeletionScaffoldingColumnInProgress,
+  setDeletionScaffoldingRowInProgress,
+  setDrawingInProgress,
+  setDrawingInProgressSwitch,
+  setDrawingScaffoldingInProgress,
+  setIsDrawingBlueprint,
+  setReplaceScaffoldingColumnInProgress,
+} from "./state";
 
 export const createToolbar = (
   components: OBC.Components,
@@ -272,11 +282,15 @@ export const createToolbar = (
     setDeletionInProgress(false);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setDeletionScaffoldingRowInProgress(false);
+    setDeletionScaffoldingColumnInProgress(false);
+    setReplaceScaffoldingColumnInProgress(false);
+    setDeletionIndividualScaffoldingInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
   });
   freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
   freeRotateButton.domElement.classList.add("hover:bg-slate-300");
@@ -287,12 +301,16 @@ export const createToolbar = (
     setDeletionInProgress(false);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setDeletionScaffoldingRowInProgress(false);
+    setDeletionScaffoldingColumnInProgress(false);
+    setReplaceScaffoldingColumnInProgress(false);
+    setDeletionIndividualScaffoldingInProgress(false);
   });
 
   observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
   });
 
   // Start Drawing Blueprint
