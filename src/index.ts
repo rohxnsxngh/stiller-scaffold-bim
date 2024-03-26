@@ -76,6 +76,7 @@ import {
   setRotatingRoofInProgress,
 } from "./utilities/state";
 import { loadSymbol } from "./utilities/base";
+import { userData } from "three/examples/jsm/nodes/Nodes.js";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -484,7 +485,7 @@ export const createModelView = async () => {
         let extrusions: THREE.Mesh[] = [];
         let roofs: THREE.Mesh[] = [];
 
-        // Toggle the roofToggleState between  0 and  1
+        // Toggle the roofToggleState between 0 and  1
         roofToggleState = roofToggleState === 0 ? 1 : 0;
 
         scene.traverse((child) => {
@@ -517,7 +518,9 @@ export const createModelView = async () => {
                 roof.userData.shape.currentPoint.y
           );
           if (!hasRoof) {
-            createRoof(extrusion, scene, roofToggleState, 3);
+            const store = useStore()
+            const height = store.height
+            createRoof(extrusion, scene, roofToggleState, height);
           }
         });
 
@@ -564,7 +567,9 @@ export const createModelView = async () => {
                 roof.userData.shape.currentPoint.y
           );
           if (!hasRoof) {
-            createShedRoof(extrusion, scene, roofToggleState, 3);
+            const store = useStore()
+            const height = store.shedHeight
+            createShedRoof(extrusion, scene, roofToggleState, height);
           }
         });
 

@@ -27,6 +27,7 @@ import {
   setDrawingScaffoldingInProgress,
   setIsDrawingBlueprint,
   setReplaceScaffoldingColumnInProgress,
+  setRotatingRoofInProgress,
 } from "./state";
 
 export const createToolbar = (
@@ -305,6 +306,7 @@ export const createToolbar = (
     setDeletionScaffoldingColumnInProgress(false);
     setReplaceScaffoldingColumnInProgress(false);
     setDeletionIndividualScaffoldingInProgress(false);
+    setRotatingRoofInProgress(false)
   });
 
   observeElementAndAddEventListener("free-rotate", "mouseenter", () => {

@@ -291,6 +291,8 @@ function attachExtrusionLabelChangeHandler(
   labelElement.addEventListener("blur", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
+      const store = useStore()
+      store.updateDepth(parseFloat(newValue as unknown as string))
       updateExtrusionGeometry(newValue, meshExtrude, shape, label);
     }
   });
@@ -519,90 +521,6 @@ function attachLabelChangeHandler(
       return currentLabels;
     }
   });
-
-  // observeElementAndAddEventListener("rectangle-length", "mouseenter", () => {
-  //   document.body.style.cursor = "grab";
-  //   setDrawingInProgress(false);
-  //   setIsDrawingBlueprint(false)
-  // })
-  // observeElementAndAddEventListener("rectangle-width", "mouseenter", () => {
-  //   document.body.style.cursor = "grab";
-  //   setDrawingInProgress(false);
-  //   setIsDrawingBlueprint(false)
-  // })
-
-  // observeElementAndAddEventListener("rectangle-length", "mouseleave", () => {
-  //   document.body.style.cursor = "crosshair";
-  //   setDrawingInProgress(false);
-  // })
-  // observeElementAndAddEventListener("rectangle-width", "mouseleave", () => {
-  //   document.body.style.cursor = "crosshair";
-  //   setDrawingInProgress(false);
-  // })
-
-  // observeElementAndAddEventListener("rectangle-length", "focus", (event) => {
-  //   setDrawingInProgress(false);
-  //   setDrawingInProgress(false);
-  //   const element = event.target as HTMLInputElement;
-  //   const textContent = element.value;
-  //   oldValue = textContent
-  //   console.log(oldValue)
-  // })
-  // observeElementAndAddEventListener("rectangle-width", "focus", (event) => {
-  //   setDrawingInProgress(false);
-  //   setDrawingInProgress(false);
-  //   const element = event.target as HTMLInputElement;
-  //   const textContent = element.value;
-  //   oldValue = textContent
-  //   console.log(oldValue)
-  // })
-
-  // observeElementAndAddEventListener("rectangle-length", "blur", (event) => {
-  //   const element = event.target as HTMLInputElement;
-  //   const textContent = element.value;
-  //   const newValue = textContent
-  //   console.log("old value:", oldValue, "new value:", newValue)
-  //   if (oldValue !== newValue) {
-  //     // create new plane based on inputs
-  //     const newRectangleVertices = updateRectangleBlueprintGeometry(
-  //       newValue,
-  //       oldValue,
-  //       markupGroup,
-  //       width,
-  //       height,
-  //       centerX,
-  //       centerZ
-  //     );
-
-  //     // create new labels based on vertices
-  //     updateLabelsForNewDimensions(newRectangleVertices);
-
-  //     return currentLabels;
-  //   }
-  // })
-  // observeElementAndAddEventListener("rectangle-width", "blur", (event) => {
-  //   const element = event.target as HTMLInputElement;
-  //   const textContent = element.value;
-  //   const newValue = textContent
-  //   console.log("old value:", oldValue, "new value:", newValue)
-  //   if (oldValue !== newValue) {
-  //     // create new plane based on inputs
-  //     const newRectangleVertices = updateRectangleBlueprintGeometry(
-  //       newValue,
-  //       oldValue,
-  //       markupGroup,
-  //       width,
-  //       height,
-  //       centerX,
-  //       centerZ
-  //     );
-
-  //     // create new labels based on vertices
-  //     updateLabelsForNewDimensions(newRectangleVertices);
-
-  //     return currentLabels;
-  //   }
-  // })
 }
 
 // cast point for top view rectangle tool
@@ -976,6 +894,8 @@ function attachRoofLabelChangeHandler(
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
       console.log("values do not match");
+      const store = useStore()
+      store.updateRoofHeight(parseFloat(newValue as unknown as string))
       if (label.userData) {
         scene.remove(label.userData as THREE.Object3D);
       }
@@ -1327,6 +1247,8 @@ function attachShedRoofLabelChangeHandler(
   labelElement.addEventListener("blur", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
+      const store = useStore()
+      store.updateShedRoofHeight(parseFloat(newValue as unknown as string))
       console.log("values do not match");
       if (label.userData) {
         scene.remove(label.userData as THREE.Object3D);
