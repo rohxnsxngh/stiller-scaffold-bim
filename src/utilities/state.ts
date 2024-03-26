@@ -7,6 +7,7 @@ export let deletionIndividualScaffoldingInProgress = false;
 export let deletionScaffoldingRowInProgress = false;
 export let deletionScaffoldingColumnInProgress = false;
 export let replaceScaffoldingColumnInProgress = false;
+export let rotatingRoofInProgress = false
 
 export const setIsDrawingBlueprint = (value: boolean) => {
   isDrawingBlueprint = value;
@@ -42,4 +43,8 @@ export const setDeletionScaffoldingColumnInProgress = (value: boolean) => {
 
 export const setReplaceScaffoldingColumnInProgress = (value: boolean) => {
   replaceScaffoldingColumnInProgress = value;
+};
+
+export const setRotatingRoofInProgress = (value: boolean) => {
+  rotatingRoofInProgress = value;
 };

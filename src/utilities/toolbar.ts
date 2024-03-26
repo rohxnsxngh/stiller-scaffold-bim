@@ -930,7 +930,6 @@ export const createToolbar = (
     "startDrawingRectangle",
     "mousedown",
     () => {
-      console.error("drawiong blueprint");
       document.body.style.cursor = "crosshair";
       startDrawing = false;
       scene.traverse((child) => {

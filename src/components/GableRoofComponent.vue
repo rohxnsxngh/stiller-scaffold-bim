@@ -26,6 +26,7 @@
         </div>
         <div
           class="btn btn-sm w-full bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
+          id="rotate-roof"
         >
           <img
             src="../assets/images/RoofSection/Rotate.svg"
