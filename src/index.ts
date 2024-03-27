@@ -1039,6 +1039,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
+    hideAllCSS2DObjects(scene)
     generateScaffolding();
   });
 
@@ -1047,6 +1048,7 @@ export const createModelView = async () => {
     "autogenerate-scaffolding",
     "mousedown",
     () => {
+      hideAllCSS2DObjects(scene)
       scene.traverse((child: any) => {
         if (child instanceof THREE.Mesh && child.name === "blueprint") {
           generateScaffoldOutline(child, scene);
@@ -1266,7 +1268,12 @@ export const createModelView = async () => {
     console.log("test button");
     calculateTotalAmountScaffoldingInScene(scene);
     calculateTotalSquareFootageForScaffolding(scene);
-    loadSymbol(scene);
+    // loadSymbol(scene);
+    scene.traverse((child) => {
+      if (child.name === "scaffoldLine") {
+        console.log(child.userData.level)
+      }
+    });
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {

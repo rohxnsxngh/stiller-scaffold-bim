@@ -386,3 +386,27 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
 export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {
   return (vector1.x === vector2.x && vector1.y === vector2.y && vector1.z === vector2.z);
 }
+
+export function areAnyTwoAxesEqual(v1: THREE.Vector3, v2: THREE.Vector3): boolean {
+  return (
+     (v1.x === v2.x && v1.y === v2.y) ||
+     (v1.x === v2.x && v1.z === v2.z) ||
+     (v1.y === v2.y && v1.z === v2.z)
+  );
+ }
+
+export function areVectorsEqualWithEpsilon(v1: THREE.Vector3, v2: THREE.Vector3, epsilon = Number.EPSILON): boolean {
+  return (
+     Math.abs(v1.x - v2.x) < epsilon &&
+     Math.abs(v1.y - v2.y) < epsilon &&
+     Math.abs(v1.z - v2.z) < epsilon
+  );
+ }
+
+ export function areAnyTwoAxesEqualWithEpsilon(v1: THREE.Vector3, v2: THREE.Vector3, epsilon = Number.EPSILON): boolean {
+  return (
+     (Math.abs(v1.x - v2.x) < epsilon && Math.abs(v1.y - v2.y) < epsilon) ||
+     (Math.abs(v1.x - v2.x) < epsilon && Math.abs(v1.z - v2.z) < epsilon) ||
+     (Math.abs(v1.y - v2.y) < epsilon && Math.abs(v1.z - v2.z) < epsilon)
+  );
+ }
