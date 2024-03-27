@@ -16,7 +16,6 @@ import {
   createFlatRoof,
 } from "./utilities/mesh";
 import {
-  createIndividualScaffoldOnClick,
   createScaffoldingShapeIsOutlined,
   createScaffoldModel,
   placeScaffoldModelsAlongLine,
@@ -45,7 +44,6 @@ import {
   disableOrbitControls,
   hideAllCSS2DObjects,
   observeElementAndAddEventListener,
-  removeHighlightMesh,
   resetScene,
   setInvisibleExceptSingularObject,
   // createBoundingBoxVisualizationFromBox,
@@ -76,7 +74,6 @@ import {
   setRotatingRoofInProgress,
 } from "./utilities/state";
 import { loadSymbol } from "./utilities/base";
-import { userData } from "three/examples/jsm/nodes/Nodes.js";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -138,8 +135,7 @@ export const createModelView = async () => {
   createLighting(scene);
 
   // Grid
-  const grid = new CustomGrid(components, new THREE.Color("#FF0000")); // Red color
-  // grid.name = "grid"
+  const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
 
   // Add some elements to the scene
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -172,8 +168,6 @@ export const createModelView = async () => {
   highlightMesh.position.set(0.5, 0, 0.5);
   highlightMesh.name = "highlightMesh";
 
-  // createScaffoldModel(scene, 1.57)
-
   components.meshes.push(cube);
   components.meshes.push(plane);
   components.meshes.push(highlightMesh);
@@ -184,7 +178,6 @@ export const createModelView = async () => {
     moveBlueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
-    // drawingButton,
     createGableRoofButton,
     createShedRoofButton,
     createEditExtrusionButton,
@@ -424,7 +417,7 @@ export const createModelView = async () => {
       );
     }
     if (placeScaffoldIndividually) {
-      const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(
+      const [_bboxWireframe, _scaffoldModeling] = await createScaffoldModel(
         1.57,
         2.0,
         0.73
@@ -466,7 +459,7 @@ export const createModelView = async () => {
       if (scaffoldingColumnToRemove.parent.name === "scaffoldingModel") {
         deleteColumnOfScaffolding(scene, scaffoldingColumnToRemove);
         if (replaceScaffoldingColumnInProgress) {
-          const [bboxWireframe, scaffoldExternalStaircaseModeling] =
+          const [_bboxWireframe, scaffoldExternalStaircaseModeling] =
             await generateScaffoldExternalStaircaseModel();
           replaceScaffoldingWithExternalStaircase(
             scene,
@@ -1359,6 +1352,7 @@ export const createModelView = async () => {
       setDeletionInProgress(false);
       setEditingBlueprint(false);
       setDrawingScaffoldingInProgress(false);
+      setReplaceScaffoldingColumnInProgress(false);
     }
   );
 
