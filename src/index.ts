@@ -26,8 +26,9 @@ import {
   deleteRowOfScaffolding,
   deleteColumnOfScaffolding,
   createScaffoldExternalStaircaseModel,
-  replaceScaffoldingWithExternalStaircase,
   deleteIndividualScaffolding,
+  createScaffoldInternalStaircaseModel,
+  replaceScaffoldingWithStaircase,
 } from "./utilities/scaffold";
 import { createToolbar } from "./utilities/toolbar";
 import { CustomGrid } from "./utilities/customgrid";
@@ -60,7 +61,8 @@ import {
   drawingInProgressSwitch,
   drawingScaffoldingInProgress,
   isDrawingBlueprint,
-  replaceScaffoldingColumnInProgress,
+  replaceScaffoldingColumnWithExternalStaircaseInProgress,
+  replaceScaffoldingColumnWithInternalStaircaseInProgress,
   rotatingRoofInProgress,
   setDeletionInProgress,
   setDeletionIndividualScaffoldingInProgress,
@@ -70,7 +72,8 @@ import {
   setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
   setIsDrawingBlueprint,
-  setReplaceScaffoldingColumnInProgress,
+  setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
+  setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
 } from "./utilities/state";
 import { loadSymbol } from "./utilities/base";
@@ -263,7 +266,8 @@ export const createModelView = async () => {
       (deletionScaffoldingRowInProgress ||
         editingBlueprint ||
         rotatingRoofInProgress ||
-        deletionIndividualScaffoldingInProgress || deletionScaffoldingColumnInProgress) &&
+        deletionIndividualScaffoldingInProgress ||
+        deletionScaffoldingColumnInProgress) &&
       !drawingInProgress
     ) {
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -458,13 +462,22 @@ export const createModelView = async () => {
       const scaffoldingColumnToRemove = intersects[0].object;
       if (scaffoldingColumnToRemove.parent.name === "scaffoldingModel") {
         deleteColumnOfScaffolding(scene, scaffoldingColumnToRemove);
-        if (replaceScaffoldingColumnInProgress) {
+        if (replaceScaffoldingColumnWithExternalStaircaseInProgress) {
           const [_bboxWireframe, scaffoldExternalStaircaseModeling] =
             await generateScaffoldExternalStaircaseModel();
-          replaceScaffoldingWithExternalStaircase(
+          replaceScaffoldingWithStaircase(
             scene,
             scaffoldingColumnToRemove,
             scaffoldExternalStaircaseModeling
+          );
+        }
+        if (replaceScaffoldingColumnWithInternalStaircaseInProgress) {
+          const [_bboxWireframe, scaffoldInternalStaircaseModeling] =
+            await generateScaffoldInternalStaircaseModel();
+          replaceScaffoldingWithStaircase(
+            scene,
+            scaffoldingColumnToRemove,
+            scaffoldInternalStaircaseModeling
           );
         }
       }
@@ -511,8 +524,8 @@ export const createModelView = async () => {
                 roof.userData.shape.currentPoint.y
           );
           if (!hasRoof) {
-            const store = useStore()
-            const height = store.height
+            const store = useStore();
+            const height = store.height;
             createRoof(extrusion, scene, roofToggleState, height);
           }
         });
@@ -560,8 +573,8 @@ export const createModelView = async () => {
                 roof.userData.shape.currentPoint.y
           );
           if (!hasRoof) {
-            const store = useStore()
-            const height = store.shedHeight
+            const store = useStore();
+            const height = store.shedHeight;
             createShedRoof(extrusion, scene, roofToggleState, height);
           }
         });
@@ -1032,7 +1045,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
-    hideAllCSS2DObjects(scene)
+    hideAllCSS2DObjects(scene);
     generateScaffolding();
   });
 
@@ -1041,7 +1054,7 @@ export const createModelView = async () => {
     "autogenerate-scaffolding",
     "mousedown",
     () => {
-      hideAllCSS2DObjects(scene)
+      hideAllCSS2DObjects(scene);
       scene.traverse((child: any) => {
         if (child instanceof THREE.Mesh && child.name === "blueprint") {
           generateScaffoldOutline(child, scene);
@@ -1257,6 +1270,12 @@ export const createModelView = async () => {
     return [bboxWireframe, scaffoldExternalStaircaseModeling];
   }
 
+  async function generateScaffoldInternalStaircaseModel() {
+    const [bboxWireframe, scaffoldInternalStaircaseModeling] =
+      await createScaffoldInternalStaircaseModel(1.57, 2.0, 0.73);
+    return [bboxWireframe, scaffoldInternalStaircaseModeling];
+  }
+
   testButton.domElement.addEventListener("mousedown", async () => {
     console.log("test button");
     calculateTotalAmountScaffoldingInScene(scene);
@@ -1264,7 +1283,7 @@ export const createModelView = async () => {
     // loadSymbol(scene);
     scene.traverse((child) => {
       if (child.name === "scaffoldLine") {
-        console.log(child.userData.level)
+        console.log(child.userData.level);
       }
     });
   });
@@ -1352,7 +1371,8 @@ export const createModelView = async () => {
       setDeletionInProgress(false);
       setEditingBlueprint(false);
       setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnInProgress(false);
+      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
+      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
     }
   );
 
@@ -1367,7 +1387,24 @@ export const createModelView = async () => {
       setDeletionInProgress(false);
       setEditingBlueprint(false);
       setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnInProgress(true);
+      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(true);
+      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
+    }
+  );
+
+  observeElementAndAddEventListener(
+    "scaffold-internal-staircase",
+    "mousedown",
+    () => {
+      console.log("scaffold-internal-staircase");
+      setDeletionScaffoldingColumnInProgress(true);
+      setDeletionScaffoldingRowInProgress(false);
+      setDrawingInProgress(false);
+      setDeletionInProgress(false);
+      setEditingBlueprint(false);
+      setDrawingScaffoldingInProgress(false);
+      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
+      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(true);
     }
   );
 

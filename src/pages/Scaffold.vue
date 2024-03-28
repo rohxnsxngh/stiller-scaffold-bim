@@ -136,6 +136,7 @@
           </div>
           <div
             class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-8 mb-2 bg-[#14141C]"
+            id="scaffold-internal-staircase"
           >
             <img
               src="../assets/images/ScaffoldSection/Staircase.svg"

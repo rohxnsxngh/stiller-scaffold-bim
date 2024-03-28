@@ -26,7 +26,8 @@ import {
   setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
   setIsDrawingBlueprint,
-  setReplaceScaffoldingColumnInProgress,
+  setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
+  setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
 } from "./state";
 
@@ -285,7 +286,8 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
     setDeletionScaffoldingRowInProgress(false);
     setDeletionScaffoldingColumnInProgress(false);
-    setReplaceScaffoldingColumnInProgress(false);
+    setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
+    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false)
     setDeletionIndividualScaffoldingInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
@@ -304,7 +306,8 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
     setDeletionScaffoldingRowInProgress(false);
     setDeletionScaffoldingColumnInProgress(false);
-    setReplaceScaffoldingColumnInProgress(false);
+    setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
+    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false)
     setDeletionIndividualScaffoldingInProgress(false);
     setRotatingRoofInProgress(false)
   });

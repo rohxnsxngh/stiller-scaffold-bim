@@ -6,7 +6,8 @@ export let isDrawingBlueprint = false;
 export let deletionIndividualScaffoldingInProgress = false;
 export let deletionScaffoldingRowInProgress = false;
 export let deletionScaffoldingColumnInProgress = false;
-export let replaceScaffoldingColumnInProgress = false;
+export let replaceScaffoldingColumnWithExternalStaircaseInProgress = false;
+export let replaceScaffoldingColumnWithInternalStaircaseInProgress = false;
 export let rotatingRoofInProgress = false
 
 export const setIsDrawingBlueprint = (value: boolean) => {
@@ -41,8 +42,12 @@ export const setDeletionScaffoldingColumnInProgress = (value: boolean) => {
   deletionScaffoldingColumnInProgress = value;
 };
 
-export const setReplaceScaffoldingColumnInProgress = (value: boolean) => {
-  replaceScaffoldingColumnInProgress = value;
+export const setReplaceScaffoldingColumnWithExternalStaircaseInProgress = (value: boolean) => {
+  replaceScaffoldingColumnWithExternalStaircaseInProgress = value;
+};
+
+export const setReplaceScaffoldingColumnWithInternalStaircaseInProgress = (value: boolean) => {
+  replaceScaffoldingColumnWithInternalStaircaseInProgress = value;
 };
 
 export const setRotatingRoofInProgress = (value: boolean) => {

@@ -867,7 +867,7 @@ export function createScaffoldExternalStaircaseModel(
   });
 }
 
-export function replaceScaffoldingWithExternalStaircase(
+export function replaceScaffoldingWithStaircase(
   scene: THREE.Scene,
   scaffold: any,
   scaffoldExternalStaircase: any
@@ -913,4 +913,112 @@ export function replaceScaffoldingWithExternalStaircase(
     externalStaircaseInstance.rotation.copy(euler);
     scene.add(externalStaircaseInstance);
   }
+}
+
+// scaffolding internal staircase model creation
+export function createScaffoldInternalStaircaseModel(
+  length: number,
+  height: number,
+  width: number
+): Promise<[THREE.LineSegments, THREE.Object3D]> {
+  return new Promise((resolve, reject) => {
+    const loader = new GLTFLoader();
+    loader.load(
+      "/models/scaffolding-external-staircase-no-texture.glb",
+      (gltf: any) => {
+        const scaffoldInternalStaircaseModel = gltf.scene;
+        scaffoldInternalStaircaseModel.name =
+          "scaffoldingInternalStaircaseModel";
+          scaffoldInternalStaircaseModel.userData = {
+          name: "scaffoldingInternalStaircaseModel",
+          length: length,
+          height: height,
+          width: width,
+          position: null,
+          first_point: null,
+          last_point: null,
+          line_length: null,
+        };
+        // Calculate bounding box
+        const bbox = new THREE.Box3().setFromObject(
+          scaffoldInternalStaircaseModel
+        );
+        // Get the dimensions of the bounding box
+        const size = bbox.getSize(new THREE.Vector3());
+
+        // Calculate the scale factor for each dimension
+        const scaleX = width / size.x;
+        const scaleY = height / size.y;
+        const scaleZ = length / size.z;
+
+        // Apply the scale factor to the model
+        scaffoldInternalStaircaseModel.scale.set(scaleX, scaleY, scaleZ);
+
+        // Update the bounding box with the scaled model
+        scaffoldInternalStaircaseModel.updateMatrixWorld();
+        const newBBox = new THREE.Box3().setFromObject(
+          scaffoldInternalStaircaseModel
+        );
+
+        // Calculate and print the new bounding box dimensions
+        const newLength = newBBox.max.z - newBBox.min.z;
+        const newWidth = newBBox.max.x - newBBox.min.x;
+        const newHeight = newBBox.max.y - newBBox.min.y;
+        console.log("New bounding box dimensions:", {
+          length: newLength,
+          width: newWidth,
+          height: newHeight,
+        });
+
+        // Create wireframe geometry
+        const bboxGeometry = new THREE.BoxGeometry().setFromPoints([
+          newBBox.min,
+          new THREE.Vector3(newBBox.min.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.min.x, newBBox.max.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.min.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.min.y, newBBox.max.z),
+          new THREE.Vector3(newBBox.max.x, newBBox.max.y, newBBox.min.z),
+          newBBox.max,
+        ]);
+
+        // Create wireframe material
+        const bboxMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+
+        // Create wireframe
+        const bboxWireframe = new THREE.LineSegments(
+          new THREE.WireframeGeometry(bboxGeometry),
+          bboxMaterial
+        );
+        bboxWireframe.name = "scaffoldingWireframe";
+        bboxWireframe.userData = {
+          name: "scaffoldingWireframe",
+          length: length,
+          height: height,
+          width: width,
+        };
+
+        console.log(
+          "scaffolding external staircase model",
+          scaffoldInternalStaircaseModel
+        );
+
+        resolve([bboxWireframe, scaffoldInternalStaircaseModel]);
+      },
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      },
+      (error) => {
+        console.error("Error loading GLB model:", error);
+        // Check if the error is related to missing texture
+        if (error instanceof Error && error.message.includes("load texture")) {
+          // Ignore the error related to missing texture and resolve the promise
+          resolve([new THREE.LineSegments(), new THREE.Object3D()]);
+        } else {
+          // Reject the promise for other types of errors
+          reject(error);
+        }
+      }
+    );
+  });
 }
