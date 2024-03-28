@@ -4,7 +4,6 @@ import { gsap } from "gsap";
 import {
   cameraDisableOrbitalFunctionality,
   cameraEnableOrbitalFunctionality,
-  cameraPerspectiveView,
   cameraTopView,
 } from "./camera";
 import {
@@ -17,6 +16,7 @@ import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
 import { setEditingBlueprint } from "./mesh";
+import lastSavedSvg from "../assets/images/SavedDisc.svg";
 import {
   setDeletionInProgress,
   setDeletionIndividualScaffoldingInProgress,
@@ -51,6 +51,8 @@ export const createToolbar = (
     setDrawingInProgress(false);
     setPlaceScaffoldIndividually(false);
   });
+  mainToolbar.domElement.classList.remove("bg-ifcjs-100");
+  mainToolbar.domElement.classList.add("bg-glass");
   // side tool bar
   const sideToolBar = new OBC.Toolbar(components);
   sideToolBar.position = "right";
@@ -59,6 +61,8 @@ export const createToolbar = (
     setDrawingInProgress(false);
     setPlaceScaffoldIndividually(false);
   });
+  sideToolBar.domElement.classList.remove("bg-ifcjs-100");
+  sideToolBar.domElement.classList.add("bg-glass");
 
   // top tool bar
   const topToolBar = new OBC.Toolbar(components);
@@ -72,6 +76,8 @@ export const createToolbar = (
     setPlaceScaffoldIndividually(false);
     setDrawingScaffoldingInProgress(false);
   });
+  topToolBar.domElement.classList.remove("bg-ifcjs-100");
+  topToolBar.domElement.classList.add("bg-[#111115]");
 
   // Vue instance inside of top tool bar
   const vueComponentTimeline = createApp(Timeline);
@@ -244,34 +250,6 @@ export const createToolbar = (
   );
   createBlueprintRectangleButton.domElement.classList.add("hover:bg-slate-300");
 
-  // Move camera to perspective view button
-  // const perspectiveViewButton = new OBC.Button(components);
-  // perspectiveViewButton.materialIcon = "fullscreen_exit";
-  // perspectiveViewButton.tooltip = "Perspective View";
-  // perspectiveViewButton.id = "perspective-button";
-  // mainToolbar.addChild(perspectiveViewButton);
-  // perspectiveViewButton.onClick.add(() => {
-  //   document.body.style.cursor = "auto";
-  //   scene.traverse((child) => {
-  //     if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-  //       scene.remove(child);
-  //     }
-  //   });
-  //   cameraPerspectiveView(gsap, components.camera);
-  //   setDeletionInProgress(false);
-  //   setDrawingInProgress(false);
-  // });
-  // perspectiveViewButton.domElement.addEventListener("mouseover", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // perspectiveViewButton.domElement.addEventListener("mouseleave", () => {
-  //   setDrawingInProgress(true);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // perspectiveViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // perspectiveViewButton.domElement.classList.add("hover:bg-slate-300");
-
   // Allow panning and rotating button
   const freeRotateButton = new OBC.Button(components);
   freeRotateButton.materialIcon = "pan_tool";
@@ -287,7 +265,7 @@ export const createToolbar = (
     setDeletionScaffoldingRowInProgress(false);
     setDeletionScaffoldingColumnInProgress(false);
     setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false)
+    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
     setDeletionIndividualScaffoldingInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
@@ -307,9 +285,9 @@ export const createToolbar = (
     setDeletionScaffoldingRowInProgress(false);
     setDeletionScaffoldingColumnInProgress(false);
     setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false)
+    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
     setDeletionIndividualScaffoldingInProgress(false);
-    setRotatingRoofInProgress(false)
+    setRotatingRoofInProgress(false);
   });
 
   observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
@@ -317,21 +295,6 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
     setIsDrawingBlueprint(false);
   });
-
-  // Start Drawing Blueprint
-  // const drawingButton = new OBC.Button(components);
-  // drawingButton.materialIcon = "polyline";
-  // drawingButton.tooltip = "Polygon Sketch";
-  // drawingButton.id = "drawing-button";
-  // mainToolbar.addChild(drawingButton);
-  // drawingButton.onClick.add(() => {
-  //   document.body.style.cursor = "auto";
-  //   setDeletionInProgress(false);
-  //   setDrawingInProgress(true);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // drawingButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // drawingButton.domElement.classList.add("hover:bg-slate-300");
 
   const deleteObjectButton = new OBC.Button(components);
   deleteObjectButton.materialIcon = "delete_forever";
@@ -777,6 +740,8 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     setDrawingInProgress(true);
   });
+  drawerToolBar.domElement.classList.remove("bg-ifcjs-100");
+  drawerToolBar.domElement.classList.add("bg-glass");
 
   const removeLabelsButton = new OBC.Button(components);
   removeLabelsButton.materialIcon = "disabled_by_default";
@@ -886,6 +851,40 @@ export const createToolbar = (
   });
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawerMenuButton.domElement.classList.add("hover:bg-slate-300");
+
+  // Fetch the SVG content from the file
+  fetch(lastSavedSvg)
+    .then((response) => response.text())
+    .then((svgContent) => {
+      // Create a new button
+      const menuSaveButton = new OBC.Button(components);
+      menuSaveButton.id = "menu-button";
+      drawerToolBar.addChild(menuSaveButton);
+
+      // Create a new DOM element for the SVG
+      const svgElement = document.createElement("div");
+      svgElement.innerHTML = svgContent;
+
+      // Append the SVG element to the button's DOM element
+      menuSaveButton.domElement.appendChild(svgElement);
+      menuSaveButton.domElement.classList.remove("hover:bg-ifcjs-200");
+      menuSaveButton.domElement.classList.add("hover:bg-slate-300");
+      menuSaveButton.domElement.classList.add("hover:text-black");
+    })
+    .catch((error) => {
+      console.error("Error fetching SVG:", error);
+    });
+
+    // menu power button
+    const menuPowerButton = new OBC.Button(components);
+    menuPowerButton.materialIcon = "power_settings_new";
+    menuPowerButton.id = "power-button";
+    drawerToolBar.addChild(menuPowerButton);
+    menuPowerButton.onClick.add(() => {
+      window.location.href = "/home";
+    })
+    menuPowerButton.domElement.classList.remove("hover:bg-ifcjs-200");
+    menuPowerButton.domElement.classList.add("hover:bg-slate-300");
   /////////////////////////////////////////////////////////
   // drawer element
   const drawer = new OBC.FloatingWindow(components);
