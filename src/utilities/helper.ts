@@ -116,10 +116,12 @@ export function createArrowHelper(
 // const midpointLine = new THREE.Vector3(0,  0,  0); // Example origin
 // createArrowHelper(scene, edgeDirection, midpointLine,  10,  0x000000);
 
+// TODO: make sure this clears the SET that stores scaffolding position eventually
 export function resetScene(
   scene: THREE.Scene,
   components: OBC.Components,
-  shadows: OBC.ShadowDropper
+  shadows: OBC.ShadowDropper,
+  scaffoldPlacedPosition: Set<string>
 ) {
   const objectsToRemove: any = [];
   const objectsToRemoveUUID: any = [];
@@ -142,7 +144,11 @@ export function resetScene(
       if (child.material.map) child.material.map.dispose();
       objectsToRemove.push(child);
     }
-    if (child.name === "scaffoldingModel") {
+    if (
+      child.name === "scaffoldingModel" ||
+      child.name === "scaffoldingInternalStaircaseModel" ||
+      child.name === "scaffoldingExternalStaircaseModel"
+    ) {
       objectsToRemove.push(child);
     }
     if (child.name === "scaffoldingSheet") {
@@ -150,6 +156,14 @@ export function resetScene(
     }
     if (child.name === "rectanglePlane") {
       objectsToRemove.push(child);
+    }
+    if (child.name === "markupGroup") {
+      // Remove children of the "markupGroup" from the scene
+      // TODO check if this implementation removes the blueprint from memory and 
+      // properly disposes of material
+      child.traverse((grandChild) => {
+        child.remove(grandChild)
+      });
     }
   });
   objectsToRemove.forEach((object: any) => {
@@ -163,7 +177,8 @@ export function resetScene(
       console.error("Error: ", error);
     }
   });
-  console.log(scene, components, shadows);
+  scaffoldPlacedPosition.clear()
+  console.log(scene, components, shadows, scaffoldPlacedPosition);
 }
 
 // helper function to measure line length
@@ -384,29 +399,44 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
 }
 
 export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {
-  return (vector1.x === vector2.x && vector1.y === vector2.y && vector1.z === vector2.z);
+  return (
+    vector1.x === vector2.x &&
+    vector1.y === vector2.y &&
+    vector1.z === vector2.z
+  );
 }
 
-export function areAnyTwoAxesEqual(v1: THREE.Vector3, v2: THREE.Vector3): boolean {
+export function areAnyTwoAxesEqual(
+  v1: THREE.Vector3,
+  v2: THREE.Vector3
+): boolean {
   return (
-     (v1.x === v2.x && v1.y === v2.y) ||
-     (v1.x === v2.x && v1.z === v2.z) ||
-     (v1.y === v2.y && v1.z === v2.z)
+    (v1.x === v2.x && v1.y === v2.y) ||
+    (v1.x === v2.x && v1.z === v2.z) ||
+    (v1.y === v2.y && v1.z === v2.z)
   );
- }
+}
 
-export function areVectorsEqualWithEpsilon(v1: THREE.Vector3, v2: THREE.Vector3, epsilon = Number.EPSILON): boolean {
+export function areVectorsEqualWithEpsilon(
+  v1: THREE.Vector3,
+  v2: THREE.Vector3,
+  epsilon = Number.EPSILON
+): boolean {
   return (
-     Math.abs(v1.x - v2.x) < epsilon &&
-     Math.abs(v1.y - v2.y) < epsilon &&
-     Math.abs(v1.z - v2.z) < epsilon
+    Math.abs(v1.x - v2.x) < epsilon &&
+    Math.abs(v1.y - v2.y) < epsilon &&
+    Math.abs(v1.z - v2.z) < epsilon
   );
- }
+}
 
- export function areAnyTwoAxesEqualWithEpsilon(v1: THREE.Vector3, v2: THREE.Vector3, epsilon = Number.EPSILON): boolean {
+export function areAnyTwoAxesEqualWithEpsilon(
+  v1: THREE.Vector3,
+  v2: THREE.Vector3,
+  epsilon = Number.EPSILON
+): boolean {
   return (
-     (Math.abs(v1.x - v2.x) < epsilon && Math.abs(v1.y - v2.y) < epsilon) ||
-     (Math.abs(v1.x - v2.x) < epsilon && Math.abs(v1.z - v2.z) < epsilon) ||
-     (Math.abs(v1.y - v2.y) < epsilon && Math.abs(v1.z - v2.z) < epsilon)
+    (Math.abs(v1.x - v2.x) < epsilon && Math.abs(v1.y - v2.y) < epsilon) ||
+    (Math.abs(v1.x - v2.x) < epsilon && Math.abs(v1.z - v2.z) < epsilon) ||
+    (Math.abs(v1.y - v2.y) < epsilon && Math.abs(v1.z - v2.z) < epsilon)
   );
- }
+}

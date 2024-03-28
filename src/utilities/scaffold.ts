@@ -64,12 +64,13 @@ export async function createScaffoldingShapeIsOutlined(
   });
 }
 
-let scaffoldPlacedPosition = new Set<string>();
+// let scaffoldPlacedPosition = new Set<string>();
 export async function placeScaffoldModelsAlongLine(
   line: THREE.Line,
   scene: THREE.Scene,
   scaffoldModeling: any,
-  bboxWireframe: any
+  bboxWireframe: any,
+  scaffoldPlacedPosition: Set<string>
 ) {
   const lineLength = line.userData.length;
   const startPoint = line.userData.first_point;
@@ -155,7 +156,8 @@ export async function placeScaffoldModelsAlongLine(
     scene,
     scaffoldModeling,
     bboxWireframe,
-    line
+    line,
+    scaffoldPlacedPosition
   );
 }
 
@@ -332,90 +334,30 @@ export function generateScaffoldOutline(
   }
 }
 
-function attachScaffoldStackingLabel(
-  scene: THREE.Scene,
-  position: THREE.Vector3
-): {
-  label: CSS2DObject;
-} {
-  // Check if there is already a label at the same position
-  const existingLabel = scene.children.find((child) => {
-    return (
-      child.name === "scaffoldingStackingLabel" &&
-      areAnyTwoAxesEqualWithEpsilon(child.position, position)
-    );
-  });
-
-  if (existingLabel) {
-    // If a label already exists, return it
-    return { label: existingLabel as CSS2DObject };
-  } else {
-    // If no label exists, create a new one
-    const labelDiv = document.createElement("div");
-    labelDiv.className =
-      "label bg-black text-white pointer-events-auto rounded-full py-1";
-    labelDiv.contentEditable = "false";
-
-    const label = new CSS2DObject(labelDiv);
-    label.name = "scaffoldingStackingLabel";
-    label.position.copy(position);
-    scene.add(label);
-    console.log(label.position);
-
-    // const randomCount = [];
-    // scene.traverse((child) => {
-    //   if (child.name === "scaffoldingStackingLabel") {
-    //     randomCount.push(child);
-    //   }
-    // });
-
-    // console.log(
-    //   "number of scaffolding labels in scene",
-    //   randomCount.length,
-    //   randomCount
-    // );
-
-    return { label };
-  }
-}
 // label that controls how many levels of scaffolding exist
 function attachScaffoldRowLabelChangeHandler(
   // label: CSS2DObject,
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any,
-  line: any
+  line: any,
+  scaffoldPlacedPosition: Set<string>
 ) {
-  // TODO in the future this level should come from the store which is currently storing the
-  // value that is being displayed on the frontend
   let levels = 0;
-  // const labelElement = label.element as HTMLDivElement;
-  // labelElement.addEventListener("mouseenter", () => {
-  //   setPlaceScaffoldIndividually(false);
-  // });
-
-  // labelElement.addEventListener("mouseleave", () => {
-  //   setPlaceScaffoldIndividually(true);
-  // });
-
-  // labelElement.addEventListener("focus", () => {
-  //   setPlaceScaffoldIndividually(false);
-  // });
-
   observeElementAndAddEventListener(
     "add-scaffolding-level",
     "mousedown",
     () => {
       console.log("add scaffolding level");
       levels++;
-      // addScaffoldingLevelForAllScaffolding(
-      //   scene,
-      //   scaffold,
-      //   scaffoldBoundingBox,
-      //   levels,
-      //   line
-      // );
-      addScaffoldingLevel(line, scene, scaffold, scaffoldBoundingBox, levels);
+      addScaffoldingLevel(
+        line,
+        scene,
+        scaffold,
+        scaffoldBoundingBox,
+        levels,
+        scaffoldPlacedPosition
+      );
     }
   );
 
@@ -424,7 +366,7 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       // removeScaffoldingLevelForAllScaffolding(scene, levels);
-      removeScaffoldingLevel(line, scene, levels);
+      removeScaffoldingLevel(line, scene, levels, scaffoldPlacedPosition);
       levels--;
       // make sure the level cannot go below 0
       if (levels < 0) {
@@ -440,7 +382,8 @@ function addScaffoldingLevel(
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any,
-  level: number
+  level: number,
+  scaffoldPlacedPosition: Set<string>
 ) {
   const lineLength = line.userData.length;
   const startPoint = new THREE.Vector3(
@@ -537,7 +480,12 @@ function addScaffoldingLevel(
 }
 
 // remove a level of scaffolding from the selected side
-function removeScaffoldingLevel(line: any, scene: THREE.Scene, level: number) {
+function removeScaffoldingLevel(
+  line: any,
+  scene: THREE.Scene,
+  level: number,
+  scaffoldPlacedPosition: Set<string>
+) {
   const lineLength = line.userData.length;
   const lineLevel = level;
   console.log("linelevel", lineLevel);
@@ -929,7 +877,7 @@ export function createScaffoldInternalStaircaseModel(
         const scaffoldInternalStaircaseModel = gltf.scene;
         scaffoldInternalStaircaseModel.name =
           "scaffoldingInternalStaircaseModel";
-          scaffoldInternalStaircaseModel.userData = {
+        scaffoldInternalStaircaseModel.userData = {
           name: "scaffoldingInternalStaircaseModel",
           length: length,
           height: height,

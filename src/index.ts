@@ -1018,6 +1018,7 @@ export const createModelView = async () => {
     generateScaffolding();
   });
 
+  let scaffoldPlacedPosition = new Set<string>();
   async function generateScaffolding() {
     const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(
       1.57,
@@ -1030,7 +1031,8 @@ export const createModelView = async () => {
           child,
           scene,
           scaffoldModeling,
-          bboxWireframe
+          bboxWireframe,
+          scaffoldPlacedPosition
         );
       }
     });
@@ -1251,14 +1253,14 @@ export const createModelView = async () => {
   });
 
   clearSceneButton.domElement.addEventListener("mousedown", () => {
-    resetScene(scene, components, shadows);
+    resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
     scaffoldPoints = [];
     points = [];
   });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
-    resetScene(scene, components, shadows);
+    resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
     scaffoldPoints = [];
     points = [];
