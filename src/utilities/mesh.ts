@@ -10,7 +10,12 @@ import {
 import { rectMaterial, roofMaterial } from "./material";
 import { DragControls } from "three/addons/controls/DragControls.js";
 import { useStore } from "../store";
-import { setDeletionInProgress, setDrawingInProgress, setDrawingScaffoldingInProgress, setIsDrawingBlueprint } from "./state";
+import {
+  setDeletionInProgress,
+  setDrawingInProgress,
+  setDrawingScaffoldingInProgress,
+  setIsDrawingBlueprint,
+} from "./state";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -291,8 +296,8 @@ function attachExtrusionLabelChangeHandler(
   labelElement.addEventListener("blur", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
-      const store = useStore()
-      store.updateDepth(parseFloat(newValue as unknown as string))
+      const store = useStore();
+      store.updateDepth(parseFloat(newValue as unknown as string));
       updateExtrusionGeometry(newValue, meshExtrude, shape, label);
     }
   });
@@ -479,7 +484,7 @@ function attachLabelChangeHandler(
     document.body.style.cursor = "grab";
     // setDeletionInProgress(false);
     setDrawingInProgress(false);
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
     // setDrawingScaffoldingInProgress(false);
   });
 
@@ -487,14 +492,14 @@ function attachLabelChangeHandler(
     document.body.style.cursor = "crosshair";
     setDrawingInProgress(false);
     if (!blurTriggered) {
-      setIsDrawingBlueprint(true)
+      setIsDrawingBlueprint(true);
     } else {
-      setIsDrawingBlueprint(false)
+      setIsDrawingBlueprint(false);
     }
   });
 
   labelElement.addEventListener("focus", () => {
-    blurTriggered = true
+    blurTriggered = true;
     setDeletionInProgress(false);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -595,7 +600,7 @@ function updateRectangleBlueprintGeometry(
 
     const geometry = new THREE.PlaneGeometry(Number(newDistance), width);
     const newRectangleBlueprint = new THREE.Mesh(geometry, rectMaterial);
-    console.log(centerX, centerZ)
+    console.log(centerX, centerZ);
     newRectangleBlueprint.position.set(centerX, -0.125, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
@@ -647,7 +652,7 @@ function updateRectangleBlueprintGeometry(
 
     const geometry = new THREE.PlaneGeometry(height, Number(newDistance));
     const newRectangleBlueprint = new THREE.Mesh(geometry, rectMaterial);
-    console.log(centerX, centerZ)
+    console.log(centerX, centerZ);
     newRectangleBlueprint.position.set(centerX, -0.125, centerZ);
     const halfWidth = newRectangleBlueprint.geometry.parameters.width / 2;
     const halfHeight = newRectangleBlueprint.geometry.parameters.height / 2;
@@ -894,8 +899,8 @@ function attachRoofLabelChangeHandler(
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
       console.log("values do not match");
-      const store = useStore()
-      store.updateRoofHeight(parseFloat(newValue as unknown as string))
+      const store = useStore();
+      store.updateRoofHeight(parseFloat(newValue as unknown as string));
       if (label.userData) {
         scene.remove(label.userData as THREE.Object3D);
       }
@@ -1048,55 +1053,58 @@ export function createShedRoof(
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   const rectShape = child.userData.shape;
   if (!child.userData.blueprintHasBeenUpdated) {
-    if (index == 0) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x + height,
-        rectShape.curves[index].v1.y
-      );
+    switch (index) {
+      case 0:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x + height,
+          rectShape.curves[index].v1.y
+        );
+        break;
+      case 1:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x,
+          rectShape.curves[index].v1.y - height
+        );
+        break;
+      case 2:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x - height,
+          rectShape.curves[index].v1.y
+        );
+        break;
+      case 3:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x,
+          rectShape.curves[index].v1.y + height
+        );
+        break;
     }
-    if (index == 1) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y - height
-      );
-    }
-    if (index == 2) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x - height,
-        rectShape.curves[index].v1.y
-      );
-    }
-    if (index == 3) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y + height
-      );
-    }
-  }
-  if (blueprintHasBeenUpdated) {
-    if (index == 0) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y - height
-      );
-    }
-    if (index == 1) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x + height,
-        rectShape.curves[index].v1.y
-      );
-    }
-    if (index == 2) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y + height
-      );
-    }
-    if (index == 3) {
-      thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x - height,
-        rectShape.curves[index].v1.y
-      );
+  } else {
+    switch (index) {
+      case 0:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x,
+          rectShape.curves[index].v1.y - height
+        );
+        break;
+      case 1:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x + height,
+          rectShape.curves[index].v1.y
+        );
+        break;
+      case 2:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x,
+          rectShape.curves[index].v1.y + height
+        );
+        break;
+      case 3:
+        thirdPoint = new THREE.Vector2(
+          rectShape.curves[index].v1.x - height,
+          rectShape.curves[index].v1.y
+        );
+        break;
     }
   }
 
@@ -1247,8 +1255,8 @@ function attachShedRoofLabelChangeHandler(
   labelElement.addEventListener("blur", () => {
     const newValue = labelElement.textContent;
     if (oldValue !== newValue) {
-      const store = useStore()
-      store.updateShedRoofHeight(parseFloat(newValue as unknown as string))
+      const store = useStore();
+      store.updateShedRoofHeight(parseFloat(newValue as unknown as string));
       console.log("values do not match");
       if (label.userData) {
         scene.remove(label.userData as THREE.Object3D);
