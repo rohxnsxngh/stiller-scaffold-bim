@@ -321,11 +321,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     document.body.style.cursor = "auto";
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        scene.remove(child);
-      }
-    });
+    removeHighlightMesh(scene)
     setDeletionInProgress(true);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -644,7 +640,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
 
-  observeElementAndAddEventListener("draw-scaffold", "mouseover", () => {
+  observeElementAndAddEventListener("draw-scaffold", "mouseleave", () => {
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
     setDrawingInProgress(false);

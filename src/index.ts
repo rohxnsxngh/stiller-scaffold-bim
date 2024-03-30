@@ -997,7 +997,6 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
-    setPlaceScaffoldIndividually(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       createScaffoldingShapeIsOutlined(
@@ -1049,6 +1048,16 @@ export const createModelView = async () => {
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
     hideAllCSS2DObjects(scene);
     generateScaffolding();
+    const cubeClone: THREE.Object3D<THREE.Object3DEventMap>[] = []
+    scene.traverse((child) => {
+      if (child.name === "cubeClone") {
+        cubeClone.push(child)
+      }
+    })
+
+    cubeClone.forEach((cube) => {
+      scene.remove(cube)
+    })
   });
 
   // autogenerate scaffolding
@@ -1085,6 +1094,11 @@ export const createModelView = async () => {
     scaffoldingObjectsToRemove.forEach((scaffold) => {
       scene.remove(scaffold);
     });
+
+    const store = useStore()
+    store.updateScaffoldLevel(0)
+
+    scaffoldPlacedPosition.clear()
   });
 
   //////////////////////////////////

@@ -145,13 +145,6 @@ export async function placeScaffoldModelsAlongLine(
     console.error("Error creating scaffold model:", error);
   }
 
-  // const { label } = attachScaffoldStackingLabel(scene, midPoint);
-  // label.userData = {
-  //   level: 0,
-  //   length: lineLength,
-  //   first_point: startPoint,
-  //   last_point: endPoint,
-  // };
   attachScaffoldRowLabelChangeHandler(
     scene,
     scaffoldModeling,

@@ -159,10 +159,10 @@ export function resetScene(
     }
     if (child.name === "markupGroup") {
       // Remove children of the "markupGroup" from the scene
-      // TODO check if this implementation removes the blueprint from memory and 
+      // TODO check if this implementation removes the blueprint from memory and
       // properly disposes of material
       child.traverse((grandChild) => {
-        child.remove(grandChild)
+        child.remove(grandChild);
       });
     }
   });
@@ -177,7 +177,7 @@ export function resetScene(
       console.error("Error: ", error);
     }
   });
-  scaffoldPlacedPosition.clear()
+  scaffoldPlacedPosition.clear();
   console.log(scene, components, shadows, scaffoldPlacedPosition);
 }
 
@@ -211,10 +211,7 @@ export function disableOrbitControls(controls: any) {
 // TODO: make this method more efficient and more inclusive
 export function deleteObject(object: any, scene: THREE.Scene) {
   // const parentObject = object.parent.children;
-  if (
-    object.parent.type === "Group" &&
-    object.parent instanceof THREE.Object3D
-  ) {
+  if (object.parent instanceof THREE.Object3D) {
     const parent = object.parent;
     console.log(parent);
     // Remove the parent recursively
@@ -230,8 +227,9 @@ export function deleteObject(object: any, scene: THREE.Scene) {
 
 // Function to remove object from the scene recursively
 // this helper function is meant specifically for gltf that contain a tree of objects
+// TODO: fix the issue with trhis function
 function removeFromScene(object: any, scene: THREE.Scene) {
-  if (object.parent) {
+  if (object.parent != null) {
     // Dispose of materials
     if (object.material) {
       if (Array.isArray(object.material)) {
@@ -259,6 +257,27 @@ function removeFromScene(object: any, scene: THREE.Scene) {
 
     scene.remove(object); // If no parent, remove from scene
   }
+}
+
+function removeHierarchy(object: any, scene: THREE.Scene) {
+  // Remove each child recursively
+  while (object.children.length > 0) {
+    removeHierarchy(object.children[0], scene);
+  }
+
+  // Dispose of geometry and material
+  if (object.geometry) {
+    object.geometry.dispose();
+  }
+  if (object.material) {
+    if (object.material.map) {
+      object.material.map.dispose();
+    }
+    object.material.dispose();
+  }
+
+  // Remove object from the scene
+  scene.remove(object);
 }
 
 export function hideAllCSS2DObjects(scene: THREE.Scene) {

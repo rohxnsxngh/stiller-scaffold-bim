@@ -159,15 +159,6 @@
               class="object-contain"
             />
           </div>
-          <!-- <div
-            class="btn btn-xl h-32 w-32 btn-outline hover:bg-[#23E6A1] ml-3 mb-2 bg-[#14141C]"
-            id="draw-scaffold"
-          >
-            <img
-              src="../assets/images/ScaffoldSection/Rudder.svg"
-              class="object-contain"
-            />
-          </div> -->
         </div>
       </div>
 
