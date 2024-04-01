@@ -321,7 +321,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     document.body.style.cursor = "auto";
-    removeHighlightMesh(scene)
+    removeHighlightMesh(scene);
     setDeletionInProgress(true);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -848,39 +848,24 @@ export const createToolbar = (
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawerMenuButton.domElement.classList.add("hover:bg-slate-300");
 
-  // Fetch the SVG content from the file
-  fetch(lastSavedSvg)
-    .then((response) => response.text())
-    .then((svgContent) => {
-      // Create a new button
-      const menuSaveButton = new OBC.Button(components);
-      menuSaveButton.id = "menu-button";
-      drawerToolBar.addChild(menuSaveButton);
+  // menu power button
+  const menuPowerButton = new OBC.Button(components);
+  menuPowerButton.materialIcon = "power_settings_new";
+  menuPowerButton.id = "menu-power-button";
+  drawerToolBar.addChild(menuPowerButton);
+  menuPowerButton.onClick.add(() => {
+    window.location.href = "/home";
+  });
+  menuPowerButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  menuPowerButton.domElement.classList.add("hover:bg-slate-300");
 
-      // Create a new DOM element for the SVG
-      const svgElement = document.createElement("div");
-      svgElement.innerHTML = svgContent;
-
-      // Append the SVG element to the button's DOM element
-      menuSaveButton.domElement.appendChild(svgElement);
-      menuSaveButton.domElement.classList.remove("hover:bg-ifcjs-200");
-      menuSaveButton.domElement.classList.add("hover:bg-slate-300");
-      menuSaveButton.domElement.classList.add("hover:text-black");
-    })
-    .catch((error) => {
-      console.error("Error fetching SVG:", error);
-    });
-
-    // menu power button
-    const menuPowerButton = new OBC.Button(components);
-    menuPowerButton.materialIcon = "power_settings_new";
-    menuPowerButton.id = "power-button";
-    drawerToolBar.addChild(menuPowerButton);
-    menuPowerButton.onClick.add(() => {
-      window.location.href = "/home";
-    })
-    menuPowerButton.domElement.classList.remove("hover:bg-ifcjs-200");
-    menuPowerButton.domElement.classList.add("hover:bg-slate-300");
+  // save button
+  const menuSaveButton = new OBC.Button(components);
+  menuSaveButton.materialIcon = "save";
+  menuSaveButton.id = "menu-save-button";
+  drawerToolBar.addChild(menuSaveButton);
+  menuSaveButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  menuSaveButton.domElement.classList.add("hover:bg-slate-300");
   /////////////////////////////////////////////////////////
   // drawer element
   const drawer = new OBC.FloatingWindow(components);
