@@ -2,13 +2,10 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import {
-  areAnyTwoAxesEqualWithEpsilon,
-  areVectorsEqualWithEpsilon,
   isVectorEqual,
   measureLineLength,
   observeElementAndAddEventListener,
 } from "./helper";
-import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { useStore } from "../store";
 
 export let placeScaffoldIndividually = false;

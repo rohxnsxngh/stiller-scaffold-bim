@@ -16,7 +16,6 @@ import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
 import { setEditingBlueprint } from "./mesh";
-import lastSavedSvg from "../assets/images/SavedDisc.svg";
 import {
   setDeletionInProgress,
   setDeletionIndividualScaffoldingInProgress,
@@ -267,6 +266,7 @@ export const createToolbar = (
     setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
     setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
     setDeletionIndividualScaffoldingInProgress(false);
+    setRotatingRoofInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
     setDrawingInProgress(false);
@@ -350,7 +350,7 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
   clearSceneButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
+    setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
   });
   clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
@@ -358,7 +358,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     setDeletionInProgress(false);
-    setDrawingInProgress(true);
+    setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
   });
 
@@ -368,7 +368,7 @@ export const createToolbar = (
   });
 
   observeElementAndAddEventListener("reset-scene", "mouseleave", () => {
-    setDrawingInProgress(true);
+    setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
   });
 

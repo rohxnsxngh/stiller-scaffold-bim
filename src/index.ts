@@ -76,7 +76,6 @@ import {
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
 } from "./utilities/state";
-import { loadSymbol } from "./utilities/base";
 
 let intersects: any, components: OBC.Components;
 let rectangleBlueprint: any;
@@ -138,15 +137,14 @@ export const createModelView = async () => {
   createLighting(scene);
 
   // Grid
-  const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
-  
+  new CustomGrid(components, new THREE.Color("#FF0000"));
+
   // Cube
   const geometry = new THREE.OctahedronGeometry(0.5); // The parameter is the radius of the octahedron
   const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
   const cube = new THREE.Mesh(geometry, material);
-  cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 4)
+  cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 4);
   cube.position.set(0, -1, 0);
-
 
   // for the blueprint rectangle
   const markupGroup = new THREE.Group();
@@ -633,7 +631,7 @@ export const createModelView = async () => {
         blueprints.push(child);
       }
     });
-    const dragControls = moveBlueprint(blueprints, components, scene, shadows);
+    // const dragControls = moveBlueprint(blueprints, components, scene, shadows);
   });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
@@ -1049,16 +1047,16 @@ export const createModelView = async () => {
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
     hideAllCSS2DObjects(scene);
     generateScaffolding();
-    const cubeClone: THREE.Object3D<THREE.Object3DEventMap>[] = []
+    const cubeClone: THREE.Object3D<THREE.Object3DEventMap>[] = [];
     scene.traverse((child) => {
       if (child.name === "cubeClone") {
-        cubeClone.push(child)
+        cubeClone.push(child);
       }
-    })
+    });
 
     cubeClone.forEach((cube) => {
-      scene.remove(cube)
-    })
+      scene.remove(cube);
+    });
   });
 
   // autogenerate scaffolding
@@ -1096,10 +1094,10 @@ export const createModelView = async () => {
       scene.remove(scaffold);
     });
 
-    const store = useStore()
-    store.updateScaffoldLevel(0)
+    const store = useStore();
+    store.updateScaffoldLevel(0);
 
-    scaffoldPlacedPosition.clear()
+    scaffoldPlacedPosition.clear();
   });
 
   //////////////////////////////////

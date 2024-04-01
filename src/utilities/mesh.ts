@@ -4,7 +4,6 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   distanceFromPointToLine,
   measureLineLength,
-  observeElementAndAddEventListener,
   resetSceneExceptSingularObject,
 } from "./helper";
 import { rectMaterial, roofMaterial } from "./material";
