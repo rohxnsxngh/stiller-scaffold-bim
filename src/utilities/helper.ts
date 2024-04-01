@@ -210,12 +210,13 @@ export function disableOrbitControls(controls: any) {
 // delete an object when raycast intersects with object
 // TODO: make this method more efficient and more inclusive
 export function deleteObject(object: any, scene: THREE.Scene) {
-  // const parentObject = object.parent.children;
-  if (object.parent instanceof THREE.Object3D) {
-    const parent = object.parent;
-    console.log(parent);
+  if (
+    object.parent instanceof THREE.Object3D &&
+    object.parent.type !== "Scene"
+  ) {
+    object = findObjectParent(object);
     // Remove the parent recursively
-    removeFromScene(parent, scene);
+    removeFromScene(object, scene);
   } else {
     // Remove the parent recursively
     console.log(object);
@@ -259,25 +260,22 @@ function removeFromScene(object: any, scene: THREE.Scene) {
   }
 }
 
-function removeHierarchy(object: any, scene: THREE.Scene) {
-  // Remove each child recursively
-  while (object.children.length > 0) {
-    removeHierarchy(object.children[0], scene);
-  }
+function findObjectParent(object: THREE.Object3D) {
+  let currentParent = object.parent;
 
-  // Dispose of geometry and material
-  if (object.geometry) {
-    object.geometry.dispose();
-  }
-  if (object.material) {
-    if (object.material.map) {
-      object.material.map.dispose();
+  // Traverse up the hierarchy until a parent that is not the scene is found
+  while (currentParent !== null && currentParent.type !== "Scene") {
+    // If a parent that is not the scene is found, return it
+    if (currentParent.parent !== null && currentParent?.parent.type === "Scene") {
+      console.log(currentParent);
+      return currentParent
     }
-    object.material.dispose();
+
+    currentParent = currentParent.parent
   }
 
-  // Remove object from the scene
-  scene.remove(object);
+  // If no such parent is found, return null
+  return null;
 }
 
 export function hideAllCSS2DObjects(scene: THREE.Scene) {
