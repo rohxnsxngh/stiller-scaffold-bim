@@ -139,13 +139,14 @@ export const createModelView = async () => {
 
   // Grid
   const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
-
-  // Add some elements to the scene
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshStandardMaterial({ color: 0x9d4b4b });
+  
+  // Cube
+  const geometry = new THREE.OctahedronGeometry(0.5); // The parameter is the radius of the octahedron
+  const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
   const cube = new THREE.Mesh(geometry, material);
-  cube.position.set(0, 0.5, 0);
-  // scene.add(cube);
+  cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 4)
+  cube.position.set(0, -1, 0);
+
 
   // for the blueprint rectangle
   const markupGroup = new THREE.Group();
