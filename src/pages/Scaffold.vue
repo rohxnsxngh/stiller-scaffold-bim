@@ -29,12 +29,6 @@
           <div class="join join-horizontal my-2">
             <button
               class="btn btn-sm join-item order-1 border-white text-white"
-              id="delete-individual-scaffolding"
-            >
-              Delete
-            </button>
-            <button
-              class="btn btn-sm join-item order-1 border-white text-white"
               id="delete-row-scaffolding"
             >
               Delete Row

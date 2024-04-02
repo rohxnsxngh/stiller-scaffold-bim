@@ -602,27 +602,6 @@ export function createScaffoldingSheeting(
   });
 }
 
-// remove individual instance of scaffolding
-export function deleteIndividualScaffolding(scene: THREE.Scene, scaffold: any) {
-  console.log("deleting individual scaffolding from scene", scaffold);
-  let scaffoldingColumnToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
-  scene.traverse((child) => {
-    if (child.name === "scaffoldingModel") {
-      if (
-        child.userData.position.x === scaffold.parent.userData.position.x &&
-        child.userData.position.z === scaffold.parent.userData.position.z &&
-        child.userData.position.y === scaffold.parent.userData.position.y
-      ) {
-        scaffoldingColumnToRemove.push(child);
-      }
-    }
-  });
-
-  scaffoldingColumnToRemove.forEach((child) => {
-    scene.remove(child);
-  });
-}
-
 // delete a row of scaffolding
 export function deleteRowOfScaffolding(scene: THREE.Scene, scaffold: any) {
   console.log("deleting row of scaffolding");

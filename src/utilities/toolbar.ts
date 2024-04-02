@@ -18,7 +18,6 @@ import { setPlaceScaffoldIndividually } from "./scaffold";
 import { setEditingBlueprint } from "./mesh";
 import {
   setDeletionInProgress,
-  setDeletionIndividualScaffoldingInProgress,
   setDeletionScaffoldingColumnInProgress,
   setDeletionScaffoldingRowInProgress,
   setDrawingInProgress,
@@ -265,7 +264,6 @@ export const createToolbar = (
     setDeletionScaffoldingColumnInProgress(false);
     setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
     setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
-    setDeletionIndividualScaffoldingInProgress(false);
     setRotatingRoofInProgress(false);
   });
   freeRotateButton.domElement.addEventListener("mouseenter", () => {
@@ -286,7 +284,6 @@ export const createToolbar = (
     setDeletionScaffoldingColumnInProgress(false);
     setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
     setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
-    setDeletionIndividualScaffoldingInProgress(false);
     setRotatingRoofInProgress(false);
   });
 

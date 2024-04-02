@@ -140,9 +140,7 @@ export function createBlueprintFromShapeOutline(
       scene.add(meshShape);
     }
 
-    //Empty Points
     points = [];
-    // blueprintHasBeenUpdated = false
 
     return points;
   }
@@ -198,9 +196,7 @@ export function createBlueprintFromMarkup(
       scene.add(meshShape);
     }
 
-    //Empty Points
     points = [];
-    // blueprintHasBeenUpdated = false
 
     return points;
   }
@@ -236,6 +232,7 @@ export function createExtrusionFromBlueprint(
   meshExtrude.userData = {
     shape: shape,
     blueprintHasBeenUpdated: blueprintShape.blueprintHasBeenUpdated,
+    label: null
   };
   console.log(meshExtrude.userData);
   meshExtrude.name = "extrusion";
@@ -243,6 +240,7 @@ export function createExtrusionFromBlueprint(
 
   const label = createExtrusionLabel(scene, shape, depth);
   attachExtrusionLabelChangeHandler(label, meshExtrude, shape);
+  meshExtrude.userData.label = label
 
   label.userData = meshExtrude;
 }

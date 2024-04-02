@@ -26,7 +26,6 @@ import {
   deleteRowOfScaffolding,
   deleteColumnOfScaffolding,
   createScaffoldExternalStaircaseModel,
-  deleteIndividualScaffolding,
   createScaffoldInternalStaircaseModel,
   replaceScaffoldingWithStaircase,
 } from "./utilities/scaffold";
@@ -54,7 +53,6 @@ import { OrbitViewHelper } from "./utilities/orbit";
 import { useStore } from "./store";
 import {
   deletionInProgress,
-  deletionIndividualScaffoldingInProgress,
   deletionScaffoldingColumnInProgress,
   deletionScaffoldingRowInProgress,
   drawingInProgress,
@@ -65,7 +63,6 @@ import {
   replaceScaffoldingColumnWithInternalStaircaseInProgress,
   rotatingRoofInProgress,
   setDeletionInProgress,
-  setDeletionIndividualScaffoldingInProgress,
   setDeletionScaffoldingColumnInProgress,
   setDeletionScaffoldingRowInProgress,
   setDrawingInProgress,
@@ -265,7 +262,6 @@ export const createModelView = async () => {
       (deletionScaffoldingRowInProgress ||
         editingBlueprint ||
         rotatingRoofInProgress ||
-        deletionIndividualScaffoldingInProgress ||
         deletionScaffoldingColumnInProgress) &&
       !drawingInProgress
     ) {
@@ -419,22 +415,6 @@ export const createModelView = async () => {
         cube
       );
     }
-    // if (placeScaffoldIndividually) {
-    //   const [_bboxWireframe, _scaffoldModeling] = await createScaffoldModel(
-    //     1.57,
-    //     2.0,
-    //     0.73
-    //   );
-    //   //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
-    //   // createIndividualScaffoldOnClick(
-    //   //   intersects,
-    //   //   highlightMesh,
-    //   //   scene,
-    //   //   scaffoldModeling,
-    //   //   bboxWireframe
-    //   // );
-    // }
-    // delete singular object from scene based on raycasting intersection
     if (deletionInProgress && !drawingInProgress) {
       const objectToRemove = intersects[0].object;
       deleteObject(objectToRemove, scene);
@@ -443,12 +423,6 @@ export const createModelView = async () => {
       const blueprintToEdit = intersects[0].object;
       if (blueprintToEdit.name === "blueprint") {
         editBlueprint(scene, blueprintToEdit);
-      }
-    }
-    if (deletionIndividualScaffoldingInProgress && !drawingInProgress) {
-      const scaffoldingToRemove = intersects[0].object;
-      if (scaffoldingToRemove.parent.name === "scaffoldingModel") {
-        deleteIndividualScaffolding(scene, scaffoldingToRemove);
       }
     }
     if (deletionScaffoldingRowInProgress && !drawingInProgress) {
@@ -1343,27 +1317,12 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener(
-    "delete-individual-scaffolding",
-    "mousedown",
-    () => {
-      console.log("delete individual scaffolding");
-      setDeletionIndividualScaffoldingInProgress(true);
-      setDeletionScaffoldingColumnInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
-    }
-  );
-
-  observeElementAndAddEventListener(
     "delete-row-scaffolding",
     "mousedown",
     () => {
       console.log("delete row of scaffolding");
       setDeletionScaffoldingRowInProgress(true);
       setDeletionScaffoldingColumnInProgress(false);
-      setDeletionIndividualScaffoldingInProgress(false);
       setDrawingInProgress(false);
       setDeletionInProgress(false);
       setEditingBlueprint(false);
@@ -1378,7 +1337,6 @@ export const createModelView = async () => {
       console.log("delete column of scaffolding");
       setDeletionScaffoldingColumnInProgress(true);
       setDeletionScaffoldingRowInProgress(false);
-      setDeletionIndividualScaffoldingInProgress(false);
       setDrawingInProgress(false);
       setDeletionInProgress(false);
       setEditingBlueprint(false);

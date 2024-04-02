@@ -3,7 +3,6 @@ export let drawingScaffoldingInProgress = false;
 export let deletionInProgress = false;
 export let drawingInProgressSwitch = false;
 export let isDrawingBlueprint = false;
-export let deletionIndividualScaffoldingInProgress = false;
 export let deletionScaffoldingRowInProgress = false;
 export let deletionScaffoldingColumnInProgress = false;
 export let replaceScaffoldingColumnWithExternalStaircaseInProgress = false;
@@ -28,10 +27,6 @@ export const setDeletionInProgress = (value: boolean) => {
 
 export const setDrawingInProgressSwitch = (value: boolean) => {
   drawingInProgressSwitch = value;
-};
-
-export const setDeletionIndividualScaffoldingInProgress = (value: boolean) => {
-  deletionIndividualScaffoldingInProgress = value;
 };
 
 export const setDeletionScaffoldingRowInProgress = (value: boolean) => {

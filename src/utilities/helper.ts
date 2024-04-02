@@ -1,6 +1,7 @@
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import * as THREE from "three";
+import { label } from "three/examples/jsm/nodes/Nodes.js";
 
 export const objectsEqual = (o1: any, o2: any): boolean =>
   typeof o1 === "object" && Object.keys(o1).length > 0
@@ -222,6 +223,9 @@ export function deleteObject(object: any, scene: THREE.Scene) {
     console.log(object);
     object.material.dispose();
     object.geometry.dispose();
+    if (object.userData.label) {
+      scene.remove(object.userData.label)
+    }
     scene.remove(object);
   }
 }
