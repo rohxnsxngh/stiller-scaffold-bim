@@ -198,11 +198,7 @@ export const createToolbar = (
   topViewButton.id = "top-view-button";
   mainToolbar.addChild(topViewButton);
   topViewButton.onClick.add(() => {
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        scene.remove(child);
-      }
-    });
+    removeHighlightMesh(scene);
     cameraTopView(gsap, components.camera);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -215,11 +211,7 @@ export const createToolbar = (
   topViewButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("top-view", "mousedown", () => {
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        scene.remove(child);
-      }
-    });
+    removeHighlightMesh(scene);
     cameraTopView(gsap, components.camera);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
@@ -300,14 +292,11 @@ export const createToolbar = (
   mainToolbar.addChild(deleteObjectButton);
   deleteObjectButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-        scene.remove(child);
-      }
-    });
+    removeHighlightMesh(scene);
     setDeletionInProgress(true);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setRotatingRoofInProgress(false);
   });
   deleteObjectButton.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
@@ -322,6 +311,7 @@ export const createToolbar = (
     setDeletionInProgress(true);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setRotatingRoofInProgress(false);
   });
 
   observeElementAndAddEventListener("delete-object", "mouseover", () => {
@@ -679,28 +669,6 @@ export const createToolbar = (
     setDrawingScaffoldingInProgress(false);
   });
 
-  // generate scaffolding outline
-  const placeScaffoldButton = new OBC.Button(components, {
-    materialIconName: "domain_add",
-    name: "Place Individual Scaffold",
-    closeOnClick: true,
-  });
-  placeScaffoldButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  placeScaffoldButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-  });
-  placeScaffoldButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
-  });
-  scaffoldButton.addChild(placeScaffoldButton);
-  placeScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  placeScaffoldButton.domElement.classList.add("hover:bg-slate-300");
-
   // generate scaffolding
   const generateScaffoldButton = new OBC.Button(components, {
     materialIconName: "select_all",
@@ -914,11 +882,7 @@ export const createToolbar = (
     () => {
       document.body.style.cursor = "crosshair";
       startDrawing = false;
-      scene.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
-          scene.remove(child);
-        }
-      });
+      removeHighlightMesh(scene);
       cameraTopView(gsap, components.camera);
       setDrawingInProgress(false);
       setDeletionInProgress(false);
@@ -959,7 +923,6 @@ export const createToolbar = (
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     drawScaffoldButton,
-    placeScaffoldButton,
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,

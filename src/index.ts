@@ -8,7 +8,6 @@ import {
   createRectangle,
   createRoof,
   createShedRoof,
-  moveBlueprint,
   editBlueprint,
   createBlueprintFromMarkup,
   createFlatRoof,
@@ -17,8 +16,6 @@ import {
   createScaffoldingShapeIsOutlined,
   createScaffoldModel,
   placeScaffoldModelsAlongLine,
-  setPlaceScaffoldIndividually,
-  placeScaffoldIndividually,
   generateScaffoldOutline,
   createScaffoldingSheeting,
   deleteRowOfScaffolding,
@@ -113,7 +110,6 @@ export const createModelView = async () => {
   document.body.appendChild(viewHelper.domElement);
 
   viewHelper.domElement.addEventListener("mouseover", () => {
-    setPlaceScaffoldIndividually(false);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
     setDeletionInProgress(false);
@@ -182,7 +178,6 @@ export const createModelView = async () => {
     createEditExtrusionButton,
     rotateRoofOrientationButton,
     drawScaffoldButton,
-    placeScaffoldButton,
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
@@ -202,10 +197,13 @@ export const createModelView = async () => {
   // Modify the mousemove event listener
   let lastHighlightedObject: THREE.Mesh | null = null;
   let lastHighlightedObjectColor: any | null = null;
+  let mutex = false;
 
   // highlight object whens deletion is in progress
   window.addEventListener("mousemove", function (e) {
+    if (mutex) return;
     if (deletionInProgress && !drawingInProgress) {
+      mutex = true;
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
       // @ts-ignore
@@ -257,6 +255,7 @@ export const createModelView = async () => {
           lastHighlightedObject = null;
         }
       }
+      mutex = false;
     }
     if (
       (deletionScaffoldingRowInProgress ||
@@ -265,6 +264,7 @@ export const createModelView = async () => {
         deletionScaffoldingColumnInProgress) &&
       !drawingInProgress
     ) {
+      mutex = true;
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
       // @ts-ignore
@@ -316,49 +316,7 @@ export const createModelView = async () => {
           lastHighlightedObject = null;
         }
       }
-    }
-  });
-
-  // place scaffold individually
-  window.addEventListener("mousemove", function (e) {
-    if (placeScaffoldIndividually) {
-      scene.add(highlightMesh);
-      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      // @ts-ignore
-      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
-      intersects = raycaster.intersectObjects(scene.children);
-      intersects.forEach(function (intersect: any) {
-        switch (intersect.object.name) {
-          case "ground":
-            const highlightPos = new THREE.Vector3().copy(intersect.point);
-            highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
-            break;
-        }
-      });
-    }
-  });
-
-  // draw scaffolding tool
-  window.addEventListener("mousemove", function (e) {
-    if (drawingScaffoldingInProgress) {
-      scene.add(highlightMesh);
-      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      // @ts-ignore
-      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
-      intersects = raycaster.intersectObjects(scene.children);
-      intersects.forEach(function (intersect: any) {
-        switch (intersect.object.name) {
-          case "ground":
-            const highlightPos = new THREE.Vector3()
-              .copy(intersect.point)
-              .floor()
-              .addScalar(0.5);
-            highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
-            break;
-        }
-      });
+      mutex = false;
     }
   });
 
@@ -374,6 +332,33 @@ export const createModelView = async () => {
       intersects.forEach(function (intersect: any) {
         switch (intersect.object.name) {
           case "ground":
+            if (drawingScaffoldingInProgress) {
+              scene.add(highlightMesh);
+              mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+              mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+              // @ts-ignore
+              raycaster.setFromCamera(
+                mousePosition,
+                // @ts-ignore
+                components.camera.activeCamera
+              );
+              intersects = raycaster.intersectObjects(scene.children);
+              intersects.forEach(function (intersect: any) {
+                switch (intersect.object.name) {
+                  case "ground":
+                    const highlightPos = new THREE.Vector3()
+                      .copy(intersect.point)
+                      .floor()
+                      .addScalar(0.5);
+                    highlightMesh.position.set(
+                      highlightPos.x,
+                      0,
+                      highlightPos.z
+                    );
+                    break;
+                }
+              });
+            }
             const highlightPos = new THREE.Vector3()
               .copy(intersect.point)
               .floor()
@@ -383,6 +368,8 @@ export const createModelView = async () => {
           case "extrusion":
             break;
           case "roof":
+            break;
+          case "shedRoof":
             break;
           case "blueprint":
             break;
@@ -419,6 +406,7 @@ export const createModelView = async () => {
       const objectToRemove = intersects[0].object;
       deleteObject(objectToRemove, scene);
     }
+    // implementation for editing blueprint after it has been created is not complete
     if (editingBlueprint && !drawingInProgress) {
       const blueprintToEdit = intersects[0].object;
       if (blueprintToEdit.name === "blueprint") {
@@ -460,7 +448,7 @@ export const createModelView = async () => {
       // Check if the click is on the roof
       if (intersects.length > 0 && intersects[0].object.name === "roof") {
         console.log("rotating roof", intersects[0].object);
-        let roof = intersects[0].object;
+        const roof = intersects[0].object;
         let extrusions: THREE.Mesh[] = [];
         // Toggle the roofToggleState between 0 and  1
         roofToggleState = roofToggleState === 0 ? 1 : 0;
@@ -482,6 +470,8 @@ export const createModelView = async () => {
 
         console.log("roof", roof);
         console.log("extrusions", extrusions);
+        const store = useStore();
+        const height = store.height;
 
         // Iterate over all extrusions
         extrusions.forEach((extrusion) => {
@@ -493,16 +483,13 @@ export const createModelView = async () => {
               extrusion.userData.shape.currentPoint.y;
 
           console.log("hasRoof", hasRoof);
+          deleteObject(roof, scene);
           // If the extrusion does nequal a roof, replace the roof with a rotated version
           if (hasRoof) {
-            scene.remove(roof);
-            const store = useStore();
-            const height = store.height;
             createRoof(extrusion, scene, roofToggleState, height);
           }
         });
 
-        roof = null;
         extrusions = [];
       }
       if (intersects.length > 0 && intersects[0].object.name === "shedRoof") {
@@ -539,7 +526,6 @@ export const createModelView = async () => {
             extrusion.userData.shape.currentPoint.y ===
               roof.userData.shape.currentPoint.y;
 
-              
           console.log("hasRoof", hasRoof);
           if (hasRoof) {
             scene.remove(roof);
@@ -945,15 +931,16 @@ export const createModelView = async () => {
   observeElementAndAddEventListener("rotate-roof", "mousedown", () => {
     document.body.style.cursor = "crosshair";
     setRotatingRoofInProgress(true);
+    setDeletionInProgress(false);
   });
 
   // handles roof rotation, snap the roof to a different rotation.
   rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
     setDrawingInProgressSwitch(false);
+    setDeletionInProgress(false);
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
-    setPlaceScaffoldIndividually(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       createScaffoldingShapeIsOutlined(
@@ -977,10 +964,6 @@ export const createModelView = async () => {
         cube
       );
     }
-  });
-
-  placeScaffoldButton.domElement.addEventListener("mousedown", async () => {
-    setPlaceScaffoldIndividually(true);
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
@@ -1185,15 +1168,6 @@ export const createModelView = async () => {
   freeRotateButton.domElement.addEventListener("mousedown", () => {
     setIsDrawingBlueprint(false);
   });
-
-  // observeElementAndAddEventListener("top-view", "mousedown", () => {
-  //   setIsDrawingBlueprint(false);
-  // })
-
-  // drawingButton.domElement.addEventListener("mousedown", () => {
-  //   setIsDrawingBlueprint(false);
-  //   setDrawingInProgressSwitch(true);
-  // });
 
   /////////////////////
   console.log(components);
