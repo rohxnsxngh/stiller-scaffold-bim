@@ -727,16 +727,6 @@ export function createRoof(
     thirdPoint.y
   );
 
-  scene.traverse((child) => {
-    if (
-      child instanceof CSS2DObject &&
-      child.name === "rectangleExtrusionLabel"
-    ) {
-      child.element.style.pointerEvents = "none";
-      child.visible = false;
-    }
-  });
-
   // Create a triangle using these three points
   const shape = new THREE.Shape();
   shape.moveTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
@@ -821,6 +811,7 @@ export function createRoof(
   extrudedMesh.userData = {
     shape: shape,
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
+    label: null
   };
   scene.add(extrudedMesh);
 
@@ -840,6 +831,7 @@ export function createRoof(
     triangle,
     extrudedMesh
   );
+  extrudedMesh.userData.label = label
   blueprintHasBeenUpdated = false;
 }
 
@@ -967,6 +959,17 @@ function updateRoofGeometry(
     rectShape.curves[index].v2.y
   );
 
+  const topTrianglePoint = new THREE.Vector3(
+    thirdPoint.x,
+    endPoint.y + desiredHeight,
+    thirdPoint.y
+  );
+  const updatedMidpoint = new THREE.Vector3().lerpVectors(
+    endPoint,
+    topTrianglePoint,
+    0.5
+  );
+
   // Create a triangle using these three points
   const shape = new THREE.Shape();
   shape.moveTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
@@ -1037,6 +1040,10 @@ function updateRoofGeometry(
   extrudedMesh.name = "roof";
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
+  console.log("extrude height", extrudeHeight)
+  label.position.copy(
+    new THREE.Vector3(updatedMidpoint.x, updatedMidpoint.y, updatedMidpoint.z + 1)
+  );
   scene.add(extrudedMesh);
 }
 
@@ -1214,6 +1221,7 @@ export function createShedRoof(
   extrudedMesh.userData = {
     shape: shape,
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
+    label: null
   };
   scene.add(extrudedMesh);
 
@@ -1231,6 +1239,7 @@ export function createShedRoof(
     triangle,
     extrudedMesh
   );
+  extrudedMesh.userData.label = label
 }
 
 function attachShedRoofLabelChangeHandler(
@@ -1351,6 +1360,17 @@ function updateShedRoofGeometry(
     rectShape.curves[index].v2.y
   );
 
+  const topTrianglePoint = new THREE.Vector3(
+    thirdPoint.x,
+    endPoint.y + height,
+    thirdPoint.y
+  );
+  const updatedMidpoint = new THREE.Vector3().lerpVectors(
+    endPoint,
+    topTrianglePoint,
+    0.5
+  );
+
   // Create a triangle using these three points
   const shape = new THREE.Shape();
   shape.moveTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
@@ -1430,6 +1450,9 @@ function updateShedRoofGeometry(
   extrudedMesh.name = "shedRoof";
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
+  label.position.copy(
+    new THREE.Vector3(updatedMidpoint.x, updatedMidpoint.y, updatedMidpoint.z + 1)
+  );
   scene.add(extrudedMesh);
 }
 
@@ -1454,6 +1477,7 @@ export function createFlatRoof(child: any, scene: THREE.Scene) {
   roofMesh.userData = {
     shape: shape,
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
+    label: null
   };
 }
 
@@ -1530,12 +1554,6 @@ export function moveBlueprint(
   return dragControls;
 }
 
-export let editingBlueprint = false;
-
-export const setEditingBlueprint = (value: boolean) => {
-  editingBlueprint = value;
-};
-
 // edit blueprint
 export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {
   console.log("editing blueprint", blueprint.userData);
@@ -1593,63 +1611,4 @@ export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {
 
     //  return [markup, labels];
   }
-
-  // const pointStartMinY = new THREE.Vector3(
-  //   startPoint.point.x,
-  //   0,
-  //   startPoint.point.z
-  // );
-  // const pointStartMaxY = new THREE.Vector3(
-  //   startPoint.point.x,
-  //   0,
-  //   endPoint.point.z
-  // );
-  // const pointEndMinY = new THREE.Vector3(
-  //   endPoint.point.x,
-  //   0,
-  //   startPoint.point.z
-  // );
-  // const pointEndMaxY = new THREE.Vector3(endPoint.point.x, 0, endPoint.point.z);
-
-  //  // Calculate the lengths of the sides
-  //  const width = pointStartMinY.distanceTo(pointStartMaxY);
-  //  const height = pointStartMaxY.distanceTo(pointEndMaxY);
-
-  //  const rectanglePoints = [
-  //    pointStartMinY,
-  //    pointStartMaxY,
-  //    pointEndMaxY,
-  //    pointEndMinY,
-  //    pointStartMinY,
-  //  ];
-
-  //  const centerX = startPoint.point.x + height / 2;
-  //  const centerZ = startPoint.point.z + width / 2;
-
-  //  //For each side of the rectangle, calculate the midpoint and create a label
-  //  const labels = createLabels(rectanglePoints);
-  //  currentLabels.forEach((label) => {
-  //    attachLabelChangeHandler(
-  //      label,
-  //      markupGroup,
-  //      width,
-  //      height,
-  //      centerX,
-  //      centerZ
-  //    );
-  //  });
-
-  //  const geometry = new THREE.PlaneGeometry(height, width);
-  //  markup = new THREE.Mesh(geometry, rectMaterial);
-  //  markup.position.set(centerX, -0.025, centerZ);
-  //  markup.rotation.x = Math.PI / 2;
-  //  markup.name = "rectanglePlane";
-  //  markup.userData = {
-  //    rectanglePoints: rectanglePoints,
-  //    width: width,
-  //    height: height,
-  //  };
-  //  markupGroup.add(markup);
-
-  //  return [markup, labels];
 }

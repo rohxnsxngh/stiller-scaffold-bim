@@ -8,6 +8,11 @@ export let deletionScaffoldingColumnInProgress = false;
 export let replaceScaffoldingColumnWithExternalStaircaseInProgress = false;
 export let replaceScaffoldingColumnWithInternalStaircaseInProgress = false;
 export let rotatingRoofInProgress = false
+export let editingBlueprint = false;
+
+export const setEditingBlueprint = (value: boolean) => {
+  editingBlueprint = value;
+};
 
 export const setIsDrawingBlueprint = (value: boolean) => {
   isDrawingBlueprint = value;

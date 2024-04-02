@@ -15,7 +15,6 @@ import MountPoint from "../pages/MountPoint.vue";
 import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import { setPlaceScaffoldIndividually } from "./scaffold";
-import { setEditingBlueprint } from "./mesh";
 import {
   setDeletionInProgress,
   setDeletionScaffoldingColumnInProgress,
@@ -23,6 +22,7 @@ import {
   setDrawingInProgress,
   setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
+  setEditingBlueprint,
   setIsDrawingBlueprint,
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
