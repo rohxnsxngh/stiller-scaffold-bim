@@ -326,6 +326,7 @@ function updateExtrusionGeometry(
   meshExtrude.rotateX(Math.PI / 2);
   label.userData = meshExtrude;
   label.position.y = updatedDepth / 2;
+  label.element.textContent = `${updatedDepth.toFixed(2)} m.`;
 
   return meshExtrude;
 }
@@ -1044,6 +1045,7 @@ function updateRoofGeometry(
   label.position.copy(
     new THREE.Vector3(updatedMidpoint.x, updatedMidpoint.y, updatedMidpoint.z + 1)
   );
+  label.element.textContent = `${desiredHeight.toFixed(2)} m.`;
   scene.add(extrudedMesh);
 }
 
@@ -1289,56 +1291,56 @@ function updateShedRoofGeometry(
   extrudedRoofMesh: THREE.Mesh,
   label: CSS2DObject
 ) {
-  const height = parseFloat(triangleHeightOffsetDistance as unknown as string);
+  const desiredHeight = parseFloat(triangleHeightOffsetDistance as unknown as string);
   const rectShape = child.userData.shape;
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   if (!child.userData.blueprintHasBeenUpdated) {
     if (index == 0) {
       thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x + height,
+        rectShape.curves[index].v1.x + desiredHeight,
         rectShape.curves[index].v1.y
       );
     }
     if (index == 1) {
       thirdPoint = new THREE.Vector2(
         rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y - height
+        rectShape.curves[index].v1.y - desiredHeight
       );
     }
     if (index == 2) {
       thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x - height,
+        rectShape.curves[index].v1.x - desiredHeight,
         rectShape.curves[index].v1.y
       );
     }
     if (index == 3) {
       thirdPoint = new THREE.Vector2(
         rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y + height
+        rectShape.curves[index].v1.y + desiredHeight
       );
     }
   } else {
     if (index == 0) {
       thirdPoint = new THREE.Vector2(
         rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y - height
+        rectShape.curves[index].v1.y - desiredHeight
       );
     }
     if (index == 1) {
       thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x + height,
+        rectShape.curves[index].v1.x + desiredHeight,
         rectShape.curves[index].v1.y
       );
     }
     if (index == 2) {
       thirdPoint = new THREE.Vector2(
         rectShape.curves[index].v1.x,
-        rectShape.curves[index].v1.y + height
+        rectShape.curves[index].v1.y + desiredHeight
       );
     }
     if (index == 3) {
       thirdPoint = new THREE.Vector2(
-        rectShape.curves[index].v1.x - height,
+        rectShape.curves[index].v1.x - desiredHeight,
         rectShape.curves[index].v1.y
       );
     }
@@ -1362,7 +1364,7 @@ function updateShedRoofGeometry(
 
   const topTrianglePoint = new THREE.Vector3(
     thirdPoint.x,
-    endPoint.y + height,
+    endPoint.y + desiredHeight,
     thirdPoint.y
   );
   const updatedMidpoint = new THREE.Vector3().lerpVectors(
@@ -1453,6 +1455,7 @@ function updateShedRoofGeometry(
   label.position.copy(
     new THREE.Vector3(updatedMidpoint.x, updatedMidpoint.y, updatedMidpoint.z + 1)
   );
+  label.element.textContent = `${desiredHeight.toFixed(2)} m.`;
   scene.add(extrudedMesh);
 }
 
