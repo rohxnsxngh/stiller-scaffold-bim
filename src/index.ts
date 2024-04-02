@@ -419,21 +419,21 @@ export const createModelView = async () => {
         cube
       );
     }
-    if (placeScaffoldIndividually) {
-      const [_bboxWireframe, _scaffoldModeling] = await createScaffoldModel(
-        1.57,
-        2.0,
-        0.73
-      );
-      //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
-      // createIndividualScaffoldOnClick(
-      //   intersects,
-      //   highlightMesh,
-      //   scene,
-      //   scaffoldModeling,
-      //   bboxWireframe
-      // );
-    }
+    // if (placeScaffoldIndividually) {
+    //   const [_bboxWireframe, _scaffoldModeling] = await createScaffoldModel(
+    //     1.57,
+    //     2.0,
+    //     0.73
+    //   );
+    //   //TODO: edit this method since the radian top degree conversion doesn't work correctly anymore
+    //   // createIndividualScaffoldOnClick(
+    //   //   intersects,
+    //   //   highlightMesh,
+    //   //   scene,
+    //   //   scaffoldModeling,
+    //   //   bboxWireframe
+    //   // );
+    // }
     // delete singular object from scene based on raycasting intersection
     if (deletionInProgress && !drawingInProgress) {
       const objectToRemove = intersects[0].object;
@@ -485,19 +485,14 @@ export const createModelView = async () => {
       console.log("ROTATING ROOFS", intersects[0].object);
       // Check if the click is on the roof
       if (intersects.length > 0 && intersects[0].object.name === "roof") {
-        console.log("rotating roof");
-        scene.remove(intersects[0].object);
+        console.log("rotating roof", intersects[0].object);
+        let roof = intersects[0].object;
         let extrusions: THREE.Mesh[] = [];
-        let roofs: THREE.Mesh[] = [];
-
         // Toggle the roofToggleState between 0 and  1
         roofToggleState = roofToggleState === 0 ? 1 : 0;
 
         scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            if (child.name === "roof") {
-              roofs.push(child);
-            }
             if (child.name === "extrusion") {
               extrusions.push(child);
             }
@@ -511,32 +506,35 @@ export const createModelView = async () => {
           }
         });
 
-        console.log("roofs", roofs);
+        console.log("roof", roof);
         console.log("extrusions", extrusions);
 
+        // Iterate over all extrusions
         extrusions.forEach((extrusion) => {
-          let hasRoof = roofs.some(
-            (roof) =>
-              extrusion.userData.shape.currentPoint.x ===
-                roof.userData.shape.currentPoint.x ||
-              extrusion.userData.shape.currentPoint.y ===
-                roof.userData.shape.currentPoint.y
-          );
-          if (!hasRoof) {
+          // Check if the current extrusion equals a roof position that was selected
+          let hasRoof =
+            roof.userData.shape.currentPoint.x ===
+              extrusion.userData.shape.currentPoint.x ||
+            roof.userData.shape.currentPoint.y ===
+              extrusion.userData.shape.currentPoint.y;
+
+          console.log("hasRoof", hasRoof);
+          // If the extrusion does nequal a roof, replace the roof with a rotated version
+          if (hasRoof) {
+            scene.remove(roof);
             const store = useStore();
             const height = store.height;
             createRoof(extrusion, scene, roofToggleState, height);
           }
         });
 
-        roofs = [];
+        roof = null;
         extrusions = [];
       }
       if (intersects.length > 0 && intersects[0].object.name === "shedRoof") {
         console.log("rotating shed roof");
-        scene.remove(intersects[0].object);
+        let roof = intersects[0].object;
         let extrusions: THREE.Mesh[] = [];
-        let roofs: THREE.Mesh[] = [];
 
         // Toggle the roofToggleState between  0,  1,  2, and  3
         roofToggleState = (roofToggleState + 1) % 4;
@@ -544,9 +542,6 @@ export const createModelView = async () => {
 
         scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            if (child.name === "shedRoof") {
-              roofs.push(child);
-            }
             if (child.name === "extrusion") {
               extrusions.push(child);
             }
@@ -560,25 +555,27 @@ export const createModelView = async () => {
           }
         });
 
-        console.log("roofs", roofs);
+        console.log("roofs", roof);
         console.log("extrusions", extrusions);
 
         extrusions.forEach((extrusion) => {
-          let hasRoof = roofs.some(
-            (roof) =>
-              extrusion.userData.shape.currentPoint.x ===
-                roof.userData.shape.currentPoint.x ||
-              extrusion.userData.shape.currentPoint.y ===
-                roof.userData.shape.currentPoint.y
-          );
-          if (!hasRoof) {
+          let hasRoof =
+            extrusion.userData.shape.currentPoint.x ===
+              roof.userData.shape.currentPoint.x ||
+            extrusion.userData.shape.currentPoint.y ===
+              roof.userData.shape.currentPoint.y;
+
+              
+          console.log("hasRoof", hasRoof);
+          if (hasRoof) {
+            scene.remove(roof);
             const store = useStore();
             const height = store.shedHeight;
             createShedRoof(extrusion, scene, roofToggleState, height);
           }
         });
 
-        roofs = [];
+        roof = null;
         extrusions = [];
       }
     }
