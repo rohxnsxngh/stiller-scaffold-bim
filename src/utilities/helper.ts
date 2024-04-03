@@ -224,7 +224,7 @@ export function deleteObject(object: any, scene: THREE.Scene) {
     object.material.dispose();
     object.geometry.dispose();
     if (object.userData.label) {
-      scene.remove(object.userData.label)
+      scene.remove(object.userData.label);
     }
     scene.remove(object);
   }
@@ -270,12 +270,15 @@ function findObjectParent(object: THREE.Object3D) {
   // Traverse up the hierarchy until a parent that is not the scene is found
   while (currentParent !== null && currentParent.type !== "Scene") {
     // If a parent that is not the scene is found, return it
-    if (currentParent.parent !== null && currentParent?.parent.type === "Scene") {
+    if (
+      currentParent.parent !== null &&
+      currentParent?.parent.type === "Scene"
+    ) {
       console.log(currentParent);
-      return currentParent
+      return currentParent;
     }
 
-    currentParent = currentParent.parent
+    currentParent = currentParent.parent;
   }
 
   // If no such parent is found, return null
@@ -408,14 +411,28 @@ export function calculateTotalSquareFootageForScaffolding(scene: THREE.Scene) {
 
 export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
   let scaffoldingModelCount = 0;
+  let scaffoldingExternalStaircaseCount = 0;
+  let scaffoldingInternalStaircaseCount = 0;
   scene.traverse((child) => {
     if (child.name === "scaffoldingModel") {
       scaffoldingModelCount++;
+    }
+    if (child.name === "scaffoldingExternalStaircaseModel") {
+      scaffoldingExternalStaircaseCount++;
+    }
+    if (child.name === "scaffoldingInternalStaircaseModel") {
+      scaffoldingInternalStaircaseCount++;
     }
   });
 
   console.log(
     `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
+  );
+  console.log(
+    `There are ${scaffoldingExternalStaircaseCount} scaffoldingExternalStaircaseCount objects in the scene.`
+  );
+  console.log(
+    `There are ${scaffoldingInternalStaircaseCount} scaffoldingInternalStaircaseModel objects in the scene.`
   );
 }
 
