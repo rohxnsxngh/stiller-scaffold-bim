@@ -1,7 +1,6 @@
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import * as THREE from "three";
-import { label } from "three/examples/jsm/nodes/Nodes.js";
 
 export const objectsEqual = (o1: any, o2: any): boolean =>
   typeof o1 === "object" && Object.keys(o1).length > 0

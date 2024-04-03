@@ -60,7 +60,6 @@ import {
   setDeletionScaffoldingColumnInProgress,
   setDeletionScaffoldingRowInProgress,
   setDrawingInProgress,
-  setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
   setEditingBlueprint,
   setIsDrawingBlueprint,
@@ -854,7 +853,6 @@ export const createModelView = async () => {
   // edit extrusion after roof as been created
   createEditExtrusionButton.domElement.addEventListener("mousedown", () => {
     let editedExtrusionHeight: any;
-    let originalExtrusionHeight: any;
     let roofs: THREE.Mesh[] = [];
     scene.traverse((child) => {
       if (
@@ -867,11 +865,6 @@ export const createModelView = async () => {
         ) {
           child.element.style.pointerEvents = "auto";
           child.visible = true;
-          child.element.addEventListener("focus", () => {
-            originalExtrusionHeight = parseFloat(
-              child.element.textContent as unknown as string
-            );
-          });
           child.element.addEventListener("blur", () => {
             editedExtrusionHeight = parseFloat(
               child.element.textContent as unknown as string
