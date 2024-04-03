@@ -77,6 +77,15 @@ export const createToolbar = (
   topToolBar.domElement.classList.remove("bg-ifcjs-100");
   topToolBar.domElement.classList.add("bg-[#111115]");
 
+  const fragments = new OBC.FragmentManager(components);
+  const fragmentIfcLoader = new OBC.FragmentIfcLoader(components);
+  fragmentIfcLoader.setup();
+
+  const ifcButton = fragmentIfcLoader.uiElement.get("main");
+  ifcButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  ifcButton.domElement.classList.add("hover:bg-slate-300");
+  mainToolbar.addChild(ifcButton as OBC.Button);
+
   // Vue instance inside of top tool bar
   const vueComponentTimeline = createApp(Timeline);
 
