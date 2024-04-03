@@ -7,14 +7,12 @@ import {
   cameraTopView,
 } from "./camera";
 import {
-  hideAllCSS2DObjects,
   observeElementAndAddEventListener,
   removeHighlightMesh,
 } from "./helper";
 import MountPoint from "../pages/MountPoint.vue";
 import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
-import { setPlaceScaffoldIndividually } from "./scaffold";
 import {
   setDeletionInProgress,
   setDeletionScaffoldingColumnInProgress,
@@ -22,7 +20,6 @@ import {
   setDrawingInProgress,
   setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
-  setEditingBlueprint,
   setIsDrawingBlueprint,
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
@@ -47,7 +44,7 @@ export const createToolbar = (
   components.ui.addToolbar(mainToolbar);
   mainToolbar.domElement.addEventListener("mousedown", () => {
     setDrawingInProgress(false);
-    setPlaceScaffoldIndividually(false);
+    setDrawingScaffoldingInProgress(false);
   });
   mainToolbar.domElement.classList.remove("bg-ifcjs-100");
   mainToolbar.domElement.classList.add("bg-glass");
@@ -57,7 +54,7 @@ export const createToolbar = (
   components.ui.addToolbar(sideToolBar);
   sideToolBar.domElement.addEventListener("mouseover", () => {
     setDrawingInProgress(false);
-    setPlaceScaffoldIndividually(false);
+    setDrawingScaffoldingInProgress(false);
   });
   sideToolBar.domElement.classList.remove("bg-ifcjs-100");
   sideToolBar.domElement.classList.add("bg-glass");
@@ -69,15 +66,15 @@ export const createToolbar = (
   topToolBar.domElement.style.position = "fixed";
   topToolBar.domElement.style.top = "20px";
   topToolBar.domElement.style.right = "100px";
-  topToolBar.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setPlaceScaffoldIndividually(false);
-    setDrawingScaffoldingInProgress(false);
-  });
+  // topToolBar.domElement.addEventListener("mouseover", () => {
+  //   setDrawingInProgress(false);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
   topToolBar.domElement.classList.remove("bg-ifcjs-100");
   topToolBar.domElement.classList.add("bg-[#111115]");
 
-  const fragments = new OBC.FragmentManager(components);
+  // IFC loader button
+  // const fragments = new OBC.FragmentManager(components);
   const fragmentIfcLoader = new OBC.FragmentIfcLoader(components);
   fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
   fragmentIfcLoader.settings.webIfc.OPTIMIZE_PROFILES = true;
@@ -124,11 +121,16 @@ export const createToolbar = (
   topToolBar.addChild(blueprintMenuButton);
   blueprintMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
     if (titleElement) {
       titleElement.textContent = "Plantegning og bygg";
     }
     // @ts-ignore
     window.setActiveSection("blueprint");
+  });
+  blueprintMenuButton.domElement.addEventListener("mouseover", () => {
+    setDrawingInProgress(false);
+    setDrawingScaffoldingInProgress(false);
   });
   blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -632,19 +634,23 @@ export const createToolbar = (
   drawScaffoldButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
+    startDrawing = true;
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setDrawingInProgressSwitch(false);
   });
 
   observeElementAndAddEventListener("draw-scaffold", "mouseleave", () => {
-    document.body.style.cursor = "auto";
-    removeHighlightMesh(scene);
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(true);
+    if (startDrawing) {
+      document.body.style.cursor = "auto";
+      removeHighlightMesh(scene);
+      setDrawingInProgress(false);
+      setDeletionInProgress(false);
+      setDrawingScaffoldingInProgress(true);
+    }
   });
 
   // generate scaffolding outline
@@ -775,7 +781,6 @@ export const createToolbar = (
   drawerToolBar.addChild(drawerMenuButton);
   drawerMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
-    setPlaceScaffoldIndividually(false);
     setDrawingScaffoldingInProgress(false);
     setDrawingInProgressSwitch(false);
     drawer.visible = !drawer.visible;
@@ -783,13 +788,11 @@ export const createToolbar = (
   drawerMenuButton.domElement.addEventListener("mouseover", () => {
     removeHighlightMesh(scene);
     setDrawingInProgress(false);
-    setPlaceScaffoldIndividually(false);
     setDrawingScaffoldingInProgress(false);
     setDrawingInProgressSwitch(false);
   });
   drawerMenuButton.domElement.addEventListener("mouseleave", () => {
     setDrawingInProgress(false);
-    setPlaceScaffoldIndividually(false);
     setDrawingScaffoldingInProgress(false);
     setDrawingInProgressSwitch(false);
   });

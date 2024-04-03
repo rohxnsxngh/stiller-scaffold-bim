@@ -8,12 +8,6 @@ import {
 } from "./helper";
 import { useStore } from "../store";
 
-export let placeScaffoldIndividually = false;
-
-export const setPlaceScaffoldIndividually = (value: boolean) => {
-  placeScaffoldIndividually = value;
-};
-
 // Create Scaffolding Shape Outline
 export async function createScaffoldingShapeIsOutlined(
   intersects: any,
