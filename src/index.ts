@@ -40,8 +40,6 @@ import {
   hideAllCSS2DObjects,
   observeElementAndAddEventListener,
   resetScene,
-  setInvisibleExceptSingularObject,
-  // createBoundingBoxVisualizationFromBox,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
@@ -169,14 +167,13 @@ export const createModelView = async () => {
 
   const [
     blueprintButton,
-    editBlueprintButton,
-    moveBlueprintButton,
+    // editBlueprintButton,
+    // moveBlueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
     createGableRoofButton,
     createShedRoofButton,
     createEditExtrusionButton,
-    rotateRoofOrientationButton,
     drawScaffoldButton,
     generateScaffoldButton,
     generateScaffoldOutlineButton,
@@ -574,22 +571,22 @@ export const createModelView = async () => {
   });
 
   // Edit Blueprint
-  editBlueprintButton.domElement.addEventListener("mousedown", () => {
-    setInvisibleExceptSingularObject(scene, "blueprint");
-  });
+  // editBlueprintButton.domElement.addEventListener("mousedown", () => {
+  //   setInvisibleExceptSingularObject(scene, "blueprint");
+  // });
 
   // Move Blueprint
-  moveBlueprintButton.domElement.addEventListener("mousedown", () => {
-    const blueprints: any[] = [];
-    setIsDrawingBlueprint(false);
-    // Array to hold objects that can be dragged
-    scene.traverse((child: any) => {
-      if (child instanceof THREE.Mesh && child.name === "blueprint") {
-        blueprints.push(child);
-      }
-    });
-    // const dragControls = moveBlueprint(blueprints, components, scene, shadows);
-  });
+  // moveBlueprintButton.domElement.addEventListener("mousedown", () => {
+  //   const blueprints: any[] = [];
+  //   setIsDrawingBlueprint(false);
+  //   // Array to hold objects that can be dragged
+  //   scene.traverse((child: any) => {
+  //     if (child instanceof THREE.Mesh && child.name === "blueprint") {
+  //       blueprints.push(child);
+  //     }
+  //   });
+  //   // const dragControls = moveBlueprint(blueprints, components, scene, shadows);
+  // });
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   createExtrusionButton.domElement.addEventListener("mousedown", () => {
@@ -931,12 +928,6 @@ export const createModelView = async () => {
   observeElementAndAddEventListener("rotate-roof", "mousedown", () => {
     document.body.style.cursor = "crosshair";
     setRotatingRoofInProgress(true);
-    setDeletionInProgress(false);
-  });
-
-  // handles roof rotation, snap the roof to a different rotation.
-  rotateRoofOrientationButton.domElement.addEventListener("mousedown", () => {
-    setDrawingInProgressSwitch(false);
     setDeletionInProgress(false);
   });
 
