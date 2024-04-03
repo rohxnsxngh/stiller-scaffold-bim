@@ -131,7 +131,7 @@ export const createModelView = async () => {
 
   // Cube
   const geometry = new THREE.OctahedronGeometry(0.5); // The parameter is the radius of the octahedron
-  const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
+  const material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
   const cube = new THREE.Mesh(geometry, material);
   cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 4);
   cube.position.set(0, -1, 0);
@@ -314,11 +314,9 @@ export const createModelView = async () => {
       }
       mutex = false;
     }
-  });
-
-  // general poly draw tool
-  window.addEventListener("mousemove", function (e) {
+      // general poly draw tool
     if (drawingInProgress) {
+      mutex = true
       scene.add(highlightMesh);
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -377,6 +375,7 @@ export const createModelView = async () => {
             break;
         }
       });
+      mutex = false
     }
   });
 
@@ -399,8 +398,10 @@ export const createModelView = async () => {
       );
     }
     if (deletionInProgress && !drawingInProgress) {
-      const objectToRemove = intersects[0].object;
-      deleteObject(objectToRemove, scene);
+      if (intersects.length > 0) {
+        const objectToRemove = intersects[0].object;
+        deleteObject(objectToRemove, scene);
+      }
     }
     // implementation for editing blueprint after it has been created is not complete
     if (editingBlueprint && !drawingInProgress) {
@@ -617,6 +618,7 @@ export const createModelView = async () => {
 
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   observeElementAndAddEventListener("create-extrusion", "mousedown", () => {
+    setDeletionInProgress(false);
     let blueprints: THREE.Mesh[] = [];
     let extrusions: THREE.Mesh[] = [];
 
@@ -689,6 +691,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-gable-roof", "mousedown", () => {
+    setDeletionInProgress(false);
     let extrusions: THREE.Mesh[] = [];
     let roofs: THREE.Mesh[] = [];
 
@@ -730,6 +733,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-flat-roof", "mousedown", () => {
+    setDeletionInProgress(false);
     let extrusions: THREE.Mesh[] = [];
     let roofs: THREE.Mesh[] = [];
 
@@ -763,6 +767,7 @@ export const createModelView = async () => {
       }
     });
 
+    hideAllCSS2DObjects(scene)
     roofs = [];
     extrusions = [];
   });
@@ -807,6 +812,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-shed-roof", "mousedown", () => {
+    setDeletionInProgress(false);
     let extrusions: THREE.Mesh[] = [];
     let roofs: THREE.Mesh[] = [];
 
@@ -938,6 +944,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
+    setDeletionInProgress(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       createScaffoldingShapeIsOutlined(
@@ -983,6 +990,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
+    setDeletionInProgress(false);
     hideAllCSS2DObjects(scene);
     generateScaffolding();
     const cubeClone: THREE.Object3D<THREE.Object3DEventMap>[] = [];
@@ -1002,6 +1010,7 @@ export const createModelView = async () => {
     "autogenerate-scaffolding",
     "mousedown",
     () => {
+      setDeletionInProgress(false);
       hideAllCSS2DObjects(scene);
       scene.traverse((child: any) => {
         if (child instanceof THREE.Mesh && child.name === "blueprint") {
@@ -1233,6 +1242,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
+    setDeletionInProgress(false);
     const scaffoldOutline: (
       | THREE.Mesh<any, any, any>
       | THREE.Line<any, any>
@@ -1247,6 +1257,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("tarp-sheet", "mousedown", () => {
+    setDeletionInProgress(false);
     const scaffoldOutline: (
       | THREE.Mesh<any, any, any>
       | THREE.Line<any, any>
@@ -1261,6 +1272,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("shrink-wrap-sheet", "mousedown", () => {
+    setDeletionInProgress(false);
     const scaffoldOutline: (
       | THREE.Mesh<any, any, any>
       | THREE.Line<any, any>

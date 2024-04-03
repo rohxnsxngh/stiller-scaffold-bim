@@ -228,11 +228,13 @@ export const createToolbar = (
     cameraTopView(gsap, components.camera);
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setDeletionInProgress(false);
   });
 
   observeElementAndAddEventListener("top-view", "mouseover", () => {
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setDeletionInProgress(false);
   });
 
   const createBlueprintRectangleButton = new OBC.Button(components, {
@@ -296,6 +298,7 @@ export const createToolbar = (
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
     setIsDrawingBlueprint(false);
+    setDeletionInProgress(false);
   });
 
   const deleteObjectButton = new OBC.Button(components);
@@ -365,6 +368,7 @@ export const createToolbar = (
   observeElementAndAddEventListener("reset-scene", "mouseover", () => {
     setDrawingInProgress(false);
     setDrawingScaffoldingInProgress(false);
+    setDeletionInProgress(false);
   });
 
   observeElementAndAddEventListener("reset-scene", "mouseleave", () => {
@@ -893,6 +897,7 @@ export const createToolbar = (
       setDrawingInProgressSwitch(true);
       setDrawingInProgress(true);
       setIsDrawingBlueprint(false);
+      setDeletionInProgress(false);
     }
   });
 
