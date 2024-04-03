@@ -75,15 +75,15 @@ export const createToolbar = (
 
   // IFC loader button
   // const fragments = new OBC.FragmentManager(components);
-  const fragmentIfcLoader = new OBC.FragmentIfcLoader(components);
-  fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
-  fragmentIfcLoader.settings.webIfc.OPTIMIZE_PROFILES = true;
-  fragmentIfcLoader.setup();
+  // const fragmentIfcLoader = new OBC.FragmentIfcLoader(components);
+  // fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
+  // fragmentIfcLoader.settings.webIfc.OPTIMIZE_PROFILES = true;
+  // fragmentIfcLoader.setup();
 
-  const ifcButton = fragmentIfcLoader.uiElement.get("main");
-  ifcButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  ifcButton.domElement.classList.add("hover:bg-slate-300");
-  mainToolbar.addChild(ifcButton as OBC.Button);
+  // const ifcButton = fragmentIfcLoader.uiElement.get("main");
+  // ifcButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  // ifcButton.domElement.classList.add("hover:bg-slate-300");
+  // mainToolbar.addChild(ifcButton as OBC.Button);
 
   // Vue instance inside of top tool bar
   const vueComponentTimeline = createApp(Timeline);
