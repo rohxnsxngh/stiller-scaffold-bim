@@ -358,6 +358,10 @@ function attachScaffoldRowLabelChangeHandler(
       }
     }
   );
+
+  observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
+    levels = -1
+  })
 }
 
 // add a level of scaffolding to the selected side
@@ -369,6 +373,7 @@ function addScaffoldingLevel(
   level: number,
   scaffoldPlacedPosition: Set<string>
 ) {
+  console.log("add scaffolding level", level)
   const lineLength = line.userData.length;
   const startPoint = new THREE.Vector3(
     line.userData.first_point.x,
