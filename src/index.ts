@@ -463,10 +463,10 @@ export const createModelView = async () => {
         extrusions.forEach((extrusion) => {
           // Check if the current extrusion equals a roof position that was selected
           let hasRoof =
-            roof.userData.shape.currentPoint.x ===
-              extrusion.userData.shape.currentPoint.x ||
-            roof.userData.shape.currentPoint.y ===
-              extrusion.userData.shape.currentPoint.y;
+          (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
+            extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
+            extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
+            extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
 
           console.log("hasRoof", hasRoof);
           deleteObject(roof, scene);
@@ -507,12 +507,13 @@ export const createModelView = async () => {
 
         extrusions.forEach((extrusion) => {
           let hasRoof =
-            extrusion.userData.shape.currentPoint.x ===
-              roof.userData.shape.currentPoint.x ||
-            extrusion.userData.shape.currentPoint.y ===
-              roof.userData.shape.currentPoint.y;
+          (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
 
           console.log("hasRoof", hasRoof);
+          console.log("curves", roof.userData.shape.curves[0].v1.x)
           scene.remove(roof);
           if (hasRoof) {
             createShedRoof(extrusion, scene, roofToggleState, height);
@@ -660,10 +661,10 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.currentPoint.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.currentPoint.y
+        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
       );
       if (!hasRoof) {
         createRoof(extrusion, scene, 0, 3);
@@ -699,10 +700,10 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.currentPoint.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.currentPoint.y
+        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
       );
       if (!hasRoof) {
         const heightValue = componentStore.height;
@@ -781,10 +782,10 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.currentPoint.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.currentPoint.y
+        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
       );
       if (!hasRoof) {
         createShedRoof(extrusion, scene, 0, 3);
@@ -821,10 +822,10 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.currentPoint.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.currentPoint.y
+        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
       );
       if (!hasRoof) {
         const heightValue = parseFloat(
@@ -862,10 +863,10 @@ export const createModelView = async () => {
             const mesh = child.userData;
             roofs.forEach((roof) => {
               if (
-                mesh.userData.shape.currentPoint.x ===
-                  roof.userData.shape.currentPoint.x ||
-                mesh.userData.shape.currentPoint.y ===
-                  roof.userData.shape.currentPoint.y
+                (mesh.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
+                  mesh.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
+                  mesh.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
+                  mesh.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
               ) {
                 // extrudedRoof = roof;
                 if (mesh) {
