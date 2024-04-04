@@ -68,7 +68,7 @@ import {
   setRotatingRoofInProgress,
 } from "./utilities/state";
 
-let intersects: any, components: OBC.Components;
+let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
 let labels: any;
 let roofToggleState: number = 0;
@@ -131,7 +131,7 @@ export const createModelView = async () => {
 
   // Cube
   const geometry = new THREE.OctahedronGeometry(0.5); // The parameter is the radius of the octahedron
-  const material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+  const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
   const cube = new THREE.Mesh(geometry, material);
   cube.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 4);
   cube.position.set(0, -1, 0);
@@ -193,13 +193,10 @@ export const createModelView = async () => {
   // Modify the mousemove event listener
   let lastHighlightedObject: THREE.Mesh | null = null;
   let lastHighlightedObjectColor: any | null = null;
-  let mutex = false;
 
   // highlight object whens deletion is in progress
   window.addEventListener("mousemove", function (e) {
-    if (mutex) return;
     if (deletionInProgress && !drawingInProgress) {
-      mutex = true;
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
       // @ts-ignore
@@ -246,12 +243,9 @@ export const createModelView = async () => {
       } else {
         // If there is no intersection, revert the material of the last highlighted object
         if (lastHighlightedObject) {
-          // revertMaterial(lastHighlightedObject);
-          // lastHighlightedObject.material = lastHighlightedObject.userData
           lastHighlightedObject = null;
         }
       }
-      mutex = false;
     }
     if (
       (deletionScaffoldingRowInProgress ||
@@ -260,7 +254,6 @@ export const createModelView = async () => {
         deletionScaffoldingColumnInProgress) &&
       !drawingInProgress
     ) {
-      mutex = true;
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
       // @ts-ignore
@@ -286,7 +279,7 @@ export const createModelView = async () => {
           // Apply the glow to the new intersected object
           lastHighlightedObjectColor =
             intersectedObject.material.color.getHex();
-          intersectedObject.material.color.set(0x000000);
+          // intersectedObject.material.color.set(0x000000);
           intersectedObject.material.needsUpdate = true;
           // applyGlow(intersectedObject);
           lastHighlightedObject = intersectedObject;
@@ -307,16 +300,12 @@ export const createModelView = async () => {
       } else {
         // If there is no intersection, revert the material of the last highlighted object
         if (lastHighlightedObject) {
-          // revertMaterial(lastHighlightedObject);
-          // lastHighlightedObject.material = lastHighlightedObject.userData
           lastHighlightedObject = null;
         }
       }
-      mutex = false;
     }
-      // general poly draw tool
+    // general poly draw tool
     if (drawingInProgress) {
-      mutex = true
       scene.add(highlightMesh);
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -362,6 +351,7 @@ export const createModelView = async () => {
           case "extrusion":
             break;
           case "roof":
+            console.log("roof");
             break;
           case "shedRoof":
             break;
@@ -375,7 +365,6 @@ export const createModelView = async () => {
             break;
         }
       });
-      mutex = false
     }
   });
 
@@ -446,7 +435,7 @@ export const createModelView = async () => {
       if (intersects.length > 0 && intersects[0].object.name === "roof") {
         console.log("rotating roof", intersects[0].object);
         const roof = intersects[0].object;
-        let extrusions: THREE.Mesh[] = [];
+        const extrusions: THREE.Mesh[] = [];
         // Toggle the roofToggleState between 0 and  1
         roofToggleState = roofToggleState === 0 ? 1 : 0;
 
@@ -486,13 +475,11 @@ export const createModelView = async () => {
             createRoof(extrusion, scene, roofToggleState, height);
           }
         });
-
-        extrusions = [];
       }
       if (intersects.length > 0 && intersects[0].object.name === "shedRoof") {
         console.log("rotating shed roof");
-        let roof = intersects[0].object;
-        let extrusions: THREE.Mesh[] = [];
+        const roof = intersects[0].object;
+        const extrusions: THREE.Mesh[] = [];
 
         // Toggle the roofToggleState between  0,  1,  2, and  3
         roofToggleState = (roofToggleState + 1) % 4;
@@ -515,6 +502,8 @@ export const createModelView = async () => {
 
         console.log("roofs", roof);
         console.log("extrusions", extrusions);
+        const store = useStore();
+        const height = store.shedHeight;
 
         extrusions.forEach((extrusion) => {
           let hasRoof =
@@ -524,16 +513,11 @@ export const createModelView = async () => {
               roof.userData.shape.currentPoint.y;
 
           console.log("hasRoof", hasRoof);
+          scene.remove(roof);
           if (hasRoof) {
-            scene.remove(roof);
-            const store = useStore();
-            const height = store.shedHeight;
             createShedRoof(extrusion, scene, roofToggleState, height);
           }
         });
-
-        roof = null;
-        extrusions = [];
       }
     }
   });
@@ -767,7 +751,7 @@ export const createModelView = async () => {
       }
     });
 
-    hideAllCSS2DObjects(scene)
+    hideAllCSS2DObjects(scene);
     roofs = [];
     extrusions = [];
   });
@@ -1234,9 +1218,15 @@ export const createModelView = async () => {
     calculateTotalAmountScaffoldingInScene(scene);
     calculateTotalSquareFootageForScaffolding(scene);
     // loadSymbol(scene);
+    // scene.traverse((child) => {
+    //   if (child.name === "scaffoldLine") {
+    //     console.log(child.userData.level);
+    //   }
+    // });
+
     scene.traverse((child) => {
-      if (child.name === "scaffoldLine") {
-        console.log(child.userData.level);
+      if (child.name === "roof") {
+        console.log(child);
       }
     });
   });

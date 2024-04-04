@@ -232,7 +232,7 @@ export function createExtrusionFromBlueprint(
   meshExtrude.userData = {
     shape: shape,
     blueprintHasBeenUpdated: blueprintShape.blueprintHasBeenUpdated,
-    label: null
+    label: null,
   };
   console.log(meshExtrude.userData);
   meshExtrude.name = "extrusion";
@@ -240,7 +240,7 @@ export function createExtrusionFromBlueprint(
 
   const label = createExtrusionLabel(scene, shape, depth);
   attachExtrusionLabelChangeHandler(label, meshExtrude, shape);
-  meshExtrude.userData.label = label
+  meshExtrude.userData.label = label;
 
   label.userData = meshExtrude;
 }
@@ -698,6 +698,27 @@ export function createRoof(
   index: number,
   height: number
 ) {
+  const roofToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = []
+  // check if duplicate roof exists
+  scene.traverse((children) => {
+    if (children.name === "roof") {
+      if (
+        children.userData.shape.currentPoint.x ===
+          child.userData.shape.currentPoint.x ||
+        children.userData.shape.currentPoint.y ===
+          child.userData.shape.currentPoint.y
+      ) {
+        console.log("DUPLICATE ROOF");
+        roofToRemove.push(children)
+        return
+      }
+    }
+  });
+
+  roofToRemove.forEach((roof) => {
+    scene.remove(roof)
+  })
+
   const rectShape = child.userData.shape;
   // Calculate the midpoint between the two points
   const midpoint = new THREE.Vector2();
@@ -812,7 +833,7 @@ export function createRoof(
   extrudedMesh.userData = {
     shape: shape,
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
-    label: null
+    label: null,
   };
   scene.add(extrudedMesh);
 
@@ -832,7 +853,7 @@ export function createRoof(
     triangle,
     extrudedMesh
   );
-  extrudedMesh.userData.label = label
+  extrudedMesh.userData.label = label;
   blueprintHasBeenUpdated = false;
 }
 
@@ -1041,9 +1062,13 @@ function updateRoofGeometry(
   extrudedMesh.name = "roof";
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
-  console.log("extrude height", extrudeHeight)
+  console.log("extrude height", extrudeHeight);
   label.position.copy(
-    new THREE.Vector3(updatedMidpoint.x, updatedMidpoint.y, updatedMidpoint.z + 1)
+    new THREE.Vector3(
+      updatedMidpoint.x,
+      updatedMidpoint.y,
+      updatedMidpoint.z + 1
+    )
   );
   label.element.textContent = `${desiredHeight.toFixed(2)} m.`;
   scene.add(extrudedMesh);
@@ -1056,6 +1081,28 @@ export function createShedRoof(
   index: number,
   height: number
 ) {
+  const roofToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = []
+  // check if duplicate roof exists
+  scene.traverse((children) => {
+    if (children.name === "shedRoof") {
+      if (
+        children.userData.shape.currentPoint.x ===
+          child.userData.shape.currentPoint.x ||
+        children.userData.shape.currentPoint.y ===
+          child.userData.shape.currentPoint.y
+      ) {
+        console.log("DUPLICATE ROOF");
+        roofToRemove.push(children)
+        return
+      }
+    }
+  });
+
+  roofToRemove.forEach((roof) => {
+    scene.remove(roof)
+  })
+
+
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   const rectShape = child.userData.shape;
   if (!child.userData.blueprintHasBeenUpdated) {
@@ -1223,7 +1270,7 @@ export function createShedRoof(
   extrudedMesh.userData = {
     shape: shape,
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
-    label: null
+    label: null,
   };
   scene.add(extrudedMesh);
 
@@ -1241,7 +1288,7 @@ export function createShedRoof(
     triangle,
     extrudedMesh
   );
-  extrudedMesh.userData.label = label
+  extrudedMesh.userData.label = label;
 }
 
 function attachShedRoofLabelChangeHandler(
@@ -1291,7 +1338,9 @@ function updateShedRoofGeometry(
   extrudedRoofMesh: THREE.Mesh,
   label: CSS2DObject
 ) {
-  const desiredHeight = parseFloat(triangleHeightOffsetDistance as unknown as string);
+  const desiredHeight = parseFloat(
+    triangleHeightOffsetDistance as unknown as string
+  );
   const rectShape = child.userData.shape;
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   if (!child.userData.blueprintHasBeenUpdated) {
@@ -1453,7 +1502,11 @@ function updateShedRoofGeometry(
   extrudedMesh.userData = shape;
   label.userData = extrudedMesh;
   label.position.copy(
-    new THREE.Vector3(updatedMidpoint.x, updatedMidpoint.y, updatedMidpoint.z + 1)
+    new THREE.Vector3(
+      updatedMidpoint.x,
+      updatedMidpoint.y,
+      updatedMidpoint.z + 1
+    )
   );
   label.element.textContent = `${desiredHeight.toFixed(2)} m.`;
   scene.add(extrudedMesh);
@@ -1480,7 +1533,7 @@ export function createFlatRoof(child: any, scene: THREE.Scene) {
   roofMesh.userData = {
     shape: shape,
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
-    label: null
+    label: null,
   };
 }
 
