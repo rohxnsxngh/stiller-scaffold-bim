@@ -219,12 +219,17 @@ export const createModelView = async () => {
             ).needsUpdate = true;
             lastHighlightedObject = null;
           }
-          // Apply the glow to the new intersected object
-          lastHighlightedObjectColor =
-            intersectedObject.material.color.getHex();
-          intersectedObject.material.color.set(0xff0000);
-          intersectedObject.material.needsUpdate = true;
-          // applyGlow(intersectedObject);
+          if (
+            intersectedObject.material instanceof THREE.MeshStandardMaterial ||
+            intersectedObject.material instanceof THREE.MeshPhongMaterial
+          ) {
+            // Apply the glow to the new intersected object
+            lastHighlightedObjectColor =
+              intersectedObject.material.color.getHex();
+            intersectedObject.material.color.set(0xff0000);
+            intersectedObject.material.needsUpdate = true;
+            // applyGlow(intersectedObject);
+          }
           lastHighlightedObject = intersectedObject;
         } else if (
           intersectedObject !== lastHighlightedObject &&
@@ -277,11 +282,17 @@ export const createModelView = async () => {
             lastHighlightedObject = null;
           }
           // Apply the glow to the new intersected object
-          lastHighlightedObjectColor =
-            intersectedObject.material.color.getHex();
-          // intersectedObject.material.color.set(0x000000);
-          intersectedObject.material.needsUpdate = true;
-          // applyGlow(intersectedObject);
+          // Apply the glow to the new intersected object
+          if (
+            intersectedObject.material instanceof THREE.MeshStandardMaterial ||
+            intersectedObject.material instanceof THREE.MeshPhongMaterial
+          ) {
+            lastHighlightedObjectColor =
+              intersectedObject.material.color.getHex();
+            intersectedObject.material.color.set(0x111115);
+            intersectedObject.material.needsUpdate = true;
+            // applyGlow(intersectedObject);
+          }
           lastHighlightedObject = intersectedObject;
         } else if (
           intersectedObject !== lastHighlightedObject &&
@@ -463,10 +474,14 @@ export const createModelView = async () => {
         extrusions.forEach((extrusion) => {
           // Check if the current extrusion equals a roof position that was selected
           let hasRoof =
-          (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
-            extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
-            extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
-            extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
+            extrusion.userData.shape.currentPoint.x ===
+              roof.userData.shape.curves[0].v1.x ||
+            extrusion.userData.shape.currentPoint.x ===
+              roof.userData.shape.curves[0].v2.x ||
+            extrusion.userData.shape.currentPoint.y ===
+              roof.userData.shape.curves[0].v1.y ||
+            extrusion.userData.shape.currentPoint.y ===
+              roof.userData.shape.curves[0].v2.y;
 
           console.log("hasRoof", hasRoof);
           deleteObject(roof, scene);
@@ -507,13 +522,17 @@ export const createModelView = async () => {
 
         extrusions.forEach((extrusion) => {
           let hasRoof =
-          (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
+            extrusion.userData.shape.currentPoint.x ===
+              roof.userData.shape.curves[0].v1.x ||
+            extrusion.userData.shape.currentPoint.x ===
+              roof.userData.shape.curves[0].v2.x ||
+            extrusion.userData.shape.currentPoint.y ===
+              roof.userData.shape.curves[0].v1.y ||
+            extrusion.userData.shape.currentPoint.y ===
+              roof.userData.shape.curves[0].v2.y;
 
           console.log("hasRoof", hasRoof);
-          console.log("curves", roof.userData.shape.curves[0].v1.x)
+          console.log("curves", roof.userData.shape.curves[0].v1.x);
           scene.remove(roof);
           if (hasRoof) {
             createShedRoof(extrusion, scene, roofToggleState, height);
@@ -661,10 +680,14 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
         createRoof(extrusion, scene, 0, 3);
@@ -700,10 +723,14 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
         const heightValue = componentStore.height;
@@ -782,10 +809,14 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
         createShedRoof(extrusion, scene, 0, 3);
@@ -822,10 +853,14 @@ export const createModelView = async () => {
     extrusions.forEach((extrusion) => {
       let hasRoof = roofs.some(
         (roof) =>
-        (extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v1.x ||
+          extrusion.userData.shape.currentPoint.x ===
+            roof.userData.shape.curves[0].v2.x ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v1.y ||
+          extrusion.userData.shape.currentPoint.y ===
+            roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
         const heightValue = parseFloat(
@@ -863,10 +898,14 @@ export const createModelView = async () => {
             const mesh = child.userData;
             roofs.forEach((roof) => {
               if (
-                (mesh.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v1.x ||
-                  mesh.userData.shape.currentPoint.x === roof.userData.shape.curves[0].v2.x ||
-                  mesh.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v1.y ||
-                  mesh.userData.shape.currentPoint.y === roof.userData.shape.curves[0].v2.y)
+                mesh.userData.shape.currentPoint.x ===
+                  roof.userData.shape.curves[0].v1.x ||
+                mesh.userData.shape.currentPoint.x ===
+                  roof.userData.shape.curves[0].v2.x ||
+                mesh.userData.shape.currentPoint.y ===
+                  roof.userData.shape.curves[0].v1.y ||
+                mesh.userData.shape.currentPoint.y ===
+                  roof.userData.shape.curves[0].v2.y
               ) {
                 // extrudedRoof = roof;
                 if (mesh) {

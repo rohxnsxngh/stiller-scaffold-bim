@@ -48,6 +48,7 @@ export const createToolbar = (
   });
   mainToolbar.domElement.classList.remove("bg-ifcjs-100");
   mainToolbar.domElement.classList.add("bg-glass");
+  mainToolbar.domElement.classList.add("hover:bg-[#111115]");
   // side tool bar
   const sideToolBar = new OBC.Toolbar(components);
   sideToolBar.position = "right";
@@ -58,6 +59,7 @@ export const createToolbar = (
   });
   sideToolBar.domElement.classList.remove("bg-ifcjs-100");
   sideToolBar.domElement.classList.add("bg-glass");
+  sideToolBar.domElement.classList.add("hover:bg-[#111115]");
 
   // top tool bar
   const topToolBar = new OBC.Toolbar(components);
@@ -718,13 +720,14 @@ export const createToolbar = (
   components.ui.addToolbar(drawerToolBar);
   drawerToolBar.domElement.style.position = "absolute";
   drawerToolBar.domElement.style.top = "20px";
-  drawerToolBar.domElement.style.right = "10px";
+  drawerToolBar.domElement.style.right = "15px";
   drawerToolBar.domElement.addEventListener("mouseleave", () => {
     document.body.style.cursor = "auto";
     setDrawingInProgress(true);
   });
   drawerToolBar.domElement.classList.remove("bg-ifcjs-100");
   drawerToolBar.domElement.classList.add("bg-glass");
+  drawerToolBar.domElement.classList.add("hover:bg-[#111115]"); 
 
   //Solidify Blueprint
   const testButton = new OBC.Button(components);

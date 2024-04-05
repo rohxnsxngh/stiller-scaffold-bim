@@ -233,7 +233,7 @@ export function deleteObject(object: any, scene: THREE.Scene) {
 // this helper function is meant specifically for gltf that contain a tree of objects
 // TODO: fix the issue with trhis function
 function removeFromScene(object: any, scene: THREE.Scene) {
-  if (object.parent != null) {
+  if (object && object.parent) {
     // Dispose of materials
     if (object.material) {
       if (Array.isArray(object.material)) {

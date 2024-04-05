@@ -1060,7 +1060,7 @@ function updateRoofGeometry(
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "roof";
-  extrudedMesh.userData = shape;
+  extrudedMesh.userData.shape = shape;
   label.userData = extrudedMesh;
   console.log("extrude height", extrudeHeight);
   label.position.copy(
@@ -1498,7 +1498,7 @@ function updateShedRoofGeometry(
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
   extrudedMesh.name = "shedRoof";
-  extrudedMesh.userData = shape;
+  extrudedMesh.userData.shape = shape;
   label.userData = extrudedMesh;
   label.position.copy(
     new THREE.Vector3(
