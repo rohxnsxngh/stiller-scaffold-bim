@@ -15,12 +15,12 @@ export function loadSymbol(scene: THREE.Scene) {
     let renderOrder = 0;
 
     for (const path of data.paths) {
-      const fillColor = path.userData.style.fill;
+      const fillColor = path.userData?.style.fill;
 
       if (fillColor !== undefined && fillColor !== "none") {
         const material = new THREE.MeshBasicMaterial({
           color: new THREE.Color().setStyle(fillColor),
-          opacity: path.userData.style.fillOpacity,
+          opacity: path.userData?.style.fillOpacity,
           transparent: true,
           side: THREE.DoubleSide,
           depthWrite: false,
@@ -37,12 +37,12 @@ export function loadSymbol(scene: THREE.Scene) {
         }
       }
 
-      const strokeColor = path.userData.style.stroke;
+      const strokeColor = path.userData?.style.stroke;
 
       if (strokeColor !== undefined && strokeColor !== "none") {
         const material = new THREE.MeshBasicMaterial({
           color: new THREE.Color().setStyle(strokeColor),
-          opacity: path.userData.style.strokeOpacity,
+          opacity: path.userData?.style.strokeOpacity,
           transparent: true,
           side: THREE.DoubleSide,
           depthWrite: false,
@@ -51,7 +51,7 @@ export function loadSymbol(scene: THREE.Scene) {
         for (const subPath of path.subPaths) {
           const geometry = SVGLoader.pointsToStroke(
             subPath.getPoints(),
-            path.userData.style
+            path.userData?.style
           );
 
           if (geometry) {
