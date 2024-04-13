@@ -357,6 +357,15 @@ function attachScaffoldRowLabelChangeHandler(
     "mousedown",
     () => {
       console.log("add scaffolding level");
+
+      // Check if there is already scaffolding in the scene
+      if (scaffoldPlacedPosition.size === 0) {
+        console.log(
+          "Cannot add scaffolding level. No scaffolding exists in the scene."
+        );
+        return; // Exit the function if no scaffolding exists
+      }
+
       levels++;
       if (levels < 0) {
         store.updateScaffoldLevel(0);
@@ -389,7 +398,7 @@ function attachScaffoldRowLabelChangeHandler(
       }
       if (levels < 0) {
         store.updateScaffoldLevel(0);
-      } else {
+      } else if (levels > 1) {
         store.updateScaffoldLevel(levels - 1);
       }
       console.log("store level", store.level);
@@ -403,7 +412,7 @@ function attachScaffoldRowLabelChangeHandler(
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     levels = -1;
-    line = null
+    line = null;
     store.updateScaffoldLevel(0);
   });
 }
@@ -566,7 +575,11 @@ function removeScaffoldingLevel(
 
       // Check if the position is in the set of placed positions
       if (
-        !addScaffoldingPositionIfUnique(position, scaffoldPlacedPosition, 0.0001)
+        !addScaffoldingPositionIfUnique(
+          position,
+          scaffoldPlacedPosition,
+          0.0001
+        )
       ) {
         // Remove the position from the set
         scaffoldPlacedPosition.delete(positionKey);
