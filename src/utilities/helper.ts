@@ -145,8 +145,10 @@ export function resetScene(
       objectsToRemove.push(child);
     }
     if (
+      child.name === "scaffoldLine" ||
       child.name === "scaffoldingModel" ||
-      child.name === "scaffoldingInternalStaircaseModel" ||
+      child.name === "scaffoldingWireframe" ||
+      child.name === "scaffoldingStackingLabel" ||
       child.name === "scaffoldingExternalStaircaseModel"
     ) {
       objectsToRemove.push(child);
@@ -154,7 +156,7 @@ export function resetScene(
     if (child.name === "scaffoldingSheet") {
       objectsToRemove.push(child);
     }
-    if (child.name === "rectanglePlane") {
+    if (child.name === "rectanglePlane" || child.name === "blueprint") {
       objectsToRemove.push(child);
     }
     if (child.name === "markupGroup") {
@@ -476,4 +478,24 @@ export function areAnyTwoAxesEqualWithEpsilon(
     (Math.abs(v1.x - v2.x) < epsilon && Math.abs(v1.z - v2.z) < epsilon) ||
     (Math.abs(v1.y - v2.y) < epsilon && Math.abs(v1.z - v2.z) < epsilon)
   );
+}
+
+export function resetScaffolding(scene: THREE.Scene) {
+  const scaffoldingObjectsToRemove: THREE.Object3D<THREE.Object3DEventMap>[] =
+    [];
+  scene.traverse((child: any) => {
+    if (
+      child.name === "scaffoldLine" ||
+      child.name === "scaffoldingModel" ||
+      child.name === "scaffoldingWireframe" ||
+      child.name === "scaffoldingStackingLabel" ||
+      child.name === "scaffoldingExternalStaircaseModel"
+    ) {
+      scaffoldingObjectsToRemove.push(child);
+    }
+  });
+
+  scaffoldingObjectsToRemove.forEach((scaffold) => {
+    scene.remove(scaffold);
+  });
 }

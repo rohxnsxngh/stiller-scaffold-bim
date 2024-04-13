@@ -327,13 +327,38 @@ function attachScaffoldRowLabelChangeHandler(
   line: any,
   scaffoldPlacedPosition: Set<string>
 ) {
+
   let levels = 0;
+
+  const store = useStore();
+  if (levels < 0) {
+    store.updateScaffoldLevel(0);
+  } else {
+    store.updateScaffoldLevel(levels);
+  }
+  console.log("store level", store.level)
+
+
   observeElementAndAddEventListener(
     "add-scaffolding-level",
     "mousedown",
     () => {
+      // Check if there is already scaffolding in the scene
+      if (scaffoldPlacedPosition.size === 0) {
+        console.log(
+          "Cannot add scaffolding level. No scaffolding exists in the scene."
+        );
+        return; // Exit the function if no scaffolding exists
+      }
+
       console.log("add scaffolding level");
       levels++;
+      if (levels < 0) {
+        store.updateScaffoldLevel(0);
+      } else {
+        store.updateScaffoldLevel(levels);
+      }
+      console.log("store level", store.level)
       addScaffoldingLevel(
         line,
         scene,
@@ -356,12 +381,22 @@ function attachScaffoldRowLabelChangeHandler(
       if (levels < 0) {
         levels = 0;
       }
+      if (levels < 0) {
+        store.updateScaffoldLevel(0);
+      } else {
+        store.updateScaffoldLevel(levels);
+      }
+      console.log("store level", store.level)
     }
   );
 
   observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
-    levels = -1
-  })
+    levels = -1;
+  });
+
+  observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    levels = -1;
+  });
 }
 
 // add a level of scaffolding to the selected side
@@ -373,7 +408,7 @@ function addScaffoldingLevel(
   level: number,
   scaffoldPlacedPosition: Set<string>
 ) {
-  console.log("add scaffolding level", level)
+  console.log("add scaffolding level", level);
   const lineLength = line.userData.length;
   const startPoint = new THREE.Vector3(
     line.userData.first_point.x,

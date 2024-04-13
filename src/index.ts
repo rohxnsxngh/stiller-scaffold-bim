@@ -39,6 +39,7 @@ import {
   disableOrbitControls,
   hideAllCSS2DObjects,
   observeElementAndAddEventListener,
+  resetScaffolding,
   resetScene,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -1047,23 +1048,7 @@ export const createModelView = async () => {
 
   // reset all scaffolding
   observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
-    const scaffoldingObjectsToRemove: THREE.Object3D<THREE.Object3DEventMap>[] =
-      [];
-    scene.traverse((child) => {
-      if (
-        child.name === "scaffoldLine" ||
-        child.name === "scaffoldingModel" ||
-        child.name === "scaffoldingWireframe" ||
-        child.name === "scaffoldingStackingLabel" ||
-        child.name === "scaffoldingExternalStaircaseModel"
-      ) {
-        scaffoldingObjectsToRemove.push(child);
-      }
-    });
-
-    scaffoldingObjectsToRemove.forEach((scaffold) => {
-      scene.remove(scaffold);
-    });
+    resetScaffolding(scene);
 
     const store = useStore();
     store.updateScaffoldLevel(0);
@@ -1235,6 +1220,11 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    resetScaffolding(scene);
+
+    const store = useStore();
+    store.updateScaffoldLevel(0);
+
     resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
     scaffoldPoints = [];
