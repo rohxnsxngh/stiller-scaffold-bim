@@ -192,11 +192,13 @@ export const createToolbar = (
   topToolBar.addChild(orderMenuButton);
   orderMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
-    const modalElement = document.getElementById("my_modal_1");
-    if (modalElement && modalElement instanceof HTMLDialogElement) {
-      modalElement.showModal();
-    } else {
-      console.error("Modal element not found or not an HTMLDialogElement");
+    if (drawer.visible) {
+      const modalElement = document.getElementById("my_modal_1");
+      if (modalElement && modalElement instanceof HTMLDialogElement) {
+        modalElement.showModal();
+      } else {
+        console.error("Modal element not found or not an HTMLDialogElement");
+      }
     }
   });
   orderMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
