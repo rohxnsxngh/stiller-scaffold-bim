@@ -139,7 +139,6 @@ export function resetScene(
         child instanceof THREE.Line) &&
       !(child.geometry instanceof THREE.PlaneGeometry)
     ) {
-      console.log(child);
       if (child.geometry) child.geometry.dispose();
       if (child.material.map) child.material.map.dispose();
       objectsToRemove.push(child);

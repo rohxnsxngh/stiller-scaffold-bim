@@ -454,13 +454,6 @@ function addScaffoldingLevel(
     endPoint,
     startPoint,
   ]);
-  newLine.userData = {
-    length: length,
-    first_point: firstPoint,
-    last_point: lastPoint,
-
-    level: level,
-  };
 
   // Check if a line with the same properties already exists in the scene
   const isLineAlreadyPlaced = scene.children.some((child) => {
