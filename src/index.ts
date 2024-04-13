@@ -130,8 +130,8 @@ export const createModelView = async () => {
   // Grid
   const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
   // @ts-ignore
-  grid._grid.name = "grid"
-  console.log("grid", grid)
+  grid._grid.name = "grid";
+  console.log("grid", grid);
 
   // Cube
   const geometry = new THREE.OctahedronGeometry(0.5); // The parameter is the radius of the octahedron
@@ -181,7 +181,7 @@ export const createModelView = async () => {
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    clearSceneButton,
+    // clearSceneButton,
     testButton,
   ] = createToolbar(components, scene);
 
@@ -997,9 +997,11 @@ export const createModelView = async () => {
       2.0,
       0.73
     );
+    const amountOfScaffoldingLines: any[] = [];
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
-        console.error("existing scaffolding lines", child)
+        console.error("existing scaffolding lines", child);
+        amountOfScaffoldingLines.push(child);
         placeScaffoldModelsAlongLine(
           child,
           scene,
@@ -1009,6 +1011,7 @@ export const createModelView = async () => {
         );
       }
     });
+    console.log(amountOfScaffoldingLines, amountOfScaffoldingLines.length);
   }
 
   generateScaffoldOutlineButton.domElement.addEventListener("mousedown", () => {
@@ -1222,12 +1225,17 @@ export const createModelView = async () => {
     });
   });
 
-  clearSceneButton.domElement.addEventListener("mousedown", () => {
-    resetScene(scene, components, shadows, scaffoldPlacedPosition);
+  // clearSceneButton.domElement.addEventListener("mousedown", () => {
+  //   resetScaffolding(scene);
 
-    scaffoldPoints.length = 0;
-    points.length = 0;
-  });
+  //   const store = useStore();
+  //   store.updateScaffoldLevel(0);
+
+  //   resetScene(scene, components, shadows, scaffoldPlacedPosition);
+
+  //   scaffoldPoints.length = 0;
+  //   points.length = 0;
+  // });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     resetScaffolding(scene);

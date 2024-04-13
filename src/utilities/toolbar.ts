@@ -338,28 +338,28 @@ export const createToolbar = (
   });
 
   // Start Drawing Blueprint
-  const clearSceneButton = new OBC.Button(components);
-  clearSceneButton.materialIcon = "check_box_outline_blank";
-  clearSceneButton.tooltip = "Reset Scene";
-  clearSceneButton.id = "drawing-button";
-  mainToolbar.addChild(clearSceneButton);
-  clearSceneButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    // resetScene(scene, components);
-    setDeletionInProgress(false);
-    setDrawingInProgress(true);
-    setDrawingScaffoldingInProgress(false);
-  });
-  clearSceneButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  clearSceneButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  clearSceneButton.domElement.classList.add("hover:bg-slate-300");
+  // const clearSceneButton = new OBC.Button(components);
+  // clearSceneButton.materialIcon = "check_box_outline_blank";
+  // clearSceneButton.tooltip = "Reset Scene";
+  // clearSceneButton.id = "drawing-button";
+  // mainToolbar.addChild(clearSceneButton);
+  // clearSceneButton.onClick.add(() => {
+  //   document.body.style.cursor = "auto";
+  //   // resetScene(scene, components);
+  //   setDeletionInProgress(false);
+  //   setDrawingInProgress(true);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
+  // clearSceneButton.domElement.addEventListener("mouseover", () => {
+  //   setDrawingInProgress(false);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
+  // clearSceneButton.domElement.addEventListener("mouseleave", () => {
+  //   setDrawingInProgress(false);
+  //   setDrawingScaffoldingInProgress(false);
+  // });
+  // clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  // clearSceneButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     setDeletionInProgress(false);
@@ -918,7 +918,7 @@ export const createToolbar = (
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    clearSceneButton,
+    // clearSceneButton,
     testButton,
   ];
 };

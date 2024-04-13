@@ -57,7 +57,8 @@ export async function createScaffoldingShapeIsOutlined(
             child.name === "scaffoldLine" &&
             child.userData.length === length &&
             child.userData.first_point.equals(firstPoint) &&
-            child.userData.last_point.equals(lastPoint)
+            child.userData.last_point.equals(lastPoint) &&
+            child.userData.level.equals(0)
           );
         });
 
@@ -73,7 +74,6 @@ export async function createScaffoldingShapeIsOutlined(
   });
 }
 
-// let scaffoldPlacedPosition = new Set<string>();
 export async function placeScaffoldModelsAlongLine(
   line: THREE.Line,
   scene: THREE.Scene,
@@ -318,7 +318,8 @@ export function generateScaffoldOutline(
         child instanceof THREE.Line &&
         child.name === "scaffoldLine" &&
         child.userData.first_point.equals(firstPoint) &&
-        child.userData.last_point.equals(lastPoint)
+        child.userData.last_point.equals(lastPoint) &&
+        child.userData.level.equals(0)
       );
     });
 
@@ -340,7 +341,6 @@ export function generateScaffoldOutline(
 
 // label that controls how many levels of scaffolding exist
 function attachScaffoldRowLabelChangeHandler(
-  // label: CSS2DObject,
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any,
@@ -350,33 +350,21 @@ function attachScaffoldRowLabelChangeHandler(
   let levels = 0;
 
   const store = useStore();
-  store.updateScaffoldLevel(0);
+  store.updateScaffoldLevel(1);
 
   observeElementAndAddEventListener(
     "add-scaffolding-level",
     "mousedown",
     () => {
-      // Check if there is already scaffolding in the scene
-      if (scaffoldPlacedPosition.size === 0) {
-        console.log(
-          "Cannot add scaffolding level. No scaffolding exists in the scene."
-        );
-        return; // Exit the function if no scaffolding exists
-      }
-
       console.log("add scaffolding level");
       levels++;
       if (levels < 0) {
         store.updateScaffoldLevel(0);
       } else {
-        store.updateScaffoldLevel(levels);
+        store.updateScaffoldLevel(levels + 1);
       }
       console.log("store level", store.level);
-      scene.traverse((child: any) => {
-        if (child.name === "scaffoldLine") {
-          console.error(child);
-        }
-      });
+
       addScaffoldingLevel(
         line,
         scene,
@@ -402,7 +390,7 @@ function attachScaffoldRowLabelChangeHandler(
       if (levels < 0) {
         store.updateScaffoldLevel(0);
       } else {
-        store.updateScaffoldLevel(levels);
+        store.updateScaffoldLevel(levels - 1);
       }
       console.log("store level", store.level);
     }
@@ -415,6 +403,7 @@ function attachScaffoldRowLabelChangeHandler(
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     levels = -1;
+    line = null
     store.updateScaffoldLevel(0);
   });
 }
@@ -462,7 +451,8 @@ function addScaffoldingLevel(
       child.name === "scaffoldLine" &&
       child.userData.length === length &&
       child.userData.first_point.equals(firstPoint) &&
-      child.userData.last_point.equals(lastPoint)
+      child.userData.last_point.equals(lastPoint) &&
+      child.userData.level.equals(level)
     );
   });
   if (!isLineAlreadyPlaced) {
@@ -471,7 +461,7 @@ function addScaffoldingLevel(
       length: length,
       first_point: firstPoint,
       last_point: lastPoint,
-      level: 0,
+      level: level,
     };
     newLine.name = "scaffoldLine";
     scene.add(newLine);
@@ -576,7 +566,7 @@ function removeScaffoldingLevel(
 
       // Check if the position is in the set of placed positions
       if (
-        addScaffoldingPositionIfUnique(position, scaffoldPlacedPosition, 0.0001)
+        !addScaffoldingPositionIfUnique(position, scaffoldPlacedPosition, 0.0001)
       ) {
         // Remove the position from the set
         scaffoldPlacedPosition.delete(positionKey);
