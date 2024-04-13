@@ -128,7 +128,10 @@ export const createModelView = async () => {
   createLighting(scene);
 
   // Grid
-  new CustomGrid(components, new THREE.Color("#FF0000"));
+  const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
+  // @ts-ignore
+  grid._grid.name = "grid"
+  console.log("grid", grid)
 
   // Cube
   const geometry = new THREE.OctahedronGeometry(0.5); // The parameter is the radius of the octahedron
@@ -986,7 +989,7 @@ export const createModelView = async () => {
     generateScaffolding();
   });
 
-  let scaffoldPlacedPosition = new Set<string>();
+  let scaffoldPlacedPosition = new Map<string, THREE.Vector3>();
   async function generateScaffolding() {
     const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(
       1.57,
