@@ -959,6 +959,7 @@ export const createModelView = async () => {
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
+    setDeletionInProgress(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       createScaffoldingShapeIsOutlined(
@@ -998,6 +999,7 @@ export const createModelView = async () => {
     );
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
+        console.error("existing scaffolding lines", child)
         placeScaffoldModelsAlongLine(
           child,
           scene,
@@ -1045,6 +1047,11 @@ export const createModelView = async () => {
           generateScaffoldOutline(child, scene);
         }
       });
+      // scene.traverse((child: any) => {
+      //   if (child.name === "scaffoldLine") {
+      //     console.error(child)
+      //   }
+      // });
       generateScaffolding();
     }
   );
@@ -1218,8 +1225,8 @@ export const createModelView = async () => {
   clearSceneButton.domElement.addEventListener("mousedown", () => {
     resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
-    scaffoldPoints = [];
-    points = [];
+    scaffoldPoints.length = 0;
+    points.length = 0;
   });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
@@ -1230,8 +1237,8 @@ export const createModelView = async () => {
 
     resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
-    scaffoldPoints = [];
-    points = [];
+    scaffoldPoints.length = 0;
+    points.length = 0;
   });
 
   async function generateScaffoldExternalStaircaseModel() {
