@@ -184,7 +184,6 @@
             <div class="flex flex-row gap-1 border-black">
               <div
                 class="btn text-2xl w-1/12"
-                @click="decrement"
                 id="remove-scaffolding-level"
               >
                 -
@@ -200,7 +199,6 @@
               </div>
               <div
                 class="btn text-2xl w-1/12"
-                @click="increment"
                 id="add-scaffolding-level"
               >
                 +
@@ -260,14 +258,6 @@ export default {
     };
   },
   methods: {
-    increment() {
-      this.level++;
-    },
-    decrement() {
-      if (this.level > 1) {
-        this.level--;
-      }
-    },
     toggleDrawer() {
       this.showDrawer = !this.showDrawer;
     },

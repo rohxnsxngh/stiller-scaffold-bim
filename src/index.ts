@@ -39,6 +39,7 @@ import {
   disableOrbitControls,
   hideAllCSS2DObjects,
   observeElementAndAddEventListener,
+  resetScaffolding,
   resetScene,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -127,7 +128,10 @@ export const createModelView = async () => {
   createLighting(scene);
 
   // Grid
-  new CustomGrid(components, new THREE.Color("#FF0000"));
+  const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
+  // @ts-ignore
+  grid._grid.name = "grid";
+  console.log("grid", grid);
 
   // Cube
   const geometry = new THREE.OctahedronGeometry(0.5); // The parameter is the radius of the octahedron
@@ -177,7 +181,7 @@ export const createModelView = async () => {
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    clearSceneButton,
+    // clearSceneButton,
     testButton,
   ] = createToolbar(components, scene);
 
@@ -955,6 +959,7 @@ export const createModelView = async () => {
   });
 
   drawScaffoldButton.domElement.addEventListener("mousedown", () => {
+    setDeletionInProgress(false);
     if (drawingScaffoldingInProgress) {
       // create blueprint on screen after the shape has been outlined by the user
       createScaffoldingShapeIsOutlined(
@@ -985,15 +990,18 @@ export const createModelView = async () => {
     generateScaffolding();
   });
 
-  let scaffoldPlacedPosition = new Set<string>();
+  let scaffoldPlacedPosition = new Map<string, THREE.Vector3>();
   async function generateScaffolding() {
     const [bboxWireframe, scaffoldModeling] = await createScaffoldModel(
       1.57,
       2.0,
       0.73
     );
+    const amountOfScaffoldingLines: any[] = [];
     scene.traverse((child) => {
       if (child instanceof THREE.Line && child.name === "scaffoldLine") {
+        console.error("existing scaffolding lines", child);
+        amountOfScaffoldingLines.push(child);
         placeScaffoldModelsAlongLine(
           child,
           scene,
@@ -1003,6 +1011,7 @@ export const createModelView = async () => {
         );
       }
     });
+    console.log(amountOfScaffoldingLines, amountOfScaffoldingLines.length);
   }
 
   generateScaffoldOutlineButton.domElement.addEventListener("mousedown", () => {
@@ -1041,29 +1050,18 @@ export const createModelView = async () => {
           generateScaffoldOutline(child, scene);
         }
       });
+      // scene.traverse((child: any) => {
+      //   if (child.name === "scaffoldLine") {
+      //     console.error(child)
+      //   }
+      // });
       generateScaffolding();
     }
   );
 
   // reset all scaffolding
   observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
-    const scaffoldingObjectsToRemove: THREE.Object3D<THREE.Object3DEventMap>[] =
-      [];
-    scene.traverse((child) => {
-      if (
-        child.name === "scaffoldLine" ||
-        child.name === "scaffoldingModel" ||
-        child.name === "scaffoldingWireframe" ||
-        child.name === "scaffoldingStackingLabel" ||
-        child.name === "scaffoldingExternalStaircaseModel"
-      ) {
-        scaffoldingObjectsToRemove.push(child);
-      }
-    });
-
-    scaffoldingObjectsToRemove.forEach((scaffold) => {
-      scene.remove(scaffold);
-    });
+    resetScaffolding(scene);
 
     const store = useStore();
     store.updateScaffoldLevel(0);
@@ -1227,18 +1225,28 @@ export const createModelView = async () => {
     });
   });
 
-  clearSceneButton.domElement.addEventListener("mousedown", () => {
-    resetScene(scene, components, shadows, scaffoldPlacedPosition);
+  // clearSceneButton.domElement.addEventListener("mousedown", () => {
+  //   resetScaffolding(scene);
 
-    scaffoldPoints = [];
-    points = [];
-  });
+  //   const store = useStore();
+  //   store.updateScaffoldLevel(0);
+
+  //   resetScene(scene, components, shadows, scaffoldPlacedPosition);
+
+  //   scaffoldPoints.length = 0;
+  //   points.length = 0;
+  // });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    resetScaffolding(scene);
+
+    const store = useStore();
+    store.updateScaffoldLevel(0);
+
     resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
-    scaffoldPoints = [];
-    points = [];
+    scaffoldPoints.length = 0;
+    points.length = 0;
   });
 
   async function generateScaffoldExternalStaircaseModel() {

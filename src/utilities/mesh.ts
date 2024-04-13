@@ -137,10 +137,25 @@ export function createBlueprintFromShapeOutline(
       meshShape.position.y = 0.025;
       meshShape.name = "blueprint";
       meshShape.userData = { shape: shape, blueprintHasBeenUpdated: false };
-      scene.add(meshShape);
+      const isBlueprintAlreadyPlaced = scene.children.some((child) => {
+        return (
+          child.name === "blueprint" &&
+          child.userData.shape.currentPoint.equals(
+            meshShape.userData.shape.currentPoint
+          )
+        );
+      });
+      if (!isBlueprintAlreadyPlaced) {
+        scene.add(meshShape);
+      }
+      scene.traverse((child) => {
+        if (child.name === "blueprint") {
+          console.log("blueprint", child)
+        }
+      })
     }
 
-    points = [];
+    points.length = 0;
 
     return points;
   }
@@ -193,10 +208,25 @@ export function createBlueprintFromMarkup(
         shape: shape,
         blueprintHasBeenUpdated: blueprintUpdatedState,
       };
-      scene.add(meshShape);
+      const isBlueprintAlreadyPlaced = scene.children.some((child) => {
+        return (
+          child.name === "blueprint" &&
+          child.userData.shape.currentPoint.equals(
+            meshShape.userData.shape.currentPoint
+          )
+        );
+      });
+      if (!isBlueprintAlreadyPlaced) {
+        scene.add(meshShape);
+      }
+      scene.traverse((child) => {
+        if (child.name === "blueprint") {
+          console.log("blueprint", child)
+        }
+      })
     }
 
-    points = [];
+    points.length = 0;
 
     return points;
   }
@@ -698,7 +728,7 @@ export function createRoof(
   index: number,
   height: number
 ) {
-  const roofToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = []
+  const roofToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
   // check if duplicate roof exists
   scene.traverse((children) => {
     if (children.name === "roof") {
@@ -709,15 +739,15 @@ export function createRoof(
           child.userData.shape.currentPoint.y
       ) {
         console.log("DUPLICATE ROOF");
-        roofToRemove.push(children)
-        return
+        roofToRemove.push(children);
+        return;
       }
     }
   });
 
   roofToRemove.forEach((roof) => {
-    scene.remove(roof)
-  })
+    scene.remove(roof);
+  });
 
   const rectShape = child.userData.shape;
   // Calculate the midpoint between the two points
@@ -1081,26 +1111,29 @@ export function createShedRoof(
   index: number,
   height: number
 ) {
-  const roofToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = []
+  const roofToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
   // check if duplicate roof exists
   scene.traverse((children) => {
     if (children.name === "shedRoof") {
       if (
-        (child.userData.shape.currentPoint.x === children.userData.shape.curves[0].v1.x ||
-          child.userData.shape.currentPoint.x === children.userData.shape.curves[0].v2.x ||
-          child.userData.shape.currentPoint.y === children.userData.shape.curves[0].v1.y ||
-          child.userData.shape.currentPoint.y === children.userData.shape.curves[0].v2.y)
+        child.userData.shape.currentPoint.x ===
+          children.userData.shape.curves[0].v1.x ||
+        child.userData.shape.currentPoint.x ===
+          children.userData.shape.curves[0].v2.x ||
+        child.userData.shape.currentPoint.y ===
+          children.userData.shape.curves[0].v1.y ||
+        child.userData.shape.currentPoint.y ===
+          children.userData.shape.curves[0].v2.y
       ) {
         console.log("DUPLICATE ROOF");
-        roofToRemove.push(children)
+        roofToRemove.push(children);
       }
     }
   });
 
   roofToRemove.forEach((roof) => {
-    scene.remove(roof)
-  })
-
+    scene.remove(roof);
+  });
 
   let thirdPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
   const rectShape = child.userData.shape;
@@ -1108,7 +1141,8 @@ export function createShedRoof(
     switch (index) {
       case 0:
         thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x + parseFloat(height as unknown as string),
+          rectShape.curves[index].v1.x +
+            parseFloat(height as unknown as string),
           rectShape.curves[index].v1.y
         );
         break;
@@ -1120,7 +1154,8 @@ export function createShedRoof(
         break;
       case 2:
         thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x - parseFloat(height as unknown as string),
+          rectShape.curves[index].v1.x -
+            parseFloat(height as unknown as string),
           rectShape.curves[index].v1.y
         );
         break;
@@ -1141,7 +1176,8 @@ export function createShedRoof(
         break;
       case 1:
         thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x + parseFloat(height as unknown as string),
+          rectShape.curves[index].v1.x +
+            parseFloat(height as unknown as string),
           rectShape.curves[index].v1.y
         );
         break;
@@ -1153,7 +1189,8 @@ export function createShedRoof(
         break;
       case 3:
         thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x - parseFloat(height as unknown as string),
+          rectShape.curves[index].v1.x -
+            parseFloat(height as unknown as string),
           rectShape.curves[index].v1.y
         );
         break;

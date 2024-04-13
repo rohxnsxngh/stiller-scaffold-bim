@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import {
+  addScaffoldingPositionIfUnique,
   isVectorEqual,
   measureLineLength,
   observeElementAndAddEventListener,
@@ -49,19 +50,36 @@ export async function createScaffoldingShapeIsOutlined(
           last_point: lastPoint,
           level: 0,
         };
-        scene.add(line);
+        // Check if a line with the same properties already exists in the scene
+        const isLineAlreadyPlaced = scene.children.some((child) => {
+          return (
+            child instanceof THREE.Line &&
+            child.name === "scaffoldLine" &&
+            child.userData.length === length &&
+            child.userData.first_point.equals(firstPoint) &&
+            child.userData.last_point.equals(lastPoint) &&
+            child.userData.level.equals(0)
+          );
+        });
+
+        if (!isLineAlreadyPlaced) {
+          scene.add(line);
+        } else {
+          console.log(
+            "A line with the same properties already exists in the scene."
+          );
+        }
       }
     }
   });
 }
 
-// let scaffoldPlacedPosition = new Set<string>();
 export async function placeScaffoldModelsAlongLine(
   line: THREE.Line,
   scene: THREE.Scene,
   scaffoldModeling: any,
   bboxWireframe: any,
-  scaffoldPlacedPosition: Set<string>
+  scaffoldPlacedPosition: Map<string, THREE.Vector3>
 ) {
   const lineLength = line.userData.length;
   const startPoint = line.userData.first_point;
@@ -77,7 +95,9 @@ export async function placeScaffoldModelsAlongLine(
       // Convert the position to a string key for the set
       const positionKey = `${position.x},${position.y},${position.z}`;
 
-      if (!scaffoldPlacedPosition.has(positionKey)) {
+      if (
+        addScaffoldingPositionIfUnique(position, scaffoldPlacedPosition, 0.0001)
+      ) {
         // Instantiate the GLB model
         const modelInstance = SkeletonUtils.clone(scaffoldModeling);
         const boundBoxInstance = bboxWireframe.clone();
@@ -124,7 +144,7 @@ export async function placeScaffoldModelsAlongLine(
         // scene.add(boundBoxInstance);
 
         // Add the position to the set of placed positions
-        scaffoldPlacedPosition.add(positionKey);
+        scaffoldPlacedPosition.set(positionKey, position);
 
         // Log the size of the set after all models have been placed
         console.log(
@@ -298,7 +318,8 @@ export function generateScaffoldOutline(
         child instanceof THREE.Line &&
         child.name === "scaffoldLine" &&
         child.userData.first_point.equals(firstPoint) &&
-        child.userData.last_point.equals(lastPoint)
+        child.userData.last_point.equals(lastPoint) &&
+        child.userData.level.equals(0)
       );
     });
 
@@ -320,20 +341,39 @@ export function generateScaffoldOutline(
 
 // label that controls how many levels of scaffolding exist
 function attachScaffoldRowLabelChangeHandler(
-  // label: CSS2DObject,
   scene: THREE.Scene,
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any,
   line: any,
-  scaffoldPlacedPosition: Set<string>
+  scaffoldPlacedPosition: Map<string, THREE.Vector3>
 ) {
   let levels = 0;
+
+  const store = useStore();
+  store.updateScaffoldLevel(1);
+
   observeElementAndAddEventListener(
     "add-scaffolding-level",
     "mousedown",
     () => {
       console.log("add scaffolding level");
+
+      // Check if there is already scaffolding in the scene
+      if (scaffoldPlacedPosition.size === 0) {
+        console.log(
+          "Cannot add scaffolding level. No scaffolding exists in the scene."
+        );
+        return; // Exit the function if no scaffolding exists
+      }
+
       levels++;
+      if (levels < 0) {
+        store.updateScaffoldLevel(0);
+      } else {
+        store.updateScaffoldLevel(levels + 1);
+      }
+      console.log("store level", store.level);
+
       addScaffoldingLevel(
         line,
         scene,
@@ -356,12 +396,25 @@ function attachScaffoldRowLabelChangeHandler(
       if (levels < 0) {
         levels = 0;
       }
+      if (levels < 0) {
+        store.updateScaffoldLevel(0);
+      } else if (levels > 1) {
+        store.updateScaffoldLevel(levels - 1);
+      }
+      console.log("store level", store.level);
     }
   );
 
   observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
-    levels = -1
-  })
+    levels = -1;
+    store.updateScaffoldLevel(0);
+  });
+
+  observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    levels = -1;
+    line = null;
+    store.updateScaffoldLevel(0);
+  });
 }
 
 // add a level of scaffolding to the selected side
@@ -371,9 +424,9 @@ function addScaffoldingLevel(
   scaffold: THREE.Object3D,
   scaffoldBoundingBox: any,
   level: number,
-  scaffoldPlacedPosition: Set<string>
+  scaffoldPlacedPosition: Map<string, THREE.Vector3>
 ) {
-  console.log("add scaffolding level", level)
+  console.log("add scaffolding level", level);
   const lineLength = line.userData.length;
   const startPoint = new THREE.Vector3(
     line.userData.first_point.x,
@@ -399,13 +452,29 @@ function addScaffoldingLevel(
     endPoint,
     startPoint,
   ]);
-  newLine.userData = {
-    length: length,
-    first_point: firstPoint,
-    last_point: lastPoint,
-    level: level,
-  };
-  scene.add(newLine);
+
+  // Check if a line with the same properties already exists in the scene
+  const isLineAlreadyPlaced = scene.children.some((child) => {
+    return (
+      child instanceof THREE.Line &&
+      child.name === "scaffoldLine" &&
+      child.userData.length === length &&
+      child.userData.first_point.equals(firstPoint) &&
+      child.userData.last_point.equals(lastPoint) &&
+      child.userData.level.equals(level)
+    );
+  });
+  if (!isLineAlreadyPlaced) {
+    // Add userData to the line
+    newLine.userData = {
+      length: length,
+      first_point: firstPoint,
+      last_point: lastPoint,
+      level: level,
+    };
+    newLine.name = "scaffoldLine";
+    scene.add(newLine);
+  }
 
   try {
     for (let i = 0; i < numSegments; i++) {
@@ -416,7 +485,9 @@ function addScaffoldingLevel(
       // Convert the position to a string key for the set
       const positionKey = `${position.x},${position.y},${position.z}`;
 
-      if (!scaffoldPlacedPosition.has(positionKey)) {
+      if (
+        addScaffoldingPositionIfUnique(position, scaffoldPlacedPosition, 0.0001)
+      ) {
         // Instantiate the GLB model
         const modelInstance = SkeletonUtils.clone(scaffold);
         const boundBoxInstance = scaffoldBoundingBox.clone();
@@ -458,7 +529,7 @@ function addScaffoldingLevel(
         // scene.add(boundBoxInstance);
 
         // Add the position to the set of placed positions
-        scaffoldPlacedPosition.add(positionKey);
+        scaffoldPlacedPosition.set(positionKey, position);
       } else {
         console.log("there are already children at this position");
       }
@@ -473,7 +544,7 @@ function removeScaffoldingLevel(
   line: any,
   scene: THREE.Scene,
   level: number,
-  scaffoldPlacedPosition: Set<string>
+  scaffoldPlacedPosition: Map<string, THREE.Vector3>
 ) {
   const lineLength = line.userData.length;
   const lineLevel = level;
@@ -503,7 +574,13 @@ function removeScaffoldingLevel(
       const positionKey = `${position.x},${position.y},${position.z}`;
 
       // Check if the position is in the set of placed positions
-      if (scaffoldPlacedPosition.has(positionKey)) {
+      if (
+        !addScaffoldingPositionIfUnique(
+          position,
+          scaffoldPlacedPosition,
+          0.0001
+        )
+      ) {
         // Remove the position from the set
         scaffoldPlacedPosition.delete(positionKey);
 

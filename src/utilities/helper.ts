@@ -121,7 +121,7 @@ export function resetScene(
   scene: THREE.Scene,
   components: OBC.Components,
   shadows: OBC.ShadowDropper,
-  scaffoldPlacedPosition: Set<string>
+  scaffoldPlacedPosition: Map<string, THREE.Vector3> 
 ) {
   const objectsToRemove: any = [];
   const objectsToRemoveUUID: any = [];
@@ -139,14 +139,15 @@ export function resetScene(
         child instanceof THREE.Line) &&
       !(child.geometry instanceof THREE.PlaneGeometry)
     ) {
-      console.log(child);
       if (child.geometry) child.geometry.dispose();
       if (child.material.map) child.material.map.dispose();
       objectsToRemove.push(child);
     }
     if (
+      child.name === "scaffoldLine" ||
       child.name === "scaffoldingModel" ||
-      child.name === "scaffoldingInternalStaircaseModel" ||
+      child.name === "scaffoldingWireframe" ||
+      child.name === "scaffoldingStackingLabel" ||
       child.name === "scaffoldingExternalStaircaseModel"
     ) {
       objectsToRemove.push(child);
@@ -154,7 +155,7 @@ export function resetScene(
     if (child.name === "scaffoldingSheet") {
       objectsToRemove.push(child);
     }
-    if (child.name === "rectanglePlane") {
+    if (child.name === "rectanglePlane" || child.name === "blueprint") {
       objectsToRemove.push(child);
     }
     if (child.name === "markupGroup") {
@@ -443,6 +444,15 @@ export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {
   );
 }
 
+// const TOLERANCE = 0.0001; // Adjust this value based on your needs
+export function areVectorsEqual(v1: THREE.Vector3, v2: THREE.Vector3, tolerance: number): boolean {
+  return (
+     Math.abs(v1.x - v2.x) <= tolerance &&
+     Math.abs(v1.y - v2.y) <= tolerance &&
+     Math.abs(v1.z - v2.z) <= tolerance
+  );
+ }
+
 export function areAnyTwoAxesEqual(
   v1: THREE.Vector3,
   v2: THREE.Vector3
@@ -477,3 +487,36 @@ export function areAnyTwoAxesEqualWithEpsilon(
     (Math.abs(v1.y - v2.y) < epsilon && Math.abs(v1.z - v2.z) < epsilon)
   );
 }
+
+export function resetScaffolding(scene: THREE.Scene) {
+  const scaffoldingObjectsToRemove: THREE.Object3D<THREE.Object3DEventMap>[] =
+    [];
+  scene.traverse((child: any) => {
+    if (
+      child.name === "scaffoldLine" ||
+      child.name === "scaffoldingModel" ||
+      child.name === "scaffoldingWireframe" ||
+      child.name === "scaffoldingStackingLabel" ||
+      child.name === "scaffoldingExternalStaircaseModel"
+    ) {
+      scaffoldingObjectsToRemove.push(child);
+    }
+  });
+
+  scaffoldingObjectsToRemove.forEach((scaffold) => {
+    scene.remove(scaffold);
+  });
+}
+
+export function addScaffoldingPositionIfUnique(position: THREE.Vector3, map: Map<string, THREE.Vector3>, tolerance: number): boolean {
+  for (const existingPosition of map.values()) {
+     if (areVectorsEqual(position, existingPosition, tolerance)) {
+       // The position is a duplicate within the tolerance
+       return false;
+     }
+  }
+  // The position is unique, add it to the map
+  const positionKey = `${position.x},${position.y},${position.z}`;
+  map.set(positionKey, position);
+  return true;
+ }
