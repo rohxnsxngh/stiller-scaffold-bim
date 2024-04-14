@@ -15,15 +15,9 @@ import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import {
   setDeletionInProgress,
-  setDeletionScaffoldingColumnInProgress,
-  setDeletionScaffoldingRowInProgress,
   setDrawingInProgress,
   setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
-  setIsDrawingBlueprint,
-  setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
-  setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
-  setRotatingRoofInProgress,
   setStates,
 } from "./state";
 
@@ -56,6 +50,11 @@ export const createToolbar = (
   sideToolBar.domElement.addEventListener("mouseover", () => {
     setStates();
   });
+  sideToolBar.domElement.addEventListener("mouseleave", () => {
+    if (startDrawing) {
+      setDrawingInProgress(true);
+    }
+  })
   sideToolBar.domElement.classList.remove("bg-ifcjs-100");
   sideToolBar.domElement.classList.add("bg-glass");
   sideToolBar.domElement.classList.add("hover:bg-[#111115]");
@@ -473,13 +472,13 @@ export const createToolbar = (
     blueprintButton.closeMenus();
     roofButton.closeMenus();
     extrusionButton.closeMenus();
-    setStates()
+    // setStates()
   });
   scaffoldButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    // setStates()
   });
   scaffoldButton.domElement.addEventListener("mouseleave", () => {
-    setStates()
+    // setStates()
   });
   scaffoldButton.domElement.addEventListener("mouseenter", () => {
     setStates()
@@ -496,13 +495,15 @@ export const createToolbar = (
   drawScaffoldButton.onClick.add(() => {
     startDrawing = true;
     document.body.style.cursor = "auto";
+    removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(true);
+    setDrawingScaffoldingInProgress(false);
+    setDrawingInProgressSwitch(false);
   });
-  drawScaffoldButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-  });
+  // drawScaffoldButton.domElement.addEventListener("mouseover", () => {
+  //   setDrawingInProgress(false);
+  // });
   drawScaffoldButton.domElement.addEventListener("mouseleave", () => {
     if (startDrawing) {
       document.body.style.cursor = "auto";
@@ -787,7 +788,7 @@ export const createToolbar = (
   observeElementAndAddEventListener("startDrawingPolygon", "mouseleave", () => {
     if (startDrawing) {
       console.log("polygon drawing start");
-      setStates({drawingInProgress: true})
+      setStates({drawingInProgress: true, drawingInProgressSwitch: true})
     }
   });
 

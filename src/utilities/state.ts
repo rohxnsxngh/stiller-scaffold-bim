@@ -65,6 +65,7 @@ export function setStates(
     replaceScaffoldingColumnWithExternalStaircaseInProgress?: boolean;
     replaceScaffoldingColumnWithInternalStaircaseInProgress?: boolean;
     rotatingRoofInProgress?: boolean;
+    drawingInProgressSwitch?: boolean;
   } = {}
 ) {
   // Default all states to false if not specified
@@ -77,6 +78,7 @@ export function setStates(
     replaceScaffoldingColumnWithExternalStaircaseInProgress: false,
     replaceScaffoldingColumnWithInternalStaircaseInProgress: false,
     rotatingRoofInProgress: false,
+    drawingInProgressSwitch: false
   };
 
   // Merge the default states with the provided states
@@ -98,4 +100,5 @@ export function setStates(
     mergedStates.replaceScaffoldingColumnWithInternalStaircaseInProgress
   );
   setRotatingRoofInProgress(mergedStates.rotatingRoofInProgress);
+  setDrawingInProgressSwitch(mergedStates.drawingInProgressSwitch);
 }
