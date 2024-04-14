@@ -555,7 +555,7 @@ function attachLabelChangeHandler(
   //     handleValueChange(labelElement.textContent);
   //     blurTriggered = false;
   //   }
-  // });
+  // }, { passive: false });
 
   function handleValueChange(newValue: string | null) {
     if (oldValue !== newValue) {
