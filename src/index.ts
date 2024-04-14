@@ -214,16 +214,32 @@ export const createModelView = async () => {
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground"
         ) {
-          if (lastHighlightedObject) {
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).color.setHex(lastHighlightedObjectColor);
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).needsUpdate = true;
+          if (lastHighlightedObject && lastHighlightedObject.material) {
+            // Check if the material is one of the specified types
+            if (
+              lastHighlightedObject.material instanceof
+                THREE.MeshBasicMaterial ||
+              lastHighlightedObject.material instanceof
+                THREE.MeshStandardMaterial ||
+              lastHighlightedObject.material instanceof THREE.MeshPhongMaterial
+            ) {
+              (
+                lastHighlightedObject.material as
+                  | THREE.MeshBasicMaterial
+                  | THREE.MeshStandardMaterial
+                  | THREE.MeshPhongMaterial
+              ).color.setHex(lastHighlightedObjectColor);
+              (
+                lastHighlightedObject.material as
+                  | THREE.MeshBasicMaterial
+                  | THREE.MeshStandardMaterial
+                  | THREE.MeshPhongMaterial
+              ).needsUpdate = true;
+            }
             lastHighlightedObject = null;
           }
           if (
+            intersectedObject.material instanceof THREE.MeshBasicMaterial ||
             intersectedObject.material instanceof THREE.MeshStandardMaterial ||
             intersectedObject.material instanceof THREE.MeshPhongMaterial
           ) {
@@ -239,13 +255,29 @@ export const createModelView = async () => {
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name === "ground"
         ) {
-          if (lastHighlightedObject) {
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).color.setHex(lastHighlightedObjectColor);
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).needsUpdate = true;
+          if (lastHighlightedObject && lastHighlightedObject.material) {
+            // Ensure the material is an instance of THREE.MeshStandardMaterial before casting
+            // Check if the material is one of the specified types
+            if (
+              lastHighlightedObject.material instanceof
+                THREE.MeshBasicMaterial ||
+              lastHighlightedObject.material instanceof
+                THREE.MeshStandardMaterial ||
+              lastHighlightedObject.material instanceof THREE.MeshPhongMaterial
+            ) {
+              (
+                lastHighlightedObject.material as
+                  | THREE.MeshBasicMaterial
+                  | THREE.MeshStandardMaterial
+                  | THREE.MeshPhongMaterial
+              ).color.setHex(lastHighlightedObjectColor);
+              (
+                lastHighlightedObject.material as
+                  | THREE.MeshBasicMaterial
+                  | THREE.MeshStandardMaterial
+                  | THREE.MeshPhongMaterial
+              ).needsUpdate = true;
+            }
             lastHighlightedObject = null;
           }
         }
@@ -261,7 +293,8 @@ export const createModelView = async () => {
         editingBlueprint ||
         rotatingRoofInProgress ||
         deletionScaffoldingColumnInProgress) &&
-      !drawingInProgress && !deletionInProgress
+      !drawingInProgress &&
+      !deletionInProgress
     ) {
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
