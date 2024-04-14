@@ -150,9 +150,9 @@ export function createBlueprintFromShapeOutline(
       }
       scene.traverse((child) => {
         if (child.name === "blueprint") {
-          console.log("blueprint", child)
+          console.log("blueprint", child);
         }
-      })
+      });
     }
 
     points.length = 0;
@@ -166,7 +166,7 @@ export function createBlueprintFromMarkup(
   blueprintUpdatedState: boolean,
   scene: THREE.Scene
 ) {
-  const rectanglePoints = points
+  const rectanglePoints = points;
   if (
     points[0].x === points[points.length - 1].x &&
     points[0].z === points[points.length - 1].z
@@ -208,7 +208,7 @@ export function createBlueprintFromMarkup(
       meshShape.userData = {
         shape: shape,
         blueprintHasBeenUpdated: blueprintUpdatedState,
-        rectanglePoints: rectanglePoints
+        rectanglePoints: rectanglePoints,
       };
       const isBlueprintAlreadyPlaced = scene.children.some((child) => {
         return (
@@ -223,9 +223,9 @@ export function createBlueprintFromMarkup(
       }
       scene.traverse((child) => {
         if (child.name === "blueprint") {
-          console.log("blueprint", child)
+          console.log("blueprint", child);
         }
-      })
+      });
     }
 
     points.length = 0;
@@ -323,13 +323,23 @@ function attachExtrusionLabelChangeHandler(
   });
 
   labelElement.addEventListener("blur", () => {
-    const newValue = labelElement.textContent;
+    handleValueChange(labelElement.textContent);
+  });
+
+  labelElement.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevents the default action of the Enter key
+      handleValueChange(labelElement.textContent);
+    }
+  });
+
+  function handleValueChange(newValue: string | null) {
     if (oldValue !== newValue) {
       const store = useStore();
       store.updateDepth(parseFloat(newValue as unknown as string));
       updateExtrusionGeometry(newValue, meshExtrude, shape, label);
     }
-  });
+  }
 }
 
 function updateExtrusionGeometry(
@@ -512,10 +522,8 @@ function attachLabelChangeHandler(
 
   labelElement.addEventListener("mouseenter", () => {
     document.body.style.cursor = "grab";
-    // setDeletionInProgress(false);
     setDrawingInProgress(false);
     setIsDrawingBlueprint(false);
-    // setDrawingScaffoldingInProgress(false);
   });
 
   labelElement.addEventListener("mouseleave", () => {
@@ -537,7 +545,19 @@ function attachLabelChangeHandler(
   });
 
   labelElement.addEventListener("blur", () => {
-    const newValue = labelElement.textContent;
+    handleValueChange(labelElement.textContent);
+    blurTriggered = false;
+  });
+
+  // labelElement.addEventListener("keydown", (event) => {
+  //   if (event.key === "Enter") {
+  //     event.preventDefault(); // Prevents the default action of the Enter key
+  //     handleValueChange(labelElement.textContent);
+  //     blurTriggered = false;
+  //   }
+  // }, { passive: false });
+
+  function handleValueChange(newValue: string | null) {
     if (oldValue !== newValue) {
       // create new plane based on inputs
       const newRectangleVertices = updateRectangleBlueprintGeometry(
@@ -555,7 +575,7 @@ function attachLabelChangeHandler(
 
       return currentLabels;
     }
-  });
+  }
 }
 
 // cast point for top view rectangle tool
@@ -939,7 +959,17 @@ function attachRoofLabelChangeHandler(
   });
 
   labelElement.addEventListener("blur", () => {
-    const newValue = labelElement.textContent;
+    handleValueChange(labelElement.textContent);
+  });
+
+  labelElement.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevents the default action of the Enter key
+      handleValueChange(labelElement.textContent);
+    }
+  });
+
+  function handleValueChange(newValue: string | null) {
     if (oldValue !== newValue) {
       console.log("values do not match");
       const store = useStore();
@@ -958,7 +988,7 @@ function attachRoofLabelChangeHandler(
         label
       );
     }
-  });
+  }
 }
 
 function updateRoofGeometry(
@@ -1346,7 +1376,17 @@ function attachShedRoofLabelChangeHandler(
   });
 
   labelElement.addEventListener("blur", () => {
-    const newValue = labelElement.textContent;
+    handleValueChange(labelElement.textContent);
+  });
+
+  labelElement.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevents the default action of the Enter key
+      handleValueChange(labelElement.textContent);
+    }
+  });
+
+  function handleValueChange(newValue: string | null) {
     if (oldValue !== newValue) {
       const store = useStore();
       store.updateShedRoofHeight(parseFloat(newValue as unknown as string));
@@ -1364,7 +1404,7 @@ function attachShedRoofLabelChangeHandler(
         label
       );
     }
-  });
+  }
 }
 
 function updateShedRoofGeometry(

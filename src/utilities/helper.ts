@@ -211,6 +211,7 @@ export function disableOrbitControls(controls: any) {
 // delete an object when raycast intersects with object
 // TODO: make this method more efficient and more inclusive
 export function deleteObject(object: any, scene: THREE.Scene) {
+  hideAllCSS2DObjects(scene)
   console.warn("OBJECT TO BE DELETED", object);
   // special instance for dealing with blueprints and shaderMaterials
   if (object.name === "blueprint") {
