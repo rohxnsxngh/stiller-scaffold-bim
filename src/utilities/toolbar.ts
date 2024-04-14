@@ -537,7 +537,7 @@ export const createToolbar = (
   testButton.materialIcon = "quiz";
   testButton.tooltip = "Test";
   testButton.id = "blueprint-button";
-  sideToolBar.addChild(testButton);
+  // sideToolBar.addChild(testButton);
   testButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     roofButton.closeMenus();
