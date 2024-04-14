@@ -54,7 +54,7 @@ export const createToolbar = (
     if (startDrawing) {
       setDrawingInProgress(true);
     }
-  })
+  });
   sideToolBar.domElement.classList.remove("bg-ifcjs-100");
   sideToolBar.domElement.classList.add("bg-glass");
   sideToolBar.domElement.classList.add("hover:bg-[#111115]");
@@ -252,19 +252,19 @@ export const createToolbar = (
   });
 
   observeElementAndAddEventListener("delete-object", "mouseover", () => {
-    setStates()
+    setStates();
   });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
-    setStates()
+    setStates();
   });
 
   observeElementAndAddEventListener("reset-scene", "mouseover", () => {
-    setStates()
+    setStates();
   });
 
   observeElementAndAddEventListener("reset-scene", "mouseleave", () => {
-    setStates()
+    setStates();
   });
 
   //Solidify Blueprint
@@ -274,75 +274,28 @@ export const createToolbar = (
   blueprintButton.id = "blueprint-button";
   sideToolBar.addChild(blueprintButton);
   blueprintButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     extrusionButton.closeMenus();
-    setStates()
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setStates();
   });
   blueprintButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    setStates();
   });
   blueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("create-blueprint", "mousedown", () => {
-    document.body.style.cursor = "auto";
-    setStates()
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setStates();
   });
 
   observeElementAndAddEventListener("create-blueprint", "mouseover", () => {
-    setStates()
+    setStates();
   });
-
-  // create blueprint from outline
-  // const editBlueprintButton = new OBC.Button(components, {
-  //   materialIconName: "category",
-  //   name: "Edit Blueprint",
-  //   closeOnClick: true,
-  // });
-  // editBlueprintButton.id = "create-blueprint-button";
-  // sideToolBar.addChild(editBlueprintButton);
-  // editBlueprintButton.onClick.add(() => {
-  //   document.body.style.cursor = "auto";
-  //   setEditingBlueprint(true);
-  //   setDrawingInProgress(false);
-  //   setDeletionInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  //   cameraTopView(gsap, components.camera);
-  //   cameraDisableOrbitalFunctionality(gsap, components.camera);
-  // });
-  // editBlueprintButton.domElement.addEventListener("mouseover", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // blueprintButton.addChild(editBlueprintButton);
-  // editBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // editBlueprintButton.domElement.classList.add("hover:bg-slate-300");
-
-  // move blueprint
-  // const moveBlueprintButton = new OBC.Button(components, {
-  //   materialIconName: "open_with",
-  //   name: "Move Blueprint",
-  //   closeOnClick: true,
-  // });
-  // moveBlueprintButton.id = "move-blueprint-button";
-  // sideToolBar.addChild(moveBlueprintButton);
-  // moveBlueprintButton.onClick.add(() => {
-  //   document.body.style.cursor = "grab";
-  //   setDrawingInProgress(false);
-  //   setDeletionInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  //   cameraTopView(gsap, components.camera);
-  //   cameraDisableOrbitalFunctionality(gsap, components.camera);
-  // });
-  // moveBlueprintButton.domElement.addEventListener("mouseover", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // blueprintButton.addChild(moveBlueprintButton);
-  // moveBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // moveBlueprintButton.domElement.classList.add("hover:bg-slate-300");
 
   // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
@@ -355,10 +308,10 @@ export const createToolbar = (
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     document.body.style.cursor = "auto";
-    setStates()
+    setStates();
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    setStates();
   });
   extrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
   extrusionButton.domElement.classList.add("hover:bg-slate-300");
@@ -370,7 +323,7 @@ export const createToolbar = (
   });
   createExtrusionButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setStates()
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   extrusionButton.addChild(createExtrusionButton);
@@ -384,7 +337,7 @@ export const createToolbar = (
   });
   createEditExtrusionButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setStates()
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   extrusionButton.addChild(createEditExtrusionButton);
@@ -403,10 +356,10 @@ export const createToolbar = (
     extrusionButton.closeMenus();
     scaffoldButton.closeMenus();
     document.body.style.cursor = "auto";
-    setStates()
+    setStates();
   });
   roofButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    setStates();
   });
   roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofButton.domElement.classList.add("hover:bg-slate-300");
@@ -418,11 +371,11 @@ export const createToolbar = (
   });
   createGableRoofButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setStates()
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   createGableRoofButton.domElement.addEventListener("mouseleave", () => {
-    setStates({drawingInProgress: true})
+    setStates({ drawingInProgress: true });
   });
   roofButton.addChild(createGableRoofButton);
   createGableRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
@@ -435,33 +388,15 @@ export const createToolbar = (
   });
   createShedRoofButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setStates()
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   createShedRoofButton.domElement.addEventListener("mouseleave", () => {
-    setStates({drawingInProgress: true})
+    setStates({ drawingInProgress: true });
   });
   roofButton.addChild(createShedRoofButton);
   createShedRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
   createShedRoofButton.domElement.classList.add("hover:bg-slate-300");
-
-  // rotate roof button
-  // const rotateRoofOrientationButton = new OBC.Button(components, {
-  //   materialIconName: "360",
-  //   name: "Rotate Roof",
-  //   closeOnClick: true,
-  // });
-  // rotateRoofOrientationButton.onClick.add(() => {
-  //   document.body.style.cursor = "crosshair";
-  //   setDrawingInProgress(false);
-  //   cameraDisableOrbitalFunctionality(gsap, components.camera);
-  // });
-  // rotateRoofOrientationButton.domElement.addEventListener("mouseleave", () => {
-  //   setDrawingInProgress(true);
-  // });
-  // roofButton.addChild(rotateRoofOrientationButton);
-  // roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // roofButton.domElement.classList.add("hover:bg-slate-300");
 
   const scaffoldButton = new OBC.Button(components);
   scaffoldButton.materialIcon = "foundation";
@@ -481,7 +416,7 @@ export const createToolbar = (
     // setStates()
   });
   scaffoldButton.domElement.addEventListener("mouseenter", () => {
-    setStates()
+    setStates();
   });
   scaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldButton.domElement.classList.add("hover:bg-slate-300");
@@ -545,15 +480,15 @@ export const createToolbar = (
   });
   generateScaffoldOutlineButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    setStates()
+    setStates();
   });
   generateScaffoldOutlineButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    setStates();
   });
   generateScaffoldOutlineButton.domElement.addEventListener(
     "mouseleave",
     () => {
-      setStates()
+      setStates();
     }
   );
   scaffoldButton.addChild(generateScaffoldOutlineButton);
@@ -564,7 +499,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
     document.body.style.cursor = "auto";
-    setStates()
+    setStates();
   });
 
   // generate scaffolding
@@ -575,13 +510,13 @@ export const createToolbar = (
   });
   generateScaffoldButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    setStates()
+    setStates();
   });
   generateScaffoldButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    setStates();
   });
   generateScaffoldButton.domElement.addEventListener("mouseleave", () => {
-    setStates()
+    setStates();
   });
   scaffoldButton.addChild(generateScaffoldButton);
   generateScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
@@ -612,10 +547,10 @@ export const createToolbar = (
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     extrusionButton.closeMenus();
-    setStates()
+    setStates();
   });
   testButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    setStates();
   });
   testButton.domElement.classList.remove("hover:bg-ifcjs-200");
   testButton.domElement.classList.add("hover:bg-slate-300");
@@ -645,10 +580,10 @@ export const createToolbar = (
   deleteObjectButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
-    setStates({deletionInProgress: true})
+    setStates({ deletionInProgress: true });
   });
   deleteObjectButton.domElement.addEventListener("mouseover", () => {
-    setStates()
+    setStates();
   });
   deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
   deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
@@ -689,15 +624,15 @@ export const createToolbar = (
   drawerMenuButton.id = "menu-button";
   drawerToolBar.addChild(drawerMenuButton);
   drawerMenuButton.onClick.add(() => {
-    setStates()
+    setStates();
     drawer.visible = !drawer.visible;
   });
   drawerMenuButton.domElement.addEventListener("mouseover", () => {
     removeHighlightMesh(scene);
-    setStates()
+    setStates();
   });
   drawerMenuButton.domElement.addEventListener("mouseleave", () => {
-    setStates()
+    setStates();
   });
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawerMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -773,7 +708,7 @@ export const createToolbar = (
       startDrawing = false;
       removeHighlightMesh(scene);
       cameraTopView(gsap, components.camera);
-      setStates()
+      setStates();
       cameraDisableOrbitalFunctionality(gsap, components.camera);
     }
   );
@@ -782,13 +717,13 @@ export const createToolbar = (
     startDrawing = true;
     console.log("draw polygon");
     document.body.style.cursor = "auto";
-    setStates()
+    setStates();
   });
 
   observeElementAndAddEventListener("startDrawingPolygon", "mouseleave", () => {
     if (startDrawing) {
       console.log("polygon drawing start");
-      setStates({drawingInProgress: true, drawingInProgressSwitch: true})
+      setStates({ drawingInProgress: true, drawingInProgressSwitch: true });
     }
   });
 
