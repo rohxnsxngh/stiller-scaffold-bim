@@ -15,15 +15,10 @@ import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import {
   setDeletionInProgress,
-  setDeletionScaffoldingColumnInProgress,
-  setDeletionScaffoldingRowInProgress,
   setDrawingInProgress,
   setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
-  setIsDrawingBlueprint,
-  setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
-  setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
-  setRotatingRoofInProgress,
+  setStates,
 } from "./state";
 
 export const createToolbar = (
@@ -39,23 +34,26 @@ export const createToolbar = (
   mainWindow.domElement.style.width = "20rem";
   mainWindow.domElement.style.height = "20rem";
   // main tool bar
-  const mainToolbar = new OBC.Toolbar(components);
-  mainToolbar.position = "bottom";
-  components.ui.addToolbar(mainToolbar);
-  mainToolbar.domElement.addEventListener("mousedown", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  mainToolbar.domElement.classList.remove("bg-ifcjs-100");
-  mainToolbar.domElement.classList.add("bg-glass");
-  mainToolbar.domElement.classList.add("hover:bg-[#111115]");
+  // const mainToolbar = new OBC.Toolbar(components);
+  // mainToolbar.position = "bottom";
+  // components.ui.addToolbar(mainToolbar);
+  // mainToolbar.domElement.addEventListener("mousedown", () => {
+  //   setStates()
+  // });
+  // mainToolbar.domElement.classList.remove("bg-ifcjs-100");
+  // mainToolbar.domElement.classList.add("bg-glass");
+  // mainToolbar.domElement.classList.add("hover:bg-[#111115]");
   // side tool bar
   const sideToolBar = new OBC.Toolbar(components);
   sideToolBar.position = "right";
   components.ui.addToolbar(sideToolBar);
   sideToolBar.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
+  });
+  sideToolBar.domElement.addEventListener("mouseleave", () => {
+    if (startDrawing) {
+      setDrawingInProgress(true);
+    }
   });
   sideToolBar.domElement.classList.remove("bg-ifcjs-100");
   sideToolBar.domElement.classList.add("bg-glass");
@@ -68,10 +66,6 @@ export const createToolbar = (
   topToolBar.domElement.style.position = "fixed";
   topToolBar.domElement.style.top = "20px";
   topToolBar.domElement.style.right = "100px";
-  // topToolBar.domElement.addEventListener("mouseover", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
   topToolBar.domElement.classList.remove("bg-ifcjs-100");
   topToolBar.domElement.classList.add("bg-[#111115]");
 
@@ -122,8 +116,7 @@ export const createToolbar = (
   blueprintMenuButton.id = "blueprint-button";
   topToolBar.addChild(blueprintMenuButton);
   blueprintMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
     if (titleElement) {
       titleElement.textContent = "Plantegning og bygg";
     }
@@ -131,8 +124,7 @@ export const createToolbar = (
     window.setActiveSection("blueprint");
   });
   blueprintMenuButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -143,7 +135,7 @@ export const createToolbar = (
   roofMenuButton.id = "roof-button";
   topToolBar.addChild(roofMenuButton);
   roofMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
+    setStates();
     if (titleElement) {
       titleElement.textContent = "Tak";
     }
@@ -159,7 +151,7 @@ export const createToolbar = (
   scaffoldMenuButton.id = "scaffold-button";
   topToolBar.addChild(scaffoldMenuButton);
   scaffoldMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
+    setStates();
     if (titleElement) {
       titleElement.textContent = "Stillas";
     }
@@ -175,7 +167,7 @@ export const createToolbar = (
   suppliesMenuButton.id = "supplies-button";
   topToolBar.addChild(suppliesMenuButton);
   suppliesMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
+    setStates();
     if (titleElement) {
       titleElement.textContent = "Tillegg";
     }
@@ -191,7 +183,7 @@ export const createToolbar = (
   orderMenuButton.id = "supplies-button";
   topToolBar.addChild(orderMenuButton);
   orderMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
+    setStates();
     if (drawer.visible) {
       const modalElement = document.getElementById("my_modal_1");
       if (modalElement && modalElement instanceof HTMLDialogElement) {
@@ -208,176 +200,71 @@ export const createToolbar = (
 
   console.log(components.camera);
 
-  // Move camera to top view button
-  const topViewButton = new OBC.Button(components);
-  topViewButton.materialIcon = "crop_free";
-  topViewButton.tooltip = "Draw Blueprint";
-  topViewButton.id = "top-view-button";
-  mainToolbar.addChild(topViewButton);
-  topViewButton.onClick.add(() => {
-    removeHighlightMesh(scene);
-    cameraTopView(gsap, components.camera);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  topViewButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  topViewButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  topViewButton.domElement.classList.add("hover:bg-slate-300");
-
-  observeElementAndAddEventListener("top-view", "mousedown", () => {
-    removeHighlightMesh(scene);
-    cameraTopView(gsap, components.camera);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDeletionInProgress(false);
-  });
-
-  observeElementAndAddEventListener("top-view", "mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDeletionInProgress(false);
-  });
-
-  const createBlueprintRectangleButton = new OBC.Button(components, {
-    materialIconName: "square",
-    name: "Layout",
-    closeOnClick: true,
-  });
+  // Move camera to top view button and create blueprint
+  const createBlueprintRectangleButton = new OBC.Button(components);
+  createBlueprintRectangleButton.materialIcon = "crop_free";
+  createBlueprintRectangleButton.tooltip = "Draw Blueprint";
+  createBlueprintRectangleButton.id = "top-view-button";
+  sideToolBar.addChild(createBlueprintRectangleButton);
   createBlueprintRectangleButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    startDrawing = false;
+    removeHighlightMesh(scene);
+    cameraTopView(gsap, components.camera);
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
-  topViewButton.addChild(createBlueprintRectangleButton);
+  createBlueprintRectangleButton.domElement.addEventListener(
+    "mouseover",
+    () => {
+      setStates();
+    }
+  );
   createBlueprintRectangleButton.domElement.classList.remove(
     "hover:bg-ifcjs-200"
   );
   createBlueprintRectangleButton.domElement.classList.add("hover:bg-slate-300");
 
-  // Allow panning and rotating button
-  const freeRotateButton = new OBC.Button(components);
-  freeRotateButton.materialIcon = "pan_tool";
-  freeRotateButton.tooltip = "Free Rotate";
-  freeRotateButton.id = "rotate-button";
-  mainToolbar.addChild(freeRotateButton);
-  freeRotateButton.onClick.add(() => {
-    document.body.style.cursor = "grab";
-    cameraEnableOrbitalFunctionality(gsap, components.camera);
-    setDeletionInProgress(false);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDeletionScaffoldingRowInProgress(false);
-    setDeletionScaffoldingColumnInProgress(false);
-    setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
-    setRotatingRoofInProgress(false);
+  observeElementAndAddEventListener("top-view", "mousedown", () => {
+    removeHighlightMesh(scene);
+    cameraTopView(gsap, components.camera);
+    setStates();
   });
-  freeRotateButton.domElement.addEventListener("mouseenter", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setIsDrawingBlueprint(false);
+
+  observeElementAndAddEventListener("top-view", "mouseover", () => {
+    setStates();
   });
-  freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  freeRotateButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("free-rotate", "mousedown", () => {
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
-    setDeletionInProgress(false);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDeletionScaffoldingRowInProgress(false);
-    setDeletionScaffoldingColumnInProgress(false);
-    setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-    setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
-    setRotatingRoofInProgress(false);
+    setStates();
   });
 
   observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setIsDrawingBlueprint(false);
-    setDeletionInProgress(false);
+    setStates();
   });
-
-  const deleteObjectButton = new OBC.Button(components);
-  deleteObjectButton.materialIcon = "delete_forever";
-  deleteObjectButton.tooltip = "Delete Object";
-  deleteObjectButton.id = "delete-button";
-  mainToolbar.addChild(deleteObjectButton);
-  deleteObjectButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    removeHighlightMesh(scene);
-    setDeletionInProgress(true);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setRotatingRoofInProgress(false);
-  });
-  deleteObjectButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-  });
-  deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
-    setDeletionInProgress(true);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setRotatingRoofInProgress(false);
+    setStates({ deletionInProgress: true });
   });
 
   observeElementAndAddEventListener("delete-object", "mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
 
-  // Start Drawing Blueprint
-  // const clearSceneButton = new OBC.Button(components);
-  // clearSceneButton.materialIcon = "check_box_outline_blank";
-  // clearSceneButton.tooltip = "Reset Scene";
-  // clearSceneButton.id = "drawing-button";
-  // mainToolbar.addChild(clearSceneButton);
-  // clearSceneButton.onClick.add(() => {
-  //   document.body.style.cursor = "auto";
-  //   // resetScene(scene, components);
-  //   setDeletionInProgress(false);
-  //   setDrawingInProgress(true);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // clearSceneButton.domElement.addEventListener("mouseover", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // clearSceneButton.domElement.addEventListener("mouseleave", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // clearSceneButton.domElement.classList.add("hover:bg-slate-300");
-
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
-    setDeletionInProgress(false);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
 
   observeElementAndAddEventListener("reset-scene", "mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDeletionInProgress(false);
+    setStates();
   });
 
   observeElementAndAddEventListener("reset-scene", "mouseleave", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
 
   //Solidify Blueprint
@@ -387,81 +274,28 @@ export const createToolbar = (
   blueprintButton.id = "blueprint-button";
   sideToolBar.addChild(blueprintButton);
   blueprintButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     extrusionButton.closeMenus();
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setStates();
   });
   blueprintButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   blueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("create-blueprint", "mousedown", () => {
-    document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setStates();
   });
 
   observeElementAndAddEventListener("create-blueprint", "mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
-
-  // create blueprint from outline
-  // const editBlueprintButton = new OBC.Button(components, {
-  //   materialIconName: "category",
-  //   name: "Edit Blueprint",
-  //   closeOnClick: true,
-  // });
-  // editBlueprintButton.id = "create-blueprint-button";
-  // sideToolBar.addChild(editBlueprintButton);
-  // editBlueprintButton.onClick.add(() => {
-  //   document.body.style.cursor = "auto";
-  //   setEditingBlueprint(true);
-  //   setDrawingInProgress(false);
-  //   setDeletionInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  //   cameraTopView(gsap, components.camera);
-  //   cameraDisableOrbitalFunctionality(gsap, components.camera);
-  // });
-  // editBlueprintButton.domElement.addEventListener("mouseover", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // blueprintButton.addChild(editBlueprintButton);
-  // editBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // editBlueprintButton.domElement.classList.add("hover:bg-slate-300");
-
-  // move blueprint
-  // const moveBlueprintButton = new OBC.Button(components, {
-  //   materialIconName: "open_with",
-  //   name: "Move Blueprint",
-  //   closeOnClick: true,
-  // });
-  // moveBlueprintButton.id = "move-blueprint-button";
-  // sideToolBar.addChild(moveBlueprintButton);
-  // moveBlueprintButton.onClick.add(() => {
-  //   document.body.style.cursor = "grab";
-  //   setDrawingInProgress(false);
-  //   setDeletionInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  //   cameraTopView(gsap, components.camera);
-  //   cameraDisableOrbitalFunctionality(gsap, components.camera);
-  // });
-  // moveBlueprintButton.domElement.addEventListener("mouseover", () => {
-  //   setDrawingInProgress(false);
-  //   setDrawingScaffoldingInProgress(false);
-  // });
-  // blueprintButton.addChild(moveBlueprintButton);
-  // moveBlueprintButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // moveBlueprintButton.domElement.classList.add("hover:bg-slate-300");
 
   // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
@@ -474,13 +308,10 @@ export const createToolbar = (
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   extrusionButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   extrusionButton.domElement.classList.remove("hover:bg-ifcjs-200");
   extrusionButton.domElement.classList.add("hover:bg-slate-300");
@@ -492,9 +323,7 @@ export const createToolbar = (
   });
   createExtrusionButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   extrusionButton.addChild(createExtrusionButton);
@@ -508,9 +337,7 @@ export const createToolbar = (
   });
   createEditExtrusionButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   extrusionButton.addChild(createEditExtrusionButton);
@@ -529,13 +356,10 @@ export const createToolbar = (
     extrusionButton.closeMenus();
     scaffoldButton.closeMenus();
     document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   roofButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofButton.domElement.classList.add("hover:bg-slate-300");
@@ -547,11 +371,11 @@ export const createToolbar = (
   });
   createGableRoofButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setDrawingInProgress(false);
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   createGableRoofButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
+    setStates({ drawingInProgress: true });
   });
   roofButton.addChild(createGableRoofButton);
   createGableRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
@@ -564,33 +388,15 @@ export const createToolbar = (
   });
   createShedRoofButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
-    setDrawingInProgress(false);
+    setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
   createShedRoofButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(true);
+    setStates({ drawingInProgress: true });
   });
   roofButton.addChild(createShedRoofButton);
   createShedRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
   createShedRoofButton.domElement.classList.add("hover:bg-slate-300");
-
-  // rotate roof button
-  // const rotateRoofOrientationButton = new OBC.Button(components, {
-  //   materialIconName: "360",
-  //   name: "Rotate Roof",
-  //   closeOnClick: true,
-  // });
-  // rotateRoofOrientationButton.onClick.add(() => {
-  //   document.body.style.cursor = "crosshair";
-  //   setDrawingInProgress(false);
-  //   cameraDisableOrbitalFunctionality(gsap, components.camera);
-  // });
-  // rotateRoofOrientationButton.domElement.addEventListener("mouseleave", () => {
-  //   setDrawingInProgress(true);
-  // });
-  // roofButton.addChild(rotateRoofOrientationButton);
-  // roofButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // roofButton.domElement.classList.add("hover:bg-slate-300");
 
   const scaffoldButton = new OBC.Button(components);
   scaffoldButton.materialIcon = "foundation";
@@ -601,20 +407,16 @@ export const createToolbar = (
     blueprintButton.closeMenus();
     roofButton.closeMenus();
     extrusionButton.closeMenus();
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    // setStates()
   });
   scaffoldButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    // setStates()
   });
   scaffoldButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
+    // setStates()
   });
   scaffoldButton.domElement.addEventListener("mouseenter", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   scaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldButton.domElement.classList.add("hover:bg-slate-300");
@@ -626,16 +428,25 @@ export const createToolbar = (
     closeOnClick: true,
   });
   drawScaffoldButton.onClick.add(() => {
+    startDrawing = true;
     document.body.style.cursor = "auto";
+    removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(true);
+    setDrawingScaffoldingInProgress(false);
+    setDrawingInProgressSwitch(false);
   });
-  drawScaffoldButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-  });
+  // drawScaffoldButton.domElement.addEventListener("mouseover", () => {
+  //   setDrawingInProgress(false);
+  // });
   drawScaffoldButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
+    if (startDrawing) {
+      document.body.style.cursor = "auto";
+      removeHighlightMesh(scene);
+      setDrawingInProgress(false);
+      setDeletionInProgress(false);
+      setDrawingScaffoldingInProgress(true);
+    }
   });
   scaffoldButton.addChild(drawScaffoldButton);
   drawScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
@@ -669,17 +480,15 @@ export const createToolbar = (
   });
   generateScaffoldOutlineButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   generateScaffoldOutlineButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
+    setStates();
   });
   generateScaffoldOutlineButton.domElement.addEventListener(
     "mouseleave",
     () => {
-      setDrawingInProgress(false);
+      setStates();
     }
   );
   scaffoldButton.addChild(generateScaffoldOutlineButton);
@@ -690,9 +499,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
     document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
 
   // generate scaffolding
@@ -703,15 +510,13 @@ export const createToolbar = (
   });
   generateScaffoldButton.onClick.add(() => {
     document.body.style.cursor = "auto";
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   generateScaffoldButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
+    setStates();
   });
   generateScaffoldButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
+    setStates();
   });
   scaffoldButton.addChild(generateScaffoldButton);
   generateScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
@@ -729,12 +534,12 @@ export const createToolbar = (
   });
   drawerToolBar.domElement.classList.remove("bg-ifcjs-100");
   drawerToolBar.domElement.classList.add("bg-glass");
-  drawerToolBar.domElement.classList.add("hover:bg-[#111115]"); 
+  drawerToolBar.domElement.classList.add("hover:bg-[#111115]");
 
   //Solidify Blueprint
   const testButton = new OBC.Button(components);
   testButton.materialIcon = "quiz";
-  testButton.tooltip = "Blueprint";
+  testButton.tooltip = "Test";
   testButton.id = "blueprint-button";
   sideToolBar.addChild(testButton);
   testButton.onClick.add(() => {
@@ -742,16 +547,46 @@ export const createToolbar = (
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     extrusionButton.closeMenus();
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   testButton.domElement.addEventListener("mouseover", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
+    setStates();
   });
   testButton.domElement.classList.remove("hover:bg-ifcjs-200");
   testButton.domElement.classList.add("hover:bg-slate-300");
+
+  // Allow panning and rotating button
+  const freeRotateButton = new OBC.Button(components);
+  freeRotateButton.materialIcon = "pan_tool";
+  freeRotateButton.tooltip = "Free Rotate";
+  freeRotateButton.id = "rotate-button";
+  sideToolBar.addChild(freeRotateButton);
+  freeRotateButton.onClick.add(() => {
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setStates();
+  });
+  freeRotateButton.domElement.addEventListener("mouseenter", () => {
+    setStates();
+  });
+  freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  freeRotateButton.domElement.classList.add("hover:bg-slate-300");
+
+  const deleteObjectButton = new OBC.Button(components);
+  deleteObjectButton.materialIcon = "delete_forever";
+  deleteObjectButton.tooltip = "Delete Object";
+  deleteObjectButton.id = "delete-button";
+  sideToolBar.addChild(deleteObjectButton);
+  deleteObjectButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    removeHighlightMesh(scene);
+    setStates({ deletionInProgress: true });
+  });
+  deleteObjectButton.domElement.addEventListener("mouseover", () => {
+    setStates();
+  });
+  deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
 
   // Function to update the title
   let titleElement: Element | null;
@@ -789,21 +624,15 @@ export const createToolbar = (
   drawerMenuButton.id = "menu-button";
   drawerToolBar.addChild(drawerMenuButton);
   drawerMenuButton.onClick.add(() => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDrawingInProgressSwitch(false);
+    setStates();
     drawer.visible = !drawer.visible;
   });
   drawerMenuButton.domElement.addEventListener("mouseover", () => {
     removeHighlightMesh(scene);
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDrawingInProgressSwitch(false);
+    setStates();
   });
   drawerMenuButton.domElement.addEventListener("mouseleave", () => {
-    setDrawingInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDrawingInProgressSwitch(false);
+    setStates();
   });
   drawerMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawerMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -879,9 +708,7 @@ export const createToolbar = (
       startDrawing = false;
       removeHighlightMesh(scene);
       cameraTopView(gsap, components.camera);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setDrawingScaffoldingInProgress(false);
+      setStates();
       cameraDisableOrbitalFunctionality(gsap, components.camera);
     }
   );
@@ -890,19 +717,13 @@ export const createToolbar = (
     startDrawing = true;
     console.log("draw polygon");
     document.body.style.cursor = "auto";
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDrawingInProgress(false);
-    setDrawingInProgressSwitch(false);
+    setStates();
   });
 
   observeElementAndAddEventListener("startDrawingPolygon", "mouseleave", () => {
     if (startDrawing) {
       console.log("polygon drawing start");
-      setDrawingInProgressSwitch(true);
-      setDrawingInProgress(true);
-      setIsDrawingBlueprint(false);
-      setDeletionInProgress(false);
+      setStates({ drawingInProgress: true, drawingInProgressSwitch: true });
     }
   });
 

@@ -121,7 +121,7 @@ export function resetScene(
   scene: THREE.Scene,
   components: OBC.Components,
   shadows: OBC.ShadowDropper,
-  scaffoldPlacedPosition: Map<string, THREE.Vector3> 
+  scaffoldPlacedPosition: Map<string, THREE.Vector3>
 ) {
   const objectsToRemove: any = [];
   const objectsToRemoveUUID: any = [];
@@ -445,13 +445,17 @@ export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {
 }
 
 // const TOLERANCE = 0.0001; // Adjust this value based on your needs
-export function areVectorsEqual(v1: THREE.Vector3, v2: THREE.Vector3, tolerance: number): boolean {
+export function areVectorsEqual(
+  v1: THREE.Vector3,
+  v2: THREE.Vector3,
+  tolerance: number
+): boolean {
   return (
-     Math.abs(v1.x - v2.x) <= tolerance &&
-     Math.abs(v1.y - v2.y) <= tolerance &&
-     Math.abs(v1.z - v2.z) <= tolerance
+    Math.abs(v1.x - v2.x) <= tolerance &&
+    Math.abs(v1.y - v2.y) <= tolerance &&
+    Math.abs(v1.z - v2.z) <= tolerance
   );
- }
+}
 
 export function areAnyTwoAxesEqual(
   v1: THREE.Vector3,
@@ -508,15 +512,19 @@ export function resetScaffolding(scene: THREE.Scene) {
   });
 }
 
-export function addScaffoldingPositionIfUnique(position: THREE.Vector3, map: Map<string, THREE.Vector3>, tolerance: number): boolean {
+export function addScaffoldingPositionIfUnique(
+  position: THREE.Vector3,
+  map: Map<string, THREE.Vector3>,
+  tolerance: number
+): boolean {
   for (const existingPosition of map.values()) {
-     if (areVectorsEqual(position, existingPosition, tolerance)) {
-       // The position is a duplicate within the tolerance
-       return false;
-     }
+    if (areVectorsEqual(position, existingPosition, tolerance)) {
+      // The position is a duplicate within the tolerance
+      return false;
+    }
   }
   // The position is unique, add it to the map
   const positionKey = `${position.x},${position.y},${position.z}`;
   map.set(positionKey, position);
   return true;
- }
+}
