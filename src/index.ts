@@ -261,7 +261,7 @@ export const createModelView = async () => {
         editingBlueprint ||
         rotatingRoofInProgress ||
         deletionScaffoldingColumnInProgress) &&
-      !drawingInProgress
+      !drawingInProgress && !deletionInProgress
     ) {
       mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
       mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
