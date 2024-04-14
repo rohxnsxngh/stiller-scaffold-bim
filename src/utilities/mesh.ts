@@ -166,6 +166,7 @@ export function createBlueprintFromMarkup(
   blueprintUpdatedState: boolean,
   scene: THREE.Scene
 ) {
+  const rectanglePoints = points
   if (
     points[0].x === points[points.length - 1].x &&
     points[0].z === points[points.length - 1].z
@@ -207,6 +208,7 @@ export function createBlueprintFromMarkup(
       meshShape.userData = {
         shape: shape,
         blueprintHasBeenUpdated: blueprintUpdatedState,
+        rectanglePoints: rectanglePoints
       };
       const isBlueprintAlreadyPlaced = scene.children.some((child) => {
         return (

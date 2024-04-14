@@ -211,6 +211,16 @@ export function disableOrbitControls(controls: any) {
 // delete an object when raycast intersects with object
 // TODO: make this method more efficient and more inclusive
 export function deleteObject(object: any, scene: THREE.Scene) {
+  console.warn("OBJECT TO BE DELETED", object);
+  // special instance for dealing with blueprints and shaderMaterials
+  if (object.name === "blueprint") {
+    scene.traverse((child) => {
+      if (child.name === "rectanglePlane" && object.userData.shape) {
+        child.visible = false
+      }
+    });
+    object.visible = false;
+  }
   if (
     object.parent instanceof THREE.Object3D &&
     object.parent.type !== "Scene"
@@ -221,8 +231,8 @@ export function deleteObject(object: any, scene: THREE.Scene) {
   } else {
     // Remove the parent recursively
     console.log(object);
-    object.material.dispose();
-    object.geometry.dispose();
+    if (object.material) object.material.dispose();
+    if (object.geometry) object.geometry.dispose();
     if (object.userData.label) {
       scene.remove(object.userData.label);
     }

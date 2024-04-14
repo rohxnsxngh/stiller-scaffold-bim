@@ -48,7 +48,7 @@ export const createToolbar = (
   sideToolBar.position = "right";
   components.ui.addToolbar(sideToolBar);
   sideToolBar.domElement.addEventListener("mouseover", () => {
-    setStates();
+    // setStates();
   });
   sideToolBar.domElement.addEventListener("mouseleave", () => {
     if (startDrawing) {
@@ -249,10 +249,6 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
     setStates({ deletionInProgress: true });
-  });
-
-  observeElementAndAddEventListener("delete-object", "mouseover", () => {
-    setStates();
   });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
@@ -581,9 +577,6 @@ export const createToolbar = (
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
     setStates({ deletionInProgress: true });
-  });
-  deleteObjectButton.domElement.addEventListener("mouseover", () => {
-    setStates();
   });
   deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
   deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
