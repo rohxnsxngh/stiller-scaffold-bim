@@ -1,7 +1,7 @@
 // Camera Top View
 export function cameraTopView(gsap: any, camera: any) {
   gsap.to(camera.activeCamera.position, {
-    duration: 0.1,
+    duration: 0.75,
     ease: "power1.inOut",
     onUpdate: () => {
       camera.controls.setLookAt(0, 50, 0, 0, 0, 0);
@@ -18,7 +18,7 @@ export function cameraTopView(gsap: any, camera: any) {
 // Camera Perspective View
 export function cameraPerspectiveView(gsap: any, camera: any) {
   gsap.to(camera.activeCamera.position, {
-    duration: 0.1,
+    duration: 0.75,
     ease: "power1.inOut",
     onUpdate: () => {
       camera.controls.setLookAt(10, 10, 10, 0, 0, 0);

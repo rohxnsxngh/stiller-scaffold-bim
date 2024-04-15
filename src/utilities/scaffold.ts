@@ -6,6 +6,7 @@ import {
   isVectorEqual,
   measureLineLength,
   observeElementAndAddEventListener,
+  resetScaffolding,
 } from "./helper";
 import { useStore } from "../store";
 
@@ -58,7 +59,7 @@ export async function createScaffoldingShapeIsOutlined(
             child.userData.length === length &&
             child.userData.first_point.equals(firstPoint) &&
             child.userData.last_point.equals(lastPoint) &&
-            child.userData.level.equals(0)
+            child.userData.level === 0
           );
         });
 
@@ -319,7 +320,7 @@ export function generateScaffoldOutline(
         child.name === "scaffoldLine" &&
         child.userData.first_point.equals(firstPoint) &&
         child.userData.last_point.equals(lastPoint) &&
-        child.userData.level.equals(0)
+        child.userData.level === 0
       );
     });
 
@@ -407,8 +408,15 @@ function attachScaffoldRowLabelChangeHandler(
 
   observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
     levels = -1;
+    line = null;
+    resetScaffolding(scene);
+
+    const store = useStore();
     store.updateScaffoldLevel(0);
+
+    scaffoldPlacedPosition.clear();
   });
+
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     levels = -1;
@@ -461,7 +469,7 @@ function addScaffoldingLevel(
       child.userData.length === length &&
       child.userData.first_point.equals(firstPoint) &&
       child.userData.last_point.equals(lastPoint) &&
-      child.userData.level.equals(level)
+      child.userData.level === level
     );
   });
   if (!isLineAlreadyPlaced) {

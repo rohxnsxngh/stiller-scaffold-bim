@@ -34,15 +34,15 @@ export const createToolbar = (
   mainWindow.domElement.style.width = "20rem";
   mainWindow.domElement.style.height = "20rem";
   // main tool bar
-  // const mainToolbar = new OBC.Toolbar(components);
-  // mainToolbar.position = "bottom";
-  // components.ui.addToolbar(mainToolbar);
-  // mainToolbar.domElement.addEventListener("mousedown", () => {
-  //   setStates()
-  // });
-  // mainToolbar.domElement.classList.remove("bg-ifcjs-100");
-  // mainToolbar.domElement.classList.add("bg-glass");
-  // mainToolbar.domElement.classList.add("hover:bg-[#111115]");
+  const mainToolbar = new OBC.Toolbar(components);
+  mainToolbar.position = "left";
+  components.ui.addToolbar(mainToolbar);
+  mainToolbar.domElement.addEventListener("mousedown", () => {
+    setStates()
+  });
+  mainToolbar.domElement.classList.remove("bg-ifcjs-100");
+  mainToolbar.domElement.classList.add("bg-glass");
+  mainToolbar.domElement.classList.add("hover:bg-[#111115]");
   // side tool bar
   const sideToolBar = new OBC.Toolbar(components);
   sideToolBar.position = "right";
@@ -537,7 +537,8 @@ export const createToolbar = (
   testButton.materialIcon = "quiz";
   testButton.tooltip = "Test";
   testButton.id = "blueprint-button";
-  // sideToolBar.addChild(testButton);
+  mainToolbar.addChild(testButton);
+
   testButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     roofButton.closeMenus();
@@ -556,7 +557,7 @@ export const createToolbar = (
   freeRotateButton.materialIcon = "pan_tool";
   freeRotateButton.tooltip = "Free Rotate";
   freeRotateButton.id = "rotate-button";
-  sideToolBar.addChild(freeRotateButton);
+  mainToolbar.addChild(freeRotateButton);
   freeRotateButton.onClick.add(() => {
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
@@ -568,11 +569,29 @@ export const createToolbar = (
   freeRotateButton.domElement.classList.remove("hover:bg-ifcjs-200");
   freeRotateButton.domElement.classList.add("hover:bg-slate-300");
 
+  const cameraToggleButton = new OBC.Button(components);
+  cameraToggleButton.materialIcon = "cameraswitch";
+  cameraToggleButton.tooltip = "Toggle View";
+  cameraToggleButton.id = "rotate-button";
+  mainToolbar.addChild(cameraToggleButton);
+  cameraToggleButton.onClick.add(() => {
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setStates();
+    // @ts-ignore
+    components.camera.toggleProjection()
+  });
+  cameraToggleButton.domElement.addEventListener("mouseenter", () => {
+    setStates();
+  });
+  cameraToggleButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  cameraToggleButton.domElement.classList.add("hover:bg-slate-300");
+
   const deleteObjectButton = new OBC.Button(components);
   deleteObjectButton.materialIcon = "delete_forever";
   deleteObjectButton.tooltip = "Delete Object";
   deleteObjectButton.id = "delete-button";
-  sideToolBar.addChild(deleteObjectButton);
+  mainToolbar.addChild(deleteObjectButton);
   deleteObjectButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
@@ -580,6 +599,27 @@ export const createToolbar = (
   });
   deleteObjectButton.domElement.classList.remove("hover:bg-ifcjs-200");
   deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
+
+  // Clear Scene
+  const clearSceneButton = new OBC.Button(components);
+  clearSceneButton.materialIcon = "check_box_outline_blank";
+  clearSceneButton.tooltip = "Reset Scene";
+  clearSceneButton.id = "clear-scene-button";
+  clearSceneButton.domElement.id = "clear-scene-button"
+  mainToolbar.addChild(clearSceneButton);
+  clearSceneButton.onClick.add(() => {
+    document.body.style.cursor = "auto";
+    setStates()
+    // console.log(clearSceneButton.domElement)
+  });
+  clearSceneButton.domElement.addEventListener("mouseover", () => {
+    setStates()
+  });
+  clearSceneButton.domElement.addEventListener("mouseleave", () => {
+    setStates()
+  });
+  clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  clearSceneButton.domElement.classList.add("hover:bg-slate-300");
 
   // Function to update the title
   let titleElement: Element | null;
@@ -734,7 +774,7 @@ export const createToolbar = (
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    // clearSceneButton,
+    clearSceneButton,
     testButton,
   ];
 };

@@ -89,7 +89,7 @@ export const createModelView = async () => {
   components = new OBC.Components();
   components.scene = new OBC.SimpleScene(components);
   components.renderer = new OBC.SimpleRenderer(components, container);
-  components.camera = new OBC.SimpleCamera(components);
+  components.camera = new OBC.OrthoPerspectiveCamera(components);
   components.raycaster = new OBC.SimpleRaycaster(components);
   components.init();
 
@@ -102,7 +102,7 @@ export const createModelView = async () => {
   );
 
   // Obit Controls Gizmo
-  viewHelper = new OrbitViewHelper(controls, { size: 100, padding: 8 });
+  viewHelper = new OrbitViewHelper(controls, { size: 100, padding: 8 }, components);
 
   // Add the Gizmo to the document
   document.body.appendChild(viewHelper.domElement);
@@ -129,6 +129,7 @@ export const createModelView = async () => {
 
   // Grid
   const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
+  // grid._fade = 0;
   // @ts-ignore
   grid._grid.name = "grid";
   console.log("grid", grid);
@@ -1091,16 +1092,6 @@ export const createModelView = async () => {
       generateScaffolding();
     }
   );
-
-  // reset all scaffolding
-  observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
-    resetScaffolding(scene);
-
-    const store = useStore();
-    store.updateScaffoldLevel(0);
-
-    scaffoldPlacedPosition.clear();
-  });
 
   //////////////////////////////////
   // this section pertains to creating the rectangle from the top view by clicking and dragging
