@@ -387,7 +387,6 @@ export function createRectangle(
   });
   const startPoint = castPoint(start, components, plane, raycaster);
   const endPoint = castPoint(end, components, plane, raycaster);
-  // console.warn("START POINT", startPoint, "ENDPOINT", endPoint);
   if (startPoint == null || endPoint == null) {
     return;
   }
@@ -410,8 +409,6 @@ export function createRectangle(
   const pointEndMaxY = new THREE.Vector3(endPoint.point.x, 0, endPoint.point.z);
 
   // Calculate the lengths of the sides
-  // const width = pointStartMinY.distanceTo(pointStartMaxY);
-  // const height = pointStartMaxY.distanceTo(pointEndMaxY);
   const widthVector = new THREE.Vector3().subVectors(
     pointStartMinY,
     pointStartMaxY
@@ -423,8 +420,6 @@ export function createRectangle(
   const width = widthVector.z;
   const height = heightVector.x;
 
-  // console.error(pointStartMinY, pointStartMaxY, pointEndMinY, pointEndMaxY)
-
   const rectanglePoints = [
     pointStartMinY,
     pointStartMaxY,
@@ -435,16 +430,6 @@ export function createRectangle(
 
   const centerX = startPoint.point.x + height / 2;
   const centerZ = startPoint.point.z + -width / 2;
-
-  // console.error(
-  //   "Width Vector:", widthVector, "\n",
-  //   "Height Vector:", heightVector, "\n",
-  //   "Width:", width, "\n",
-  //   "Height:", height, "\n",
-  //   "Starting Point", startPoint.point, "\n",
-  //   "Center X:", centerX, "\n",
-  //   "Center Z:", centerZ
-  // );
 
   //For each side of the rectangle, calculate the midpoint and create a label
   const labels = createLabels(rectanglePoints);
@@ -634,7 +619,6 @@ function updateRectangleBlueprintGeometry(
   centerX: any,
   centerZ: any
 ) {
-  console.error("EDITING RECTANGLE", newValue, oldValue);
   let oldDistance, newDistance;
   if (newValue !== null && oldValue !== null) {
     oldDistance = parseFloat(oldValue).toFixed(2);
@@ -667,7 +651,6 @@ function updateRectangleBlueprintGeometry(
     planeWidth !== undefined &&
     parseFloat(oldDistance) === Math.abs(parseFloat(planeWidth))
   ) {
-    console.log("editing width");
     // reset the width to the current plane
     if (planeHeight !== undefined && planeWidth !== undefined) {
       width = parseFloat(planeHeight);
@@ -724,7 +707,6 @@ function updateRectangleBlueprintGeometry(
     planeHeight !== undefined &&
     parseFloat(oldDistance) === Math.abs(parseFloat(planeHeight))
   ) {
-    console.log("editing height");
     // reset the width to the current plane
     if (planeHeight !== undefined && planeWidth !== undefined) {
       width = parseFloat(planeHeight);
