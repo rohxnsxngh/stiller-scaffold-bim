@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import * as OBC from "openbim-components";
+import { gsap } from "gsap";
 
 interface Axis {
   axis: string;
@@ -20,7 +22,7 @@ class OrbitViewHelper {
 
   domElement: HTMLCanvasElement;
 
-  constructor(orbitControls: any, options: any) {
+  constructor(orbitControls: any, options: any, components: OBC.Components) {
     options = Object.assign(
       {
         size: 90,
@@ -204,6 +206,7 @@ class OrbitViewHelper {
 
     function onPointerEnter() {
       rect = scoped.domElement.getBoundingClientRect();
+      console.log(orbit);
     }
 
     function onPointerMove(
@@ -256,28 +259,30 @@ class OrbitViewHelper {
 
     function onMouseClick() {
       //FIXME Don't like the current animation
+      console.log("orbit control clicked");
       if (isDragging || !selectedAxis) return;
 
       const vec = selectedAxis.direction.clone();
       const distance = camera.position.distanceTo(orbit.target);
       vec.multiplyScalar(distance);
 
-      const duration = 400;
-      const start = performance.now();
-      const maxAlpha = 1;
-      function loop() {
-        const now = performance.now();
-        const delta = now - start;
-        const alpha = Math.min(delta / duration, maxAlpha);
-        camera.position.lerp(vec, alpha);
-        orbit.update();
-
-        if (alpha !== maxAlpha) return requestAnimationFrame(loop);
-
-        onPointerMove(undefined);
-      }
-
-      loop();
+      // Use GSAP to animate the camera's position to the target position
+      gsap.to(components.camera.activeCamera.position, {
+        duration: 1, // Adjust the duration as needed
+        ease: "power1.inOut", // Adjust the easing as needed
+        x: vec.x,
+        y: vec.y,
+        z: vec.z,
+        onUpdate: () => {
+          components.camera.controls.setLookAt(vec.x + 0.025, vec.y + 0.025, vec.z +0.025, 0, 0, 0); // Adjust the lookAt parameters as needed
+        },
+        onComplete: () => {
+          components.camera.controls.enabled = true;
+          components.camera.controls.enablePan = true;
+          components.camera.controls.enableZoom = true;
+          components.camera.controls.screenSpacePanning = true;
+        },
+      });
 
       selectedAxis = null;
     }

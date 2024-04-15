@@ -102,7 +102,7 @@ export const createModelView = async () => {
   );
 
   // Obit Controls Gizmo
-  viewHelper = new OrbitViewHelper(controls, { size: 100, padding: 8 });
+  viewHelper = new OrbitViewHelper(controls, { size: 100, padding: 8 }, components);
 
   // Add the Gizmo to the document
   document.body.appendChild(viewHelper.domElement);
