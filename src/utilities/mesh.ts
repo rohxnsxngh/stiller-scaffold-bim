@@ -419,6 +419,7 @@ export function createRectangle(
   );
   const width = widthVector.z;
   const height = heightVector.x;
+  console.log(width, height);
 
   const rectanglePoints = [
     pointStartMinY,
@@ -450,12 +451,22 @@ export function createRectangle(
   markup.position.set(centerX, -0.025, centerZ);
   markup.rotation.x = Math.PI / 2;
   markup.name = "rectanglePlane";
-  markup.userData = {
-    rectanglePoints: rectanglePoints,
-    width: width,
-    height: height,
-    blueprintHasBeenUpdated: false,
-  };
+  if ((width >= 0 && height >= 0) || (width <= 0 && height <= 0)) {
+    markup.userData = {
+      rectanglePoints: rectanglePoints,
+      width: -width,
+      height: -height,
+      blueprintHasBeenUpdated: true,
+    };
+  } else {
+    markup.userData = {
+      rectanglePoints: rectanglePoints,
+      width: width,
+      height: height,
+      blueprintHasBeenUpdated: false,
+    };
+  }
+
   markupGroup.add(markup);
 
   return [markup, labels];
