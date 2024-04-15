@@ -763,8 +763,6 @@ export const createToolbar = (
   ////////////////////////////////////////////////
   return [
     blueprintButton,
-    // editBlueprintButton,
-    // moveBlueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
     createGableRoofButton,

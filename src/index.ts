@@ -171,8 +171,6 @@ export const createModelView = async () => {
 
   const [
     blueprintButton,
-    // editBlueprintButton,
-    // moveBlueprintButton,
     createBlueprintRectangleButton,
     freeRotateButton,
     createGableRoofButton,
@@ -612,24 +610,6 @@ export const createModelView = async () => {
     }
   });
 
-  // Edit Blueprint
-  // editBlueprintButton.domElement.addEventListener("mousedown", () => {
-  //   setInvisibleExceptSingularObject(scene, "blueprint");
-  // });
-
-  // Move Blueprint
-  // moveBlueprintButton.domElement.addEventListener("mousedown", () => {
-  //   const blueprints: any[] = [];
-  //   setIsDrawingBlueprint(false);
-  //   // Array to hold objects that can be dragged
-  //   scene.traverse((child: any) => {
-  //     if (child instanceof THREE.Mesh && child.name === "blueprint") {
-  //       blueprints.push(child);
-  //     }
-  //   });
-  //   // const dragControls = moveBlueprint(blueprints, components, scene, shadows);
-  // });
-
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   createExtrusionButton.domElement.addEventListener("mousedown", () => {
     let blueprints: THREE.Mesh[] = [];
@@ -728,7 +708,9 @@ export const createModelView = async () => {
             roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
-        createRoof(extrusion, scene, 0, 3);
+        componentStore.updateRoofHeight(3)
+        const heightLevel = componentStore.height
+        createRoof(extrusion, scene, 0, heightLevel);
       }
     });
 
@@ -857,7 +839,9 @@ export const createModelView = async () => {
             roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
-        createShedRoof(extrusion, scene, 0, 3);
+        componentStore.updateShedRoofHeight(3)
+        const heightLevel = componentStore.shedHeight
+        createShedRoof(extrusion, scene, 0, heightLevel);
       }
     });
 
