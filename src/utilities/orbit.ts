@@ -283,7 +283,7 @@ class OrbitViewHelper {
             0,
             0,
             0
-          ); // Adjust the lookAt parameters as needed
+          );
         },
         onComplete: () => {
           //@ts-ignore

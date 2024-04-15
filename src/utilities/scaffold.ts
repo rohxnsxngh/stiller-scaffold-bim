@@ -410,6 +410,13 @@ function attachScaffoldRowLabelChangeHandler(
     store.updateScaffoldLevel(0);
   });
 
+  // document.addEventListener("mousedown", (event) => {
+  //   if (event.target && (event.target as Element).id === "clear-scene-button") {
+  //      console.warn('HELLO');
+  //   }
+  //  });
+
+
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     levels = -1;
     line = null;

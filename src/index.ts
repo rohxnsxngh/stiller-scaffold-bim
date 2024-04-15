@@ -89,7 +89,7 @@ export const createModelView = async () => {
   components = new OBC.Components();
   components.scene = new OBC.SimpleScene(components);
   components.renderer = new OBC.SimpleRenderer(components, container);
-  components.camera = new OBC.SimpleCamera(components);
+  components.camera = new OBC.OrthoPerspectiveCamera(components);
   components.raycaster = new OBC.SimpleRaycaster(components);
   components.init();
 
@@ -129,6 +129,7 @@ export const createModelView = async () => {
 
   // Grid
   const grid = new CustomGrid(components, new THREE.Color("#FF0000"));
+  // grid._fade = 0;
   // @ts-ignore
   grid._grid.name = "grid";
   console.log("grid", grid);
@@ -181,7 +182,7 @@ export const createModelView = async () => {
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    // clearSceneButton,
+    clearSceneButton,
     testButton,
   ] = createToolbar(components, scene);
 
@@ -1258,17 +1259,17 @@ export const createModelView = async () => {
     });
   });
 
-  // clearSceneButton.domElement.addEventListener("mousedown", () => {
-  //   resetScaffolding(scene);
+  clearSceneButton.domElement.addEventListener("mousedown", () => {
+    resetScaffolding(scene);
 
-  //   const store = useStore();
-  //   store.updateScaffoldLevel(0);
+    const store = useStore();
+    store.updateScaffoldLevel(0);
 
-  //   resetScene(scene, components, shadows, scaffoldPlacedPosition);
+    resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
-  //   scaffoldPoints.length = 0;
-  //   points.length = 0;
-  // });
+    scaffoldPoints.length = 0;
+    points.length = 0;
+  });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     resetScaffolding(scene);
