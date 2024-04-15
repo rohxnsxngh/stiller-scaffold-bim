@@ -409,8 +409,17 @@ export function createRectangle(
   const pointEndMaxY = new THREE.Vector3(endPoint.point.x, 0, endPoint.point.z);
 
   // Calculate the lengths of the sides
-  const width = pointStartMinY.distanceTo(pointStartMaxY);
-  const height = pointStartMaxY.distanceTo(pointEndMaxY);
+  const widthVector = new THREE.Vector3().subVectors(
+    pointStartMinY,
+    pointStartMaxY
+  );
+  const heightVector = new THREE.Vector3().subVectors(
+    pointEndMaxY,
+    pointStartMaxY
+  );
+  const width = widthVector.z;
+  const height = heightVector.x;
+  console.log(width, height);
 
   const rectanglePoints = [
     pointStartMinY,
@@ -421,7 +430,7 @@ export function createRectangle(
   ];
 
   const centerX = startPoint.point.x + height / 2;
-  const centerZ = startPoint.point.z + width / 2;
+  const centerZ = startPoint.point.z + -width / 2;
 
   //For each side of the rectangle, calculate the midpoint and create a label
   const labels = createLabels(rectanglePoints);
@@ -438,15 +447,26 @@ export function createRectangle(
 
   const geometry = new THREE.PlaneGeometry(height, width);
   markup = new THREE.Mesh(geometry, rectMaterial);
+
   markup.position.set(centerX, -0.025, centerZ);
   markup.rotation.x = Math.PI / 2;
   markup.name = "rectanglePlane";
-  markup.userData = {
-    rectanglePoints: rectanglePoints,
-    width: width,
-    height: height,
-    blueprintHasBeenUpdated: false,
-  };
+  if ((width >= 0 && height >= 0) || (width <= 0 && height <= 0)) {
+    markup.userData = {
+      rectanglePoints: rectanglePoints,
+      width: -width,
+      height: -height,
+      blueprintHasBeenUpdated: true,
+    };
+  } else {
+    markup.userData = {
+      rectanglePoints: rectanglePoints,
+      width: width,
+      height: height,
+      blueprintHasBeenUpdated: false,
+    };
+  }
+
   markupGroup.add(markup);
 
   return [markup, labels];
@@ -637,7 +657,11 @@ function updateRectangleBlueprintGeometry(
     planeHeight = planeGeometry.parameters.height.toFixed(2);
   }
 
-  if (oldDistance === planeWidth) {
+  if (
+    oldDistance !== undefined &&
+    planeWidth !== undefined &&
+    parseFloat(oldDistance) === Math.abs(parseFloat(planeWidth))
+  ) {
     // reset the width to the current plane
     if (planeHeight !== undefined && planeWidth !== undefined) {
       width = parseFloat(planeHeight);
@@ -689,7 +713,11 @@ function updateRectangleBlueprintGeometry(
 
     return rectanglePointsUpdated;
   }
-  if (oldDistance === planeHeight) {
+  if (
+    oldDistance !== undefined &&
+    planeHeight !== undefined &&
+    parseFloat(oldDistance) === Math.abs(parseFloat(planeHeight))
+  ) {
     // reset the width to the current plane
     if (planeHeight !== undefined && planeWidth !== undefined) {
       width = parseFloat(planeHeight);

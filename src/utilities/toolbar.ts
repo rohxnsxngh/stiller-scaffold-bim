@@ -538,6 +538,7 @@ export const createToolbar = (
   testButton.tooltip = "Test";
   testButton.id = "blueprint-button";
   mainToolbar.addChild(testButton);
+
   testButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     roofButton.closeMenus();
