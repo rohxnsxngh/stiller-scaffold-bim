@@ -1259,17 +1259,17 @@ export const createModelView = async () => {
     });
   });
 
-  clearSceneButton.domElement.addEventListener("mousedown", () => {
-    resetScaffolding(scene);
+  // clearSceneButton.domElement.addEventListener("mousedown", () => {
+  //   resetScaffolding(scene);
 
-    const store = useStore();
-    store.updateScaffoldLevel(0);
+  //   const store = useStore();
+  //   store.updateScaffoldLevel(0);
 
-    resetScene(scene, components, shadows, scaffoldPlacedPosition);
+  //   resetScene(scene, components, shadows, scaffoldPlacedPosition);
 
-    scaffoldPoints.length = 0;
-    points.length = 0;
-  });
+  //   scaffoldPoints.length = 0;
+  //   points.length = 0;
+  // });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     resetScaffolding(scene);

@@ -609,7 +609,7 @@ export const createToolbar = (
   clearSceneButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     setStates()
-    console.log(clearSceneButton.domElement)
+    // console.log(clearSceneButton.domElement)
   });
   clearSceneButton.domElement.addEventListener("mouseover", () => {
     setStates()
