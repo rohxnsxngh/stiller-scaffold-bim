@@ -182,7 +182,7 @@ export const createModelView = async () => {
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    clearSceneButton,
+    // clearSceneButton,
     testButton,
   ] = createToolbar(components, scene);
 
@@ -1092,16 +1092,6 @@ export const createModelView = async () => {
       generateScaffolding();
     }
   );
-
-  // reset all scaffolding
-  observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
-    resetScaffolding(scene);
-
-    const store = useStore();
-    store.updateScaffoldLevel(0);
-
-    scaffoldPlacedPosition.clear();
-  });
 
   //////////////////////////////////
   // this section pertains to creating the rectangle from the top view by clicking and dragging
