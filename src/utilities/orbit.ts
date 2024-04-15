@@ -267,6 +267,7 @@ class OrbitViewHelper {
       vec.multiplyScalar(distance);
 
       // Use GSAP to animate the camera's position to the target position
+      //@ts-ignore
       gsap.to(components.camera.activeCamera.position, {
         duration: 1, // Adjust the duration as needed
         ease: "power1.inOut", // Adjust the easing as needed
@@ -274,12 +275,24 @@ class OrbitViewHelper {
         y: vec.y,
         z: vec.z,
         onUpdate: () => {
-          components.camera.controls.setLookAt(vec.x + 0.025, vec.y + 0.025, vec.z +0.025, 0, 0, 0); // Adjust the lookAt parameters as needed
+          //@ts-ignore
+          components.camera.controls.setLookAt(
+            vec.x + 0.025,
+            vec.y + 0.025,
+            vec.z + 0.025,
+            0,
+            0,
+            0
+          ); // Adjust the lookAt parameters as needed
         },
         onComplete: () => {
+          //@ts-ignore
           components.camera.controls.enabled = true;
+          //@ts-ignore
           components.camera.controls.enablePan = true;
+          //@ts-ignore
           components.camera.controls.enableZoom = true;
+          //@ts-ignore
           components.camera.controls.screenSpacePanning = true;
         },
       });
