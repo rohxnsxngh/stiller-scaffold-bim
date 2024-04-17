@@ -1283,33 +1283,36 @@ export function createShedRoof(
         }
         break;
     }
-  }
-  else {
+  } else {
     switch (index) {
       case 0:
-        if (rectShape.curves[index].v1.y < 0) {
+        if (blueprintWidth > 0 && blueprintHeight > 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x +
               parseFloat(height as unknown as string),
             rectShape.curves[index].v1.y
           );
-        } else {
+        }
+
+        if (blueprintWidth < 0 && blueprintHeight < 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x -
               parseFloat(height as unknown as string),
             rectShape.curves[index].v1.y
           );
         }
-        console.log(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
+
         break;
       case 1:
-        if (rectShape.curves[index].v1.y < 0) {
+        if (blueprintWidth > 0 && blueprintHeight > 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x,
             rectShape.curves[index].v1.y +
               parseFloat(height as unknown as string)
           );
-        } else {
+        }
+
+        if (blueprintWidth < 0 && blueprintHeight < 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x,
             rectShape.curves[index].v1.y -
@@ -1318,13 +1321,15 @@ export function createShedRoof(
         }
         break;
       case 2:
-        if (rectShape.curves[index].v1.y < 0) {
+        if (blueprintWidth > 0 && blueprintHeight > 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x -
               parseFloat(height as unknown as string),
             rectShape.curves[index].v1.y
           );
-        } else {
+        }
+
+        if (blueprintWidth < 0 && blueprintHeight < 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x +
               parseFloat(height as unknown as string),
@@ -1333,13 +1338,15 @@ export function createShedRoof(
         }
         break;
       case 3:
-        if (rectShape.curves[index].v1.y < 0) {
+        if (blueprintWidth > 0 && blueprintHeight > 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x,
             rectShape.curves[index].v1.y -
               parseFloat(height as unknown as string)
           );
-        } else {
+        }
+
+        if (blueprintWidth < 0 && blueprintHeight < 0) {
           thirdPoint = new THREE.Vector2(
             rectShape.curves[index].v1.x,
             rectShape.curves[index].v1.y +
