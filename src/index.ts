@@ -586,11 +586,15 @@ export const createModelView = async () => {
       points = createBlueprintFromShapeOutline(points, scene);
     }
     if (rectangleBlueprint) {
-      points = createBlueprintFromMarkup(
-        markupGroup.children[0].userData.rectanglePoints,
-        markupGroup.children[0].userData.blueprintHasBeenUpdated,
-        scene
-      );
+      scene.traverse((rectPlane) => {
+        if (rectPlane.name === "rectanglePlane") {
+          points = createBlueprintFromMarkup(
+            rectPlane.userData.rectanglePoints,
+            rectPlane.userData.blueprintHasBeenUpdated,
+            scene
+          );
+        }
+      })
     }
   });
 
@@ -602,11 +606,15 @@ export const createModelView = async () => {
       points = createBlueprintFromShapeOutline(points, scene);
     }
     if (rectangleBlueprint) {
-      points = createBlueprintFromMarkup(
-        markupGroup.children[0].userData.rectanglePoints,
-        markupGroup.children[0].userData.blueprintHasBeenUpdated,
-        scene
-      );
+      scene.traverse((rectPlane) => {
+        if (rectPlane.name === "rectanglePlane") {
+          points = createBlueprintFromMarkup(
+            rectPlane.userData.rectanglePoints,
+            rectPlane.userData.blueprintHasBeenUpdated,
+            scene
+          );
+        }
+      })
     }
   });
 

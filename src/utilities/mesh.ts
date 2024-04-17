@@ -1172,6 +1172,7 @@ export function createShedRoof(
   height: number
 ) {
   const roofToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+  console.log("child", child.userData.blueprintHasBeenUpdated, child);
   // check if duplicate roof exists
   scene.traverse((children) => {
     if (children.name === "shedRoof") {
@@ -1200,63 +1201,145 @@ export function createShedRoof(
   if (!child.userData.blueprintHasBeenUpdated) {
     switch (index) {
       case 0:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x +
-            parseFloat(height as unknown as string),
-          rectShape.curves[index].v1.y
-        );
+        if (
+          rectShape.curves[index].v1.x > 0 &&
+          rectShape.curves[index].v1.y > 0
+        ) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x -
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x +
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        }
         break;
       case 1:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x,
-          rectShape.curves[index].v1.y - parseFloat(height as unknown as string)
-        );
+        if (
+          rectShape.curves[index].v1.x > 0 &&
+          rectShape.curves[index].v1.y > 0
+        ) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y +
+              parseFloat(height as unknown as string)
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y -
+              parseFloat(height as unknown as string)
+          );
+        }
         break;
       case 2:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x -
-            parseFloat(height as unknown as string),
-          rectShape.curves[index].v1.y
-        );
+        if (
+          rectShape.curves[index].v1.x > 0 &&
+          rectShape.curves[index].v1.y > 0
+        ) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x +
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x -
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        }
         break;
       case 3:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x,
-          rectShape.curves[index].v1.y + parseFloat(height as unknown as string)
-        );
+        if (
+          rectShape.curves[index].v1.x > 0 &&
+          rectShape.curves[index].v1.y > 0
+        ) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y -
+              parseFloat(height as unknown as string)
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y +
+              parseFloat(height as unknown as string)
+          );
+        }
         break;
     }
   } else {
     switch (index) {
       case 0:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x,
-          rectShape.curves[index].v1.y - parseFloat(height as unknown as string)
-        );
+        if (rectShape.curves[index].v1.y < 0) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x +
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x -
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        }
+        console.log(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y);
         break;
       case 1:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x +
-            parseFloat(height as unknown as string),
-          rectShape.curves[index].v1.y
-        );
+        if (rectShape.curves[index].v1.y < 0) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y +
+              parseFloat(height as unknown as string)
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y -
+              parseFloat(height as unknown as string)
+          );
+        }
         break;
       case 2:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x,
-          rectShape.curves[index].v1.y + parseFloat(height as unknown as string)
-        );
+        if (rectShape.curves[index].v1.y < 0) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x -
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x +
+              parseFloat(height as unknown as string),
+            rectShape.curves[index].v1.y
+          );
+        }
         break;
       case 3:
-        thirdPoint = new THREE.Vector2(
-          rectShape.curves[index].v1.x -
-            parseFloat(height as unknown as string),
-          rectShape.curves[index].v1.y
-        );
+        if (rectShape.curves[index].v1.y < 0) {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y -
+              parseFloat(height as unknown as string)
+          );
+        } else {
+          thirdPoint = new THREE.Vector2(
+            rectShape.curves[index].v1.x,
+            rectShape.curves[index].v1.y +
+              parseFloat(height as unknown as string)
+          );
+        }
         break;
     }
   }
 
+  console.log("third point", thirdPoint);
   const triangleHeightOffsetDistance = Math.round(
     distanceFromPointToLine(
       rectShape.curves[index].v1.x,
@@ -1275,8 +1358,8 @@ export function createShedRoof(
   shape.lineTo(thirdPoint.x, thirdPoint.y);
   shape.lineTo(rectShape.curves[index].v1.x, rectShape.curves[index].v1.y); // close the shape
 
-  console.log("child", rectShape);
-  console.log("shape", shape);
+  console.log("blueprint child", rectShape);
+  console.log("triangle shape", shape);
   console.log("third point", thirdPoint);
   console.log("height of the third point", triangleHeightOffsetDistance);
 
@@ -1337,7 +1420,7 @@ export function createShedRoof(
   const extrusionPath = new THREE.CatmullRomCurve3([endPoint, nextPoint]);
   const extrusionDistance = endPoint.distanceTo(nextPoint);
   let extrusionSettings;
-  console.error("blueprint state", blueprintHasBeenUpdated);
+  console.error("blueprint state", child.userData.blueprintHasBeenUpdated);
   if (child.userData.blueprintHasBeenUpdated) {
     extrusionSettings = {
       bevelEnabled: true,
