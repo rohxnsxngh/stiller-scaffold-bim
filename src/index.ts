@@ -591,6 +591,8 @@ export const createModelView = async () => {
           points = createBlueprintFromMarkup(
             rectPlane.userData.rectanglePoints,
             rectPlane.userData.blueprintHasBeenUpdated,
+            rectPlane.userData.width,
+            rectPlane.userData.height,
             scene
           );
         }
@@ -611,6 +613,8 @@ export const createModelView = async () => {
           points = createBlueprintFromMarkup(
             rectPlane.userData.rectanglePoints,
             rectPlane.userData.blueprintHasBeenUpdated,
+            rectPlane.userData.width,
+            rectPlane.userData.height,
             scene
           );
         }
