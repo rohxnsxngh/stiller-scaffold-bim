@@ -17,7 +17,7 @@
       </div>
       <div><p class="text-xs text-center mt-2">Rektangel</p></div>
     </div>
-    <div class="flex flex-col m-4">
+    <!-- <div class="flex flex-col m-4">
       <div
         class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
         id="startDrawingPolygon"
@@ -29,7 +29,7 @@
         />
       </div>
       <div><p class="text-xs text-center mt-2">Polygon</p></div>
-    </div>
+    </div> -->
   </div>
 
   <div class="grid grid-cols-8 gap-4">

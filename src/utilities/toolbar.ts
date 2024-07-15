@@ -746,19 +746,19 @@ export const createToolbar = (
     }
   );
 
-  observeElementAndAddEventListener("startDrawingPolygon", "mousedown", () => {
-    startDrawing = true;
-    console.log("draw polygon");
-    document.body.style.cursor = "auto";
-    setStates();
-  });
+  // observeElementAndAddEventListener("startDrawingPolygon", "mousedown", () => {
+  //   startDrawing = true;
+  //   console.log("draw polygon");
+  //   document.body.style.cursor = "auto";
+  //   setStates();
+  // });
 
-  observeElementAndAddEventListener("startDrawingPolygon", "mouseleave", () => {
-    if (startDrawing) {
-      console.log("polygon drawing start");
-      setStates({ drawingInProgress: true, drawingInProgressSwitch: true });
-    }
-  });
+  // observeElementAndAddEventListener("startDrawingPolygon", "mouseleave", () => {
+  //   if (startDrawing) {
+  //     console.log("polygon drawing start");
+  //     setStates({ drawingInProgress: true, drawingInProgressSwitch: true });
+  //   }
+  // });
 
   ////////////////////////////////////////////////
   return [
