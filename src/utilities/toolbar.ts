@@ -706,7 +706,7 @@ export const createToolbar = (
   drawer.domElement.style.zIndex = "50";
   drawer.domElement.style.backgroundColor = "#111115";
   drawer.domElement.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
-  drawer.visible = false; // change this to true to make the drawer open on mount
+  drawer.visible = true; // change this to true to make the drawer open on mount
   drawer.domElement.addEventListener("mouseover", () => {
     removeHighlightMesh(scene);
     setDrawingInProgress(false);

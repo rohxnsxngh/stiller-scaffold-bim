@@ -8,7 +8,7 @@
       <div class="divider"></div>
       <GeneralTools />
 
-      <div class="bg-[#24242F] rounded flex flex-row my-4">
+      <!-- <div class="bg-[#24242F] rounded flex flex-row my-4">
         <div>
           <img
             src="../assets/images/GeneralSection/Clipboard.svg"
@@ -22,40 +22,42 @@
             rekkverk motfasaden
           </p>
         </div>
-      </div>
+      </div> -->
 
-      <div class="card-actions justify-end">
-        <div class="m-4">
-          <div class="join join-horizontal my-2">
-            <button
-              class="btn btn-sm join-item order-1 border-white text-white"
-              id="delete-row-scaffolding"
+      <div class="bg-[#14141C] rounded mt-4">
+        <div class="card-actions justify-end">
+          <div class="p-4">
+            <div class="join join-horizontal my-2">
+              <button
+                class="btn btn-sm join-item order-1 border-white text-white"
+                id="delete-row-scaffolding"
+              >
+                Delete Row
+              </button>
+              <button
+                class="btn btn-sm join-item order-1 border-white text-white"
+                id="delete-column-scaffolding"
+              >
+                Delete Column
+              </button>
+              <button
+                class="btn btn-sm join-item order-1 border-white text-white"
+                id="reset-scaffolding"
+              >
+                Delete All
+              </button>
+            </div>
+            <div
+              class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin w-full mt-3"
+              id="autogenerate-scaffolding"
             >
-              Delete Row
-            </button>
-            <button
-              class="btn btn-sm join-item order-1 border-white text-white"
-              id="delete-column-scaffolding"
-            >
-              Delete Column
-            </button>
-            <button
-              class="btn btn-sm join-item order-1 border-white text-white"
-              id="reset-scaffolding"
-            >
-              Reset
-            </button>
-          </div>
-          <div
-            class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin w-full mt-3"
-            id="autogenerate-scaffolding"
-          >
-            <img
-              src="../assets/images/ScaffoldSection/MagicWand.svg"
-              alt="Magic Wand"
-              class="w-4 mx-0.5"
-            />
-            Autogenerer stillas
+              <img
+                src="../assets/images/ScaffoldSection/MagicWand.svg"
+                alt="Magic Wand"
+                class="w-4 mx-0.5"
+              />
+              Autogenerer stillas
+            </div>
           </div>
         </div>
       </div>
@@ -65,6 +67,7 @@
           <div
             class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2"
             id="draw-scaffold"
+            @click="toggleDisabledButton"
           >
             <img
               src="../assets/images/ScaffoldSection/DrawScaffoldingOutline.svg"
@@ -73,8 +76,9 @@
             <p class="">Tegn omriss rundt bygning</p>
           </div>
           <div
-            class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2"
+            class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2 disabled"
             id="generate-scaffolding"
+            data-disabled="true"
           >
             <img
               src="../assets/images/ScaffoldSection/GenerateScaffolding.svg"
@@ -182,10 +186,7 @@
               <span class="label-text">Antall stillas etasjer</span>
             </div>
             <div class="flex flex-row gap-1 border-black">
-              <div
-                class="btn text-2xl w-1/12"
-                id="remove-scaffolding-level"
-              >
+              <div class="btn text-2xl w-1/12" id="remove-scaffolding-level">
                 -
               </div>
               <div class="btn text-2xl">
@@ -197,10 +198,7 @@
                   disabled
                 />
               </div>
-              <div
-                class="btn text-2xl w-1/12"
-                id="add-scaffolding-level"
-              >
+              <div class="btn text-2xl w-1/12" id="add-scaffolding-level">
                 +
               </div>
             </div>
@@ -261,6 +259,23 @@ export default {
     toggleDrawer() {
       this.showDrawer = !this.showDrawer;
     },
+    toggleDisabledButton() {
+      console.log("toggle");
+      const div = document.getElementById("generate-scaffolding");
+      if (div !== null) {
+        const isDisabled = div.getAttribute("data-disabled") === "true";
+
+        if (isDisabled) {
+          div.removeAttribute("data-disabled");
+          div.classList.remove("disabled");
+        } else {
+          div.setAttribute("data-disabled", "true");
+          div.classList.add("disabled");
+        }
+      } else {
+        console.error("Element with ID 'generate-scaffolding' not found.");
+      }
+    },
     goToNextPage() {
       // @ts-ignore
       window.setActiveSection("supply");
@@ -288,3 +303,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+</style>

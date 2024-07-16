@@ -6,21 +6,30 @@
       <div class="mb-8">
         <p class="text-sm mb-4 mt-8">Tildekking av stillas</p>
         <div class="grid grid-cols-3 gap-3">
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]" id="cloth-sheet">
+          <div
+            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
+            id="cloth-sheet"
+          >
             <img
               src="../assets/images/SupplySection/Tablecloth.svg"
               class="object-contain"
             />
             <p class="">Duk</p>
           </div>
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]" id="tarp-sheet">
+          <div
+            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
+            id="tarp-sheet"
+          >
             <img
               src="../assets/images/SupplySection/Presenting.svg"
               class="object-contain"
             />
             <p>Presenning</p>
           </div>
-          <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]" id="shrink-wrap-sheet">
+          <div
+            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
+            id="shrink-wrap-sheet"
+          >
             <img
               src="../assets/images/SupplySection/ShrinkPlastic.svg"
               class="object-contain"
@@ -30,7 +39,7 @@
         </div>
       </div>
 
-      <div class="bg-[#24242F] rounded flex flex-row my-4">
+      <!-- <div class="bg-[#24242F] rounded flex flex-row my-4">
         <div>
           <img
             src="../assets/images/GeneralSection/Clipboard.svg"
@@ -62,6 +71,21 @@
               Må forankret hver 2m i høyden/vertikal. Kryssforankes forhvert
               femte feste
             </p>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="bg-[#24242F] rounded flex flex-row my-4">
+        <div>
+          <div class="text-sm text-[#9E9E9E] m-4">
+            <div class="font-semibold text-[#623CEA]">ta skjermbilde</div>
+            <button
+              class="btn btn-sm my-2"
+              id="screenshot-button"
+              @click="screenshotTrigger"
+            >
+              <span class="material-symbols-outlined"> photo_camera </span>
+            </button>
           </div>
         </div>
       </div>
@@ -116,6 +140,41 @@ export default {
     GeneralTools,
   },
   methods: {
+    screenshotTrigger() {
+      const screenshotButton = document.getElementById("screenshot-button");
+      if (screenshotButton) {
+        screenshotButton.addEventListener("click", async function () {
+          try {
+            const stream = await navigator.mediaDevices.getDisplayMedia({
+              video: true,
+            });
+
+            const video = document.createElement("video");
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+              video.play();
+              const canvas = document.createElement("canvas");
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const ctx = canvas.getContext("2d");
+              //@ts-ignore
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+              // Stop the stream
+              stream.getTracks().forEach((track) => track.stop());
+
+              // Create a download link for the screenshot
+              const link = document.createElement("a");
+              link.download = "screenshot.png";
+              link.href = canvas.toDataURL("image/png");
+              link.click();
+            };
+          } catch (err) {
+            console.error("Error: " + err);
+          }
+        });
+      }
+    },
     goToNextPage() {
       // @ts-ignore
       const svgElement = document.getElementById("supply-svg");
