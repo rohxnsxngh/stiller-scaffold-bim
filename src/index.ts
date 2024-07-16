@@ -102,7 +102,11 @@ export const createModelView = async () => {
   );
 
   // Obit Controls Gizmo
-  viewHelper = new OrbitViewHelper(controls, { size: 100, padding: 8 }, components);
+  viewHelper = new OrbitViewHelper(
+    controls,
+    { size: 100, padding: 8 },
+    components
+  );
 
   // Add the Gizmo to the document
   document.body.appendChild(viewHelper.domElement);
@@ -596,7 +600,7 @@ export const createModelView = async () => {
             scene
           );
         }
-      })
+      });
     }
   });
 
@@ -618,7 +622,7 @@ export const createModelView = async () => {
             scene
           );
         }
-      })
+      });
     }
   });
 
@@ -720,8 +724,8 @@ export const createModelView = async () => {
             roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
-        componentStore.updateRoofHeight(3)
-        const heightLevel = componentStore.height
+        componentStore.updateRoofHeight(3);
+        const heightLevel = componentStore.height;
         createRoof(extrusion, scene, 0, heightLevel);
       }
     });
@@ -851,8 +855,8 @@ export const createModelView = async () => {
             roof.userData.shape.curves[0].v2.y
       );
       if (!hasRoof) {
-        componentStore.updateShedRoofHeight(3)
-        const heightLevel = componentStore.shedHeight
+        componentStore.updateShedRoofHeight(3);
+        const heightLevel = componentStore.shedHeight;
         createShedRoof(extrusion, scene, 0, heightLevel);
       }
     });
@@ -1422,6 +1426,19 @@ export const createModelView = async () => {
 
     stats.end();
   }
+
+  window.addEventListener("resize", () => {
+    //@ts-ignore
+    components.camera.activeCamera.aspect =
+      window.innerWidth / window.innerHeight;
+    //@ts-ignore
+    components.camera.activeCamera.updateProjectionMatrix();
+    //@ts-ignore
+    components.renderer._renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+  });
 
   animate();
 };

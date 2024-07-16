@@ -95,14 +95,14 @@ export const createToolbar = (
   topToolBar.domElement.appendChild(mountPointTimeline);
 
   const generalMenuButton = new OBC.Button(components, {
-    name: "Generelt",
+    name: "Underlag",
   });
   generalMenuButton.id = "general-button";
   topToolBar.addChild(generalMenuButton);
   generalMenuButton.onClick.add(() => {
     setDrawingInProgress(false);
     if (titleElement) {
-      titleElement.textContent = "Generelt";
+      titleElement.textContent = "Underlag";
     }
     // @ts-ignore
     window.setActiveSection("general");
@@ -178,7 +178,7 @@ export const createToolbar = (
   suppliesMenuButton.domElement.classList.add("hover:bg-slate-300");
 
   const orderMenuButton = new OBC.Button(components, {
-    name: "Prisforespørsel",
+    name: "Oppsummering",
   });
   orderMenuButton.id = "supplies-button";
   topToolBar.addChild(orderMenuButton);
@@ -628,7 +628,7 @@ export const createToolbar = (
       "h3.text-3xl.text-ifcjs-200.font-medium.my-0"
     );
     if (titleElement) {
-      titleElement.textContent = "Generelt";
+      titleElement.textContent = "Underlag";
       // @ts-ignore
       titleElement.classList =
         "text-3xl text-[#DEDEDE] font-medium my-0 btn btn-ghost";
@@ -676,7 +676,12 @@ export const createToolbar = (
   menuPowerButton.id = "menu-power-button";
   drawerToolBar.addChild(menuPowerButton);
   menuPowerButton.onClick.add(() => {
-    window.location.href = "/home";
+    // window.location.href = "/home";
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+  } else {
+      document.documentElement.requestFullscreen();
+  }
   });
   menuPowerButton.domElement.classList.remove("hover:bg-ifcjs-200");
   menuPowerButton.domElement.classList.add("hover:bg-slate-300");

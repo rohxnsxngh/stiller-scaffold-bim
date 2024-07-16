@@ -211,13 +211,13 @@ export function disableOrbitControls(controls: any) {
 // delete an object when raycast intersects with object
 // TODO: make this method more efficient and more inclusive
 export function deleteObject(object: any, scene: THREE.Scene) {
-  hideAllCSS2DObjects(scene)
+  hideAllCSS2DObjects(scene);
   console.warn("OBJECT TO BE DELETED", object);
   // special instance for dealing with blueprints and shaderMaterials
   if (object.name === "blueprint") {
     scene.traverse((child) => {
       if (child.name === "rectanglePlane" && object.userData.shape) {
-        child.visible = false
+        child.visible = false;
       }
     });
     object.visible = false;
@@ -538,4 +538,41 @@ export function addScaffoldingPositionIfUnique(
   const positionKey = `${position.x},${position.y},${position.z}`;
   map.set(positionKey, position);
   return true;
+}
+
+// Vendor prefixes for older browsers
+export function requestFullscreen(element: any) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) {
+    // Firefox
+    element.mozRequestFullScreen();
+  } else if (element.webkitRequestFullscreen) {
+    // Chrome, Safari, and Opera
+    element.webkitRequestFullscreen();
+  } else if (element.msRequestFullscreen) {
+    // IE/Edge
+    element.msRequestFullscreen();
+  }
+}
+
+export function exitFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+    //@ts-ignore
+  } else if (document.mozCancelFullScreen) {
+    // Firefox
+    //@ts-ignore
+    document.mozCancelFullScreen();
+    //@ts-ignore
+  } else if (document.webkitExitFullscreen) {
+    // Chrome, Safari, and Opera
+    //@ts-ignore
+    document.webkitExitFullscreen();
+    //@ts-ignore
+  } else if (document.msExitFullscreen) {
+    // IE/Edge
+    //@ts-ignore
+    document.msExitFullscreen();
+  }
 }
