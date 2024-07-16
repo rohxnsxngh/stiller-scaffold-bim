@@ -1410,6 +1410,21 @@ export const createModelView = async () => {
     }
   );
 
+  observeElementAndAddEventListener("delete-sheeting", "mousedown", () => {
+    const sheetingToRemove: any = [];
+    scene.traverse((child) => {
+      if (child.name === "scaffoldingSheet") {
+        sheetingToRemove.push(child);
+      }
+    });
+
+    sheetingToRemove.forEach(
+      (child: THREE.Object3D<THREE.Object3DEventMap>) => {
+        scene.remove(child);
+      }
+    );
+  });
+
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 

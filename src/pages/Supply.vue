@@ -4,7 +4,8 @@
       <GeneralTools />
 
       <div class="mb-8">
-        <p class="text-sm mb-4 mt-8">Tildekking av stillas</p>
+        <p class="text-sm mb-4 mt-8 font-semibold">Tildekking av stillas</p>
+        <button id="delete-sheeting" class="btn btn-xs mb-2 border-white text-white text-xs">delete all</button>
         <div class="grid grid-cols-3 gap-3">
           <div
             class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
