@@ -26,7 +26,7 @@ export const useStore = defineStore("component", {
     depth: 0,
     height: 0,
     shedHeight: 0,
-    level: 1
+    level: 1,
   }),
   actions: {
     updateLength(value: any) {
@@ -46,6 +46,38 @@ export const useStore = defineStore("component", {
     },
     updateScaffoldLevel(value: any) {
       this.level = value;
+    },
+  },
+});
+
+export const supplyStore = defineStore("supply", {
+  state: () => ({
+    scaffolding: 0,
+    internalScaffolding: 0,
+    externalScaffolding: 0,
+    elevator: 0,
+    lift: 0,
+  }),
+  actions: {
+    updateScaffolding(value: any) {
+      this.scaffolding = value;
+    },
+    updateInternalScaffolding(value: any) {
+      this.internalScaffolding = value;
+    },
+    updateExternalScaffolding(value: any) {
+      this.externalScaffolding = value;
+    },
+  },
+});
+
+export const selectedStore = defineStore("selected", {
+  state: () => ({
+    selected: "Selected Tool",
+  }),
+  actions: {
+    updateSelected(value: any) {
+      this.selected = value;
     },
   },
 });

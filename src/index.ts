@@ -44,7 +44,7 @@ import {
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
-import { useStore } from "./store";
+import { supplyStore, useStore } from "./store";
 import {
   deletionInProgress,
   deletionScaffoldingColumnInProgress,
@@ -185,7 +185,7 @@ export const createModelView = async () => {
     generateScaffoldOutlineButton,
     createExtrusionButton,
     // clearSceneButton,
-    testButton,
+    // testButton,
   ] = createToolbar(components, scene);
 
   const mousePosition = new THREE.Vector2();
@@ -1285,23 +1285,37 @@ export const createModelView = async () => {
     return [bboxWireframe, scaffoldInternalStaircaseModeling];
   }
 
-  testButton.domElement.addEventListener("mousedown", async () => {
-    console.log("test button");
-    calculateTotalAmountScaffoldingInScene(scene);
-    calculateTotalSquareFootageForScaffolding(scene);
-    // loadSymbol(scene);
-    // scene.traverse((child) => {
-    //   if (child.name === "scaffoldLine") {
-    //     console.log(child.userData.level);
-    //   }
-    // });
+  // testButton.domElement.addEventListener("mousedown", async () => {
+  //   console.log("test button");
+  //   calculateTotalAmountScaffoldingInScene(scene);
+  //   calculateTotalSquareFootageForScaffolding(scene);
+  //   // loadSymbol(scene);
+  //   // scene.traverse((child) => {
+  //   //   if (child.name === "scaffoldLine") {
+  //   //     console.log(child.userData.level);
+  //   //   }
+  //   // });
 
-    scene.traverse((child) => {
-      if (child.name === "roof") {
-        console.log(child);
-      }
-    });
-  });
+  //   scene.traverse((child) => {
+  //     if (child.name === "roof") {
+  //       console.log(child);
+  //     }
+  //   });
+  // });
+
+  observeElementAndAddEventListener("generate-supply", "mousedown", () => {
+    const [scaffolding, internalScaffolding, externalScaffolding] = calculateTotalAmountScaffoldingInScene(scene);
+    const totalSquareFootageOfScaffolding = calculateTotalSquareFootageForScaffolding(scene);
+    console.log(totalSquareFootageOfScaffolding)
+
+    const supply = supplyStore()
+    supply.updateScaffolding(scaffolding)
+    supply.updateInternalScaffolding(internalScaffolding)
+    supply.updateExternalScaffolding(externalScaffolding)
+
+    console.log(supply.scaffolding, supply.internalScaffolding, supply.externalScaffolding)
+
+  })
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
     setDeletionInProgress(false);

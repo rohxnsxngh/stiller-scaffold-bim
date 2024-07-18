@@ -1,4 +1,5 @@
 <template>
+  <div ref="selected" class="fixed -left-32 mt-1 text-amber-300 font-semibold" >{{ value }}</div>
   <div class="w-2">
     <ul class="timeline">
       <li class="ml-10 -top-4">
@@ -30,12 +31,7 @@
               stroke="white"
               stroke-width="2"
             >
-              <line
-                x1="-32"
-                y1="0"
-                x2="100"
-                y2="0"
-              />
+              <line x1="-32" y1="0" x2="100" y2="0" />
             </svg>
           </div>
         </div>
@@ -71,12 +67,7 @@
               stroke-width="2"
               id="blueprint-svg-line"
             >
-              <line
-                x1="18"
-                y1="0"
-                x2="102"
-                y2="0"
-              />
+              <line x1="18" y1="0" x2="102" y2="0" />
             </svg>
           </div>
         </div>
@@ -112,12 +103,7 @@
               stroke-width="2"
               id="roof-svg-line"
             >
-              <line
-                x1="18"
-                y1="0"
-                x2="64"
-                y2="0"
-              />
+              <line x1="18" y1="0" x2="64" y2="0" />
             </svg>
           </div>
         </div>
@@ -153,12 +139,7 @@
               stroke-width="2"
               id="scaffold-svg-line"
             >
-              <line
-                x1="18"
-                y1="0"
-                x2="86"
-                y2="0"
-              />
+              <line x1="18" y1="0" x2="86" y2="0" />
             </svg>
           </div>
         </div>
@@ -189,3 +170,25 @@
     </ul>
   </div>
 </template>
+
+<script>
+import { ref, onMounted, computed } from 'vue';
+import { selectedStore } from '../store';
+
+export default {
+  setup() {
+    const selected = selectedStore();
+
+    // const depth = computed(() => componentStore.depth);
+    const value = computed({
+      // Make depth a computed property
+      get: () => selected.selected,
+      set: (value) => selected.updateSelected(value),
+    });
+
+    return {
+      value,
+    };
+  },
+};
+</script>

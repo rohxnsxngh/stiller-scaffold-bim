@@ -445,6 +445,11 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
   console.log(
     `There are ${scaffoldingInternalStaircaseCount} scaffoldingInternalStaircaseModel objects in the scene.`
   );
+  return [
+    scaffoldingModelCount,
+    scaffoldingInternalStaircaseCount,
+    scaffoldingExternalStaircaseCount,
+  ];
 }
 
 export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {

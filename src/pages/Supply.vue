@@ -121,6 +121,7 @@
           </div>
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
+            id="generate-supply"
             @click="goToNextPage"
           >
             Neste

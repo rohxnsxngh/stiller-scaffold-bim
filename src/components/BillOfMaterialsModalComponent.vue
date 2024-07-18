@@ -17,41 +17,29 @@
             <tr>
               <th></th>
               <th>Element</th>
-              <th>Antall</th>
+              <th>Number</th>
             </tr>
           </thead>
           <tbody>
-            <!-- row 1 -->
-            <tr>
-              <th>1</th>
-              <td>Lett stillas</td>
-              <td>***</td>
-            </tr>
-            <!-- row 2 -->
-            <tr>
-              <th>2</th>
-              <td>OSB</td>
-              <td>20 stk</td>
-            </tr>
-            <!-- row 3 -->
-            <tr>
-              <th>3</th>
-              <td>Trappetårn</td>
-              <td>2</td>
-            </tr>
-
-            <tr>
-              <th>4</th>
-              <td>Plattform</td>
-              <td>2</td>
-            </tr>
-
-            <tr>
-              <th>5</th>
-              <td>Heis</td>
-              <td>1</td>
-            </tr>
-          </tbody>
+                <!-- row 1 -->
+                <tr>
+                  <th>1</th>
+                  <td>Light scaffolding</td>
+                  <td>{{ scaffolding }}</td>
+                </tr>
+                <!-- row 2 -->
+                <tr>
+                  <th>2</th>
+                  <td>Internal Staircase</td>
+                  <td>{{ internalScaffolding }}</td>
+                </tr>
+                <!-- row 3 -->
+                <tr>
+                  <th>3</th>
+                  <td>External Staircase</td>
+                  <td>{{ externalScaffolding }}</td>
+                </tr>
+              </tbody>
         </table>
       </div>
       <div>
@@ -69,3 +57,40 @@
     </div>
   </dialog>
 </template>
+
+<script lang="ts">
+import { computed } from "vue";
+import { supplyStore } from "../store";
+
+export default {
+  setup() {
+    const supply = supplyStore();
+
+    // Use computed properties to reactively access store state
+    const scaffolding = computed({
+      // Make length a computed property
+      get: () => supply.scaffolding,
+      set: (value) => supply.updateScaffolding(value),
+    });
+
+    const internalScaffolding = computed({
+      // Make width a computed property
+      get: () => supply.internalScaffolding,
+      set: (value) => supply.updateInternalScaffolding(value),
+    });
+
+    const externalScaffolding = computed({
+      // Make depth a computed property
+      get: () => supply.externalScaffolding,
+      set: (value) => supply.updateExternalScaffolding(value),
+    });
+
+    return {
+      scaffolding,
+      internalScaffolding,
+      externalScaffolding,
+    };
+  },
+};
+</script>
+

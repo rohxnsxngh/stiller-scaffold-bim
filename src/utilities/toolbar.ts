@@ -20,6 +20,7 @@ import {
   setDrawingScaffoldingInProgress,
   setStates,
 } from "./state";
+import { selectedStore } from "../store";
 
 export const createToolbar = (
   components: OBC.Components,
@@ -34,15 +35,15 @@ export const createToolbar = (
   mainWindow.domElement.style.width = "20rem";
   mainWindow.domElement.style.height = "20rem";
   // main tool bar
-  const mainToolbar = new OBC.Toolbar(components);
-  mainToolbar.position = "left";
-  components.ui.addToolbar(mainToolbar);
-  mainToolbar.domElement.addEventListener("mousedown", () => {
-    setStates()
-  });
-  mainToolbar.domElement.classList.remove("bg-ifcjs-100");
-  mainToolbar.domElement.classList.add("bg-glass");
-  mainToolbar.domElement.classList.add("hover:bg-[#111115]");
+  // const mainToolbar = new OBC.Toolbar(components);
+  // mainToolbar.position = "left";
+  // components.ui.addToolbar(mainToolbar);
+  // mainToolbar.domElement.addEventListener("mousedown", () => {
+  //   setStates()
+  // });
+  // mainToolbar.domElement.classList.remove("bg-ifcjs-100");
+  // mainToolbar.domElement.classList.add("bg-glass");
+  // mainToolbar.domElement.classList.add("hover:bg-[#111115]");
   // side tool bar
   const sideToolBar = new OBC.Toolbar(components);
   sideToolBar.position = "right";
@@ -69,17 +70,55 @@ export const createToolbar = (
   topToolBar.domElement.classList.remove("bg-ifcjs-100");
   topToolBar.domElement.classList.add("bg-[#111115]");
 
-  // IFC loader button
-  // const fragments = new OBC.FragmentManager(components);
-  // const fragmentIfcLoader = new OBC.FragmentIfcLoader(components);
-  // fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
-  // fragmentIfcLoader.settings.webIfc.OPTIMIZE_PROFILES = true;
-  // fragmentIfcLoader.setup();
+  // show which tool is currently being used
+  // const selectedToolsBar = new OBC.Toolbar(components);
+  // selectedToolsBar.position = "bottom";
+  // components.ui.addToolbar(selectedToolsBar);
+  // selectedToolsBar.domElement.addEventListener("mouseover", () => {
+  //   // setStates();
+  // });
+  // selectedToolsBar.domElement.addEventListener("mouseleave", () => {
+  //   if (startDrawing) {
+  //     setDrawingInProgress(true);
+  //   }
+  // });
+  // selectedToolsBar.domElement.classList.remove("bg-ifcjs-100");
+  // selectedToolsBar.domElement.classList.add("bg-glass");
+  // selectedToolsBar.domElement.classList.add("hover:bg-[#111115]");
 
-  // const ifcButton = fragmentIfcLoader.uiElement.get("main");
-  // ifcButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  // ifcButton.domElement.classList.add("hover:bg-slate-300");
-  // mainToolbar.addChild(ifcButton as OBC.Button);
+  const selected = selectedStore()
+  // const selectedButtonDisplay = new OBC.Button(components, {
+  //   name: selected.selected,
+  // });
+  // selectedButtonDisplay.id = "selected-tool-button";
+  // topToolBar.addChild(selectedButtonDisplay);
+  // selectedButtonDisplay.domElement.classList.remove("hover:bg-ifcjs-200");
+  // selectedButtonDisplay.domElement.classList.remove("hover:text-black");
+  // selectedButtonDisplay.domElement.classList.add("hover:text-white");
+  // selectedButtonDisplay.domElement.classList.remove("text-white");
+  // selectedButtonDisplay.domElement.classList.add("text-amber-500");
+
+
+
+  // IFC loader button
+  const fragments = new OBC.FragmentManager(components);
+  console.log(fragments)
+  const fragmentIfcLoader = new OBC.FragmentIfcLoader(components);
+  fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = false;
+  fragmentIfcLoader.settings.webIfc.OPTIMIZE_PROFILES = true;
+  fragmentIfcLoader.setup();
+
+  observeElementAndAddEventListener("upload-ifc", "mousedown", () => {
+    setStates();
+    console.log("uploading ifc model")
+    selected.updateSelected(ifcButton.name)
+    ifcButton.domElement.click();
+  });
+
+  const ifcButton = fragmentIfcLoader.uiElement.get("main");
+  ifcButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  ifcButton.domElement.classList.add("hover:bg-slate-300");
+  sideToolBar.addChild(ifcButton as OBC.Button);
 
   // Vue instance inside of top tool bar
   const vueComponentTimeline = createApp(Timeline);
@@ -203,10 +242,13 @@ export const createToolbar = (
   // Move camera to top view button and create blueprint
   const createBlueprintRectangleButton = new OBC.Button(components);
   createBlueprintRectangleButton.materialIcon = "crop_free";
+  createBlueprintRectangleButton.name = "Draw Blueprint";
   createBlueprintRectangleButton.tooltip = "Draw Blueprint";
   createBlueprintRectangleButton.id = "top-view-button";
   sideToolBar.addChild(createBlueprintRectangleButton);
   createBlueprintRectangleButton.onClick.add(() => {
+    console.log(createBlueprintRectangleButton.name)
+    selected.updateSelected(createBlueprintRectangleButton.name)
     document.body.style.cursor = "crosshair";
     startDrawing = false;
     removeHighlightMesh(scene);
@@ -265,11 +307,13 @@ export const createToolbar = (
 
   //Solidify Blueprint
   const blueprintButton = new OBC.Button(components);
+  blueprintButton.name = "Blueprint"
   blueprintButton.materialIcon = "dashboard";
   blueprintButton.tooltip = "Blueprint";
   blueprintButton.id = "blueprint-button";
   sideToolBar.addChild(blueprintButton);
   blueprintButton.onClick.add(() => {
+    selected.updateSelected(blueprintButton.name)
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     extrusionButton.closeMenus();
@@ -533,31 +577,31 @@ export const createToolbar = (
   drawerToolBar.domElement.classList.add("hover:bg-[#111115]");
 
   //Solidify Blueprint
-  const testButton = new OBC.Button(components);
-  testButton.materialIcon = "quiz";
-  testButton.tooltip = "Test";
-  testButton.id = "blueprint-button";
-  mainToolbar.addChild(testButton);
+  // const testButton = new OBC.Button(components);
+  // testButton.materialIcon = "quiz";
+  // testButton.tooltip = "Test";
+  // testButton.id = "blueprint-button";
+  // mainToolbar.addChild(testButton);
 
-  testButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    roofButton.closeMenus();
-    scaffoldButton.closeMenus();
-    extrusionButton.closeMenus();
-    setStates();
-  });
-  testButton.domElement.addEventListener("mouseover", () => {
-    setStates();
-  });
-  testButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  testButton.domElement.classList.add("hover:bg-slate-300");
+  // testButton.onClick.add(() => {
+  //   document.body.style.cursor = "auto";
+  //   roofButton.closeMenus();
+  //   scaffoldButton.closeMenus();
+  //   extrusionButton.closeMenus();
+  //   setStates();
+  // });
+  // testButton.domElement.addEventListener("mouseover", () => {
+  //   setStates();
+  // });
+  // testButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  // testButton.domElement.classList.add("hover:bg-slate-300");
 
   // Allow panning and rotating button
   const freeRotateButton = new OBC.Button(components);
   freeRotateButton.materialIcon = "pan_tool";
   freeRotateButton.tooltip = "Free Rotate";
   freeRotateButton.id = "rotate-button";
-  mainToolbar.addChild(freeRotateButton);
+  sideToolBar.addChild(freeRotateButton);
   freeRotateButton.onClick.add(() => {
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
@@ -573,7 +617,7 @@ export const createToolbar = (
   cameraToggleButton.materialIcon = "cameraswitch";
   cameraToggleButton.tooltip = "Toggle View";
   cameraToggleButton.id = "rotate-button";
-  mainToolbar.addChild(cameraToggleButton);
+  sideToolBar.addChild(cameraToggleButton);
   cameraToggleButton.onClick.add(() => {
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
@@ -591,7 +635,7 @@ export const createToolbar = (
   deleteObjectButton.materialIcon = "delete_forever";
   deleteObjectButton.tooltip = "Delete Object";
   deleteObjectButton.id = "delete-button";
-  mainToolbar.addChild(deleteObjectButton);
+  sideToolBar.addChild(deleteObjectButton);
   deleteObjectButton.onClick.add(() => {
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
@@ -601,25 +645,25 @@ export const createToolbar = (
   deleteObjectButton.domElement.classList.add("hover:bg-slate-300");
 
   // Clear Scene
-  const clearSceneButton = new OBC.Button(components);
-  clearSceneButton.materialIcon = "check_box_outline_blank";
-  clearSceneButton.tooltip = "Reset Scene";
-  clearSceneButton.id = "clear-scene-button";
-  clearSceneButton.domElement.id = "clear-scene-button"
-  mainToolbar.addChild(clearSceneButton);
-  clearSceneButton.onClick.add(() => {
-    document.body.style.cursor = "auto";
-    setStates()
-    // console.log(clearSceneButton.domElement)
-  });
-  clearSceneButton.domElement.addEventListener("mouseover", () => {
-    setStates()
-  });
-  clearSceneButton.domElement.addEventListener("mouseleave", () => {
-    setStates()
-  });
-  clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
-  clearSceneButton.domElement.classList.add("hover:bg-slate-300");
+  // const clearSceneButton = new OBC.Button(components);
+  // clearSceneButton.materialIcon = "check_box_outline_blank";
+  // clearSceneButton.tooltip = "Reset Scene";
+  // clearSceneButton.id = "clear-scene-button";
+  // clearSceneButton.domElement.id = "clear-scene-button"
+  // mainToolbar.addChild(clearSceneButton);
+  // clearSceneButton.onClick.add(() => {
+  //   document.body.style.cursor = "auto";
+  //   setStates()
+  //   // console.log(clearSceneButton.domElement)
+  // });
+  // clearSceneButton.domElement.addEventListener("mouseover", () => {
+  //   setStates()
+  // });
+  // clearSceneButton.domElement.addEventListener("mouseleave", () => {
+  //   setStates()
+  // });
+  // clearSceneButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  // clearSceneButton.domElement.classList.add("hover:bg-slate-300");
 
   // Function to update the title
   let titleElement: Element | null;
@@ -777,7 +821,7 @@ export const createToolbar = (
     generateScaffoldButton,
     generateScaffoldOutlineButton,
     createExtrusionButton,
-    clearSceneButton,
-    testButton,
+    // clearSceneButton,
+    // testButton,
   ];
 };

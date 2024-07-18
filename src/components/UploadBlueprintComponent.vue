@@ -7,6 +7,7 @@
     <div class="flex flex-col m-4">
       <div
         class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767] indicator"
+        id="upload-ifc"
       >
         <span
           class="indicator-item badge badge-transparent bg-transparent border-transparent"
@@ -23,6 +24,7 @@
     <div class="flex flex-col m-4">
       <div
         class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767] indicator"
+        id="upload-blueprint"
       >
         <span
           class="indicator-item badge badge-transparent bg-transparent border-transparent"
