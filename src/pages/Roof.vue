@@ -50,12 +50,14 @@
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
             @click="goToPreviousPage"
+            id="go-to-previous-blueprint"
           >
             Tilbake
           </div>
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
             @click="goToNextPage"
+            id="go-to-next-scaffold"
           >
             Neste
           </div>
@@ -103,7 +105,7 @@ export default {
     },
     goToNextPage() {
       // @ts-ignore
-      window.setActiveSection("scaffold");
+      // window.setActiveSection("scaffold");
       const svgElement = document.getElementById("roof-svg");
       const svgElementLine = document.getElementById("roof-svg-line");
       if (svgElement && svgElementLine) {
@@ -115,7 +117,7 @@ export default {
     },
     goToPreviousPage() {
       // @ts-ignore
-      window.setActiveSection("blueprint");
+      // window.setActiveSection("blueprint");
       const svgElement = document.getElementById("blueprint-svg");
       const svgElementLine = document.getElementById("blueprint-svg-line");
       if (svgElement && svgElementLine) {

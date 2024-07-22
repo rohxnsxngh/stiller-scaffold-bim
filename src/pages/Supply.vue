@@ -116,6 +116,7 @@
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
             @click="goToPreviousPage"
+            id="go-to-previous-scaffold"
           >
             Tilbake
           </div>
@@ -196,7 +197,7 @@ export default {
     },
     goToPreviousPage() {
       // @ts-ignore
-      window.setActiveSection("scaffold");
+      // window.setActiveSection("scaffold");
       const svgElement = document.getElementById("scaffold-svg");
       const svgElementCurrent = document.getElementById("supply-svg");
       const svgElementLine = document.getElementById("scaffold-svg-line");

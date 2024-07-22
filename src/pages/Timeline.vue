@@ -1,5 +1,5 @@
 <template>
-  <div ref="selected" class="fixed -left-32 mt-1 text-amber-300 font-semibold" >{{ value }}</div>
+  <div ref="selected" class="fixed -right-0 -bottom-12 mt-1 text-amber-300 font-semibold" >{{ value }}</div>
   <div class="w-2">
     <ul class="timeline">
       <li class="ml-10 -top-4">

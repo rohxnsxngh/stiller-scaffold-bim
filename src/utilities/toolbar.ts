@@ -86,7 +86,7 @@ export const createToolbar = (
   // selectedToolsBar.domElement.classList.add("bg-glass");
   // selectedToolsBar.domElement.classList.add("hover:bg-[#111115]");
 
-  const selected = selectedStore()
+  const selected = selectedStore();
   // const selectedButtonDisplay = new OBC.Button(components, {
   //   name: selected.selected,
   // });
@@ -98,11 +98,9 @@ export const createToolbar = (
   // selectedButtonDisplay.domElement.classList.remove("text-white");
   // selectedButtonDisplay.domElement.classList.add("text-amber-500");
 
-
-
   // IFC loader button
   const fragments = new OBC.FragmentManager(components);
-  console.log(fragments)
+  console.log(fragments);
   const fragmentIfcLoader = new OBC.FragmentIfcLoader(components);
   fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = false;
   fragmentIfcLoader.settings.webIfc.OPTIMIZE_PROFILES = true;
@@ -110,8 +108,8 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("upload-ifc", "mousedown", () => {
     setStates();
-    console.log("uploading ifc model")
-    selected.updateSelected(ifcButton.name)
+    console.log("uploading ifc model");
+    selected.updateSelected(ifcButton.name);
     ifcButton.domElement.click();
   });
 
@@ -168,6 +166,16 @@ export const createToolbar = (
   blueprintMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   blueprintMenuButton.domElement.classList.add("hover:bg-slate-300");
 
+  observeElementAndAddEventListener("go-to-blueprint", "mousedown", () => {
+    setDrawingInProgress(false);
+    setStates();
+    if (titleElement) {
+      titleElement.textContent = "Plantegning og bygg";
+    }
+    // @ts-ignore
+    window.setActiveSection("blueprint");
+  });
+
   const roofMenuButton = new OBC.Button(components, {
     name: "Tak",
   });
@@ -183,6 +191,26 @@ export const createToolbar = (
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-slate-300");
+
+  observeElementAndAddEventListener(
+    "go-to-previous-general",
+    "mousedown",
+    () => {
+      if (titleElement) {
+        titleElement.textContent = "Underlag";
+      }
+      // @ts-ignore
+      window.setActiveSection("general");
+    }
+  );
+
+  observeElementAndAddEventListener("go-to-next-roof", "mousedown", () => {
+    if (titleElement) {
+      titleElement.textContent = "Tak";
+    }
+    // @ts-ignore
+    window.setActiveSection("roof");
+  });
 
   const scaffoldMenuButton = new OBC.Button(components, {
     name: "Stillas",
@@ -200,6 +228,42 @@ export const createToolbar = (
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-slate-300");
 
+  observeElementAndAddEventListener(
+    "go-to-previous-blueprint",
+    "mousedown",
+    () => {
+      if (titleElement) {
+        titleElement.textContent = "Plantegning og bygg";
+      }
+      // @ts-ignore
+      window.setActiveSection("blueprint");
+    }
+  );
+
+  observeElementAndAddEventListener("go-to-next-scaffold", "mousedown", () => {
+    if (titleElement) {
+      titleElement.textContent = "Stillas";
+    }
+    // @ts-ignore
+    window.setActiveSection("scaffold");
+  });
+
+  observeElementAndAddEventListener("go-to-previous-roof", "mousedown", () => {
+    if (titleElement) {
+      titleElement.textContent = "Tak";
+    }
+    // @ts-ignore
+    window.setActiveSection("roof");
+  });
+
+  observeElementAndAddEventListener("go-to-next-supply", "mousedown", () => {
+    if (titleElement) {
+      titleElement.textContent = "Tillegg";
+    }
+    // @ts-ignore
+    window.setActiveSection("supply");
+  });
+
   const suppliesMenuButton = new OBC.Button(components, {
     name: "Tillegg",
   });
@@ -215,6 +279,18 @@ export const createToolbar = (
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-slate-300");
+
+  observeElementAndAddEventListener(
+    "go-to-previous-scaffold",
+    "mousedown",
+    () => {
+      if (titleElement) {
+        titleElement.textContent = "Stillas";
+      }
+      // @ts-ignore
+      window.setActiveSection("scaffold");
+    }
+  );
 
   const orderMenuButton = new OBC.Button(components, {
     name: "Oppsummering",
@@ -247,8 +323,8 @@ export const createToolbar = (
   createBlueprintRectangleButton.id = "top-view-button";
   sideToolBar.addChild(createBlueprintRectangleButton);
   createBlueprintRectangleButton.onClick.add(() => {
-    console.log(createBlueprintRectangleButton.name)
-    selected.updateSelected(createBlueprintRectangleButton.name)
+    console.log(createBlueprintRectangleButton.name);
+    selected.updateSelected(createBlueprintRectangleButton.name);
     document.body.style.cursor = "crosshair";
     startDrawing = false;
     removeHighlightMesh(scene);
@@ -307,13 +383,13 @@ export const createToolbar = (
 
   //Solidify Blueprint
   const blueprintButton = new OBC.Button(components);
-  blueprintButton.name = "Blueprint"
+  blueprintButton.name = "Confirm Blueprint";
   blueprintButton.materialIcon = "dashboard";
   blueprintButton.tooltip = "Blueprint";
   blueprintButton.id = "blueprint-button";
   sideToolBar.addChild(blueprintButton);
   blueprintButton.onClick.add(() => {
-    selected.updateSelected(blueprintButton.name)
+    selected.updateSelected(blueprintButton.name);
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
     extrusionButton.closeMenus();
@@ -339,11 +415,13 @@ export const createToolbar = (
 
   // Create Extrusion from Blueprint
   const extrusionButton = new OBC.Button(components);
+  extrusionButton.name = "Extrude";
   extrusionButton.materialIcon = "view_in_ar";
   extrusionButton.tooltip = "Extrude";
   extrusionButton.id = "extrusion-button";
   sideToolBar.addChild(extrusionButton);
   extrusionButton.onClick.add(() => {
+    selected.updateSelected(extrusionButton.name);
     blueprintButton.closeMenus();
     roofButton.closeMenus();
     scaffoldButton.closeMenus();
@@ -363,6 +441,7 @@ export const createToolbar = (
   });
   createExtrusionButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
+    selected.updateSelected("Create Extrusion");
     setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
@@ -377,6 +456,7 @@ export const createToolbar = (
   });
   createEditExtrusionButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
+    selected.updateSelected("Edit Extrusion");
     setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
@@ -388,10 +468,12 @@ export const createToolbar = (
     closeOnClick: true,
   });
   roofButton.materialIcon = "roofing";
+  roofButton.name = "Roof";
   roofButton.tooltip = "Roof";
   roofButton.id = "roof-button";
   sideToolBar.addChild(roofButton);
   roofButton.onClick.add(() => {
+    selected.updateSelected(roofButton.name);
     blueprintButton.closeMenus();
     extrusionButton.closeMenus();
     scaffoldButton.closeMenus();
@@ -411,6 +493,7 @@ export const createToolbar = (
   });
   createGableRoofButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
+    selected.updateSelected("Gable Roof");
     setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
@@ -428,6 +511,7 @@ export const createToolbar = (
   });
   createShedRoofButton.onClick.add(() => {
     document.body.style.cursor = "crosshair";
+    selected.updateSelected("Shed Roof");
     setStates();
     cameraDisableOrbitalFunctionality(gsap, components.camera);
   });
@@ -441,9 +525,11 @@ export const createToolbar = (
   const scaffoldButton = new OBC.Button(components);
   scaffoldButton.materialIcon = "foundation";
   scaffoldButton.tooltip = "Scaffolding";
+  scaffoldButton.name = "Scaffolding";
   scaffoldButton.id = "scaffold-button";
   sideToolBar.addChild(scaffoldButton);
   scaffoldButton.onClick.add(() => {
+    selected.updateSelected(scaffoldButton.name);
     blueprintButton.closeMenus();
     roofButton.closeMenus();
     extrusionButton.closeMenus();
@@ -470,6 +556,7 @@ export const createToolbar = (
   drawScaffoldButton.onClick.add(() => {
     startDrawing = true;
     document.body.style.cursor = "auto";
+    selected.updateSelected("Draw Scaffolding Outline");
     removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
@@ -481,6 +568,7 @@ export const createToolbar = (
   // });
   drawScaffoldButton.domElement.addEventListener("mouseleave", () => {
     if (startDrawing) {
+      selected.updateSelected("Draw Scaffolding Outline");
       document.body.style.cursor = "auto";
       removeHighlightMesh(scene);
       setDrawingInProgress(false);
@@ -519,6 +607,7 @@ export const createToolbar = (
     closeOnClick: true,
   });
   generateScaffoldOutlineButton.onClick.add(() => {
+    selected.updateSelected("Generate Scaffolding Outline");
     document.body.style.cursor = "auto";
     setStates();
   });
@@ -538,6 +627,7 @@ export const createToolbar = (
   generateScaffoldOutlineButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
+    selected.updateSelected("Generate Scaffolding Outline");
     document.body.style.cursor = "auto";
     setStates();
   });
@@ -549,6 +639,7 @@ export const createToolbar = (
     closeOnClick: true,
   });
   generateScaffoldButton.onClick.add(() => {
+    selected.updateSelected("Generate Scaffolding From Outline");
     document.body.style.cursor = "auto";
     setStates();
   });
@@ -601,8 +692,10 @@ export const createToolbar = (
   freeRotateButton.materialIcon = "pan_tool";
   freeRotateButton.tooltip = "Free Rotate";
   freeRotateButton.id = "rotate-button";
+  freeRotateButton.name = "Free Rotate";
   sideToolBar.addChild(freeRotateButton);
   freeRotateButton.onClick.add(() => {
+    selected.updateSelected(freeRotateButton.name);
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setStates();
@@ -614,16 +707,18 @@ export const createToolbar = (
   freeRotateButton.domElement.classList.add("hover:bg-slate-300");
 
   const cameraToggleButton = new OBC.Button(components);
+  cameraToggleButton.name = "Toggle Camera";
   cameraToggleButton.materialIcon = "cameraswitch";
   cameraToggleButton.tooltip = "Toggle View";
   cameraToggleButton.id = "rotate-button";
   sideToolBar.addChild(cameraToggleButton);
   cameraToggleButton.onClick.add(() => {
+    selected.updateSelected(cameraToggleButton.name);
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setStates();
     // @ts-ignore
-    components.camera.toggleProjection()
+    components.camera.toggleProjection();
   });
   cameraToggleButton.domElement.addEventListener("mouseenter", () => {
     setStates();
@@ -634,9 +729,11 @@ export const createToolbar = (
   const deleteObjectButton = new OBC.Button(components);
   deleteObjectButton.materialIcon = "delete_forever";
   deleteObjectButton.tooltip = "Delete Object";
+  deleteObjectButton.name = "Delete Object";
   deleteObjectButton.id = "delete-button";
   sideToolBar.addChild(deleteObjectButton);
   deleteObjectButton.onClick.add(() => {
+    selected.updateSelected(deleteObjectButton.name);
     document.body.style.cursor = "auto";
     removeHighlightMesh(scene);
     setStates({ deletionInProgress: true });
@@ -723,9 +820,9 @@ export const createToolbar = (
     // window.location.href = "/home";
     if (document.fullscreenElement) {
       document.exitFullscreen();
-  } else {
+    } else {
       document.documentElement.requestFullscreen();
-  }
+    }
   });
   menuPowerButton.domElement.classList.remove("hover:bg-ifcjs-200");
   menuPowerButton.domElement.classList.add("hover:bg-slate-300");

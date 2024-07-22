@@ -1,7 +1,7 @@
 <template>
   <div class="card w-full h-screen bg-inherit shadow-xl">
     <div class="card-body p-2">
-      <div>Oppgi byggets ytre mål</div>
+      <div class="font-semibold">Oppgi byggets ytre mål</div>
       <GeneralTools />
 
       <div class="mb-8">
@@ -39,12 +39,14 @@
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
             @click="goToPreviousPage"
+            id="go-to-previous-general"
           >
             Tilbake
           </div>
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
             @click="goToNextPage"
+            id="go-to-next-roof"
           >
             Neste
           </div>
@@ -82,7 +84,7 @@ export default {
     },
     goToNextPage() {
       // @ts-ignore
-      window.setActiveSection("roof");
+      // window.setActiveSection("roof");
       const svgElement = document.getElementById("blueprint-svg");
       const svgElementLine = document.getElementById("blueprint-svg-line");
       if (svgElement && svgElementLine) {
@@ -94,7 +96,7 @@ export default {
     },
     goToPreviousPage() {
       // @ts-ignore
-      window.setActiveSection("general");
+      // window.setActiveSection("general");
       const svgElement = document.getElementById("general-svg");
       const svgElementLine = document.getElementById("general-svg-line");
       if (svgElement && svgElementLine) {

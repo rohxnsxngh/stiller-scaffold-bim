@@ -212,12 +212,14 @@
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
             @click="goToPreviousPage"
+            id="go-to-previous-roof"
           >
             Tilbake
           </div>
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
             @click="goToNextPage"
+            id="go-to-next-supply"
           >
             Neste
           </div>
@@ -278,7 +280,7 @@ export default {
     },
     goToNextPage() {
       // @ts-ignore
-      window.setActiveSection("supply");
+      // window.setActiveSection("supply");
       const svgElement = document.getElementById("scaffold-svg");
       const svgElementLine = document.getElementById("scaffold-svg-line");
       if (svgElement && svgElementLine) {
@@ -290,7 +292,7 @@ export default {
     },
     goToPreviousPage() {
       // @ts-ignore
-      window.setActiveSection("roof");
+      // window.setActiveSection("roof");
       const svgElement = document.getElementById("roof-svg");
       const svgElementLine = document.getElementById("roof-svg-line");
       if (svgElement && svgElementLine) {

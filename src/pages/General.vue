@@ -194,6 +194,7 @@
           </div>
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
+            id="go-to-blueprint"
             @click="goToNextPage"
           >
             Neste
@@ -213,7 +214,7 @@ export default {
   methods: {
     goToNextPage() {
       // @ts-ignore
-      window.setActiveSection("blueprint");
+      // window.setActiveSection("blueprint");
       const svgElement = document.getElementById("general-svg");
       const svgElementLine = document.getElementById("general-svg-line");
       if (svgElement && svgElementLine) {
