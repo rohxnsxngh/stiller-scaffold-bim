@@ -7,7 +7,7 @@ export let deletionScaffoldingRowInProgress = false;
 export let deletionScaffoldingColumnInProgress = false;
 export let replaceScaffoldingColumnWithExternalStaircaseInProgress = false;
 export let replaceScaffoldingColumnWithInternalStaircaseInProgress = false;
-export let rotatingRoofInProgress = false
+export let rotatingRoofInProgress = false;
 export let editingBlueprint = false;
 
 export const setEditingBlueprint = (value: boolean) => {
@@ -42,11 +42,15 @@ export const setDeletionScaffoldingColumnInProgress = (value: boolean) => {
   deletionScaffoldingColumnInProgress = value;
 };
 
-export const setReplaceScaffoldingColumnWithExternalStaircaseInProgress = (value: boolean) => {
+export const setReplaceScaffoldingColumnWithExternalStaircaseInProgress = (
+  value: boolean
+) => {
   replaceScaffoldingColumnWithExternalStaircaseInProgress = value;
 };
 
-export const setReplaceScaffoldingColumnWithInternalStaircaseInProgress = (value: boolean) => {
+export const setReplaceScaffoldingColumnWithInternalStaircaseInProgress = (
+  value: boolean
+) => {
   replaceScaffoldingColumnWithInternalStaircaseInProgress = value;
 };
 
@@ -66,6 +70,8 @@ export function setStates(
     replaceScaffoldingColumnWithInternalStaircaseInProgress?: boolean;
     rotatingRoofInProgress?: boolean;
     drawingInProgressSwitch?: boolean;
+    // editingBlueprint?: boolean;
+    // isDrawingBlueprint?: boolean;
   } = {}
 ) {
   // Default all states to false if not specified
@@ -78,7 +84,9 @@ export function setStates(
     replaceScaffoldingColumnWithExternalStaircaseInProgress: false,
     replaceScaffoldingColumnWithInternalStaircaseInProgress: false,
     rotatingRoofInProgress: false,
-    drawingInProgressSwitch: false
+    drawingInProgressSwitch: false,
+    // editingBlueprint: false,
+    // isDrawingBlueprint: false
   };
 
   // Merge the default states with the provided states
@@ -101,4 +109,6 @@ export function setStates(
   );
   setRotatingRoofInProgress(mergedStates.rotatingRoofInProgress);
   setDrawingInProgressSwitch(mergedStates.drawingInProgressSwitch);
+  // setEditingBlueprint(mergedStates.editingBlueprint)
+  // setIsDrawingBlueprint(mergedStates.isDrawingBlueprint)
 }

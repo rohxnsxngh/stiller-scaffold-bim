@@ -18,6 +18,7 @@ import {
   setDrawingInProgress,
   setDrawingInProgressSwitch,
   setDrawingScaffoldingInProgress,
+  setIsDrawingBlueprint,
   setStates,
 } from "./state";
 import { selectedStore } from "../store";
@@ -355,16 +356,19 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("free-rotate", "mousedown", () => {
     document.body.style.cursor = "grab";
+    selected.updateSelected("Free Rotate")
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setStates();
   });
 
   observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
     setStates();
+    setIsDrawingBlueprint(false)
   });
 
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     document.body.style.cursor = "auto";
+    selected.updateSelected("Delete Object")
     removeHighlightMesh(scene);
     setStates({ deletionInProgress: true });
   });

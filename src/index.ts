@@ -67,7 +67,10 @@ import {
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
+  setStates,
 } from "./utilities/state";
+import gsap from "gsap";
+import { cameraEnableOrbitalFunctionality } from "./utilities/camera";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -1146,7 +1149,8 @@ export const createModelView = async () => {
         markup,
         components,
         plane,
-        raycaster
+        raycaster,
+        gsap
       );
     }
   }
@@ -1168,7 +1172,8 @@ export const createModelView = async () => {
           markup,
           components,
           plane,
-          raycaster
+          raycaster,
+          gsap
         );
         if (result) {
           [rectangleBlueprint, labels] = result;

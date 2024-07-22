@@ -8,13 +8,16 @@ import {
 } from "./helper";
 import { rectMaterial, roofMaterial } from "./material";
 import { DragControls } from "three/addons/controls/DragControls.js";
-import { useStore } from "../store";
+import { selectedStore, useStore } from "../store";
 import {
   setDeletionInProgress,
   setDrawingInProgress,
   setDrawingScaffoldingInProgress,
+  setEditingBlueprint,
   setIsDrawingBlueprint,
+  setStates,
 } from "./state";
+import { cameraEnableOrbitalFunctionality } from "./camera";
 
 // Create Shape Outline
 export function createShapeIsOutlined(
@@ -386,7 +389,8 @@ export function createRectangle(
   markup: any,
   components: OBC.Components,
   plane: THREE.Mesh,
-  raycaster: THREE.Raycaster
+  raycaster: THREE.Raycaster,
+  gsap: any
 ) {
   markupGroup.children.forEach((child) => {
     markupGroup.remove(child);
@@ -447,7 +451,9 @@ export function createRectangle(
       width,
       height,
       centerX,
-      centerZ
+      centerZ,
+      gsap,
+      components
     );
   });
 
@@ -540,7 +546,9 @@ function attachLabelChangeHandler(
   width: number,
   height: number,
   centerX: any,
-  centerZ: any
+  centerZ: any,
+  gsap: any,
+  components: OBC.Components
 ) {
   const labelElement = label.element as HTMLDivElement;
   let oldValue: any;
@@ -573,16 +581,28 @@ function attachLabelChangeHandler(
   labelElement.addEventListener("blur", () => {
     handleValueChange(labelElement.textContent);
     blurTriggered = false;
+    document.body.style.cursor = "grab";
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setIsDrawingBlueprint(false)
+    setEditingBlueprint(false)
   });
 
   // TODO: There is something wrong with this, this logic needs to be edited
-  labelElement.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault(); // Prevents the default action of the Enter key
-      handleValueChange(labelElement.textContent);
-      blurTriggered = false;
-    }
-  }, { passive: false });
+  labelElement.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Prevents the default action of the Enter key
+        handleValueChange(labelElement.textContent);
+        blurTriggered = false;
+        document.body.style.cursor = "grab";
+        cameraEnableOrbitalFunctionality(gsap, components.camera);
+        setIsDrawingBlueprint(false)
+        setEditingBlueprint(false)
+      }
+    },
+    { passive: false }
+  );
 
   function handleValueChange(newValue: string | null) {
     if (oldValue !== newValue) {
