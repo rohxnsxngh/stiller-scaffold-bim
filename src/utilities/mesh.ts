@@ -575,13 +575,14 @@ function attachLabelChangeHandler(
     blurTriggered = false;
   });
 
-  // labelElement.addEventListener("keydown", (event) => {
-  //   if (event.key === "Enter") {
-  //     event.preventDefault(); // Prevents the default action of the Enter key
-  //     handleValueChange(labelElement.textContent);
-  //     blurTriggered = false;
-  //   }
-  // }, { passive: false });
+  // TODO: There is something wrong with this, this logic needs to be edited
+  labelElement.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevents the default action of the Enter key
+      handleValueChange(labelElement.textContent);
+      blurTriggered = false;
+    }
+  }, { passive: false });
 
   function handleValueChange(newValue: string | null) {
     if (oldValue !== newValue) {
