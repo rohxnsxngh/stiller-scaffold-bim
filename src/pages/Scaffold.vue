@@ -280,7 +280,7 @@ export default {
     },
     goToNextPage() {
       // @ts-ignore
-      // window.setActiveSection("supply");
+      window.setActiveSection("supply");
       const svgElement = document.getElementById("scaffold-svg");
       const svgElementLine = document.getElementById("scaffold-svg-line");
       if (svgElement && svgElementLine) {
@@ -292,7 +292,7 @@ export default {
     },
     goToPreviousPage() {
       // @ts-ignore
-      // window.setActiveSection("roof");
+      window.setActiveSection("roof");
       const svgElement = document.getElementById("roof-svg");
       const svgElementLine = document.getElementById("roof-svg-line");
       if (svgElement && svgElementLine) {

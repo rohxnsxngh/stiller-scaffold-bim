@@ -197,7 +197,7 @@ export default {
     },
     goToPreviousPage() {
       // @ts-ignore
-      // window.setActiveSection("scaffold");
+      window.setActiveSection("scaffold");
       const svgElement = document.getElementById("scaffold-svg");
       const svgElementCurrent = document.getElementById("supply-svg");
       const svgElementLine = document.getElementById("scaffold-svg-line");

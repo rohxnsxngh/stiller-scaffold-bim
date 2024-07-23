@@ -105,7 +105,7 @@ export default {
     },
     goToNextPage() {
       // @ts-ignore
-      // window.setActiveSection("scaffold");
+      window.setActiveSection("scaffold");
       const svgElement = document.getElementById("roof-svg");
       const svgElementLine = document.getElementById("roof-svg-line");
       if (svgElement && svgElementLine) {
@@ -117,7 +117,7 @@ export default {
     },
     goToPreviousPage() {
       // @ts-ignore
-      // window.setActiveSection("blueprint");
+      window.setActiveSection("blueprint");
       const svgElement = document.getElementById("blueprint-svg");
       const svgElementLine = document.getElementById("blueprint-svg-line");
       if (svgElement && svgElementLine) {

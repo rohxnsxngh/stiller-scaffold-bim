@@ -15,7 +15,7 @@
           class="scale-150"
         />
       </div>
-      <div><p class="text-xs text-center mt-2">Rektangel</p></div>
+      <div><p class="text-xs text-center mt-2">Tegn Plantegning</p></div>
     </div>
     <!-- <div class="flex flex-col m-4">
       <div

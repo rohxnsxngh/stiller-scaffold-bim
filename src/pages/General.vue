@@ -214,7 +214,7 @@ export default {
   methods: {
     goToNextPage() {
       // @ts-ignore
-      // window.setActiveSection("blueprint");
+      window.setActiveSection("blueprint");
       const svgElement = document.getElementById("general-svg");
       const svgElementLine = document.getElementById("general-svg-line");
       if (svgElement && svgElementLine) {

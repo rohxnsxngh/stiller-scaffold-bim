@@ -173,8 +173,6 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Plantegning og bygg";
     }
-    // @ts-ignore
-    window.setActiveSection("blueprint");
   });
 
   const roofMenuButton = new OBC.Button(components, {
@@ -187,8 +185,6 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Tak";
     }
-    // @ts-ignore
-    window.setActiveSection("roof");
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -200,8 +196,6 @@ export const createToolbar = (
       if (titleElement) {
         titleElement.textContent = "Underlag";
       }
-      // @ts-ignore
-      window.setActiveSection("general");
     }
   );
 
@@ -209,8 +203,6 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Tak";
     }
-    // @ts-ignore
-    window.setActiveSection("roof");
   });
 
   const scaffoldMenuButton = new OBC.Button(components, {
@@ -223,8 +215,6 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Stillas";
     }
-    // @ts-ignore
-    window.setActiveSection("scaffold");
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -236,8 +226,6 @@ export const createToolbar = (
       if (titleElement) {
         titleElement.textContent = "Plantegning og bygg";
       }
-      // @ts-ignore
-      window.setActiveSection("blueprint");
     }
   );
 
@@ -245,24 +233,18 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Stillas";
     }
-    // @ts-ignore
-    window.setActiveSection("scaffold");
   });
 
   observeElementAndAddEventListener("go-to-previous-roof", "mousedown", () => {
     if (titleElement) {
       titleElement.textContent = "Tak";
     }
-    // @ts-ignore
-    window.setActiveSection("roof");
   });
 
   observeElementAndAddEventListener("go-to-next-supply", "mousedown", () => {
     if (titleElement) {
       titleElement.textContent = "Tillegg";
     }
-    // @ts-ignore
-    window.setActiveSection("supply");
   });
 
   const suppliesMenuButton = new OBC.Button(components, {
@@ -275,8 +257,6 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Tillegg";
     }
-    // @ts-ignore
-    window.setActiveSection("supply");
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -288,8 +268,6 @@ export const createToolbar = (
       if (titleElement) {
         titleElement.textContent = "Stillas";
       }
-      // @ts-ignore
-      window.setActiveSection("scaffold");
     }
   );
 
@@ -363,6 +341,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
     setStates();
+    removeHighlightMesh(scene);
     setIsDrawingBlueprint(false)
   });
 
@@ -700,6 +679,7 @@ export const createToolbar = (
   sideToolBar.addChild(freeRotateButton);
   freeRotateButton.onClick.add(() => {
     selected.updateSelected(freeRotateButton.name);
+    removeHighlightMesh(scene);
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setStates();
