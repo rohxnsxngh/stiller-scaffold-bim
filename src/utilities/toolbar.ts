@@ -334,7 +334,8 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("free-rotate", "mousedown", () => {
     document.body.style.cursor = "grab";
-    selected.updateSelected("Free Rotate")
+    selected.updateSelected("Free Rotate");
+    startDrawing = false;
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setStates();
   });
@@ -342,12 +343,12 @@ export const createToolbar = (
   observeElementAndAddEventListener("free-rotate", "mouseenter", () => {
     setStates();
     removeHighlightMesh(scene);
-    setIsDrawingBlueprint(false)
+    setIsDrawingBlueprint(false);
   });
 
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     document.body.style.cursor = "auto";
-    selected.updateSelected("Delete Object")
+    selected.updateSelected("Delete Object");
     removeHighlightMesh(scene);
     setStates({ deletionInProgress: true });
   });
@@ -678,6 +679,7 @@ export const createToolbar = (
   freeRotateButton.name = "Free Rotate";
   sideToolBar.addChild(freeRotateButton);
   freeRotateButton.onClick.add(() => {
+    startDrawing = false;
     selected.updateSelected(freeRotateButton.name);
     removeHighlightMesh(scene);
     document.body.style.cursor = "grab";
