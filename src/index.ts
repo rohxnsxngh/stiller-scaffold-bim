@@ -67,10 +67,8 @@ import {
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
-  setStates,
 } from "./utilities/state";
 import gsap from "gsap";
-import { cameraEnableOrbitalFunctionality } from "./utilities/camera";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -204,96 +202,85 @@ export const createModelView = async () => {
   let lastHighlightedObject: THREE.Mesh | null = null;
   let lastHighlightedObjectColor: any | null = null;
 
+  // Function to reset the color of the last highlighted object
+  function resetLastHighlightedObject() {
+    if (lastHighlightedObject && lastHighlightedObject.material) {
+      const material = lastHighlightedObject.material;
+      if (
+        material instanceof THREE.MeshBasicMaterial ||
+        material instanceof THREE.MeshStandardMaterial ||
+        material instanceof THREE.MeshPhongMaterial
+      ) {
+        material.color.setHex(lastHighlightedObjectColor);
+        material.needsUpdate = true;
+      }
+      lastHighlightedObject = null;
+    }
+  }
+
+  // Function to highlight the intersected object
+  function highlightObject(object: THREE.Mesh, color: number) {
+    const material = object.material;
+    if (
+      material instanceof THREE.MeshStandardMaterial ||
+      material instanceof THREE.MeshPhongMaterial
+    ) {
+      lastHighlightedObjectColor = material.color.getHex();
+      material.color.set(color);
+      material.needsUpdate = true;
+    }
+  }
+
   // highlight object whens deletion is in progress
   window.addEventListener("mousemove", function (e) {
-    if (deletionInProgress && !drawingInProgress) {
-      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      // @ts-ignore
-      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
-      intersects = raycaster.intersectObjects(scene.children);
+    mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    //@ts-ignore
+    raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
+    intersects = raycaster.intersectObjects(scene.children);
 
-      // If there is an intersection, apply the glow to the intersected object
+    if (drawingInProgress) {
+      scene.add(highlightMesh);
+      intersects.forEach(function (intersect: any) {
+        switch (intersect.object.name) {
+          case "ground":
+            const highlightPos = new THREE.Vector3()
+              .copy(intersect.point)
+              .floor()
+              .addScalar(0.5);
+            highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
+            break;
+          case "extrusion":
+          case "roof":
+          case "shedRoof":
+          case "blueprint":
+          case "line":
+          case "cubeClone":
+          case "rectangleLine":
+            // Handle other cases if necessary
+            break;
+        }
+      });
+    }
+
+    if (deletionInProgress && !drawingInProgress) {
       if (intersects.length > 0) {
-        const intersectedObject = intersects[0].object;
+        const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground"
         ) {
-          if (lastHighlightedObject && lastHighlightedObject.material) {
-            // Check if the material is one of the specified types
-            if (
-              lastHighlightedObject.material instanceof
-                THREE.MeshBasicMaterial ||
-              lastHighlightedObject.material instanceof
-                THREE.MeshStandardMaterial ||
-              lastHighlightedObject.material instanceof THREE.MeshPhongMaterial
-            ) {
-              (
-                lastHighlightedObject.material as
-                  | THREE.MeshBasicMaterial
-                  | THREE.MeshStandardMaterial
-                  | THREE.MeshPhongMaterial
-              ).color.setHex(lastHighlightedObjectColor);
-              (
-                lastHighlightedObject.material as
-                  | THREE.MeshBasicMaterial
-                  | THREE.MeshStandardMaterial
-                  | THREE.MeshPhongMaterial
-              ).needsUpdate = true;
-            }
-            lastHighlightedObject = null;
-          }
-          if (
-            intersectedObject.material instanceof THREE.MeshBasicMaterial ||
-            intersectedObject.material instanceof THREE.MeshStandardMaterial ||
-            intersectedObject.material instanceof THREE.MeshPhongMaterial
-          ) {
-            // Apply the glow to the new intersected object
-            lastHighlightedObjectColor =
-              intersectedObject.material.color.getHex();
-            intersectedObject.material.color.set(0xff0000);
-            intersectedObject.material.needsUpdate = true;
-            // applyGlow(intersectedObject);
-          }
+          resetLastHighlightedObject();
+          highlightObject(intersectedObject, 0xff0000);
           lastHighlightedObject = intersectedObject;
-        } else if (
-          intersectedObject !== lastHighlightedObject &&
-          intersectedObject.name === "ground"
-        ) {
-          if (lastHighlightedObject && lastHighlightedObject.material) {
-            // Ensure the material is an instance of THREE.MeshStandardMaterial before casting
-            // Check if the material is one of the specified types
-            if (
-              lastHighlightedObject.material instanceof
-                THREE.MeshBasicMaterial ||
-              lastHighlightedObject.material instanceof
-                THREE.MeshStandardMaterial ||
-              lastHighlightedObject.material instanceof THREE.MeshPhongMaterial
-            ) {
-              (
-                lastHighlightedObject.material as
-                  | THREE.MeshBasicMaterial
-                  | THREE.MeshStandardMaterial
-                  | THREE.MeshPhongMaterial
-              ).color.setHex(lastHighlightedObjectColor);
-              (
-                lastHighlightedObject.material as
-                  | THREE.MeshBasicMaterial
-                  | THREE.MeshStandardMaterial
-                  | THREE.MeshPhongMaterial
-              ).needsUpdate = true;
-            }
-            lastHighlightedObject = null;
-          }
+        } else if (intersectedObject.name === "ground") {
+          resetLastHighlightedObject();
         }
       } else {
-        // If there is no intersection, revert the material of the last highlighted object
-        if (lastHighlightedObject) {
-          lastHighlightedObject = null;
-        }
+        resetLastHighlightedObject();
       }
     }
+
     if (
       (deletionScaffoldingRowInProgress ||
         editingBlueprint ||
@@ -302,123 +289,21 @@ export const createModelView = async () => {
       !drawingInProgress &&
       !deletionInProgress
     ) {
-      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      // @ts-ignore
-      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
-      intersects = raycaster.intersectObjects(scene.children);
-
-      // If there is an intersection, apply the glow to the intersected object
       if (intersects.length > 0) {
-        const intersectedObject = intersects[0].object;
+        const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground"
         ) {
-          if (lastHighlightedObject) {
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).color.setHex(lastHighlightedObjectColor);
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).needsUpdate = true;
-            lastHighlightedObject = null;
-          }
-          // Apply the glow to the new intersected object
-          // Apply the glow to the new intersected object
-          if (
-            intersectedObject.material instanceof THREE.MeshStandardMaterial ||
-            intersectedObject.material instanceof THREE.MeshPhongMaterial
-          ) {
-            lastHighlightedObjectColor =
-              intersectedObject.material.color.getHex();
-            intersectedObject.material.color.set(0x111115);
-            intersectedObject.material.needsUpdate = true;
-            // applyGlow(intersectedObject);
-          }
+          resetLastHighlightedObject();
+          highlightObject(intersectedObject, 0x111115);
           lastHighlightedObject = intersectedObject;
-        } else if (
-          intersectedObject !== lastHighlightedObject &&
-          intersectedObject.name === "ground"
-        ) {
-          if (lastHighlightedObject) {
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).color.setHex(lastHighlightedObjectColor);
-            (
-              lastHighlightedObject.material as THREE.MeshStandardMaterial
-            ).needsUpdate = true;
-            lastHighlightedObject = null;
-          }
+        } else if (intersectedObject.name === "ground") {
+          resetLastHighlightedObject();
         }
       } else {
-        // If there is no intersection, revert the material of the last highlighted object
-        if (lastHighlightedObject) {
-          lastHighlightedObject = null;
-        }
+        resetLastHighlightedObject();
       }
-    }
-    // general poly draw tool
-    if (drawingInProgress) {
-      scene.add(highlightMesh);
-      mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      // @ts-ignore
-      raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
-      intersects = raycaster.intersectObjects(scene.children);
-      intersects.forEach(function (intersect: any) {
-        switch (intersect.object.name) {
-          case "ground":
-            if (drawingScaffoldingInProgress) {
-              scene.add(highlightMesh);
-              mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-              mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-              // @ts-ignore
-              raycaster.setFromCamera(
-                mousePosition,
-                // @ts-ignore
-                components.camera.activeCamera
-              );
-              intersects = raycaster.intersectObjects(scene.children);
-              intersects.forEach(function (intersect: any) {
-                switch (intersect.object.name) {
-                  case "ground":
-                    const highlightPos = new THREE.Vector3()
-                      .copy(intersect.point)
-                      .floor()
-                      .addScalar(0.5);
-                    highlightMesh.position.set(
-                      highlightPos.x,
-                      0,
-                      highlightPos.z
-                    );
-                    break;
-                }
-              });
-            }
-            const highlightPos = new THREE.Vector3()
-              .copy(intersect.point)
-              .floor()
-              .addScalar(0.5);
-            highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
-            break;
-          case "extrusion":
-            break;
-          case "roof":
-            console.log("roof");
-            break;
-          case "shedRoof":
-            break;
-          case "blueprint":
-            break;
-          case "line":
-            break;
-          case "cubeClone":
-            break;
-          case "rectangleLine":
-            break;
-        }
-      });
     }
   });
 
@@ -1309,18 +1194,23 @@ export const createModelView = async () => {
   // });
 
   observeElementAndAddEventListener("generate-supply", "mousedown", () => {
-    const [scaffolding, internalScaffolding, externalScaffolding] = calculateTotalAmountScaffoldingInScene(scene);
-    const totalSquareFootageOfScaffolding = calculateTotalSquareFootageForScaffolding(scene);
-    console.log(totalSquareFootageOfScaffolding)
+    const [scaffolding, internalScaffolding, externalScaffolding] =
+      calculateTotalAmountScaffoldingInScene(scene);
+    const totalSquareFootageOfScaffolding =
+      calculateTotalSquareFootageForScaffolding(scene);
+    console.log(totalSquareFootageOfScaffolding);
 
-    const supply = supplyStore()
-    supply.updateScaffolding(scaffolding)
-    supply.updateInternalScaffolding(internalScaffolding)
-    supply.updateExternalScaffolding(externalScaffolding)
+    const supply = supplyStore();
+    supply.updateScaffolding(scaffolding);
+    supply.updateInternalScaffolding(internalScaffolding);
+    supply.updateExternalScaffolding(externalScaffolding);
 
-    console.log(supply.scaffolding, supply.internalScaffolding, supply.externalScaffolding)
-
-  })
+    console.log(
+      supply.scaffolding,
+      supply.internalScaffolding,
+      supply.externalScaffolding
+    );
+  });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
     setDeletionInProgress(false);
