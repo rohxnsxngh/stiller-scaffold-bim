@@ -697,10 +697,10 @@ export function deleteRowOfScaffolding(scene: THREE.Scene, scaffold: any) {
   const numSegments = Math.ceil(lineLength / 1.57);
   try {
     for (let i = 0; i < numSegments; i++) {
-      if (startPoint.y === 0 || endPoint.y === 0) {
-        console.log("level cannot be lower than 0");
-        return;
-      }
+      // if (startPoint.y < 0 || endPoint.y < 0) {
+      //   console.log("level cannot be lower than 0");
+      //   return;
+      // }
       // Calculate the interpolated position along the line
       const t = i / numSegments; // Parameter for interpolation along the line
       const position = new THREE.Vector3().lerpVectors(startPoint, endPoint, t);

@@ -38,6 +38,7 @@ import {
   deleteObject,
   disableOrbitControls,
   hideAllCSS2DObjects,
+  isVectorEqual,
   observeElementAndAddEventListener,
   resetScaffolding,
   resetScene,
@@ -201,6 +202,7 @@ export const createModelView = async () => {
   // Modify the mousemove event listener
   let lastHighlightedObject: THREE.Mesh | null = null;
   let lastHighlightedObjectColor: any | null = null;
+  let lastHighlightedObjects: THREE.Object3D<THREE.Object3DEventMap>[] = [];
 
   // Function to reset the color of the last highlighted object
   function resetLastHighlightedObject() {
@@ -216,6 +218,22 @@ export const createModelView = async () => {
       }
       lastHighlightedObject = null;
     }
+    if (lastHighlightedObjects.length > 0) {
+      const originalMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0x404141,
+        emissive: 0x000000,
+      });
+      lastHighlightedObjects.forEach((scaffold: THREE.Object3D) => {
+        if (scaffold.children[0] instanceof THREE.Mesh) {
+          scaffold.children[0].material = originalMaterial;
+          console.log("switching to original color");
+        } else {
+          console.error("The first child of the model instance is not a Mesh.");
+        }
+      });
+
+      lastHighlightedObjects = [];
+    }
   }
 
   // Function to highlight the intersected object
@@ -228,6 +246,53 @@ export const createModelView = async () => {
       lastHighlightedObjectColor = material.color.getHex();
       material.color.set(color);
       material.needsUpdate = true;
+    }
+  }
+
+  // highlight an entire row of scaffolding
+  function highlightScaffoldingRow(scaffold: any, color: number) {
+    const lineLength = scaffold.parent.userData.line_length;
+    const startPoint = scaffold.parent.userData.first_point;
+    const endPoint = scaffold.parent.userData.last_point;
+    const numSegments = Math.ceil(lineLength / 1.57);
+
+    try {
+      for (let i = 0; i < numSegments; i++) {
+        // Calculate the interpolated position along the line
+        const t = i / numSegments; // Parameter for interpolation along the line
+        const position = new THREE.Vector3().lerpVectors(
+          startPoint,
+          endPoint,
+          t
+        );
+
+        scene.traverse((child) => {
+          if (
+            child instanceof THREE.Object3D &&
+            child.position.equals(position)
+          ) {
+            lastHighlightedObjects.push(child);
+          }
+        });
+
+        const material = new THREE.MeshPhysicalMaterial({
+          color: 0x000000,
+          emissive: 0x000000,
+        });
+
+        lastHighlightedObjects.forEach((scaffold: THREE.Object3D) => {
+          if (scaffold.children[0] instanceof THREE.Mesh) {
+            scaffold.children[0].material = material;
+            lastHighlightedObjectColor = material.color.getHex();
+          } else {
+            console.error(
+              "The first child of the model instance is not a Mesh."
+            );
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error highlighting scaffold model:", error);
     }
   }
 
@@ -270,6 +335,7 @@ export const createModelView = async () => {
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground"
         ) {
+          console.warn("highlighting");
           resetLastHighlightedObject();
           highlightObject(intersectedObject, 0xff0000);
           lastHighlightedObject = intersectedObject;
@@ -280,10 +346,28 @@ export const createModelView = async () => {
         resetLastHighlightedObject();
       }
     }
+    if (deletionScaffoldingRowInProgress) {
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object as THREE.Mesh;
+        if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name !== "ground" &&
+          (intersectedObject.name.startsWith("scaffolding") ||
+            intersectedObject.parent?.name.startsWith("scaffolding"))
+        ) {
+          resetLastHighlightedObject();
+          highlightScaffoldingRow(intersectedObject, 0x111115);
+          lastHighlightedObject = intersectedObject;
+        } else if (intersectedObject.name === "ground") {
+          resetLastHighlightedObject();
+        }
+      } else {
+        resetLastHighlightedObject();
+      }
+    }
 
     if (
-      (deletionScaffoldingRowInProgress ||
-        editingBlueprint ||
+      (editingBlueprint ||
         rotatingRoofInProgress ||
         deletionScaffoldingColumnInProgress) &&
       !drawingInProgress &&
