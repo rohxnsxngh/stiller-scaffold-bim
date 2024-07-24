@@ -231,7 +231,6 @@ export const createModelView = async () => {
           console.error("The first child of the model instance is not a Mesh.");
         }
       });
-
       lastHighlightedObjects = [];
     }
   }
@@ -276,8 +275,8 @@ export const createModelView = async () => {
         });
 
         const material = new THREE.MeshPhysicalMaterial({
-          color: 0x000000,
-          emissive: 0x000000,
+          color: color,
+          emissive: color,
         });
 
         lastHighlightedObjects.forEach((scaffold: THREE.Object3D) => {
@@ -353,10 +352,10 @@ export const createModelView = async () => {
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
           (intersectedObject.name.startsWith("scaffolding") ||
-            intersectedObject.parent?.name.startsWith("scaffolding"))
+            intersectedObject.parent?.name.startsWith("scaffolding") || intersectedObject.name === "scaffoldLine")
         ) {
           resetLastHighlightedObject();
-          highlightScaffoldingRow(intersectedObject, 0x111115);
+          highlightScaffoldingRow(intersectedObject, 0x000000);
           lastHighlightedObject = intersectedObject;
         } else if (intersectedObject.name === "ground") {
           resetLastHighlightedObject();
