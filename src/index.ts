@@ -291,36 +291,43 @@ export const createModelView = async () => {
         });
       }
     } catch (error) {
-      console.error("Error highlighting scaffold model:", error);
+      console.warn("Error highlighting scaffold model:", error, scaffold);
     }
   }
 
   // highlight entire column of scaffolding
   function highlightScaffoldingColumn(scaffold: any) {
-    scene.traverse((child) => {
-      if (child.name === "scaffoldingModel") {
-        if (
-          child.userData.position.x === scaffold.parent.userData.position.x &&
-          child.userData.position.z === scaffold.parent.userData.position.z
-        ) {
-          lastHighlightedObjects.push(child);
+    try {
+      if (scaffold.name === "scaffoldLine") {
+        return;
+      }
+      scene.traverse((child) => {
+        if (child.name === "scaffoldingModel") {
+          if (
+            child.userData.position.x === scaffold.parent.userData.position.x &&
+            child.userData.position.z === scaffold.parent.userData.position.z
+          ) {
+            lastHighlightedObjects.push(child);
+          }
         }
-      }
-    });
+      });
 
-    const material = new THREE.MeshPhysicalMaterial({
-      color: 0x000000,
-      emissive: 0x000000,
-    });
+      const material = new THREE.MeshPhysicalMaterial({
+        color: 0x000000,
+        emissive: 0x000000,
+      });
 
-    lastHighlightedObjects.forEach((scaffold: THREE.Object3D) => {
-      if (scaffold.children[0] instanceof THREE.Mesh) {
-        scaffold.children[0].material = material;
-        lastHighlightedObjectColor = material.color.getHex();
-      } else {
-        console.error("The first child of the model instance is not a Mesh.");
-      }
-    });
+      lastHighlightedObjects.forEach((scaffold: THREE.Object3D) => {
+        if (scaffold.children[0] instanceof THREE.Mesh) {
+          scaffold.children[0].material = material;
+          lastHighlightedObjectColor = material.color.getHex();
+        } else {
+          console.error("The first child of the model instance is not a Mesh.");
+        }
+      });
+    } catch (error) {
+      console.warn("Error highlighting scaffold model:", error, scaffold);
+    }
   }
 
   // highlight object whens deletion is in progress
