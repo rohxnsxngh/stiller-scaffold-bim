@@ -295,6 +295,34 @@ export const createModelView = async () => {
     }
   }
 
+  // highlight entire column of scaffolding
+  function highlightScaffoldingColumn(scaffold: any) {
+    scene.traverse((child) => {
+      if (child.name === "scaffoldingModel") {
+        if (
+          child.userData.position.x === scaffold.parent.userData.position.x &&
+          child.userData.position.z === scaffold.parent.userData.position.z
+        ) {
+          lastHighlightedObjects.push(child);
+        }
+      }
+    });
+
+    const material = new THREE.MeshPhysicalMaterial({
+      color: 0x000000,
+      emissive: 0x000000,
+    });
+
+    lastHighlightedObjects.forEach((scaffold: THREE.Object3D) => {
+      if (scaffold.children[0] instanceof THREE.Mesh) {
+        scaffold.children[0].material = material;
+        lastHighlightedObjectColor = material.color.getHex();
+      } else {
+        console.error("The first child of the model instance is not a Mesh.");
+      }
+    });
+  }
+
   // highlight object whens deletion is in progress
   window.addEventListener("mousemove", function (e) {
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -352,7 +380,8 @@ export const createModelView = async () => {
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
           (intersectedObject.name.startsWith("scaffolding") ||
-            intersectedObject.parent?.name.startsWith("scaffolding") || intersectedObject.name === "scaffoldLine")
+            intersectedObject.parent?.name.startsWith("scaffolding") ||
+            intersectedObject.name === "scaffoldLine")
         ) {
           resetLastHighlightedObject();
           highlightScaffoldingRow(intersectedObject, 0x000000);
@@ -365,10 +394,29 @@ export const createModelView = async () => {
       }
     }
 
+    if (deletionScaffoldingColumnInProgress) {
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object as THREE.Mesh;
+        if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name !== "ground" &&
+          (intersectedObject.name.startsWith("scaffolding") ||
+            intersectedObject.parent?.name.startsWith("scaffolding") ||
+            intersectedObject.name === "scaffoldLine")
+        ) {
+          resetLastHighlightedObject();
+          highlightScaffoldingColumn(intersectedObject);
+          lastHighlightedObject = intersectedObject;
+        } else if (intersectedObject.name === "ground") {
+          resetLastHighlightedObject();
+        }
+      } else {
+        resetLastHighlightedObject();
+      }
+    }
+
     if (
-      (editingBlueprint ||
-        rotatingRoofInProgress ||
-        deletionScaffoldingColumnInProgress) &&
+      (editingBlueprint || rotatingRoofInProgress) &&
       !drawingInProgress &&
       !deletionInProgress
     ) {
