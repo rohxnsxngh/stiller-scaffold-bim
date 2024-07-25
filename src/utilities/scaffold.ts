@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import {
   addScaffoldingPositionIfUnique,
+  deleteObject,
   isVectorEqual,
   measureLineLength,
   observeElementAndAddEventListener,
@@ -417,7 +418,6 @@ function attachScaffoldRowLabelChangeHandler(
     scaffoldPlacedPosition.clear();
   });
 
-
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     levels = -1;
     line = null;
@@ -744,20 +744,29 @@ export function deleteRowOfScaffolding(scene: THREE.Scene, scaffold: any) {
 // delete column of scaffolding
 export function deleteColumnOfScaffolding(scene: THREE.Scene, scaffold: any) {
   let scaffoldingColumnToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
-  scene.traverse((child) => {
-    if (child.name === "scaffoldingModel") {
+  try {
+    scene.traverse((child) => {
+      console.log(child)
       if (
-        child.userData.position.x === scaffold.parent.userData.position.x &&
-        child.userData.position.z === scaffold.parent.userData.position.z
+        child.name === "scaffoldingModel"
       ) {
-        scaffoldingColumnToRemove.push(child);
+        if (
+          child.userData.position.x === scaffold.parent.userData.position.x &&
+          child.userData.position.z === scaffold.parent.userData.position.z
+        ) {
+          scaffoldingColumnToRemove.push(child);
+        }
       }
-    }
-  });
+    });
+  
+    scaffoldingColumnToRemove.forEach((child) => {
+      scene.remove(child);
+      // deleteObject(child, scene);
+    });
+  } catch (error) {
+    console.warn("Error:", error)
+  }
 
-  scaffoldingColumnToRemove.forEach((child) => {
-    scene.remove(child);
-  });
 }
 
 // scaffolding model creation along with bounding box for respective scaffolding model

@@ -275,7 +275,7 @@ function removeFromScene(object: any, scene: THREE.Scene) {
   }
 }
 
-function findObjectParent(object: THREE.Object3D) {
+export function findObjectParent(object: THREE.Object3D) {
   let currentParent = object.parent;
 
   // Traverse up the hierarchy until a parent that is not the scene is found
@@ -285,7 +285,7 @@ function findObjectParent(object: THREE.Object3D) {
       currentParent.parent !== null &&
       currentParent?.parent.type === "Scene"
     ) {
-      console.log(currentParent);
+      // console.log(currentParent);
       return currentParent;
     }
 

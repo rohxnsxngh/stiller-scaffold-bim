@@ -37,6 +37,7 @@ import {
   calculateTransformedBoundingBox,
   deleteObject,
   disableOrbitControls,
+  findObjectParent,
   hideAllCSS2DObjects,
   isVectorEqual,
   observeElementAndAddEventListener,
@@ -218,6 +219,9 @@ export const createModelView = async () => {
       }
       lastHighlightedObject = null;
     }
+  }
+
+  function resetLastHighlightedObjects() {
     if (lastHighlightedObjects.length > 0) {
       const originalMaterial = new THREE.MeshPhysicalMaterial({
         color: 0x404141,
@@ -250,6 +254,9 @@ export const createModelView = async () => {
 
   // highlight an entire row of scaffolding
   function highlightScaffoldingRow(scaffold: any, color: number) {
+    if (scaffold.name === "scaffoldLine") {
+      return
+    }
     const lineLength = scaffold.parent.userData.line_length;
     const startPoint = scaffold.parent.userData.first_point;
     const endPoint = scaffold.parent.userData.last_point;
@@ -302,6 +309,8 @@ export const createModelView = async () => {
         return;
       }
       scene.traverse((child) => {
+        const objectParent = findObjectParent(child);
+        const scaffoldParent = findObjectParent(scaffold);
         if (child.name === "scaffoldingModel") {
           if (
             child.userData.position.x === scaffold.parent.userData.position.x &&
@@ -310,6 +319,34 @@ export const createModelView = async () => {
             lastHighlightedObjects.push(child);
           }
         }
+
+        // if (
+        //   objectParent &&
+        //   objectParent.name === "scaffoldingExternalStaircaseModel" &&
+        //   scaffoldParent &&
+        //   scaffoldParent.name === "scaffoldingExternalStaircaseModel"
+        // ) {
+        //   if (
+        //     objectParent.position.x === scaffoldParent.position.x &&
+        //     objectParent.position.z === scaffoldParent.position.z
+        //   ) {
+        //     lastHighlightedObjects.push(child);
+        //   }
+        // }
+        // if (
+        //   objectParent &&
+        //   objectParent.name.startsWith("scaffolding") &&
+        //   scaffoldParent &&
+        //   scaffoldParent.name.startsWith("scaffolding")
+        // ) {
+        //   console.warn("SPECIAL CASE")
+        //   if (
+        //     objectParent.position.x === scaffoldParent.position.x &&
+        //     objectParent.position.z === scaffoldParent.position.z
+        //   ) {
+        //     lastHighlightedObjects.push(child);
+        //   }
+        // }
       });
 
       const material = new THREE.MeshPhysicalMaterial({
@@ -380,6 +417,7 @@ export const createModelView = async () => {
         resetLastHighlightedObject();
       }
     }
+
     if (deletionScaffoldingRowInProgress) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
@@ -390,35 +428,37 @@ export const createModelView = async () => {
             intersectedObject.parent?.name.startsWith("scaffolding") ||
             intersectedObject.name === "scaffoldLine")
         ) {
-          resetLastHighlightedObject();
+          resetLastHighlightedObjects();
           highlightScaffoldingRow(intersectedObject, 0x000000);
           lastHighlightedObject = intersectedObject;
         } else if (intersectedObject.name === "ground") {
-          resetLastHighlightedObject();
+          resetLastHighlightedObjects();
         }
       } else {
-        resetLastHighlightedObject();
+        resetLastHighlightedObjects();
       }
     }
 
     if (deletionScaffoldingColumnInProgress) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
+        const object = findObjectParent(intersectedObject);
         if (
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
           (intersectedObject.name.startsWith("scaffolding") ||
             intersectedObject.parent?.name.startsWith("scaffolding") ||
-            intersectedObject.name === "scaffoldLine")
+            intersectedObject.name === "scaffoldLine" ||
+            object?.name.startsWith("scaffolding"))
         ) {
-          resetLastHighlightedObject();
+          resetLastHighlightedObjects();
           highlightScaffoldingColumn(intersectedObject);
           lastHighlightedObject = intersectedObject;
         } else if (intersectedObject.name === "ground") {
-          resetLastHighlightedObject();
+          resetLastHighlightedObjects();
         }
       } else {
-        resetLastHighlightedObject();
+        resetLastHighlightedObjects();
       }
     }
 
@@ -478,13 +518,15 @@ export const createModelView = async () => {
     }
     if (deletionScaffoldingRowInProgress && !drawingInProgress) {
       const scaffoldingRowToRemove = intersects[0].object;
-      if (scaffoldingRowToRemove.parent.name === "scaffoldingModel") {
+      const object = findObjectParent(scaffoldingRowToRemove);
+      if (object && object.name.startsWith("scaffolding")) {
         deleteRowOfScaffolding(scene, scaffoldingRowToRemove);
       }
     }
     if (deletionScaffoldingColumnInProgress && !drawingInProgress) {
       const scaffoldingColumnToRemove = intersects[0].object;
-      if (scaffoldingColumnToRemove.parent.name === "scaffoldingModel") {
+      const object = findObjectParent(scaffoldingColumnToRemove);
+      if (object && object.name.startsWith("scaffolding")) {
         deleteColumnOfScaffolding(scene, scaffoldingColumnToRemove);
         if (replaceScaffoldingColumnWithExternalStaircaseInProgress) {
           const [_bboxWireframe, scaffoldExternalStaircaseModeling] =
@@ -494,6 +536,7 @@ export const createModelView = async () => {
             scaffoldingColumnToRemove,
             scaffoldExternalStaircaseModeling
           );
+          setDeletionScaffoldingColumnInProgress(false);
         }
         if (replaceScaffoldingColumnWithInternalStaircaseInProgress) {
           const [_bboxWireframe, scaffoldInternalStaircaseModeling] =
@@ -503,6 +546,7 @@ export const createModelView = async () => {
             scaffoldingColumnToRemove,
             scaffoldInternalStaircaseModeling
           );
+          setDeletionScaffoldingColumnInProgress(false);
         }
       }
     }
