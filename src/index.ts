@@ -255,7 +255,7 @@ export const createModelView = async () => {
   // highlight an entire row of scaffolding
   function highlightScaffoldingRow(scaffold: any, color: number) {
     if (scaffold.name === "scaffoldLine") {
-      return
+      return;
     }
     const lineLength = scaffold.parent.userData.line_length;
     const startPoint = scaffold.parent.userData.first_point;
@@ -311,14 +311,45 @@ export const createModelView = async () => {
       scene.traverse((child) => {
         const objectParent = findObjectParent(child);
         const scaffoldParent = findObjectParent(scaffold);
-        if (child.name === "scaffoldingModel") {
+
+        if (
+          objectParent &&
+          objectParent.name === "scaffoldingExternalStaircaseModel" &&
+          scaffoldParent &&
+          scaffoldParent.name === "scaffoldingExternalStaircaseModel"
+        ) {
+          console.warn("FOUND EXTERNAL STAIRCASE");
           if (
-            child.userData.position.x === scaffold.parent.userData.position.x &&
-            child.userData.position.z === scaffold.parent.userData.position.z
+            objectParent.position.x === scaffoldParent.position.x &&
+            objectParent.position.z === scaffoldParent.position.z
           ) {
             lastHighlightedObjects.push(child);
           }
         }
+
+        if (
+          objectParent &&
+          objectParent.name === "scaffoldingInternalStaircaseModel" &&
+          scaffoldParent &&
+          scaffoldParent.name === "scaffoldingInternalStaircaseModel"
+        ) {
+          console.warn("FOUND INTERNAL STAIRCASE");
+          if (
+            objectParent.position.x === scaffoldParent.position.x &&
+            objectParent.position.z === scaffoldParent.position.z
+          ) {
+            lastHighlightedObjects.push(child);
+          }
+        } 
+        
+        // if (child.name === "scaffoldingModel") {
+        //   if (
+        //     child.userData.position.x === scaffold.parent.userData.position.x &&
+        //     child.userData.position.z === scaffold.parent.userData.position.z
+        //   ) {
+        //     lastHighlightedObjects.push(child);
+        //   }
+        // }
 
         // if (
         //   objectParent &&
@@ -359,7 +390,7 @@ export const createModelView = async () => {
           scaffold.children[0].material = material;
           lastHighlightedObjectColor = material.color.getHex();
         } else {
-          console.error("The first child of the model instance is not a Mesh.");
+          console.error("The first child of the model instance is not a Mesh.", scaffold.children[0]);
         }
       });
     } catch (error) {

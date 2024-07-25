@@ -11,6 +11,7 @@ import {
   removeHighlightMesh,
 } from "./helper";
 import MountPoint from "../pages/MountPoint.vue";
+//@ts-ignore
 import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import {
@@ -185,6 +186,8 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Tak";
     }
+    // @ts-ignore
+    window.setActiveSection("roof");
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -215,6 +218,8 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Stillas";
     }
+    // @ts-ignore
+    window.setActiveSection("scaffold");
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -257,6 +262,8 @@ export const createToolbar = (
     if (titleElement) {
       titleElement.textContent = "Tillegg";
     }
+    // @ts-ignore
+    window.setActiveSection("supply");
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-slate-300");
