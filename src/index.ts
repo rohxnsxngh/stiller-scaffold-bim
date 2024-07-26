@@ -340,8 +340,8 @@ export const createModelView = async () => {
           ) {
             lastHighlightedObjects.push(child);
           }
-        } 
-        
+        }
+
         // if (child.name === "scaffoldingModel") {
         //   if (
         //     child.userData.position.x === scaffold.parent.userData.position.x &&
@@ -390,7 +390,10 @@ export const createModelView = async () => {
           scaffold.children[0].material = material;
           lastHighlightedObjectColor = material.color.getHex();
         } else {
-          console.error("The first child of the model instance is not a Mesh.", scaffold.children[0]);
+          console.error(
+            "The first child of the model instance is not a Mesh.",
+            scaffold.children[0]
+          );
         }
       });
     } catch (error) {
@@ -1546,6 +1549,55 @@ export const createModelView = async () => {
       }
     );
   });
+
+  // Add a basic plane
+  let planeBlueprint: any;
+  function addPlaneWithTexture(texture: any) {
+    const geometry = new THREE.PlaneGeometry(5, 5);
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+    if (planeBlueprint) {
+      scene.remove(planeBlueprint);
+    }
+    planeBlueprint = new THREE.Mesh(geometry, material);
+    planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+    scene.add(planeBlueprint);
+  }
+
+  // Handle image upload
+  function handleImageUpload(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const texture = new THREE.Texture(img);
+          texture.needsUpdate = true;
+          addPlaneWithTexture(texture);
+        };
+        //@ts-ignore
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Create a hidden file input element
+  const hiddenFileInput = document.createElement("input");
+  hiddenFileInput.type = "file";
+  hiddenFileInput.accept = "image/*";
+  hiddenFileInput.style.display = "none";
+  hiddenFileInput.addEventListener("change", handleImageUpload);
+  document.body.appendChild(hiddenFileInput);
+
+  observeElementAndAddEventListener(
+    "upload-image-blueprint",
+    "mousedown",
+    () => {
+      console.log("upload image as blueprint");
+      hiddenFileInput.click();
+    }
+  );
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
