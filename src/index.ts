@@ -1552,35 +1552,50 @@ export const createModelView = async () => {
 
   // Add a basic plane
   let planeBlueprint: any;
-  function addPlaneWithTexture(texture: any) {
-    const geometry = new THREE.PlaneGeometry(5, 5);
+  function addPlaneWithTexture(texture: THREE.Texture, imageWidth: number, imageHeight: number) {
+    const aspect = imageWidth / imageHeight;
+    let width, height;
+  
+    // Determine plane size based on aspect ratio
+    if (aspect > 1) {
+      width = 5;
+      height = 5 / aspect;
+    } else {
+      width = 5 * aspect;
+      height = 5;
+    }
+  
+    const geometry = new THREE.PlaneGeometry(width, height);
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+    
     if (planeBlueprint) {
       scene.remove(planeBlueprint);
     }
     planeBlueprint = new THREE.Mesh(geometry, material);
-    planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+    planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), - Math.PI / 2)
     scene.add(planeBlueprint);
   }
 
-  // Handle image upload
-  function handleImageUpload(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = new Image();
-        img.onload = function () {
-          const texture = new THREE.Texture(img);
-          texture.needsUpdate = true;
-          addPlaneWithTexture(texture);
-        };
-        //@ts-ignore
-        img.src = e.target.result;
+// Handle image upload
+function handleImageUpload(event: any) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        const texture = new THREE.Texture(img);
+        texture.needsUpdate = true;
+
+        // Add plane with texture and adjust size to fit the image
+        addPlaneWithTexture(texture, img.width, img.height);
       };
-      reader.readAsDataURL(file);
-    }
+      // @ts-ignore
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
+}
 
   // Create a hidden file input element
   const hiddenFileInput = document.createElement("input");
