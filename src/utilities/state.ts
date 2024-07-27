@@ -9,9 +9,14 @@ export let replaceScaffoldingColumnWithExternalStaircaseInProgress = false;
 export let replaceScaffoldingColumnWithInternalStaircaseInProgress = false;
 export let rotatingRoofInProgress = false;
 export let editingBlueprint = false;
+export let movingGeometry = false
 
 export const setEditingBlueprint = (value: boolean) => {
   editingBlueprint = value;
+};
+
+export const setMovingGeometry = (value: boolean) => {
+  movingGeometry = value;
 };
 
 export const setIsDrawingBlueprint = (value: boolean) => {
@@ -70,6 +75,7 @@ export function setStates(
     replaceScaffoldingColumnWithInternalStaircaseInProgress?: boolean;
     rotatingRoofInProgress?: boolean;
     drawingInProgressSwitch?: boolean;
+    movingGeometry?: boolean;
     // editingBlueprint?: boolean;
     // isDrawingBlueprint?: boolean;
   } = {}
@@ -85,6 +91,7 @@ export function setStates(
     replaceScaffoldingColumnWithInternalStaircaseInProgress: false,
     rotatingRoofInProgress: false,
     drawingInProgressSwitch: false,
+    movingGeometry: false
     // editingBlueprint: false,
     // isDrawingBlueprint: false
   };
@@ -109,6 +116,7 @@ export function setStates(
   );
   setRotatingRoofInProgress(mergedStates.rotatingRoofInProgress);
   setDrawingInProgressSwitch(mergedStates.drawingInProgressSwitch);
+  setMovingGeometry(mergedStates.movingGeometry);
   // setEditingBlueprint(mergedStates.editingBlueprint)
   // setIsDrawingBlueprint(mergedStates.isDrawingBlueprint)
 }

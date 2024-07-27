@@ -36,5 +36,14 @@
       </div>
       <div><p class="text-xs text-center mt-2">Reset Scene</p></div>
     </div>
+    <div class="flex flex-col m-4">
+      <div
+        class="btn btn-md bg-[#355E3B] rounded-lg border-2 border-[#0BDA51]"
+        id="move-geometry"
+      >
+        <i class="material-symbols-outlined text-[#0BDA51]">drag_pan</i>
+      </div>
+      <div><p class="text-xs text-center mt-2">Move Geometry</p></div>
+    </div>
   </div>
 </template>

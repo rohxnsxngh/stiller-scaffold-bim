@@ -583,8 +583,8 @@ function attachLabelChangeHandler(
     blurTriggered = false;
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
-    setIsDrawingBlueprint(false)
-    setEditingBlueprint(false)
+    setIsDrawingBlueprint(false);
+    setEditingBlueprint(false);
   });
 
   // TODO: There is something wrong with this, this logic needs to be edited
@@ -597,8 +597,8 @@ function attachLabelChangeHandler(
         blurTriggered = false;
         document.body.style.cursor = "grab";
         cameraEnableOrbitalFunctionality(gsap, components.camera);
-        setIsDrawingBlueprint(false)
-        setEditingBlueprint(false)
+        setIsDrawingBlueprint(false);
+        setEditingBlueprint(false);
       }
     },
     { passive: false }
@@ -1769,6 +1769,74 @@ export function createFlatRoof(child: any, scene: THREE.Scene) {
     blueprintHasBeenUpdated: child.userData.blueprintHasBeenUpdated,
     label: null,
   };
+}
+
+export function moveObject(
+  objectGroup: any[],
+  scene: THREE.Scene,
+  shadows: OBC.ShadowDropper,
+  components: OBC.Components
+) {
+  const dragControls: DragControls = new DragControls(
+    objectGroup,
+    // @ts-ignore
+    components.camera.activeCamera,
+    // @ts-ignore
+    components.renderer._renderer.domElement
+  );
+
+  let originalLocation: THREE.Vector3;
+  let newLocation: THREE.Vector3;
+
+  dragControls.addEventListener("dragstart", (event) => {
+    originalLocation = event.object.position.clone(); // Create a copy of the position vector
+  });
+
+  dragControls.addEventListener("dragend", (event) => {
+    if (event.object instanceof THREE.Mesh) {
+      shadows.renderShadow([event.object], event.object.uuid);
+      event.object.position.y = 0.025;
+      newLocation = event.object.position; // Update newLocation here
+
+      const xDisplacement = newLocation.x - originalLocation.x;
+      const yDisplacement = newLocation.z - originalLocation.z;
+      const previousShape = event.object.userData.shape;
+      if (previousShape instanceof THREE.Shape) {
+        const newShape = new THREE.Shape();
+        previousShape.curves.forEach((curve) => {
+          if (curve instanceof THREE.LineCurve) {
+            const startPoint = curve.v1
+              .clone()
+              .add(new THREE.Vector2(xDisplacement, yDisplacement));
+            const endPoint = curve.v2
+              .clone()
+              .add(new THREE.Vector2(xDisplacement, yDisplacement));
+            newShape.moveTo(startPoint.x, startPoint.y);
+            newShape.lineTo(endPoint.x, endPoint.y);
+          }
+        });
+
+        event.object.userData.shape = newShape;
+      }
+    }
+
+    event.object.updateMatrix();
+  });
+
+  dragControls.addEventListener("hoveron", (event) => {
+    if (event.object instanceof THREE.Mesh) {
+      event.object.material.color.set(0xb72c2c);
+      shadows.deleteShadow(event.object.uuid);
+    }
+  });
+
+  dragControls.addEventListener("hoveroff", (event) => {
+    if (event.object instanceof THREE.Mesh) {
+      event.object.material.color.set(0x7f1d1d);
+    }
+  });
+
+  return dragControls;
 }
 
 // move blueprint

@@ -11,6 +11,7 @@ import {
   editBlueprint,
   createBlueprintFromMarkup,
   createFlatRoof,
+  moveObject,
 } from "./utilities/mesh";
 import {
   createScaffoldingShapeIsOutlined,
@@ -56,6 +57,7 @@ import {
   drawingScaffoldingInProgress,
   editingBlueprint,
   isDrawingBlueprint,
+  movingGeometry,
   replaceScaffoldingColumnWithExternalStaircaseInProgress,
   replaceScaffoldingColumnWithInternalStaircaseInProgress,
   rotatingRoofInProgress,
@@ -66,6 +68,7 @@ import {
   setDrawingScaffoldingInProgress,
   setEditingBlueprint,
   setIsDrawingBlueprint,
+  setMovingGeometry,
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
@@ -215,6 +218,8 @@ export const createModelView = async () => {
         material instanceof THREE.MeshPhongMaterial
       ) {
         material.color.setHex(lastHighlightedObjectColor);
+        // material.opacity = 1;
+        // material.transparent = false;
         material.needsUpdate = true;
       }
       lastHighlightedObject = null;
@@ -248,6 +253,8 @@ export const createModelView = async () => {
     ) {
       lastHighlightedObjectColor = material.color.getHex();
       material.color.set(color);
+      // material.opacity = 0.5;
+      // material.transparent = true;
       material.needsUpdate = true;
     }
   }
@@ -438,7 +445,8 @@ export const createModelView = async () => {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
           intersectedObject !== lastHighlightedObject &&
-          intersectedObject.name !== "ground"
+          intersectedObject.name !== "ground" &&
+          intersectedObject.name !== "grid"
         ) {
           console.warn("highlighting");
           resetLastHighlightedObject();
@@ -458,6 +466,7 @@ export const createModelView = async () => {
         if (
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
+          intersectedObject.name !== "grid" &&
           (intersectedObject.name.startsWith("scaffolding") ||
             intersectedObject.parent?.name.startsWith("scaffolding") ||
             intersectedObject.name === "scaffoldLine")
@@ -480,6 +489,7 @@ export const createModelView = async () => {
         if (
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
+          intersectedObject.name !== "grid" &&
           (intersectedObject.name.startsWith("scaffolding") ||
             intersectedObject.parent?.name.startsWith("scaffolding") ||
             intersectedObject.name === "scaffoldLine" ||
@@ -505,10 +515,30 @@ export const createModelView = async () => {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
           intersectedObject !== lastHighlightedObject &&
-          intersectedObject.name !== "ground"
+          intersectedObject.name !== "ground" &&
+          intersectedObject.name !== "grid"
         ) {
           resetLastHighlightedObject();
           highlightObject(intersectedObject, 0x111115);
+          lastHighlightedObject = intersectedObject;
+        } else if (intersectedObject.name === "ground") {
+          resetLastHighlightedObject();
+        }
+      } else {
+        resetLastHighlightedObject();
+      }
+    }
+
+    if (movingGeometry) {
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object as THREE.Mesh;
+        if (
+          intersectedObject !== lastHighlightedObject &&
+          intersectedObject.name !== "ground" &&
+          intersectedObject.name !== "grid"
+        ) {
+          resetLastHighlightedObject();
+          highlightObject(intersectedObject, 0x0bda51);
           lastHighlightedObject = intersectedObject;
         } else if (intersectedObject.name === "ground") {
           resetLastHighlightedObject();
@@ -583,6 +613,38 @@ export const createModelView = async () => {
           setDeletionScaffoldingColumnInProgress(false);
         }
       }
+    }
+    if (movingGeometry) {
+      const geometriesToMove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+      const object = intersects[0].object;
+      console.log(object);
+      if (object.userData && object.userData.shape) {
+        const currentPoint = object.userData.shape.currentPoint;
+
+        scene.traverse((child) => {
+          if (
+            child.userData &&
+            child.userData.shape &&
+            child.userData.shape.currentPoint.equals(currentPoint)
+          ) {
+            console.warn("matching current points", child);
+            geometriesToMove.push(child);
+          } else {
+            console.error("this child is not included", child);
+          }
+        });
+      }
+
+      console.log(geometriesToMove);
+
+      geometriesToMove.forEach((geometry: any) => {
+        geometry.material.opacity = 0.5;
+        geometry.material.transparent = true;
+        geometry.material.needsUpdate = true;
+      });
+
+      // moving objects: this does not work lol
+      moveObject(geometriesToMove, scene, shadows, components);
     }
     if (rotatingRoofInProgress && !drawingInProgressSwitch) {
       console.log("ROTATING ROOFS", intersects[0].object);
@@ -1550,12 +1612,20 @@ export const createModelView = async () => {
     );
   });
 
+  observeElementAndAddEventListener("move-geometry", "mousedown", () => {
+    setMovingGeometry(true);
+  });
+
   // Add a basic plane
   let planeBlueprint: any;
-  function addPlaneWithTexture(texture: THREE.Texture, imageWidth: number, imageHeight: number) {
+  function addPlaneWithTexture(
+    texture: THREE.Texture,
+    imageWidth: number,
+    imageHeight: number
+  ) {
     const aspect = imageWidth / imageHeight;
     let width, height;
-  
+
     // Determine plane size based on aspect ratio
     if (aspect > 1) {
       width = 5;
@@ -1564,38 +1634,41 @@ export const createModelView = async () => {
       width = 5 * aspect;
       height = 5;
     }
-  
+
     const geometry = new THREE.PlaneGeometry(width, height);
-    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-    
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+    });
+
     if (planeBlueprint) {
       scene.remove(planeBlueprint);
     }
     planeBlueprint = new THREE.Mesh(geometry, material);
-    planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), - Math.PI / 2)
+    planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
     scene.add(planeBlueprint);
   }
 
-// Handle image upload
-function handleImageUpload(event: any) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const img = new Image();
-      img.onload = function () {
-        const texture = new THREE.Texture(img);
-        texture.needsUpdate = true;
+  // Handle image upload
+  function handleImageUpload(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const texture = new THREE.Texture(img);
+          texture.needsUpdate = true;
 
-        // Add plane with texture and adjust size to fit the image
-        addPlaneWithTexture(texture, img.width, img.height);
+          // Add plane with texture and adjust size to fit the image
+          addPlaneWithTexture(texture, img.width, img.height);
+        };
+        // @ts-ignore
+        img.src = e.target.result;
       };
-      // @ts-ignore
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    }
   }
-}
 
   // Create a hidden file input element
   const hiddenFileInput = document.createElement("input");
