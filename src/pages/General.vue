@@ -133,7 +133,7 @@
         </div>
       </div>
 
-      <div>
+      <!-- <div>
         <h2 class="text-sm mb-2">Hva slags underlag skal stillaset stå på?</h2>
         <div class="grid grid-cols-3 gap-3">
           <div class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]">
@@ -185,7 +185,7 @@
             Blandet
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="card-actions justify-end">
         <div class="m-4">
