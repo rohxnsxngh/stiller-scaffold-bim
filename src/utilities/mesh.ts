@@ -1778,7 +1778,7 @@ export function moveObject(
   components: OBC.Components
 ) {
   const dragControls: DragControls = new DragControls(
-    objectGroup,
+    [...objectGroup],
     // @ts-ignore
     components.camera.activeCamera,
     // @ts-ignore
@@ -1788,129 +1788,149 @@ export function moveObject(
   let originalLocation: THREE.Vector3;
   let newLocation: THREE.Vector3;
 
+  let originalLocations: { position: THREE.Vector3; y: number }[] = [];
+
   dragControls.addEventListener("dragstart", (event) => {
-    originalLocation = event.object.position.clone(); // Create a copy of the position vector
+    originalLocations = objectGroup.map((obj) => ({
+      position: obj.position.clone(),
+      y: obj.position.y,
+    })); // Store original locations and y-coordinate for all objects
   });
 
-  dragControls.addEventListener("dragend", (event) => {
+  dragControls.addEventListener("drag", (event) => {
     if (event.object instanceof THREE.Mesh) {
-      shadows.renderShadow([event.object], event.object.uuid);
-      event.object.position.y = 0.025;
-      newLocation = event.object.position; // Update newLocation here
-
-      const xDisplacement = newLocation.x - originalLocation.x;
-      const yDisplacement = newLocation.z - originalLocation.z;
-      const previousShape = event.object.userData.shape;
-      if (previousShape instanceof THREE.Shape) {
-        const newShape = new THREE.Shape();
-        previousShape.curves.forEach((curve) => {
-          if (curve instanceof THREE.LineCurve) {
-            const startPoint = curve.v1
-              .clone()
-              .add(new THREE.Vector2(xDisplacement, yDisplacement));
-            const endPoint = curve.v2
-              .clone()
-              .add(new THREE.Vector2(xDisplacement, yDisplacement));
-            newShape.moveTo(startPoint.x, startPoint.y);
-            newShape.lineTo(endPoint.x, endPoint.y);
-          }
-        });
-
-        event.object.userData.shape = newShape;
+      const originalY = originalLocations.find((loc) =>
+        loc.position.equals(event.object.position)
+      )?.y;
+      if (originalY !== undefined) {
+        event.object.position.y = originalY; // Maintain the original y-position
       }
     }
-
-    event.object.updateMatrix();
   });
 
-  dragControls.addEventListener("hoveron", (event) => {
-    if (event.object instanceof THREE.Mesh) {
-      event.object.material.color.set(0xb72c2c);
-      shadows.deleteShadow(event.object.uuid);
-    }
-  });
+  // dragControls.addEventListener("dragstart", (event) => {
+  //   originalLocation = event.object.position.clone(); // Create a copy of the position vector
+  // });
 
-  dragControls.addEventListener("hoveroff", (event) => {
-    if (event.object instanceof THREE.Mesh) {
-      event.object.material.color.set(0x7f1d1d);
-    }
-  });
+  // dragControls.addEventListener("dragend", (event) => {
+  //   if (event.object instanceof THREE.Mesh) {
+  //     shadows.renderShadow([event.object], event.object.uuid);
+  //     event.object.position.y = 0.025;
+  //     newLocation = event.object.position; // Update newLocation here
+
+  //     const xDisplacement = newLocation.x - originalLocation.x;
+  //     const yDisplacement = newLocation.z - originalLocation.z;
+  //     const previousShape = event.object.userData.shape;
+  //     if (previousShape instanceof THREE.Shape) {
+  //       const newShape = new THREE.Shape();
+  //       previousShape.curves.forEach((curve) => {
+  //         if (curve instanceof THREE.LineCurve) {
+  //           const startPoint = curve.v1
+  //             .clone()
+  //             .add(new THREE.Vector2(xDisplacement, yDisplacement));
+  //           const endPoint = curve.v2
+  //             .clone()
+  //             .add(new THREE.Vector2(xDisplacement, yDisplacement));
+  //           newShape.moveTo(startPoint.x, startPoint.y);
+  //           newShape.lineTo(endPoint.x, endPoint.y);
+  //         }
+  //       });
+
+  //       event.object.userData.shape = newShape;
+  //     }
+  //   }
+
+  //   event.object.updateMatrix();
+  // });
+
+  // dragControls.addEventListener("hoveron", (event) => {
+  //   if (event.object instanceof THREE.Mesh) {
+  //     event.object.material.color.set(0xb72c2c);
+  //     shadows.deleteShadow(event.object.uuid);
+  //   }
+  // });
+
+  // dragControls.addEventListener("hoveroff", (event) => {
+  //   if (event.object instanceof THREE.Mesh) {
+  //     event.object.material.color.set(0x7f1d1d);
+  //   }
+  // });
 
   return dragControls;
 }
 
-// move blueprint
-export function moveBlueprint(
-  blueprints: any[],
-  components: OBC.Components,
-  scene: THREE.Scene,
-  shadows: OBC.ShadowDropper
-) {
-  // remove all objects before moving the blueprint
-  // since you are literally moving the foundation of the building
-  resetSceneExceptSingularObject(scene, "blueprint");
+// // move blueprint
+// export function moveBlueprint(
+//   blueprints: any[],
+//   components: OBC.Components,
+//   scene: THREE.Scene,
+//   shadows: OBC.ShadowDropper
+// ) {
+//   // remove all objects before moving the blueprint
+//   // since you are literally moving the foundation of the building
+//   resetSceneExceptSingularObject(scene, "blueprint");
 
-  const dragControls: DragControls = new DragControls(
-    blueprints,
-    // @ts-ignore
-    components.camera.activeCamera,
-    // @ts-ignore
-    components.renderer._renderer.domElement
-  );
+//   const dragControls: DragControls = new DragControls(
+//     blueprints,
+//     // @ts-ignore
+//     components.camera.activeCamera,
+//     // @ts-ignore
+//     components.renderer._renderer.domElement
+//   );
 
-  let originalLocation: THREE.Vector3;
-  let newLocation: THREE.Vector3;
+//   let originalLocation: THREE.Vector3;
+//   let newLocation: THREE.Vector3;
 
-  dragControls.addEventListener("dragstart", (event) => {
-    originalLocation = event.object.position.clone(); // Create a copy of the position vector
-  });
+//   dragControls.addEventListener("dragstart", (event) => {
+//     originalLocation = event.object.position.clone(); // Create a copy of the position vector
+//   });
 
-  dragControls.addEventListener("dragend", (event) => {
-    if (event.object instanceof THREE.Mesh) {
-      shadows.renderShadow([event.object], event.object.uuid);
-      event.object.position.y = 0.025;
-      newLocation = event.object.position; // Update newLocation here
+//   dragControls.addEventListener("dragend", (event) => {
+//     if (event.object instanceof THREE.Mesh) {
+//       shadows.renderShadow([event.object], event.object.uuid);
+//       event.object.position.y = 0.025;
+//       newLocation = event.object.position; // Update newLocation here
 
-      const xDisplacement = newLocation.x - originalLocation.x;
-      const yDisplacement = newLocation.z - originalLocation.z;
-      const previousShape = event.object.userData.shape;
-      if (previousShape instanceof THREE.Shape) {
-        const newShape = new THREE.Shape();
-        previousShape.curves.forEach((curve) => {
-          if (curve instanceof THREE.LineCurve) {
-            const startPoint = curve.v1
-              .clone()
-              .add(new THREE.Vector2(xDisplacement, yDisplacement));
-            const endPoint = curve.v2
-              .clone()
-              .add(new THREE.Vector2(xDisplacement, yDisplacement));
-            newShape.moveTo(startPoint.x, startPoint.y);
-            newShape.lineTo(endPoint.x, endPoint.y);
-          }
-        });
+//       const xDisplacement = newLocation.x - originalLocation.x;
+//       const yDisplacement = newLocation.z - originalLocation.z;
+//       const previousShape = event.object.userData.shape;
+//       if (previousShape instanceof THREE.Shape) {
+//         const newShape = new THREE.Shape();
+//         previousShape.curves.forEach((curve) => {
+//           if (curve instanceof THREE.LineCurve) {
+//             const startPoint = curve.v1
+//               .clone()
+//               .add(new THREE.Vector2(xDisplacement, yDisplacement));
+//             const endPoint = curve.v2
+//               .clone()
+//               .add(new THREE.Vector2(xDisplacement, yDisplacement));
+//             newShape.moveTo(startPoint.x, startPoint.y);
+//             newShape.lineTo(endPoint.x, endPoint.y);
+//           }
+//         });
 
-        event.object.userData.shape = newShape;
-      }
-    }
+//         event.object.userData.shape = newShape;
+//       }
+//     }
 
-    event.object.updateMatrix();
-  });
+//     event.object.updateMatrix();
+//   });
 
-  dragControls.addEventListener("hoveron", (event) => {
-    if (event.object instanceof THREE.Mesh) {
-      event.object.material.color.set(0xb72c2c);
-      shadows.deleteShadow(event.object.uuid);
-    }
-  });
+//   dragControls.addEventListener("hoveron", (event) => {
+//     if (event.object instanceof THREE.Mesh) {
+//       event.object.material.color.set(0xb72c2c);
+//       shadows.deleteShadow(event.object.uuid);
+//     }
+//   });
 
-  dragControls.addEventListener("hoveroff", (event) => {
-    if (event.object instanceof THREE.Mesh) {
-      event.object.material.color.set(0x7f1d1d);
-    }
-  });
+//   dragControls.addEventListener("hoveroff", (event) => {
+//     if (event.object instanceof THREE.Mesh) {
+//       event.object.material.color.set(0x7f1d1d);
+//     }
+//   });
 
-  return dragControls;
-}
+//   return dragControls;
+// }
 
 // edit blueprint
 export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {

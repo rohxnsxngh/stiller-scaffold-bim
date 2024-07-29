@@ -74,6 +74,7 @@ import {
   setRotatingRoofInProgress,
 } from "./utilities/state";
 import gsap from "gsap";
+import { DragControls } from "three/addons/controls/DragControls.js";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -618,6 +619,10 @@ export const createModelView = async () => {
       const geometriesToMove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
       const object = intersects[0].object;
       console.log(object);
+
+      const group = new THREE.Group();
+      scene.add(group);
+
       if (object.userData && object.userData.shape) {
         const currentPoint = object.userData.shape.currentPoint;
 
@@ -627,15 +632,15 @@ export const createModelView = async () => {
             child.userData.shape &&
             child.userData.shape.currentPoint.equals(currentPoint)
           ) {
-            console.warn("matching current points", child);
             geometriesToMove.push(child);
           } else {
-            console.error("this child is not included", child);
+            console.error("This child is not included", child);
           }
         });
       }
 
-      console.log(geometriesToMove);
+      group.add(...geometriesToMove);
+      console.log(geometriesToMove, group);
 
       geometriesToMove.forEach((geometry: any) => {
         geometry.material.opacity = 0.5;
@@ -643,9 +648,48 @@ export const createModelView = async () => {
         geometry.material.needsUpdate = true;
       });
 
-      // moving objects: this does not work lol
-      moveObject(geometriesToMove, scene, shadows, components);
+      const dragControls = new DragControls(
+        [group], // Add the group to DragControls
+        // @ts-ignore
+        components.camera.activeCamera,
+        // @ts-ignore
+        components.renderer._renderer.domElement
+      );
+
+      const draggableObjects = dragControls.getObjects();
+
+      dragControls.transformGroup = true; // Ensure transformGroup is set to true
+      // draggableObjects.push(group)
+      console.warn("draggableObjects:", draggableObjects)
+
+      // if (intersects.length > 0) {
+      //   if (group.children.includes(object)) {
+      //     console.log("OBJECT IS IN GROUP");
+      //     dragControls.transformGroup = true;
+      //   } else {
+      //     console.error("Object is not in the group");
+      //   }
+      // }
+
+      // if (group.children.length === 0) {
+      //   dragControls.transformGroup = false;
+      //   draggableObjects.push(...geometriesToMove);
+      // }
+
+      // Event listeners for debugging
+      dragControls.addEventListener("dragstart", (event) => {
+        console.log("Drag start:", event.object);
+      });
+
+      dragControls.addEventListener("drag", (event) => {
+        console.log("Dragging:", event.object);
+      });
+
+      dragControls.addEventListener("dragend", (event) => {
+        console.log("Drag end:", event.object);
+      });
     }
+
     if (rotatingRoofInProgress && !drawingInProgressSwitch) {
       console.log("ROTATING ROOFS", intersects[0].object);
       // Check if the click is on the roof
