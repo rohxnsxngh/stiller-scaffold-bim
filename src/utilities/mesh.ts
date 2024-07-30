@@ -6,7 +6,7 @@ import {
   measureLineLength,
   resetSceneExceptSingularObject,
 } from "./helper";
-import { rectMaterial, roofMaterial } from "./material";
+import { rectMaterial } from "./material";
 import { DragControls } from "three/addons/controls/DragControls.js";
 import { selectedStore, useStore } from "../store";
 import {
@@ -967,6 +967,11 @@ export function createRoof(
     extrusionSettings // Extrusion settings
   );
 
+  const roofMaterial = new THREE.MeshPhongMaterial({
+    color: 0x1a1a1c,
+    side: THREE.DoubleSide,
+  });
+
   const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
@@ -997,7 +1002,7 @@ export function createRoof(
   extrudedMesh.userData.label = label;
   blueprintHasBeenUpdated = false;
 
-  return extrudedMesh
+  return extrudedMesh;
 }
 
 function createRoofLabel(
@@ -1208,6 +1213,11 @@ function updateRoofGeometry(
     shape, // The shape to extrude
     extrusionSettings // Extrusion settings
   );
+
+  const roofMaterial = new THREE.MeshPhongMaterial({
+    color: 0x1a1a1c,
+    side: THREE.DoubleSide,
+  });
 
   const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
@@ -1523,6 +1533,11 @@ export function createShedRoof(
     extrusionSettings // Extrusion settings
   );
 
+  const roofMaterial = new THREE.MeshPhongMaterial({
+    color: 0x1a1a1c,
+    side: THREE.DoubleSide,
+  });
+
   const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
@@ -1765,6 +1780,11 @@ function updateShedRoofGeometry(
     extrusionSettings // Extrusion settings
   );
 
+  const roofMaterial = new THREE.MeshPhongMaterial({
+    color: 0x1a1a1c,
+    side: THREE.DoubleSide,
+  });
+
   const extrudedMesh = new THREE.Mesh(extrudeGeometry, roofMaterial);
   extrudedMesh.position.copy(triangle.position);
   extrudedMesh.rotation.copy(triangle.rotation);
@@ -1786,6 +1806,11 @@ export function createFlatRoof(child: any, scene: THREE.Scene) {
   console.log("create flat roof", child.userData);
   const extrudeHeight = -1 * child.geometry.parameters.options.depth;
   const shape = child.userData.shape;
+
+  const roofMaterial = new THREE.MeshPhongMaterial({
+    color: 0x1a1a1c,
+    side: THREE.DoubleSide,
+  });
 
   // Create a new geometry from the shape
   const geometry = new THREE.ShapeGeometry(shape);
