@@ -9,10 +9,15 @@ export let replaceScaffoldingColumnWithExternalStaircaseInProgress = false;
 export let replaceScaffoldingColumnWithInternalStaircaseInProgress = false;
 export let rotatingRoofInProgress = false;
 export let editingBlueprint = false;
-export let movingGeometry = false
+export let movingGeometry = false;
+export let highlightingObject = false;
 
 export const setEditingBlueprint = (value: boolean) => {
   editingBlueprint = value;
+};
+
+export const setHighlightingObject = (value: boolean) => {
+  highlightingObject = value;
 };
 
 export const setMovingGeometry = (value: boolean) => {
@@ -76,6 +81,7 @@ export function setStates(
     rotatingRoofInProgress?: boolean;
     drawingInProgressSwitch?: boolean;
     movingGeometry?: boolean;
+    highlightingObject?: boolean;
     // editingBlueprint?: boolean;
     // isDrawingBlueprint?: boolean;
   } = {}
@@ -91,7 +97,8 @@ export function setStates(
     replaceScaffoldingColumnWithInternalStaircaseInProgress: false,
     rotatingRoofInProgress: false,
     drawingInProgressSwitch: false,
-    movingGeometry: false
+    movingGeometry: false,
+    highlightingObject: false,
     // editingBlueprint: false,
     // isDrawingBlueprint: false
   };
@@ -117,6 +124,7 @@ export function setStates(
   setRotatingRoofInProgress(mergedStates.rotatingRoofInProgress);
   setDrawingInProgressSwitch(mergedStates.drawingInProgressSwitch);
   setMovingGeometry(mergedStates.movingGeometry);
+  setHighlightingObject(mergedStates.highlightingObject);
   // setEditingBlueprint(mergedStates.editingBlueprint)
   // setIsDrawingBlueprint(mergedStates.isDrawingBlueprint)
 }

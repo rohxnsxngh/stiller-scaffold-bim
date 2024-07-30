@@ -57,6 +57,7 @@ import {
   drawingInProgressSwitch,
   drawingScaffoldingInProgress,
   editingBlueprint,
+  highlightingObject,
   isDrawingBlueprint,
   movingGeometry,
   replaceScaffoldingColumnWithExternalStaircaseInProgress,
@@ -68,11 +69,13 @@ import {
   setDrawingInProgress,
   setDrawingScaffoldingInProgress,
   setEditingBlueprint,
+  setHighlightingObject,
   setIsDrawingBlueprint,
   setMovingGeometry,
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
+  setStates,
 } from "./utilities/state";
 import gsap from "gsap";
 import { DragControls } from "three/addons/controls/DragControls.js";
@@ -531,7 +534,7 @@ export const createModelView = async () => {
       }
     }
 
-    if (movingGeometry) {
+    if (movingGeometry && !highlightingObject) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
@@ -617,6 +620,8 @@ export const createModelView = async () => {
       }
     }
     if (movingGeometry && !drawingInProgress) {
+      document.body.style.cursor = "grab";
+      setStates({movingGeometry})
       const object = intersects[0].object;
       console.log(object);
       hideAllCSS2DObjects(scene);
@@ -624,50 +629,43 @@ export const createModelView = async () => {
       const group = new THREE.Group();
       scene.add(group);
 
-      const geometriesToMove = findObjectBuildingRelations(object, scene)
+      const geometriesToMove = findObjectBuildingRelations(object, scene);
+
+      // Store initial y heights
+      const initialYHeights = new Map();
+      geometriesToMove.forEach((geometry) => {
+        initialYHeights.set(geometry, geometry.position.y);
+      });
 
       group.add(...geometriesToMove);
       console.log(geometriesToMove, group);
 
       const dragControls = new DragControls(
         [group], // Add the group to DragControls
-        // @ts-ignore
         components.camera.activeCamera,
-        // @ts-ignore
         components.renderer._renderer.domElement
       );
 
-      const draggableObjects = dragControls.getObjects();
-
       dragControls.transformGroup = true; // Ensure transformGroup is set to true
-      // draggableObjects.push(group)
-      console.warn("draggableObjects:", draggableObjects);
 
-      // if (intersects.length > 0) {
-      //   if (group.children.includes(object)) {
-      //     console.log("OBJECT IS IN GROUP");
-      //     dragControls.transformGroup = true;
-      //   } else {
-      //     console.error("Object is not in the group");
-      //   }
-      // }
-
-      // if (group.children.length === 0) {
-      //   dragControls.transformGroup = false;
-      //   draggableObjects.push(...geometriesToMove);
-      // }
-
-      // Event listeners for debugging
+      // Event listeners for drag controls
       dragControls.addEventListener("dragstart", (event) => {
         console.log("Drag start:", event.object);
       });
 
       dragControls.addEventListener("drag", (event) => {
+        // Maintain original y heights
+        group.children.forEach((child) => {
+          if (initialYHeights.has(child)) {
+            child.position.y = initialYHeights.get(child);
+          }
+        });
         console.log("Dragging:", event.object);
       });
 
       dragControls.addEventListener("dragend", (event) => {
         console.log("Drag end:", event.object);
+        dragControls.enabled = false; // Disable drag controls after dragging
       });
     }
 
@@ -1671,9 +1669,9 @@ export const createModelView = async () => {
     }
     planeBlueprint = new THREE.Mesh(geometry, material);
     planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
-    planeBlueprint.userData.scale = 1
-    planeBlueprint.name = "uploaded-blueprint"
-    planeBlueprint.position.y = -0.03
+    planeBlueprint.userData.scale = 1;
+    planeBlueprint.name = "uploaded-blueprint";
+    planeBlueprint.position.y = -0.03;
     scene.add(planeBlueprint);
   }
 
@@ -1713,22 +1711,26 @@ export const createModelView = async () => {
   );
 
   observeElementAndAddEventListener("scale-image-blueprint", "blur", () => {
-    console.log("blur")
-    const uploadStore = uploadImageStore()
-    const uploadedBlueprints: THREE.Object3D<THREE.Object3DEventMap>[] = []
+    console.log("blur");
+    const uploadStore = uploadImageStore();
+    const uploadedBlueprints: THREE.Object3D<THREE.Object3DEventMap>[] = [];
     scene.traverse((child) => {
       if (child.name === "uploaded-blueprint") {
-        uploadedBlueprints.push(child)
+        uploadedBlueprints.push(child);
       }
-    })
+    });
 
-    console.log(uploadedBlueprints)
+    console.log(uploadedBlueprints);
 
     uploadedBlueprints.forEach((blueprint: any) => {
-      console.log(uploadStore.scale)
-      blueprint.scale.set(uploadStore.scale, uploadStore.scale, uploadStore.scale)
-    })
-  })
+      console.log(uploadStore.scale);
+      blueprint.scale.set(
+        uploadStore.scale,
+        uploadStore.scale,
+        uploadStore.scale
+      );
+    });
+  });
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
