@@ -1693,6 +1693,7 @@ export const createModelView = async () => {
     planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
     planeBlueprint.userData.scale = 1
     planeBlueprint.name = "uploaded-blueprint"
+    planeBlueprint.position.y = -0.03
     scene.add(planeBlueprint);
   }
 
@@ -1717,14 +1718,7 @@ export const createModelView = async () => {
     }
   }
 
-  // Create a hidden file input element
-  // const hiddenFileInput = document.createElement("input");
-  // hiddenFileInput.type = "file";
-  // hiddenFileInput.accept = "image/*";
-  // hiddenFileInput.style.display = "none";
-  // hiddenFileInput.addEventListener("change", handleImageUpload);
-  // document.body.appendChild(hiddenFileInput);
-
+  // listen for upload blueprint button and then call the hidden file input
   observeElementAndAddEventListener(
     "upload-image-blueprint",
     "mousedown",
