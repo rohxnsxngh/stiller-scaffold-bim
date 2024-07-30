@@ -585,3 +585,53 @@ export function exitFullscreen() {
     document.msExitFullscreen();
   }
 }
+
+let previousSelectedGeometries: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+let originalOpacities: Map<
+  THREE.Object3D<THREE.Object3DEventMap>,
+  number
+> = new Map();
+
+export function findObjectBuildingRelations(object: any, scene: THREE.Scene) {
+  // Revert the opacity of previously selected geometries
+  previousSelectedGeometries.forEach((geometry: any) => {
+    if (originalOpacities.has(geometry)) {
+      geometry.material.opacity = originalOpacities.get(geometry) || 1;
+      geometry.material.transparent = geometry.material.opacity < 1;
+      geometry.material.needsUpdate = true;
+    }
+  });
+
+  const selectedGeometries: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+
+  if (object.userData && object.userData.shape) {
+    const currentPoint = object.userData.shape.currentPoint;
+
+    scene.traverse((child) => {
+      if (
+        child.userData &&
+        child.userData.shape &&
+        child.userData.shape.currentPoint.equals(currentPoint)
+      ) {
+        selectedGeometries.push(child);
+      } else {
+        console.error("This child is not included", child);
+      }
+    });
+  }
+
+  selectedGeometries.forEach((geometry: any) => {
+    if (!originalOpacities.has(geometry)) {
+      // Store the original opacity if it's not already stored
+      originalOpacities.set(geometry, geometry.material.opacity);
+    }
+    geometry.material.opacity = 0.5;
+    geometry.material.transparent = true;
+    geometry.material.needsUpdate = true;
+  });
+
+  // Update the reference to the currently selected geometries
+  previousSelectedGeometries = selectedGeometries;
+
+  return selectedGeometries;
+}

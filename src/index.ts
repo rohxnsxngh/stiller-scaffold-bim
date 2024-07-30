@@ -38,6 +38,7 @@ import {
   calculateTransformedBoundingBox,
   deleteObject,
   disableOrbitControls,
+  findObjectBuildingRelations,
   findObjectParent,
   hideAllCSS2DObjects,
   isVectorEqual,
@@ -616,7 +617,6 @@ export const createModelView = async () => {
       }
     }
     if (movingGeometry && !drawingInProgress) {
-      const geometriesToMove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
       const object = intersects[0].object;
       console.log(object);
       hideAllCSS2DObjects(scene);
@@ -624,30 +624,10 @@ export const createModelView = async () => {
       const group = new THREE.Group();
       scene.add(group);
 
-      if (object.userData && object.userData.shape) {
-        const currentPoint = object.userData.shape.currentPoint;
-
-        scene.traverse((child) => {
-          if (
-            child.userData &&
-            child.userData.shape &&
-            child.userData.shape.currentPoint.equals(currentPoint)
-          ) {
-            geometriesToMove.push(child);
-          } else {
-            console.error("This child is not included", child);
-          }
-        });
-      }
+      const geometriesToMove = findObjectBuildingRelations(object, scene)
 
       group.add(...geometriesToMove);
       console.log(geometriesToMove, group);
-
-      geometriesToMove.forEach((geometry: any) => {
-        geometry.material.opacity = 0.5;
-        geometry.material.transparent = true;
-        geometry.material.needsUpdate = true;
-      });
 
       const dragControls = new DragControls(
         [group], // Add the group to DragControls
@@ -1749,8 +1729,6 @@ export const createModelView = async () => {
       blueprint.scale.set(uploadStore.scale, uploadStore.scale, uploadStore.scale)
     })
   })
-
-
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);

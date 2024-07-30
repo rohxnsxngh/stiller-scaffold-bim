@@ -45,10 +45,11 @@
     </div>
   </div>
 
-  <div class="bg-[#14141C]" v-if="show2DUpload">
+  <div class="bg-[#14141C]">
     <label class="form-control w-full">
       <div class="label">
-        <span class="label-text"> last opp én plan per scene</span>
+        <span class="label-text">
+          last opp én blåkopi per scene og skala</span>
       </div>
       <input
         type="text"
