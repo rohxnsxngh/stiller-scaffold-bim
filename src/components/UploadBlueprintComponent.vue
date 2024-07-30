@@ -21,11 +21,16 @@
       </div>
       <div><p class="text-xs text-center mt-2">IFC</p></div>
     </div>
-    <div class="flex flex-col m-4" @click="showBlueprintScaling" id="upload-image-blueprint">
+    <div
+      class="flex flex-col m-4"
+      @click="showBlueprintScaling"
+      id="upload-image-blueprint"
+    >
       <div
         class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767] indicator"
         id="upload-blueprint"
       >
+      <input id="2D-hidden-file-input" type="file" accept="image/*" class="hidden">
         <span
           class="indicator-item badge badge-transparent bg-transparent border-transparent"
         >
@@ -58,12 +63,28 @@
 </template>
 
 <script lang="ts">
+import { computed } from "vue";
+import { uploadImageStore, useStore } from "../store";
+
 export default {
+  setup() {
+    const uploadStore = uploadImageStore();
+
+    // const depth = computed(() => componentStore.depth);
+    const scale = computed({
+      // Make depth a computed property
+      get: () => uploadStore.scale,
+      set: (value) => uploadStore.updateScale(value),
+    });
+
+    return {
+      scale,
+    };
+  },
   components: {},
   data() {
     return {
       show2DUpload: false,
-      scale: null
     };
   },
   methods: {

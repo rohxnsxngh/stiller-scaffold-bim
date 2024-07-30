@@ -47,7 +47,7 @@ import {
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
-import { supplyStore, useStore } from "./store";
+import { supplyStore, uploadImageStore, useStore } from "./store";
 import {
   deletionInProgress,
   deletionScaffoldingColumnInProgress,
@@ -615,10 +615,11 @@ export const createModelView = async () => {
         }
       }
     }
-    if (movingGeometry) {
+    if (movingGeometry && !drawingInProgress) {
       const geometriesToMove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
       const object = intersects[0].object;
       console.log(object);
+      hideAllCSS2DObjects(scene);
 
       const group = new THREE.Group();
       scene.add(group);
@@ -660,7 +661,7 @@ export const createModelView = async () => {
 
       dragControls.transformGroup = true; // Ensure transformGroup is set to true
       // draggableObjects.push(group)
-      console.warn("draggableObjects:", draggableObjects)
+      console.warn("draggableObjects:", draggableObjects);
 
       // if (intersects.length > 0) {
       //   if (group.children.includes(object)) {
@@ -1690,6 +1691,8 @@ export const createModelView = async () => {
     }
     planeBlueprint = new THREE.Mesh(geometry, material);
     planeBlueprint.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+    planeBlueprint.userData.scale = 1
+    planeBlueprint.name = "uploaded-blueprint"
     scene.add(planeBlueprint);
   }
 
@@ -1715,21 +1718,45 @@ export const createModelView = async () => {
   }
 
   // Create a hidden file input element
-  const hiddenFileInput = document.createElement("input");
-  hiddenFileInput.type = "file";
-  hiddenFileInput.accept = "image/*";
-  hiddenFileInput.style.display = "none";
-  hiddenFileInput.addEventListener("change", handleImageUpload);
-  document.body.appendChild(hiddenFileInput);
+  // const hiddenFileInput = document.createElement("input");
+  // hiddenFileInput.type = "file";
+  // hiddenFileInput.accept = "image/*";
+  // hiddenFileInput.style.display = "none";
+  // hiddenFileInput.addEventListener("change", handleImageUpload);
+  // document.body.appendChild(hiddenFileInput);
 
   observeElementAndAddEventListener(
     "upload-image-blueprint",
     "mousedown",
     () => {
       console.log("upload image as blueprint");
-      hiddenFileInput.click();
+      const hiddenFileInput = document.getElementById("2D-hidden-file-input");
+      if (hiddenFileInput) {
+        hiddenFileInput.addEventListener("change", handleImageUpload);
+        hiddenFileInput.click();
+      }
     }
   );
+
+  observeElementAndAddEventListener("scale-image-blueprint", "blur", () => {
+    console.log("blur")
+    const uploadStore = uploadImageStore()
+    const uploadedBlueprints: THREE.Object3D<THREE.Object3DEventMap>[] = []
+    scene.traverse((child) => {
+      if (child.name === "uploaded-blueprint") {
+        uploadedBlueprints.push(child)
+      }
+    })
+
+    console.log(uploadedBlueprints)
+
+    uploadedBlueprints.forEach((blueprint: any) => {
+      console.log(uploadStore.scale)
+      blueprint.scale.set(uploadStore.scale, uploadStore.scale, uploadStore.scale)
+    })
+  })
+
+
 
   // @ts-ignore
   components.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);

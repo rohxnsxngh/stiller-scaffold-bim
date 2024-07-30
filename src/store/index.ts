@@ -81,3 +81,14 @@ export const selectedStore = defineStore("selected", {
     },
   },
 });
+
+export const uploadImageStore = defineStore("image", {
+  state: () => ({
+    scale: 1,
+  }),
+  actions: {
+    updateScale(value: any) {
+      this.scale = value;
+    },
+  },
+});

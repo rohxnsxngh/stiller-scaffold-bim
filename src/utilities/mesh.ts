@@ -463,8 +463,19 @@ export function createRectangle(
   markup.position.set(centerX, -0.025, centerZ);
   markup.rotation.x = Math.PI / 2;
   markup.name = "rectanglePlane";
+
+  const shape = new THREE.Shape();
+  // Create shape
+  if (rectanglePoints.length >= 3) {
+    shape.moveTo(rectanglePoints[0].x, rectanglePoints[0].z);
+    for (let i = 1; i < rectanglePoints.length; i++) {
+      shape.lineTo(rectanglePoints[i].x, rectanglePoints[i].z);
+    }
+    shape.lineTo(rectanglePoints[0].x, rectanglePoints[0].z); // close the shape
+  }
   if ((width >= 0 && height >= 0) || (width <= 0 && height <= 0)) {
     markup.userData = {
+      shape: shape,
       rectanglePoints: rectanglePoints,
       width: -width,
       height: -height,
@@ -472,6 +483,7 @@ export function createRectangle(
     };
   } else {
     markup.userData = {
+      shape: shape,
       rectanglePoints: rectanglePoints,
       width: width,
       height: height,
@@ -728,9 +740,20 @@ function updateRectangleBlueprintGeometry(
       corner1,
     ];
 
+    const shape = new THREE.Shape();
+    // Create shape
+    if (rectanglePointsUpdated.length >= 3) {
+      shape.moveTo(rectanglePointsUpdated[0].x, rectanglePointsUpdated[0].z);
+      for (let i = 1; i < rectanglePointsUpdated.length; i++) {
+        shape.lineTo(rectanglePointsUpdated[i].x, rectanglePointsUpdated[i].z);
+      }
+      shape.lineTo(rectanglePointsUpdated[0].x, rectanglePointsUpdated[0].z); // close the shape
+    }
+
     newRectangleBlueprint.rotation.x = Math.PI / 2;
     newRectangleBlueprint.name = "rectanglePlane";
     newRectangleBlueprint.userData = {
+      shape: shape,
       rectanglePoints: rectanglePointsUpdated,
       width: width,
       height: height,
@@ -784,9 +807,20 @@ function updateRectangleBlueprintGeometry(
       corner1,
     ];
 
+    const shape = new THREE.Shape();
+    // Create shape
+    if (rectanglePointsUpdated.length >= 3) {
+      shape.moveTo(rectanglePointsUpdated[0].x, rectanglePointsUpdated[0].z);
+      for (let i = 1; i < rectanglePointsUpdated.length; i++) {
+        shape.lineTo(rectanglePointsUpdated[i].x, rectanglePointsUpdated[i].z);
+      }
+      shape.lineTo(rectanglePointsUpdated[0].x, rectanglePointsUpdated[0].z); // close the shape
+    }
+
     newRectangleBlueprint.rotation.x = Math.PI / 2;
     newRectangleBlueprint.name = "rectanglePlane";
     newRectangleBlueprint.userData = {
+      shape: shape,
       rectanglePoints: rectanglePointsUpdated,
       width: width,
       height: height,
@@ -962,6 +996,8 @@ export function createRoof(
   );
   extrudedMesh.userData.label = label;
   blueprintHasBeenUpdated = false;
+
+  return extrudedMesh
 }
 
 function createRoofLabel(

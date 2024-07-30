@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-[#14141C] grid grid-cols-4 gap-4 rounded">
-    <div class="flex flex-col m-4">
+  <div class="bg-[#14141C] grid grid-cols-4 gap-4 rounded p-1">
+    <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
         id="top-view"
@@ -9,7 +9,7 @@
       </div>
       <div><p class="text-xs text-center mt-2">Top View</p></div>
     </div>
-    <div class="flex flex-col m-4">
+    <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767]"
         id="free-rotate"
@@ -18,7 +18,7 @@
       </div>
       <div><p class="text-xs text-center mt-2">Rotate</p></div>
     </div>
-    <div class="flex flex-col m-4">
+    <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#393924] rounded-lg border-2 border-[#E9D733]"
         id="delete-object"
@@ -27,7 +27,7 @@
       </div>
       <div><p class="text-xs text-center mt-2">Delete Object</p></div>
     </div>
-    <div class="flex flex-col m-4">
+    <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#221F41] rounded-lg border-2 border-[#623CEA]"
         id="reset-scene"
@@ -36,7 +36,7 @@
       </div>
       <div><p class="text-xs text-center mt-2">Reset Scene</p></div>
     </div>
-    <div class="flex flex-col m-4">
+    <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#355E3B] rounded-lg border-2 border-[#0BDA51]"
         id="move-geometry"
