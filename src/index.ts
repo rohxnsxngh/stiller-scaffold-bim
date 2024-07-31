@@ -45,6 +45,7 @@ import {
   observeElementAndAddEventListener,
   resetScaffolding,
   resetScene,
+  returnObjectsToOriginalState,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
@@ -79,6 +80,7 @@ import {
 } from "./utilities/state";
 import gsap from "gsap";
 import { DragControls } from "three/addons/controls/DragControls.js";
+import { cameraEnableOrbitalFunctionality } from "./utilities/camera";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -621,7 +623,7 @@ export const createModelView = async () => {
     }
     if (movingGeometry && !drawingInProgress) {
       document.body.style.cursor = "grab";
-      setStates({movingGeometry})
+      cameraEnableOrbitalFunctionality(gsap, components.camera);
       const object = intersects[0].object;
       console.log(object);
       hideAllCSS2DObjects(scene);
@@ -646,7 +648,7 @@ export const createModelView = async () => {
         components.renderer._renderer.domElement
       );
 
-      dragControls.transformGroup = true; // Ensure transformGroup is set to true
+      dragControls.transformGroup = true;
 
       // Event listeners for drag controls
       dragControls.addEventListener("dragstart", (event) => {
@@ -657,7 +659,11 @@ export const createModelView = async () => {
         // Maintain original y heights
         group.children.forEach((child) => {
           if (initialYHeights.has(child)) {
-            child.position.y = initialYHeights.get(child);
+            console.log(
+              "geometry group heights: ",
+              initialYHeights.get(child),
+              child
+            );
           }
         });
         console.log("Dragging:", event.object);
@@ -666,6 +672,14 @@ export const createModelView = async () => {
       dragControls.addEventListener("dragend", (event) => {
         console.log("Drag end:", event.object);
         dragControls.enabled = false; // Disable drag controls after dragging
+        group.position.y = 0;
+        group.updateMatrix();
+        group.children.forEach((child) => {
+          console.log(child.position)
+          child.updateMatrix();
+        });
+        returnObjectsToOriginalState();
+        // setStates()
       });
     }
 

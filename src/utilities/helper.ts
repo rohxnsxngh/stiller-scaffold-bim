@@ -635,3 +635,14 @@ export function findObjectBuildingRelations(object: any, scene: THREE.Scene) {
 
   return selectedGeometries;
 }
+
+export function returnObjectsToOriginalState() {
+  // Revert the opacity of previously selected geometries
+  previousSelectedGeometries.forEach((geometry: any) => {
+    if (originalOpacities.has(geometry)) {
+      geometry.material.opacity = originalOpacities.get(geometry) || 1;
+      geometry.material.transparent = geometry.material.opacity < 1;
+      geometry.material.needsUpdate = true;
+    }
+  });
+}
