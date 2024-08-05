@@ -51,6 +51,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
 import { supplyStore, uploadImageStore, useStore } from "./store";
 import {
+  deleteBuilding,
   deletionInProgress,
   deletionScaffoldingColumnInProgress,
   deletionScaffoldingRowInProgress,
@@ -64,6 +65,7 @@ import {
   replaceScaffoldingColumnWithExternalStaircaseInProgress,
   replaceScaffoldingColumnWithInternalStaircaseInProgress,
   rotatingRoofInProgress,
+  setDeleteBuilding,
   setDeletionInProgress,
   setDeletionScaffoldingColumnInProgress,
   setDeletionScaffoldingRowInProgress,
@@ -536,7 +538,7 @@ export const createModelView = async () => {
       }
     }
 
-    if (movingGeometry && !highlightingObject) {
+    if ((movingGeometry || deleteBuilding) && !highlightingObject) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
@@ -621,6 +623,29 @@ export const createModelView = async () => {
         }
       }
     }
+    if (deleteBuilding) {
+      const building = intersects[0].object;
+      const buildings = findObjectBuildingRelations(building, scene);
+
+      buildings.forEach((object) => {
+        console.warn(object);
+        if (
+          (object.parent && object.parent.name === "markupGroup")
+        ) {
+          const parentObject = object.parent
+          // Remove children of the "markupGroup" from the scene
+          // TODO check if this implementation removes the blueprint from memory and
+          // properly disposes of material
+          parentObject.traverse((grandChild) => {
+            parentObject.remove(grandChild);
+          });
+        } else {
+          // console.warn(object);
+          hideAllCSS2DObjects(scene);
+          scene.remove(object);
+        }
+      });
+    }
     if (movingGeometry && !drawingInProgress) {
       document.body.style.cursor = "grab";
       cameraEnableOrbitalFunctionality(gsap, components.camera);
@@ -644,7 +669,9 @@ export const createModelView = async () => {
 
       const dragControls = new DragControls(
         [group], // Add the group to DragControls
+        //@ts-ignore
         components.camera.activeCamera,
+        //@ts-ignore
         components.renderer._renderer.domElement
       );
 
@@ -675,7 +702,7 @@ export const createModelView = async () => {
         group.position.y = 0;
         group.updateMatrix();
         group.children.forEach((child) => {
-          console.log(child.position)
+          console.log(child.position);
           child.updateMatrix();
         });
         returnObjectsToOriginalState();
@@ -1744,6 +1771,10 @@ export const createModelView = async () => {
         uploadStore.scale
       );
     });
+  });
+
+  observeElementAndAddEventListener("delete-building", "mousedown", () => {
+    setDeleteBuilding(true);
   });
 
   // @ts-ignore

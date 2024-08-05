@@ -11,9 +11,14 @@ export let rotatingRoofInProgress = false;
 export let editingBlueprint = false;
 export let movingGeometry = false;
 export let highlightingObject = false;
+export let deleteBuilding = false;
 
 export const setEditingBlueprint = (value: boolean) => {
   editingBlueprint = value;
+};
+
+export const setDeleteBuilding = (value: boolean) => {
+  deleteBuilding = value;
 };
 
 export const setHighlightingObject = (value: boolean) => {
@@ -82,6 +87,7 @@ export function setStates(
     drawingInProgressSwitch?: boolean;
     movingGeometry?: boolean;
     highlightingObject?: boolean;
+    deleteBuilding?: boolean;
     // editingBlueprint?: boolean;
     // isDrawingBlueprint?: boolean;
   } = {}
@@ -99,6 +105,7 @@ export function setStates(
     drawingInProgressSwitch: false,
     movingGeometry: false,
     highlightingObject: false,
+    deleteBuilding: false,
     // editingBlueprint: false,
     // isDrawingBlueprint: false
   };
@@ -125,6 +132,7 @@ export function setStates(
   setDrawingInProgressSwitch(mergedStates.drawingInProgressSwitch);
   setMovingGeometry(mergedStates.movingGeometry);
   setHighlightingObject(mergedStates.highlightingObject);
+  setDeleteBuilding(mergedStates.deleteBuilding);
   // setEditingBlueprint(mergedStates.editingBlueprint)
   // setIsDrawingBlueprint(mergedStates.isDrawingBlueprint)
 }

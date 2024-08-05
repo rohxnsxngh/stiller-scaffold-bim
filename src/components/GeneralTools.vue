@@ -45,5 +45,14 @@
       </div>
       <div><p class="text-xs text-center mt-2">Move Geometry</p></div>
     </div>
+    <div class="flex flex-col mx-4">
+      <div
+        class="btn btn-md bg-[#393924] rounded-lg border-2 border-[#E9D733]"
+        id="delete-building"
+      >
+        <i class="material-icons text-[#E9D733]"> home_work</i>
+      </div>
+      <div><p class="text-xs text-center mt-2">Delete Building</p></div>
+    </div>
   </div>
 </template>
