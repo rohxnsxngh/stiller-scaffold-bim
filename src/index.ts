@@ -82,7 +82,11 @@ import {
 } from "./utilities/state";
 import gsap from "gsap";
 import { DragControls } from "three/addons/controls/DragControls.js";
-import { cameraEnableOrbitalFunctionality } from "./utilities/camera";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
+import {
+  cameraDisableOrbitalFunctionality,
+  cameraEnableOrbitalFunctionality,
+} from "./utilities/camera";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -629,10 +633,8 @@ export const createModelView = async () => {
 
       buildings.forEach((object) => {
         console.warn(object);
-        if (
-          (object.parent && object.parent.name === "markupGroup")
-        ) {
-          const parentObject = object.parent
+        if (object.parent && object.parent.name === "markupGroup") {
+          const parentObject = object.parent;
           // Remove children of the "markupGroup" from the scene
           // TODO check if this implementation removes the blueprint from memory and
           // properly disposes of material
@@ -647,67 +649,121 @@ export const createModelView = async () => {
       });
     }
     if (movingGeometry && !drawingInProgress) {
-      document.body.style.cursor = "grab";
-      cameraEnableOrbitalFunctionality(gsap, components.camera);
-      const object = intersects[0].object;
-      console.log(object);
-      hideAllCSS2DObjects(scene);
+      if (intersects.length > 0) {
+        document.body.style.cursor = "grab";
+        // cameraEnableOrbitalFunctionality(gsap, components.camera);
+        const mesh = intersects[0].object;
+        console.log(mesh);
+        hideAllCSS2DObjects(scene);
 
-      const group = new THREE.Group();
-      scene.add(group);
+        const group = new THREE.Group();
+        scene.add(group);
 
-      const geometriesToMove = findObjectBuildingRelations(object, scene);
+        const geometriesToMove = findObjectBuildingRelations(mesh, scene);
 
-      // Store initial y heights
-      const initialYHeights = new Map();
-      geometriesToMove.forEach((geometry) => {
-        initialYHeights.set(geometry, geometry.position.y);
-      });
+        // Store initial y heights
+        const initialYHeights = new Map();
+        geometriesToMove.forEach((geometry) => {
+          initialYHeights.set(geometry, geometry.position.y);
+        });
 
-      group.add(...geometriesToMove);
-      console.log(geometriesToMove, group);
+        group.add(...geometriesToMove);
+        console.warn(group);
 
-      const dragControls = new DragControls(
-        [group], // Add the group to DragControls
-        //@ts-ignore
-        components.camera.activeCamera,
-        //@ts-ignore
-        components.renderer._renderer.domElement
-      );
+        /////////////////////////////////
 
-      dragControls.transformGroup = true;
+        const transformControls = new TransformControls(
+          //@ts-ignore
+          components.camera.activeCamera,
+          //@ts-ignore
+          components.renderer._renderer.domElement
+        );
+        if (
+          mesh.name !== "ground" &&
+          mesh.name !== "grid" &&
+          mesh.name.indexOf("label") === -1
+        ) {
+          console.log("attaching to SOMETHING", mesh)
+          transformControls.enabled = true;
+          transformControls.attach(mesh);
+          scene.add(transformControls);
+        }
 
-      // Event listeners for drag controls
-      dragControls.addEventListener("dragstart", (event) => {
-        console.log("Drag start:", event.object);
-      });
+        console.log(geometriesToMove, group, transformControls);
+        transformControls.addEventListener("change", render);
+        transformControls.addEventListener("mouseDown", function () {
+          cameraDisableOrbitalFunctionality(gsap, components.camera);
+          console.log(transformControls, group);
+        });
+        transformControls.addEventListener("mouseUp", function () {
+          cameraEnableOrbitalFunctionality(gsap, components.camera);
+          transformControls.detach();
+          group.children = []
+          scene.remove(transformControls);
+          transformControls.enabled = false
+        });
 
-      dragControls.addEventListener("drag", (event) => {
-        // Maintain original y heights
-        group.children.forEach((child) => {
-          if (initialYHeights.has(child)) {
-            console.log(
-              "geometry group heights: ",
-              initialYHeights.get(child),
-              child
-            );
+        window.addEventListener("keydown", function (event: KeyboardEvent) {
+          switch (event.key) {
+            case "g":
+              transformControls.setMode("translate");
+              break;
+            case "r":
+              transformControls.setMode("rotate");
+              break;
+            case "s":
+              transformControls.setMode("scale");
+              break;
           }
         });
-        console.log("Dragging:", event.object);
-      });
+      }
 
-      dragControls.addEventListener("dragend", (event) => {
-        console.log("Drag end:", event.object);
-        dragControls.enabled = false; // Disable drag controls after dragging
-        group.position.y = 0;
-        group.updateMatrix();
-        group.children.forEach((child) => {
-          console.log(child.position);
-          child.updateMatrix();
-        });
-        returnObjectsToOriginalState();
-        // setStates()
-      });
+      ////////////////////////////////////////////
+
+      // const dragControls = new DragControls(
+      //   [group], // Add the group to DragControls
+      //   //@ts-ignore
+      //   components.camera.activeCamera,
+      //   //@ts-ignore
+      //   components.renderer._renderer.domElement
+      // );
+
+      // dragControls.transformGroup = true;
+      // cameraDisableOrbitalFunctionality(gsap, components.camera)
+
+      // // Event listeners for drag controls
+      // dragControls.addEventListener("dragstart", (event) => {
+      //   // cameraDisableOrbitalFunctionality(gsap, components.camera)
+      //   console.log("Drag start:", event.object);
+      // });
+
+      // dragControls.addEventListener("drag", (event) => {
+      //   // Maintain original y heights
+      //   group.children.forEach((child) => {
+      //     if (initialYHeights.has(child)) {
+      //       console.log(
+      //         "geometry group heights: ",
+      //         initialYHeights.get(child),
+      //         child
+      //       );
+      //     }
+      //   });
+      //   console.log("Dragging:", event.object);
+      // });
+
+      // dragControls.addEventListener("dragend", (event) => {
+      //   console.log("Drag end:", event.object);
+      //   dragControls.enabled = false; // Disable drag controls after dragging
+      //   group.position.y = 0;
+      //   group.updateMatrix();
+      //   group.children.forEach((child) => {
+      //     console.log(child.position);
+      //     child.updateMatrix();
+      //   });
+      //   returnObjectsToOriginalState();
+      //   cameraEnableOrbitalFunctionality(gsap, components.camera)
+      //   // setStates()
+      // });
     }
 
     if (rotatingRoofInProgress && !drawingInProgressSwitch) {
@@ -1806,6 +1862,11 @@ export const createModelView = async () => {
       window.innerHeight
     );
   });
+
+  function render() {
+    //@ts-ignore
+    components.renderer._renderer.render(scene, components.camera.activeCamera);
+  }
 
   animate();
 };

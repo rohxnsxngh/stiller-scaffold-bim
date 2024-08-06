@@ -615,7 +615,7 @@ export function findObjectBuildingRelations(object: any, scene: THREE.Scene) {
       ) {
         selectedGeometries.push(child);
       } else {
-        console.error("This child is not included", child);
+        // console.error("This child is not included", child);
       }
     });
   }
