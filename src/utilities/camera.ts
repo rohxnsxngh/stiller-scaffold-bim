@@ -48,6 +48,25 @@ export function cameraDisableOrbitalFunctionality(gsap: any, camera: any) {
   });
 }
 
+export function cameraDisableOrbitalFunctionalities(gsap: any, camera: any) {
+  gsap.to(camera.activeCamera.position, {
+    duration: 0.1,
+    ease: "power1.inOut",
+    onUpdated: () => {
+      // camera.controls.updateProjectionMatrix()
+    },
+    onComplete: () => {
+      camera.controls.enabled = false;
+      camera.controls.dollyToCursor = false;
+      camera.controls.enablePan = false;
+      camera.controls.enableZoom = false;
+      camera.controls.screenSpacePanning = false;
+      camera.controls.azimuthRotateSpeed = 0;
+      camera.controls.maxPolarAngle = 180;
+    },
+  });
+}
+
 export function cameraEnableOrbitalFunctionality(gsap: any, camera: any) {
   gsap.to(camera.activeCamera.position, {
     duration: 0.1,

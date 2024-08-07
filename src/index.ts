@@ -84,6 +84,7 @@ import gsap from "gsap";
 import { DragControls } from "three/addons/controls/DragControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import {
+  cameraDisableOrbitalFunctionalities,
   cameraDisableOrbitalFunctionality,
   cameraEnableOrbitalFunctionality,
 } from "./utilities/camera";
@@ -678,6 +679,7 @@ export const createModelView = async () => {
           //@ts-ignore
           components.renderer._renderer.domElement
         );
+        transformControls.showY = false
         if (
           mesh.name !== "ground" &&
           mesh.name !== "grid" &&
@@ -685,22 +687,34 @@ export const createModelView = async () => {
         ) {
           console.log("attaching to SOMETHING", mesh)
           transformControls.enabled = true;
-          transformControls.attach(mesh);
+          transformControls.attach(group);
           scene.add(transformControls);
+          // freeRotateButton.domElement.click()
         }
 
         console.log(geometriesToMove, group, transformControls);
-        transformControls.addEventListener("change", render);
+
+        // transformControls.addEventListener("change", render);
+
         transformControls.addEventListener("mouseDown", function () {
-          cameraDisableOrbitalFunctionality(gsap, components.camera);
+          cameraDisableOrbitalFunctionalities(gsap, components.camera);
+          freeRotateButton.domElement.click()
           console.log(transformControls, group);
         });
+
         transformControls.addEventListener("mouseUp", function () {
           cameraEnableOrbitalFunctionality(gsap, components.camera);
           transformControls.detach();
-          group.children = []
+          // group.children = []
           scene.remove(transformControls);
-          transformControls.enabled = false
+          // transformControls.enabled = false
+          freeRotateButton.domElement.click()
+          returnObjectsToOriginalState()
+          const moveGeometry = document.getElementById("move-geometry")
+          if (moveGeometry) {
+            console.error("triggered")
+            moveGeometry.click()
+          }
         });
 
         window.addEventListener("keydown", function (event: KeyboardEvent) {
