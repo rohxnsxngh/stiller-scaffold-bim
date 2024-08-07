@@ -43,7 +43,7 @@
       >
         <i class="material-symbols-outlined text-[#0BDA51]">drag_pan</i>
       </div>
-      <div><p class="text-xs text-center mt-2">Move Geometry</p></div>
+      <div><p class="text-xs text-center mt-2">Move Building</p></div>
     </div>
     <div class="flex flex-col mx-4">
       <div

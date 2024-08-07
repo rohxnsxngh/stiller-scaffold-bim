@@ -543,7 +543,9 @@ export const createModelView = async () => {
       }
     }
 
-    if ((movingGeometry || deleteBuilding) && !highlightingObject) {
+    if ((
+      // movingGeometry || 
+      deleteBuilding) && !highlightingObject) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
@@ -696,8 +698,8 @@ export const createModelView = async () => {
         // transformControls.addEventListener("change", render);
 
         transformControls.addEventListener("mouseDown", function () {
-          setMovingGeometry(false)
           cameraDisableOrbitalFunctionalities(gsap, components.camera);
+          resetLastHighlightedObject()
           freeRotateButton.domElement.click()
           console.log(transformControls, group);
         });
@@ -708,6 +710,7 @@ export const createModelView = async () => {
           scene.remove(transformControls);
           freeRotateButton.domElement.click()
           returnObjectsToOriginalState()
+          console.log("AFTER TRANSLATION", group)
         });
 
         window.addEventListener("keydown", function (event: KeyboardEvent) {
