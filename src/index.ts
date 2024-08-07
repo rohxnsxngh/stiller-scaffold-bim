@@ -689,7 +689,6 @@ export const createModelView = async () => {
           transformControls.enabled = true;
           transformControls.attach(group);
           scene.add(transformControls);
-          // freeRotateButton.domElement.click()
         }
 
         console.log(geometriesToMove, group, transformControls);
@@ -697,6 +696,7 @@ export const createModelView = async () => {
         // transformControls.addEventListener("change", render);
 
         transformControls.addEventListener("mouseDown", function () {
+          setMovingGeometry(false)
           cameraDisableOrbitalFunctionalities(gsap, components.camera);
           freeRotateButton.domElement.click()
           console.log(transformControls, group);
@@ -705,16 +705,9 @@ export const createModelView = async () => {
         transformControls.addEventListener("mouseUp", function () {
           cameraEnableOrbitalFunctionality(gsap, components.camera);
           transformControls.detach();
-          // group.children = []
           scene.remove(transformControls);
-          // transformControls.enabled = false
           freeRotateButton.domElement.click()
           returnObjectsToOriginalState()
-          const moveGeometry = document.getElementById("move-geometry")
-          if (moveGeometry) {
-            console.error("triggered")
-            moveGeometry.click()
-          }
         });
 
         window.addEventListener("keydown", function (event: KeyboardEvent) {
