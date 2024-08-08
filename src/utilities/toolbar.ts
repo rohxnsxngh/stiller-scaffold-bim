@@ -330,13 +330,14 @@ export const createToolbar = (
   createBlueprintRectangleButton.domElement.classList.add("hover:bg-slate-300");
 
   observeElementAndAddEventListener("top-view", "mousedown", () => {
+    selected.updateSelected("Top View");
     removeHighlightMesh(scene);
     cameraTopView(gsap, components.camera);
     setStates();
   });
 
   observeElementAndAddEventListener("top-view", "mouseover", () => {
-    setStates();
+    // setStates();
   });
 
   observeElementAndAddEventListener("free-rotate", "mousedown", () => {
@@ -361,7 +362,16 @@ export const createToolbar = (
   });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    selected.updateSelected("Reset Scene");
     setStates();
+  });
+
+  observeElementAndAddEventListener("move-geometry", "mousedown", () => {
+    selected.updateSelected("Move Building");
+  });
+
+  observeElementAndAddEventListener("delete-building", "mousedown", () => {
+    selected.updateSelected("Delete Building");
   });
 
   observeElementAndAddEventListener("reset-scene", "mouseover", () => {
