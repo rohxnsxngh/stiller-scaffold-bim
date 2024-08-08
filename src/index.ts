@@ -670,6 +670,13 @@ export const createModelView = async () => {
         const initialWorldPosition = new THREE.Vector3();
         group.getWorldPosition(initialWorldPosition);
 
+        const initialWorldPositionChildren = new THREE.Vector3();
+        mesh.getWorldPosition(initialWorldPositionChildren);
+        console.log(
+          "initialWorldPositionChildren",
+          initialWorldPositionChildren
+        );
+
         group.add(...geometriesToMove);
         console.warn(group);
 
@@ -704,6 +711,7 @@ export const createModelView = async () => {
           console.warn("BEFORE TRANSLATION", group, transformControls);
         });
 
+        let height: number, width: number;
         transformControls.addEventListener("mouseUp", function () {
           cameraEnableOrbitalFunctionality(gsap, components.camera);
           transformControls.detach();
@@ -715,13 +723,17 @@ export const createModelView = async () => {
           const finalWorldPosition = new THREE.Vector3();
           group.getWorldPosition(finalWorldPosition);
 
+          const finalWorldPositionChildren = new THREE.Vector3();
+          geometriesToMove[0].getWorldPosition(finalWorldPositionChildren);
+          console.log("finalWorldPositionChildren", finalWorldPositionChildren);
+
           // Calculate the distance traveled
           const xDisplacement = finalWorldPosition.x - initialWorldPosition.x;
-          const yDisplacement = finalWorldPosition.z - initialWorldPosition.z;
+          const zDisplacement = finalWorldPosition.z - initialWorldPosition.z;
           console.log("Initial World Position:", initialWorldPosition);
           console.log("Final World Position:", finalWorldPosition);
           console.log("Distance Traveled in X:", xDisplacement);
-          console.log("Distance Traveled in Z:", yDisplacement);
+          console.log("Distance Traveled in Z:", zDisplacement);
 
           group.children.forEach((child) => {
             const previousShape = child.userData.shape;
@@ -731,10 +743,10 @@ export const createModelView = async () => {
                 if (curve instanceof THREE.LineCurve) {
                   const startPoint = curve.v1
                     .clone()
-                    .add(new THREE.Vector2(xDisplacement, yDisplacement));
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
                   const endPoint = curve.v2
                     .clone()
-                    .add(new THREE.Vector2(xDisplacement, yDisplacement));
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
                   newShape.moveTo(startPoint.x, startPoint.y);
                   newShape.lineTo(endPoint.x, endPoint.y);
                 }
@@ -742,11 +754,25 @@ export const createModelView = async () => {
               console.log("shape comparison", child.userData.shape, newShape);
               child.userData.shape = newShape;
             }
+
+            if (child.name === "blueprint") {
+              height = child.userData.height;
+              width = child.userData.width;
+            }
           });
 
-          group.updateMatrix();
-          group.matrixWorldNeedsUpdate = true;
-          group.updateMatrixWorld(true);
+          // group.updateMatrix();
+          group.children.forEach((child) => {
+            child.position.x =
+              child.position.x +
+              (finalWorldPositionChildren.x - initialWorldPositionChildren.x) /
+                height;
+            child.position.z =
+              child.position.z +
+              (finalWorldPositionChildren.z - initialWorldPositionChildren.z) /
+                width;
+            child.updateMatrix();
+          });
 
           console.warn("AFTER TRANSLATION", group, transformControls);
         });
