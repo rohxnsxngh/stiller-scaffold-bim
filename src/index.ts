@@ -543,9 +543,11 @@ export const createModelView = async () => {
       }
     }
 
-    if ((
-      // movingGeometry || 
-      deleteBuilding) && !highlightingObject) {
+    if (
+      // movingGeometry ||
+      deleteBuilding &&
+      !highlightingObject
+    ) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
@@ -664,11 +666,9 @@ export const createModelView = async () => {
 
         const geometriesToMove = findObjectBuildingRelations(mesh, scene);
 
-        // Store initial y heights
-        const initialYHeights = new Map();
-        geometriesToMove.forEach((geometry) => {
-          initialYHeights.set(geometry, geometry.position.y);
-        });
+        // Store initial world position of the group
+        const initialWorldPosition = new THREE.Vector3();
+        group.getWorldPosition(initialWorldPosition);
 
         group.add(...geometriesToMove);
         console.warn(group);
@@ -681,13 +681,13 @@ export const createModelView = async () => {
           //@ts-ignore
           components.renderer._renderer.domElement
         );
-        transformControls.showY = false
+        transformControls.showY = false;
         if (
           mesh.name !== "ground" &&
           mesh.name !== "grid" &&
           mesh.name.indexOf("label") === -1
         ) {
-          console.log("attaching to SOMETHING", mesh)
+          console.log("attaching to SOMETHING", mesh);
           transformControls.enabled = true;
           transformControls.attach(group);
           scene.add(transformControls);
@@ -699,18 +699,56 @@ export const createModelView = async () => {
 
         transformControls.addEventListener("mouseDown", function () {
           cameraDisableOrbitalFunctionalities(gsap, components.camera);
-          resetLastHighlightedObject()
-          freeRotateButton.domElement.click()
-          console.log(transformControls, group);
+          resetLastHighlightedObject();
+          freeRotateButton.domElement.click();
+          console.warn("BEFORE TRANSLATION", group, transformControls);
         });
 
         transformControls.addEventListener("mouseUp", function () {
           cameraEnableOrbitalFunctionality(gsap, components.camera);
           transformControls.detach();
           scene.remove(transformControls);
-          freeRotateButton.domElement.click()
-          returnObjectsToOriginalState()
-          console.log("AFTER TRANSLATION", group)
+          freeRotateButton.domElement.click();
+          returnObjectsToOriginalState();
+
+          // Get final world position of the group
+          const finalWorldPosition = new THREE.Vector3();
+          group.getWorldPosition(finalWorldPosition);
+
+          // Calculate the distance traveled
+          const xDisplacement = finalWorldPosition.x - initialWorldPosition.x;
+          const yDisplacement = finalWorldPosition.z - initialWorldPosition.z;
+          console.log("Initial World Position:", initialWorldPosition);
+          console.log("Final World Position:", finalWorldPosition);
+          console.log("Distance Traveled in X:", xDisplacement);
+          console.log("Distance Traveled in Z:", yDisplacement);
+
+          group.children.forEach((child) => {
+            const previousShape = child.userData.shape;
+            if (previousShape instanceof THREE.Shape) {
+              const newShape = new THREE.Shape();
+              previousShape.curves.forEach((curve) => {
+                if (curve instanceof THREE.LineCurve) {
+                  const startPoint = curve.v1
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, yDisplacement));
+                  const endPoint = curve.v2
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, yDisplacement));
+                  newShape.moveTo(startPoint.x, startPoint.y);
+                  newShape.lineTo(endPoint.x, endPoint.y);
+                }
+              });
+              console.log("shape comparison", child.userData.shape, newShape);
+              child.userData.shape = newShape;
+            }
+          });
+
+          group.updateMatrix();
+          group.matrixWorldNeedsUpdate = true;
+          group.updateMatrixWorld(true);
+
+          console.warn("AFTER TRANSLATION", group, transformControls);
         });
 
         window.addEventListener("keydown", function (event: KeyboardEvent) {
