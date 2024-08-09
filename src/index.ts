@@ -668,6 +668,9 @@ export const createModelView = async () => {
 
         // Store initial world position of the group
         const initialWorldPosition = new THREE.Vector3();
+        // if (!initialWorldPosition) {
+
+        // }
         group.getWorldPosition(initialWorldPosition);
 
         const initialWorldPositionChildren = new THREE.Vector3();
@@ -694,9 +697,11 @@ export const createModelView = async () => {
           mesh.name !== "grid" &&
           mesh.name.indexOf("label") === -1
         ) {
-          console.log("attaching to SOMETHING", mesh);
+          console.log("SELECTED mESH", mesh);
           transformControls.enabled = true;
           transformControls.attach(group);
+          transformControls.position.x = mesh.userData.shape.currentPoint.x;
+          transformControls.position.z = mesh.userData.shape.currentPoint.y;
           scene.add(transformControls);
         }
 
@@ -761,18 +766,33 @@ export const createModelView = async () => {
             }
           });
 
-          // group.updateMatrix();
-          group.children.forEach((child) => {
-            child.position.x =
-              child.position.x +
-              (finalWorldPositionChildren.x - initialWorldPositionChildren.x) /
-                height;
-            child.position.z =
-              child.position.z +
-              (finalWorldPositionChildren.z - initialWorldPositionChildren.z) /
-                width;
-            child.updateMatrix();
-          });
+          group.updateMatrixWorld();
+
+          // the problem is the mesh position does not update but the position of the shape in userData does update. TransformControls is based on
+          // the shape location. I need to update the mesh accordingly as well
+          // group.children.forEach((child) => {
+          //   console.warn(
+          //     "MESH POSITIONS",
+          //     child,
+          //     child.position,
+          //     finalWorldPosition,
+          //     initialWorldPosition
+          //   );
+          //   child.position.x =
+          //     child.position.x +
+          //     (finalWorldPositionChildren.x - initialWorldPositionChildren.x) /
+          //       height;
+          //   child.position.z =
+          //     child.position.z +
+          //     (finalWorldPositionChildren.z - initialWorldPositionChildren.z) /
+          //       width;
+          //   // child.updateMatrix();
+
+          //   child.matrixWorldNeedsUpdate = true;
+          //   child.updateMatrixWorld();
+
+          //   console.log("POSITION", child.position)
+          // });
 
           console.warn("AFTER TRANSLATION", group, transformControls);
         });
