@@ -778,7 +778,7 @@ export function createScaffoldExternalStaircaseModel(
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
     loader.load(
-      "/models/scaffolding-external-staircase-no-texture.glb",
+      "/models/scaffolding-external.glb",
       (gltf: any) => {
         const scaffoldExternalStaircaseModel = gltf.scene;
         scaffoldExternalStaircaseModel.name =
@@ -934,7 +934,7 @@ export function createScaffoldInternalStaircaseModel(
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
     loader.load(
-      "/models/scaffolding-external-staircase-no-texture.glb",
+      "/models/scaffolding-external.glb",
       (gltf: any) => {
         const scaffoldInternalStaircaseModel = gltf.scene;
         scaffoldInternalStaircaseModel.name =
