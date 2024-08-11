@@ -11,9 +11,24 @@
       <div class="divider"></div>
       <div class="overflow-x-auto p-6">
         <h3 class="font-semibold text-2xl">Oppsummering</h3>
-        <p class="text-sm my-2 font-semibold text-green-300" v-if="squareMeterScaffoldingCoverage > 0">
+        <p
+          class="text-sm my-2 font-semibold"
+          v-if="squareMeterScaffoldingCoverage > 0"
+        >
           Total Square Footage of Scaffolding Cover:
-          {{ squareMeterScaffoldingCoverage }} square meters
+          <span class="text-green-300">{{
+            squareMeterScaffoldingCoverage
+          }}</span>
+          square meters
+        </p>
+
+        <p
+          class="text-sm my-2 font-semibold"
+          v-if="squareMeterBuildingCoverage > 0"
+        >
+          Total Square Footage of Buildings Modeled:
+          <span class="text-green-300"> {{ squareMeterBuildingCoverage }}</span>
+          square meters
         </p>
         <table class="table table-zebra">
           <!-- head -->
@@ -95,11 +110,18 @@ export default {
       set: (value) => supply.updateSquareMetersOfScaffolding(value),
     });
 
+    const squareMeterBuildingCoverage = computed({
+      // Make depth a computed property
+      get: () => supply.squareMetersOfBuilding,
+      set: (value) => supply.updateSquareMetersOfBuilding(value),
+    });
+
     return {
       scaffolding,
       internalScaffolding,
       externalScaffolding,
       squareMeterScaffoldingCoverage,
+      squareMeterBuildingCoverage,
     };
   },
 };

@@ -461,14 +461,45 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
 export function calculateTotalSquareMetersForBlueprint(scene: THREE.Scene) {
   let totalSquareMetersOfBlueprint = 0;
   scene.traverse((child) => {
-    if (child.name === "blueprint" && child.userData) { 
-      totalSquareMetersOfBlueprint += Math.abs(child.userData.height) * Math.abs(child.userData.width)
+    if (child.name === "blueprint" && child.userData.shape) {
+      const dimensions = calculateDimensions(child.userData.shape);
+      console.log(`Width: ${dimensions.width}, Height: ${dimensions.height}`);
+      totalSquareMetersOfBlueprint += dimensions.width * dimensions.height;
       console.error(child);
     }
   });
 
-  console.log(totalSquareMetersOfBlueprint)
-  return totalSquareMetersOfBlueprint
+  return totalSquareMetersOfBlueprint;
+}
+
+function calculateDimensions(shape: THREE.Shape) {
+  const curves = shape.curves;
+
+  let minX = Infinity,
+    maxX = -Infinity;
+  let minY = Infinity,
+    maxY = -Infinity;
+
+  curves.forEach((curve) => {
+    // @ts-ignore
+    const { x: x1, y: y1 } = curve.v1;
+    // @ts-ignore
+    const { x: x2, y: y2 } = curve.v2;
+
+    // Update min/max x values
+    minX = Math.min(minX, x1, x2);
+    maxX = Math.max(maxX, x1, x2);
+
+    // Update min/max y values
+    minY = Math.min(minY, y1, y2);
+    maxY = Math.max(maxY, y1, y2);
+  });
+
+  // Calculate width and height
+  const width = maxX - minX;
+  const height = maxY - minY;
+
+  return { width, height };
 }
 
 export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {

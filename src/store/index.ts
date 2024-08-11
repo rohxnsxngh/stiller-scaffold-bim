@@ -58,6 +58,7 @@ export const supplyStore = defineStore("supply", {
     elevator: 0,
     lift: 0,
     squareMetersOfScaffolding: 0,
+    squareMetersOfBuilding: 0,
   }),
   actions: {
     updateScaffolding(value: any) {
@@ -71,6 +72,9 @@ export const supplyStore = defineStore("supply", {
     },
     updateSquareMetersOfScaffolding(value: any) {
       this.squareMetersOfScaffolding = value;
+    },
+    updateSquareMetersOfBuilding(value: any) {
+      this.squareMetersOfBuilding = value;
     },
   },
 });

@@ -88,6 +88,7 @@ import {
   cameraDisableOrbitalFunctionality,
   cameraEnableOrbitalFunctionality,
 } from "./utilities/camera";
+import { sign } from "three/examples/jsm/nodes/Nodes.js";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -1648,6 +1649,8 @@ export const createModelView = async () => {
     const totalSquareFootageOfScaffolding =
       calculateTotalSquareMetersForScaffolding(scene);
     console.log(totalSquareFootageOfScaffolding);
+    const totalBuildingSquareMeterage =
+      calculateTotalSquareMetersForBlueprint(scene);
 
     const supply = supplyStore();
     supply.updateScaffolding(scaffolding);
@@ -1656,15 +1659,15 @@ export const createModelView = async () => {
     supply.updateSquareMetersOfScaffolding(
       totalSquareFootageOfScaffolding.toFixed(2)
     );
+    supply.updateSquareMetersOfBuilding(totalBuildingSquareMeterage.toFixed(2));
 
     console.log(
       supply.scaffolding,
       supply.internalScaffolding,
       supply.externalScaffolding,
-      supply.squareMetersOfScaffolding
+      supply.squareMetersOfScaffolding,
+      supply.squareMetersOfBuilding
     );
-
-    calculateTotalSquareMetersForBlueprint(scene)
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
