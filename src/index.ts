@@ -1885,6 +1885,34 @@ export const createModelView = async () => {
     });
   });
 
+  observeElementAndAddEventListener(
+    "scale-image-blueprint",
+    "keydown",
+    (event) => {
+      if ((event as KeyboardEvent).key === "Enter") {
+        console.log("Enter key was pressed");
+        const uploadStore = uploadImageStore();
+        const uploadedBlueprints: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+        scene.traverse((child) => {
+          if (child.name === "uploaded-blueprint") {
+            uploadedBlueprints.push(child);
+          }
+        });
+
+        console.log(uploadedBlueprints);
+
+        uploadedBlueprints.forEach((blueprint: any) => {
+          console.log(uploadStore.scale);
+          blueprint.scale.set(
+            uploadStore.scale,
+            uploadStore.scale,
+            uploadStore.scale
+          );
+        });
+      }
+    }
+  );
+
   observeElementAndAddEventListener("delete-building", "mousedown", () => {
     setDeleteBuilding(true);
   });

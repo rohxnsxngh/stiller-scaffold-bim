@@ -65,7 +65,7 @@
 
 <script lang="ts">
 import { computed } from "vue";
-import { uploadImageStore, useStore } from "../store";
+import { uploadImageStore } from "../store";
 
 export default {
   setup() {
