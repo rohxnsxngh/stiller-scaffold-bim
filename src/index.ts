@@ -11,7 +11,6 @@ import {
   editBlueprint,
   createBlueprintFromMarkup,
   createFlatRoof,
-  moveObject,
 } from "./utilities/mesh";
 import {
   createScaffoldingShapeIsOutlined,
@@ -34,7 +33,8 @@ import {
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
   calculateTotalAmountScaffoldingInScene,
-  calculateTotalSquareFootageForScaffolding,
+  calculateTotalSquareMetersForBlueprint,
+  calculateTotalSquareMetersForScaffolding,
   calculateTransformedBoundingBox,
   deleteObject,
   disableOrbitControls,
@@ -313,7 +313,8 @@ export const createModelView = async () => {
             lastHighlightedObjectColor = material.color.getHex();
           } else {
             console.error(
-              "The first child of the model instance is not a Mesh.", scaffold
+              "The first child of the model instance is not a Mesh.",
+              scaffold
             );
           }
         });
@@ -1645,19 +1646,25 @@ export const createModelView = async () => {
     const [scaffolding, internalScaffolding, externalScaffolding] =
       calculateTotalAmountScaffoldingInScene(scene);
     const totalSquareFootageOfScaffolding =
-      calculateTotalSquareFootageForScaffolding(scene);
+      calculateTotalSquareMetersForScaffolding(scene);
     console.log(totalSquareFootageOfScaffolding);
 
     const supply = supplyStore();
     supply.updateScaffolding(scaffolding);
     supply.updateInternalScaffolding(internalScaffolding);
     supply.updateExternalScaffolding(externalScaffolding);
+    supply.updateSquareMetersOfScaffolding(
+      totalSquareFootageOfScaffolding.toFixed(2)
+    );
 
     console.log(
       supply.scaffolding,
       supply.internalScaffolding,
-      supply.externalScaffolding
+      supply.externalScaffolding,
+      supply.squareMetersOfScaffolding
     );
+
+    calculateTotalSquareMetersForBlueprint(scene)
   });
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {

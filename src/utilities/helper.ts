@@ -409,7 +409,7 @@ export function removeHighlightMesh(scene: THREE.Scene) {
   });
 }
 
-export function calculateTotalSquareFootageForScaffolding(scene: THREE.Scene) {
+export function calculateTotalSquareMetersForScaffolding(scene: THREE.Scene) {
   let totalSquareFootage = 0;
   // TODO need to check the math in this section
   scene.traverse((child) => {
@@ -421,7 +421,9 @@ export function calculateTotalSquareFootageForScaffolding(scene: THREE.Scene) {
     }
   });
 
-  console.log("total square footage or whatever meter", totalSquareFootage);
+  console.log("total square meters", totalSquareFootage);
+
+  return totalSquareFootage;
 }
 
 export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
@@ -454,6 +456,19 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
     scaffoldingInternalStaircaseCount,
     scaffoldingExternalStaircaseCount,
   ];
+}
+
+export function calculateTotalSquareMetersForBlueprint(scene: THREE.Scene) {
+  let totalSquareMetersOfBlueprint = 0;
+  scene.traverse((child) => {
+    if (child.name === "blueprint" && child.userData) { 
+      totalSquareMetersOfBlueprint += Math.abs(child.userData.height) * Math.abs(child.userData.width)
+      console.error(child);
+    }
+  });
+
+  console.log(totalSquareMetersOfBlueprint)
+  return totalSquareMetersOfBlueprint
 }
 
 export function isVectorEqual(vector1: THREE.Vector3, vector2: THREE.Vector3) {

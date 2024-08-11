@@ -11,6 +11,10 @@
       <div class="divider"></div>
       <div class="overflow-x-auto p-6">
         <h3 class="font-semibold text-2xl">Oppsummering</h3>
+        <p class="text-sm my-2 font-semibold text-green-300" v-if="squareMeterScaffoldingCoverage > 0">
+          Total Square Footage of Scaffolding Cover:
+          {{ squareMeterScaffoldingCoverage }} square meters
+        </p>
         <table class="table table-zebra">
           <!-- head -->
           <thead>
@@ -21,25 +25,25 @@
             </tr>
           </thead>
           <tbody>
-                <!-- row 1 -->
-                <tr>
-                  <th>1</th>
-                  <td>Light scaffolding</td>
-                  <td>{{ scaffolding }}</td>
-                </tr>
-                <!-- row 2 -->
-                <tr>
-                  <th>2</th>
-                  <td>Internal Staircase</td>
-                  <td>{{ internalScaffolding }}</td>
-                </tr>
-                <!-- row 3 -->
-                <tr>
-                  <th>3</th>
-                  <td>External Staircase</td>
-                  <td>{{ externalScaffolding }}</td>
-                </tr>
-              </tbody>
+            <!-- row 1 -->
+            <tr>
+              <th>1</th>
+              <td>Light scaffolding</td>
+              <td>{{ scaffolding }}</td>
+            </tr>
+            <!-- row 2 -->
+            <tr>
+              <th>2</th>
+              <td>Internal Staircase</td>
+              <td>{{ internalScaffolding }}</td>
+            </tr>
+            <!-- row 3 -->
+            <tr>
+              <th>3</th>
+              <td>External Staircase</td>
+              <td>{{ externalScaffolding }}</td>
+            </tr>
+          </tbody>
         </table>
       </div>
       <div>
@@ -85,12 +89,18 @@ export default {
       set: (value) => supply.updateExternalScaffolding(value),
     });
 
+    const squareMeterScaffoldingCoverage = computed({
+      // Make depth a computed property
+      get: () => supply.squareMetersOfScaffolding,
+      set: (value) => supply.updateSquareMetersOfScaffolding(value),
+    });
+
     return {
       scaffolding,
       internalScaffolding,
       externalScaffolding,
+      squareMeterScaffoldingCoverage,
     };
   },
 };
 </script>
-
