@@ -41,7 +41,6 @@ import {
   findObjectBuildingRelations,
   findObjectParent,
   hideAllCSS2DObjects,
-  isVectorEqual,
   observeElementAndAddEventListener,
   resetScaffolding,
   resetScene,
@@ -72,23 +71,20 @@ import {
   setDrawingInProgress,
   setDrawingScaffoldingInProgress,
   setEditingBlueprint,
-  setHighlightingObject,
   setIsDrawingBlueprint,
   setMovingGeometry,
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
-  setStates,
 } from "./utilities/state";
 import gsap from "gsap";
-import { DragControls } from "three/addons/controls/DragControls.js";
+// import { DragControls } from "three/addons/controls/DragControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import {
   cameraDisableOrbitalFunctionalities,
-  cameraDisableOrbitalFunctionality,
   cameraEnableOrbitalFunctionality,
 } from "./utilities/camera";
-import { sign } from "three/examples/jsm/nodes/Nodes.js";
+// import { sign } from "three/examples/jsm/nodes/Nodes.js";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -1923,10 +1919,10 @@ export const createModelView = async () => {
     );
   });
 
-  function render() {
-    //@ts-ignore
-    components.renderer._renderer.render(scene, components.camera.activeCamera);
-  }
+  // function render() {
+  //   //@ts-ignore
+  //   components.renderer._renderer.render(scene, components.camera.activeCamera);
+  // }
 
   animate();
 };

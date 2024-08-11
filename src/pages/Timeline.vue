@@ -1,5 +1,29 @@
 <template>
-  <div ref="selected" class="fixed -right-0 -bottom-12 mt-1 text-amber-300 font-semibold" >{{ value }}</div>
+  <div
+    ref="selected"
+    class="fixed -right-0 -bottom-12 mt-1 text-amber-300 font-semibold"
+  >
+    {{ value }}
+  </div>
+  <div
+    id="scaffold-guidance"
+    onclick="my_modal_3.showModal()"
+    class="fixed -left-12 top-2 mt-1 btn bg-transparent border-none hover:bg-transparent text-amber-300 font-semibold shadow-lg tooltip tooltip-left"
+    data-tip="help"
+  >
+    <span class="material-symbols-outlined"> help </span>
+  </div>
+  <dialog id="my_modal_3" class="modal">
+    <div class="modal-box max-w-2xl h-screen bg-[#111115]">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+          ✕
+        </button>
+      </form>
+      <h3 class="text-lg font-bold">Guidance</h3>
+      <p class="py-4">Add HTML/CSS Instructions here Anders</p>
+    </div>
+  </dialog>
   <div class="w-2">
     <ul class="timeline">
       <li class="ml-10 -top-4">
@@ -172,8 +196,8 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue';
-import { selectedStore } from '../store';
+import { ref, onMounted, computed } from "vue";
+import { selectedStore } from "../store";
 
 export default {
   setup() {
