@@ -313,7 +313,7 @@ export const createModelView = async () => {
             lastHighlightedObjectColor = material.color.getHex();
           } else {
             console.error(
-              "The first child of the model instance is not a Mesh."
+              "The first child of the model instance is not a Mesh.", scaffold
             );
           }
         });
@@ -329,76 +329,28 @@ export const createModelView = async () => {
       if (scaffold.name === "scaffoldLine") {
         return;
       }
+      const scaffoldParent = findObjectParent(scaffold);
+
       scene.traverse((child) => {
         const objectParent = findObjectParent(child);
-        const scaffoldParent = findObjectParent(scaffold);
 
         if (
           objectParent &&
-          objectParent.name === "scaffoldingExternalStaircaseModel" &&
-          scaffoldParent &&
-          scaffoldParent.name === "scaffoldingExternalStaircaseModel"
+          (objectParent.name === "scaffoldingModel" ||
+            objectParent.name === "scaffoldingStaircase" ||
+            objectParent.name === "scaffoldingExternalStaircaseModel" ||
+            objectParent.name === "scaffoldingInternalStaircaseModel")
         ) {
-          console.warn("FOUND EXTERNAL STAIRCASE");
           if (
-            objectParent.position.x === scaffoldParent.position.x &&
-            objectParent.position.z === scaffoldParent.position.z
+            scaffoldParent &&
+            objectParent.userData.position.x ===
+              scaffoldParent.userData.position.x &&
+            objectParent.userData.position.z ===
+              scaffoldParent.userData.position.z
           ) {
-            lastHighlightedObjects.push(child);
+            lastHighlightedObjects.push(objectParent);
           }
         }
-
-        if (
-          objectParent &&
-          objectParent.name === "scaffoldingInternalStaircaseModel" &&
-          scaffoldParent &&
-          scaffoldParent.name === "scaffoldingInternalStaircaseModel"
-        ) {
-          console.warn("FOUND INTERNAL STAIRCASE");
-          if (
-            objectParent.position.x === scaffoldParent.position.x &&
-            objectParent.position.z === scaffoldParent.position.z
-          ) {
-            lastHighlightedObjects.push(child);
-          }
-        }
-
-        // if (child.name === "scaffoldingModel") {
-        //   if (
-        //     child.userData.position.x === scaffold.parent.userData.position.x &&
-        //     child.userData.position.z === scaffold.parent.userData.position.z
-        //   ) {
-        //     lastHighlightedObjects.push(child);
-        //   }
-        // }
-
-        // if (
-        //   objectParent &&
-        //   objectParent.name === "scaffoldingExternalStaircaseModel" &&
-        //   scaffoldParent &&
-        //   scaffoldParent.name === "scaffoldingExternalStaircaseModel"
-        // ) {
-        //   if (
-        //     objectParent.position.x === scaffoldParent.position.x &&
-        //     objectParent.position.z === scaffoldParent.position.z
-        //   ) {
-        //     lastHighlightedObjects.push(child);
-        //   }
-        // }
-        // if (
-        //   objectParent &&
-        //   objectParent.name.startsWith("scaffolding") &&
-        //   scaffoldParent &&
-        //   scaffoldParent.name.startsWith("scaffolding")
-        // ) {
-        //   console.warn("SPECIAL CASE")
-        //   if (
-        //     objectParent.position.x === scaffoldParent.position.x &&
-        //     objectParent.position.z === scaffoldParent.position.z
-        //   ) {
-        //     lastHighlightedObjects.push(child);
-        //   }
-        // }
       });
 
       const material = new THREE.MeshPhysicalMaterial({
@@ -413,7 +365,7 @@ export const createModelView = async () => {
         } else {
           console.error(
             "The first child of the model instance is not a Mesh.",
-            scaffold.children[0]
+            scaffold
           );
         }
       });
@@ -607,6 +559,10 @@ export const createModelView = async () => {
     }
     if (deletionScaffoldingColumnInProgress && !drawingInProgress) {
       const scaffoldingColumnToRemove = intersects[0].object;
+      console.log(
+        "SCAFFOLDING COLUMN OBJECT TO REMOVE",
+        scaffoldingColumnToRemove
+      );
       const object = findObjectParent(scaffoldingColumnToRemove);
       if (object && object.name.startsWith("scaffolding")) {
         deleteColumnOfScaffolding(scene, scaffoldingColumnToRemove);
@@ -716,7 +672,7 @@ export const createModelView = async () => {
           console.warn("BEFORE TRANSLATION", group, transformControls);
         });
 
-        let height: number, width: number;
+        // let height: number, width: number;
         transformControls.addEventListener("mouseUp", function () {
           cameraEnableOrbitalFunctionality(gsap, components.camera);
           transformControls.detach();
@@ -760,10 +716,10 @@ export const createModelView = async () => {
               child.userData.shape = newShape;
             }
 
-            if (child.name === "blueprint") {
-              height = child.userData.height;
-              width = child.userData.width;
-            }
+            // if (child.name === "blueprint") {
+            //   height = child.userData.height;
+            //   width = child.userData.width;
+            // }
           });
 
           group.updateMatrixWorld();

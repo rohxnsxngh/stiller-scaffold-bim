@@ -4,6 +4,7 @@ import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import {
   addScaffoldingPositionIfUnique,
   deleteObject,
+  findObjectParent,
   isVectorEqual,
   measureLineLength,
   observeElementAndAddEventListener,
@@ -744,29 +745,37 @@ export function deleteRowOfScaffolding(scene: THREE.Scene, scaffold: any) {
 // delete column of scaffolding
 export function deleteColumnOfScaffolding(scene: THREE.Scene, scaffold: any) {
   let scaffoldingColumnToRemove: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+  const scaffoldParent = findObjectParent(scaffold);
   try {
     scene.traverse((child) => {
-      console.log(child)
+      const objectParent = findObjectParent(child);
+      console.log(objectParent);
       if (
-        child.name === "scaffoldingModel"
+        objectParent &&
+        (objectParent.name === "scaffoldingModel" ||
+          objectParent.name === "scaffoldingStaircase" ||
+          objectParent.name === "scaffoldingExternalStaircaseModel" ||
+          objectParent.name === "scaffoldingInternalStaircaseModel")
       ) {
         if (
-          child.userData.position.x === scaffold.parent.userData.position.x &&
-          child.userData.position.z === scaffold.parent.userData.position.z
+          scaffoldParent &&
+          objectParent.userData.position.x ===
+            scaffoldParent.userData.position.x &&
+          objectParent.userData.position.z ===
+            scaffoldParent.userData.position.z
         ) {
-          scaffoldingColumnToRemove.push(child);
+          scaffoldingColumnToRemove.push(objectParent);
         }
       }
     });
-  
+
     scaffoldingColumnToRemove.forEach((child) => {
       scene.remove(child);
       // deleteObject(child, scene);
     });
   } catch (error) {
-    console.warn("Error:", error)
+    console.warn("Error:", error);
   }
-
 }
 
 // scaffolding model creation along with bounding box for respective scaffolding model
@@ -910,6 +919,11 @@ export function replaceScaffoldingWithStaircase(
       }
     });
     externalStaircaseInstance.position.set(
+      scaffoldPositionX,
+      lvl * 2,
+      scaffoldPositionZ
+    );
+    externalStaircaseInstance.userData.position = new THREE.Vector3(
       scaffoldPositionX,
       lvl * 2,
       scaffoldPositionZ
