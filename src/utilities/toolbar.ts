@@ -523,6 +523,21 @@ export const createToolbar = (
   createShedRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
   createShedRoofButton.domElement.classList.add("hover:bg-slate-300");
 
+  const createEditRoofButton = new OBC.Button(components, {
+    materialIconName: "unfold_less",
+    name: "Edit Roof",
+    closeOnClick: true,
+  });
+  createEditRoofButton.onClick.add(() => {
+    document.body.style.cursor = "crosshair";
+    selected.updateSelected("Edit Roof");
+    setStates();
+    cameraDisableOrbitalFunctionality(gsap, components.camera);
+  });
+  roofButton.addChild(createEditRoofButton);
+  createEditRoofButton.domElement.classList.remove("hover:bg-ifcjs-200");
+  createEditRoofButton.domElement.classList.add("hover:bg-slate-300");
+
   const scaffoldButton = new OBC.Button(components);
   scaffoldButton.materialIcon = "foundation";
   scaffoldButton.tooltip = "Scaffolding";
@@ -916,6 +931,7 @@ export const createToolbar = (
     freeRotateButton,
     createGableRoofButton,
     createShedRoofButton,
+    createEditRoofButton,
     createEditExtrusionButton,
     drawScaffoldButton,
     generateScaffoldButton,

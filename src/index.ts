@@ -197,6 +197,7 @@ export const createModelView = async () => {
     freeRotateButton,
     createGableRoofButton,
     createShedRoofButton,
+    createEditRoofButton,
     createEditExtrusionButton,
     drawScaffoldButton,
     generateScaffoldButton,
@@ -1317,6 +1318,16 @@ export const createModelView = async () => {
       ) {
         console.log(child);
         roofs.push(child);
+      }
+    });
+  });
+
+  createEditRoofButton.domElement.addEventListener("mousedown", () => {
+    console.log("edit roofing button");
+    scene.traverse((child) => {
+      if (child instanceof CSS2DObject && child.name === "rectangleRoofLabel") {
+        child.element.style.pointerEvents = "auto";
+        child.visible = true;
       }
     });
   });
