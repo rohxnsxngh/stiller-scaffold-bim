@@ -670,66 +670,59 @@ export const createModelView = async () => {
           console.warn("BEFORE TRANSLATION", group, transformControls);
         });
 
-        // let height: number, width: number;
         transformControls.addEventListener("mouseUp", function () {
           cameraEnableOrbitalFunctionality(gsap, components.camera);
           transformControls.detach();
           scene.remove(transformControls);
           freeRotateButton.domElement.click();
           returnObjectsToOriginalState();
-
-          // Get final world position of the group
-          const finalWorldPosition = new THREE.Vector3();
-          group.getWorldPosition(finalWorldPosition);
-
-          const finalWorldPositionChildren = new THREE.Vector3();
-          geometriesToMove[0].getWorldPosition(finalWorldPositionChildren);
-          console.log("finalWorldPositionChildren", finalWorldPositionChildren);
-
-          // Calculate the distance traveled
-          const xDisplacement = finalWorldPosition.x - initialWorldPosition.x;
-          const zDisplacement = finalWorldPosition.z - initialWorldPosition.z;
-          console.log("Initial World Position:", initialWorldPosition);
-          console.log("Final World Position:", finalWorldPosition);
-          console.log("Distance Traveled in X:", xDisplacement);
-          console.log("Distance Traveled in Z:", zDisplacement);
-
+        
+          // Calculate displacement
+          const finalGroupPosition = new THREE.Vector3();
+          group.getWorldPosition(finalGroupPosition);
+        
+          const xDisplacement = finalGroupPosition.x - initialWorldPosition.x;
+          const zDisplacement = finalGroupPosition.z - initialWorldPosition.z;
+        
+          console.log("Initial Group Position:", initialWorldPosition);
+          console.log("Final Group Position:", finalGroupPosition);
+          console.log("Displacement X:", xDisplacement, "Z:", zDisplacement);
+        
+          // Reset group position
+          group.position.set(initialWorldPosition.x, initialWorldPosition.y, initialWorldPosition.z);
+        
+          // Update children
           group.children.forEach((child) => {
-            const previousShape = child.userData.shape;
-            if (previousShape instanceof THREE.Shape) {
+            // Update shape
+            if (child.userData.shape instanceof THREE.Shape) {
               const newShape = new THREE.Shape();
-              previousShape.curves.forEach((curve) => {
+              child.userData.shape.curves.forEach((curve) => {
                 if (curve instanceof THREE.LineCurve) {
-                  const startPoint = curve.v1
-                    .clone()
-                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
-                  const endPoint = curve.v2
-                    .clone()
-                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  const startPoint = curve.v1.clone().add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  const endPoint = curve.v2.clone().add(new THREE.Vector2(xDisplacement, zDisplacement));
                   newShape.moveTo(startPoint.x, startPoint.y);
                   newShape.lineTo(endPoint.x, endPoint.y);
                 }
               });
-              console.log("shape comparison", child.userData.shape, newShape);
               child.userData.shape = newShape;
             }
-
-            console.warn("CHILD BEFORE TRANSLATION", child);
-            child.position.set(
-              child.position.x + xDisplacement,
-              child.position.y,
-              child.position.z + zDisplacement
-            );
-            console.warn("CHILD AFTER TRANSLATION", child);
-
-            child.matrixWorldNeedsUpdate = true;
+        
+            // Update position
+            child.position.x += xDisplacement;
+            child.position.z += zDisplacement;
+            
+            // Update matrices
             child.updateMatrix();
-            child.updateMatrixWorld();
+            child.updateMatrixWorld(true);
+        
+            console.log(`Child ${child.name} new position:`, child.position);
           });
-
-          group.updateMatrixWorld();
-
-          console.warn("AFTER TRANSLATION", group, transformControls);
+        
+          // Update group matrix
+          group.updateMatrix();
+          group.updateMatrixWorld(true);
+        
+          console.log("After transformation:", group);
         });
 
         window.addEventListener("keydown", function (event: KeyboardEvent) {
