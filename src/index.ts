@@ -79,13 +79,11 @@ import {
   setRotatingRoofInProgress,
 } from "./utilities/state";
 import gsap from "gsap";
-// import { DragControls } from "three/addons/controls/DragControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import {
   cameraDisableOrbitalFunctionalities,
   cameraEnableOrbitalFunctionality,
 } from "./utilities/camera";
-// import { sign } from "three/examples/jsm/nodes/Nodes.js";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -641,6 +639,8 @@ export const createModelView = async () => {
 
         /////////////////////////////////
 
+        let xDisplacement: any, zDisplacement: any;
+
         const transformControls = new TransformControls(
           //@ts-ignore
           components.camera.activeCamera,
@@ -689,8 +689,8 @@ export const createModelView = async () => {
           console.log("finalWorldPositionChildren", finalWorldPositionChildren);
 
           // Calculate the distance traveled
-          const xDisplacement = finalWorldPosition.x - initialWorldPosition.x;
-          const zDisplacement = finalWorldPosition.z - initialWorldPosition.z;
+          xDisplacement = finalWorldPosition.x - initialWorldPosition.x;
+          zDisplacement = finalWorldPosition.z - initialWorldPosition.z;
           console.log("Initial World Position:", initialWorldPosition);
           console.log("Final World Position:", finalWorldPosition);
           console.log("Distance Traveled in X:", xDisplacement);
@@ -716,39 +716,20 @@ export const createModelView = async () => {
               child.userData.shape = newShape;
             }
 
-            // if (child.name === "blueprint") {
-            //   height = child.userData.height;
-            //   width = child.userData.width;
-            // }
+            console.warn("CHILD BEFORE TRANSLATION", child);
+            child.position.set(
+              child.position.x + xDisplacement,
+              child.position.y,
+              child.position.z + zDisplacement
+            );
+            console.warn("CHILD AFTER TRANSLATION", child);
+
+            child.matrixWorldNeedsUpdate = true;
+            child.updateMatrix();
+            child.updateMatrixWorld();
           });
 
           group.updateMatrixWorld();
-
-          // the problem is the mesh position does not update but the position of the shape in userData does update. TransformControls is based on
-          // the shape location. I need to update the mesh accordingly as well
-          // group.children.forEach((child) => {
-          //   console.warn(
-          //     "MESH POSITIONS",
-          //     child,
-          //     child.position,
-          //     finalWorldPosition,
-          //     initialWorldPosition
-          //   );
-          //   child.position.x =
-          //     child.position.x +
-          //     (finalWorldPositionChildren.x - initialWorldPositionChildren.x) /
-          //       height;
-          //   child.position.z =
-          //     child.position.z +
-          //     (finalWorldPositionChildren.z - initialWorldPositionChildren.z) /
-          //       width;
-          //   // child.updateMatrix();
-
-          //   child.matrixWorldNeedsUpdate = true;
-          //   child.updateMatrixWorld();
-
-          //   console.log("POSITION", child.position)
-          // });
 
           console.warn("AFTER TRANSLATION", group, transformControls);
         });
@@ -767,53 +748,6 @@ export const createModelView = async () => {
           }
         });
       }
-
-      ////////////////////////////////////////////
-
-      // const dragControls = new DragControls(
-      //   [group], // Add the group to DragControls
-      //   //@ts-ignore
-      //   components.camera.activeCamera,
-      //   //@ts-ignore
-      //   components.renderer._renderer.domElement
-      // );
-
-      // dragControls.transformGroup = true;
-      // cameraDisableOrbitalFunctionality(gsap, components.camera)
-
-      // // Event listeners for drag controls
-      // dragControls.addEventListener("dragstart", (event) => {
-      //   // cameraDisableOrbitalFunctionality(gsap, components.camera)
-      //   console.log("Drag start:", event.object);
-      // });
-
-      // dragControls.addEventListener("drag", (event) => {
-      //   // Maintain original y heights
-      //   group.children.forEach((child) => {
-      //     if (initialYHeights.has(child)) {
-      //       console.log(
-      //         "geometry group heights: ",
-      //         initialYHeights.get(child),
-      //         child
-      //       );
-      //     }
-      //   });
-      //   console.log("Dragging:", event.object);
-      // });
-
-      // dragControls.addEventListener("dragend", (event) => {
-      //   console.log("Drag end:", event.object);
-      //   dragControls.enabled = false; // Disable drag controls after dragging
-      //   group.position.y = 0;
-      //   group.updateMatrix();
-      //   group.children.forEach((child) => {
-      //     console.log(child.position);
-      //     child.updateMatrix();
-      //   });
-      //   returnObjectsToOriginalState();
-      //   cameraEnableOrbitalFunctionality(gsap, components.camera)
-      //   // setStates()
-      // });
     }
 
     if (rotatingRoofInProgress && !drawingInProgressSwitch) {
