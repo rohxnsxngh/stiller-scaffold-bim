@@ -639,8 +639,6 @@ export const createModelView = async () => {
 
         /////////////////////////////////
 
-        let xDisplacement: any, zDisplacement: any;
-
         const transformControls = new TransformControls(
           //@ts-ignore
           components.camera.activeCamera,
@@ -689,8 +687,8 @@ export const createModelView = async () => {
           console.log("finalWorldPositionChildren", finalWorldPositionChildren);
 
           // Calculate the distance traveled
-          xDisplacement = finalWorldPosition.x - initialWorldPosition.x;
-          zDisplacement = finalWorldPosition.z - initialWorldPosition.z;
+          const xDisplacement = finalWorldPosition.x - initialWorldPosition.x;
+          const zDisplacement = finalWorldPosition.z - initialWorldPosition.z;
           console.log("Initial World Position:", initialWorldPosition);
           console.log("Final World Position:", finalWorldPosition);
           console.log("Distance Traveled in X:", xDisplacement);
