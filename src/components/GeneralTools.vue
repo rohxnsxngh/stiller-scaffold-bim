@@ -54,5 +54,14 @@
       </div>
       <div><p class="text-xs text-center mt-2">Delete Building</p></div>
     </div>
+    <div class="flex flex-col mx-4">
+      <div
+        class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
+        id="screenshot-button"
+      >
+        <i class="material-icons text-blue-400"> photo_camera</i>
+      </div>
+      <div><p class="text-xs text-center mt-2">Capture Scene</p></div>
+    </div>
   </div>
 </template>

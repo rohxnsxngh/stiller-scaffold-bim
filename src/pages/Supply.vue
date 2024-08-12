@@ -5,7 +5,7 @@
 
       <div class="mb-8">
         <p class="text-sm mb-4 mt-8 font-semibold">Tildekking av stillas</p>
-        <button id="delete-sheeting" class="btn btn-xs mb-2 border-white text-white text-xs">delete all</button>
+        <button id="delete-sheeting" class="btn btn-sm mb-2 border-white text-white text-xs">Delete all</button>
         <div class="grid grid-cols-3 gap-3">
           <div
             class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
@@ -76,19 +76,6 @@
         </div>
       </div> -->
 
-      <div class="bg-[#24242F] rounded flex flex-row my-4">
-        <div>
-          <div class="text-sm text-[#9E9E9E] m-4">
-            <div class="font-semibold text-[#623CEA]">ta skjermbilde</div>
-            <button
-              class="btn btn-sm my-2"
-              id="screenshot-button"
-            >
-              <span class="material-symbols-outlined"> photo_camera </span>
-            </button>
-          </div>
-        </div>
-      </div>
 
       <div class="">
         <label class="form-control w-full max-w-xs">
@@ -142,41 +129,6 @@ export default {
     GeneralTools,
   },
   methods: {
-    // screenshotTrigger() {
-    //   const screenshotButton = document.getElementById("screenshot-button");
-    //   if (screenshotButton) {
-    //     screenshotButton.addEventListener("click", async function () {
-    //       try {
-    //         const stream = await navigator.mediaDevices.getDisplayMedia({
-    //           video: true,
-    //         });
-
-    //         const video = document.createElement("video");
-    //         video.srcObject = stream;
-    //         video.onloadedmetadata = () => {
-    //           video.play();
-    //           const canvas = document.createElement("canvas");
-    //           canvas.width = video.videoWidth;
-    //           canvas.height = video.videoHeight;
-    //           const ctx = canvas.getContext("2d");
-    //           //@ts-ignore
-    //           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    //           // Stop the stream
-    //           stream.getTracks().forEach((track) => track.stop());
-
-    //           // Create a download link for the screenshot
-    //           const link = document.createElement("a");
-    //           link.download = "screenshot.png";
-    //           link.href = canvas.toDataURL("image/png");
-    //           link.click();
-    //         };
-    //       } catch (err) {
-    //         console.error("Error: " + err);
-    //       }
-    //     });
-    //   }
-    // },
     goToNextPage() {
       // @ts-ignore
       const svgElement = document.getElementById("supply-svg");
