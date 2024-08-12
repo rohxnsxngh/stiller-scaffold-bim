@@ -45,6 +45,7 @@ import {
   resetScaffolding,
   resetScene,
   returnObjectsToOriginalState,
+  saveAsImage,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
@@ -1933,6 +1934,16 @@ export const createModelView = async () => {
 
     stats.end();
   }
+
+  observeElementAndAddEventListener("screenshot-button", "mousedown", () => {
+    saveAsImage(
+      //@ts-ignore
+      components.renderer._renderer,
+      scene,
+      //@ts-ignore
+      components.camera.activeCamera
+    );
+  });
 
   window.addEventListener("resize", () => {
     //@ts-ignore

@@ -692,3 +692,39 @@ export function returnObjectsToOriginalState() {
     }
   });
 }
+
+export function saveAsImage(renderer: THREE.Renderer, scene: THREE.Scene, camera: THREE.Camera) {
+  let imgData;
+
+  try {
+    // Force a render before capturing the screenshot
+    renderer.render(scene, camera);
+
+    // Wait for the next animation frame to ensure the render is complete
+    requestAnimationFrame(() => {
+      var strMime = "image/jpeg";
+      var strDownloadMime = "image/octet-stream";
+
+      imgData = renderer.domElement.toDataURL(strMime);
+
+      saveFile(imgData.replace(strMime, strDownloadMime), "screenshot.jpg");
+    });
+  } catch (e) {
+    console.log(e);
+    return;
+  }
+}
+
+function saveFile(strData: string, filename: string) {
+  var link = document.createElement("a");
+  if (typeof link.download === "string") {
+    document.body.appendChild(link); //Firefox requires the link to be in the body
+    link.download = filename;
+    link.href = strData;
+    link.click();
+    document.body.removeChild(link); //remove the link when done
+  } else {
+    location.replace(strData);
+  }
+}
+

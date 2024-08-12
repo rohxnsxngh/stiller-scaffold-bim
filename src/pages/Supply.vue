@@ -83,7 +83,6 @@
             <button
               class="btn btn-sm my-2"
               id="screenshot-button"
-              @click="screenshotTrigger"
             >
               <span class="material-symbols-outlined"> photo_camera </span>
             </button>
@@ -143,41 +142,41 @@ export default {
     GeneralTools,
   },
   methods: {
-    screenshotTrigger() {
-      const screenshotButton = document.getElementById("screenshot-button");
-      if (screenshotButton) {
-        screenshotButton.addEventListener("click", async function () {
-          try {
-            const stream = await navigator.mediaDevices.getDisplayMedia({
-              video: true,
-            });
+    // screenshotTrigger() {
+    //   const screenshotButton = document.getElementById("screenshot-button");
+    //   if (screenshotButton) {
+    //     screenshotButton.addEventListener("click", async function () {
+    //       try {
+    //         const stream = await navigator.mediaDevices.getDisplayMedia({
+    //           video: true,
+    //         });
 
-            const video = document.createElement("video");
-            video.srcObject = stream;
-            video.onloadedmetadata = () => {
-              video.play();
-              const canvas = document.createElement("canvas");
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-              const ctx = canvas.getContext("2d");
-              //@ts-ignore
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    //         const video = document.createElement("video");
+    //         video.srcObject = stream;
+    //         video.onloadedmetadata = () => {
+    //           video.play();
+    //           const canvas = document.createElement("canvas");
+    //           canvas.width = video.videoWidth;
+    //           canvas.height = video.videoHeight;
+    //           const ctx = canvas.getContext("2d");
+    //           //@ts-ignore
+    //           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-              // Stop the stream
-              stream.getTracks().forEach((track) => track.stop());
+    //           // Stop the stream
+    //           stream.getTracks().forEach((track) => track.stop());
 
-              // Create a download link for the screenshot
-              const link = document.createElement("a");
-              link.download = "screenshot.png";
-              link.href = canvas.toDataURL("image/png");
-              link.click();
-            };
-          } catch (err) {
-            console.error("Error: " + err);
-          }
-        });
-      }
-    },
+    //           // Create a download link for the screenshot
+    //           const link = document.createElement("a");
+    //           link.download = "screenshot.png";
+    //           link.href = canvas.toDataURL("image/png");
+    //           link.click();
+    //         };
+    //       } catch (err) {
+    //         console.error("Error: " + err);
+    //       }
+    //     });
+    //   }
+    // },
     goToNextPage() {
       // @ts-ignore
       const svgElement = document.getElementById("supply-svg");
