@@ -23,3 +23,9 @@ npm run dev
 ```
 
 # Additional Information
+
+'''
+git ls-files | grep -vE 'package.json|package-lock.json|tsconfig.json|tsconfig.node.json|vite.config.ts|tailwind.config.js|.*\.glb|.*\.ifc' | xargs wc -l
+'''
+
+11542 total - 8/12/2024
