@@ -3,7 +3,6 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import {
   addScaffoldingPositionIfUnique,
-  deleteObject,
   findObjectParent,
   isVectorEqual,
   measureLineLength,
