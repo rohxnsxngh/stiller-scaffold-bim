@@ -67,7 +67,7 @@
       </label>
     </div>
 
-    <div class="col-span-4">
+    <div class="col-span-4" @click="setActiveTrue">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text text-sm">Lag tegning</span>
@@ -82,7 +82,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-6 gap-4">
+  <div class="grid grid-cols-6 gap-4" v-if="isActive">
     <div class="col-span-4">
       <label class="form-control w-full max-w-xs">
         <div class="label">
@@ -99,7 +99,7 @@
       </label>
     </div>
 
-    <div class="col-span-2">
+    <div class="col-span-2" @click="setActiveFalse">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text text-sm">Sett høyde</span>
@@ -144,8 +144,7 @@ export default {
       // Make depth a computed property
       get: () => componentStore.depth,
       set: (value) => {
-        componentStore.updateDepth(value), 
-        console.error(value, depth.value);
+        componentStore.updateDepth(value), console.error(value, depth.value);
       },
     });
 
@@ -163,6 +162,19 @@ export default {
       depth,
       showDrawBlueprint,
     };
+  },
+  data() {
+    return {
+      isActive: false,
+    };
+  },
+  methods: {
+    setActiveTrue() {
+      this.isActive = true;
+    },
+    setActiveFalse() {
+      this.isActive = false;
+    },
   },
 };
 </script>
