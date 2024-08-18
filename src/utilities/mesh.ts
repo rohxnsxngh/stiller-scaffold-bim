@@ -1,10 +1,7 @@
 import * as THREE from "three";
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import {
-  distanceFromPointToLine,
-  measureLineLength,
-} from "./helper";
+import { distanceFromPointToLine, measureLineLength } from "./helper";
 import { rectMaterial } from "./material";
 import { useStore } from "../store";
 import {
@@ -332,6 +329,12 @@ function attachExtrusionLabelChangeHandler(
     handleValueChange(labelElement.textContent);
   });
 
+    // Add an event listener to restrict input to numbers only
+    labelElement.addEventListener("input", () => {
+      const regex = /[^0-9m.]/g;
+      labelElement.textContent = labelElement.textContent?.replace(regex, "") ?? null;
+    });
+
   labelElement.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault(); // Prevents the default action of the Enter key
@@ -594,6 +597,13 @@ function attachLabelChangeHandler(
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setIsDrawingBlueprint(false);
     setEditingBlueprint(false);
+  });
+
+  // Add an event listener to restrict input to numbers only
+  labelElement.addEventListener("input", () => {
+    const regex = /[^0-9m.]/g;
+    labelElement.textContent =
+      labelElement.textContent?.replace(regex, "") ?? null;
   });
 
   // TODO: There is something wrong with this, this logic needs to be edited
@@ -1060,6 +1070,13 @@ function attachRoofLabelChangeHandler(
       event.preventDefault(); // Prevents the default action of the Enter key
       handleValueChange(labelElement.textContent);
     }
+  });
+
+  // Add an event listener to restrict input to numbers only
+  labelElement.addEventListener("input", () => {
+    const regex = /[^0-9m.]/g;
+    labelElement.textContent =
+      labelElement.textContent?.replace(regex, "") ?? null;
   });
 
   function handleValueChange(newValue: string | null) {
@@ -1588,6 +1605,13 @@ function attachShedRoofLabelChangeHandler(
       event.preventDefault(); // Prevents the default action of the Enter key
       handleValueChange(labelElement.textContent);
     }
+  });
+
+  // Add an event listener to restrict input to numbers only
+  labelElement.addEventListener("input", () => {
+    const regex = /[^0-9m.]/g;
+    labelElement.textContent =
+      labelElement.textContent?.replace(regex, "") ?? null;
   });
 
   function handleValueChange(newValue: string | null) {

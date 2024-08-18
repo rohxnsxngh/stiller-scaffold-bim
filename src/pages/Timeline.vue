@@ -26,7 +26,7 @@
   </dialog>
   <div class="w-2">
     <ul class="timeline">
-      <li class="ml-10 -top-4">
+      <li class="ml-6 -top-4">
         <div class="timeline-middle">
           <div class="">
             <svg
@@ -55,13 +55,13 @@
               stroke="white"
               stroke-width="2"
             >
-              <line x1="-32" y1="0" x2="100" y2="0" />
+              <line x1="-32" y1="0" x2="132" y2="0" />
             </svg>
           </div>
         </div>
         <hr />
       </li>
-      <li class="ml-32 -top-4">
+      <li class="ml-40 -top-4">
         <hr />
         <div class="timeline-middle">
           <div class="">
@@ -91,13 +91,13 @@
               stroke-width="2"
               id="blueprint-svg-line"
             >
-              <line x1="18" y1="0" x2="102" y2="0" />
+              <line x1="18" y1="0" x2="60" y2="0" />
             </svg>
           </div>
         </div>
         <hr />
       </li>
-      <li class="ml-20 -top-4">
+      <li class="ml-10 -top-4">
         <hr />
         <div class="timeline-middle">
           <div class="">

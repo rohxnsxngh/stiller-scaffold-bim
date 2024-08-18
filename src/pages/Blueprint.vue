@@ -36,13 +36,13 @@
 
       <div class="card-actions justify-end">
         <div class="m-4">
-          <div
+          <!-- <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
             @click="goToPreviousPage"
             id="go-to-previous-general"
           >
             Tilbake
-          </div>
+          </div> -->
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
             @click="goToNextPage"

@@ -33,7 +33,7 @@
   </div>
 
   <div class="grid grid-cols-8 gap-4">
-    <div class="col-span-3">
+    <div class="col-span-2">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text">Lengde (m)</span>
@@ -44,13 +44,13 @@
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
           v-model="length"
-          disabled 
+          disabled
         />
         <div class="label"></div>
       </label>
     </div>
 
-    <div class="col-span-3">
+    <div class="col-span-2">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text">Bredde (m)</span>
@@ -61,16 +61,16 @@
           placeholder="Antall meter"
           class="input input-md input-bordered w-full max-w-xs"
           v-model="width"
-          disabled 
+          disabled
         />
         <div class="label"></div>
       </label>
     </div>
 
-    <div class="col-span-2">
+    <div class="col-span-4">
       <label class="form-control w-full max-w-xs">
         <div class="label">
-          <span class="label-text text-sm">blåkopi</span>
+          <span class="label-text text-sm">Lag tegning</span>
         </div>
         <div
           class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
@@ -86,7 +86,7 @@
     <div class="col-span-4">
       <label class="form-control w-full max-w-xs">
         <div class="label">
-          <span class="label-text">Høyde (m)</span>
+          <span class="label-text">Bygningshøyde (m)</span>
         </div>
         <input
           type="text"
@@ -102,11 +102,12 @@
     <div class="col-span-2">
       <label class="form-control w-full max-w-xs">
         <div class="label">
-          <span class="label-text text-sm">ekstrudere</span>
+          <span class="label-text text-sm">Sett høyde</span>
         </div>
         <div
           class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
           id="create-extrusion"
+          :disabled="depth > 0"
         >
           <i class="material-icons">expand</i>
         </div>
@@ -143,7 +144,10 @@ export default {
     const depth = computed({
       // Make depth a computed property
       get: () => componentStore.depth,
-      set: (value) => componentStore.updateDepth(value),
+      set: (value) => {
+        componentStore.updateDepth(value), 
+        console.error(value, depth.value);
+      },
     });
 
     // Define methods

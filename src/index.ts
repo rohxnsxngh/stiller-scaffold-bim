@@ -676,21 +676,25 @@ export const createModelView = async () => {
           scene.remove(transformControls);
           freeRotateButton.domElement.click();
           returnObjectsToOriginalState();
-        
+
           // Calculate displacement
           const finalGroupPosition = new THREE.Vector3();
           group.getWorldPosition(finalGroupPosition);
-        
+
           const xDisplacement = finalGroupPosition.x - initialWorldPosition.x;
           const zDisplacement = finalGroupPosition.z - initialWorldPosition.z;
-        
+
           console.log("Initial Group Position:", initialWorldPosition);
           console.log("Final Group Position:", finalGroupPosition);
           console.log("Displacement X:", xDisplacement, "Z:", zDisplacement);
-        
+
           // Reset group position
-          group.position.set(initialWorldPosition.x, initialWorldPosition.y, initialWorldPosition.z);
-        
+          group.position.set(
+            initialWorldPosition.x,
+            initialWorldPosition.y,
+            initialWorldPosition.z
+          );
+
           // Update children
           group.children.forEach((child) => {
             // Update shape
@@ -698,30 +702,34 @@ export const createModelView = async () => {
               const newShape = new THREE.Shape();
               child.userData.shape.curves.forEach((curve) => {
                 if (curve instanceof THREE.LineCurve) {
-                  const startPoint = curve.v1.clone().add(new THREE.Vector2(xDisplacement, zDisplacement));
-                  const endPoint = curve.v2.clone().add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  const startPoint = curve.v1
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  const endPoint = curve.v2
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
                   newShape.moveTo(startPoint.x, startPoint.y);
                   newShape.lineTo(endPoint.x, endPoint.y);
                 }
               });
               child.userData.shape = newShape;
             }
-        
+
             // Update position
             child.position.x += xDisplacement;
             child.position.z += zDisplacement;
-            
+
             // Update matrices
             child.updateMatrix();
             child.updateMatrixWorld(true);
-        
+
             console.log(`Child ${child.name} new position:`, child.position);
           });
-        
+
           // Update group matrix
           group.updateMatrix();
           group.updateMatrixWorld(true);
-        
+
           console.log("After transformation:", group);
         });
 
@@ -1783,6 +1791,9 @@ export const createModelView = async () => {
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+      return reader;
+    } else {
+      return null;
     }
   }
 
@@ -1821,6 +1832,32 @@ export const createModelView = async () => {
       );
     });
   });
+
+  observeElementAndAddEventListener(
+    "scale-image-blueprint-button",
+    "mousedown",
+    () => {
+      console.log("blur");
+      const uploadStore = uploadImageStore();
+      const uploadedBlueprints: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+      scene.traverse((child) => {
+        if (child.name === "uploaded-blueprint") {
+          uploadedBlueprints.push(child);
+        }
+      });
+
+      console.log(uploadedBlueprints);
+
+      uploadedBlueprints.forEach((blueprint: any) => {
+        console.log(uploadStore.scale);
+        blueprint.scale.set(
+          uploadStore.scale,
+          uploadStore.scale,
+          uploadStore.scale
+        );
+      });
+    }
+  );
 
   observeElementAndAddEventListener(
     "scale-image-blueprint",
