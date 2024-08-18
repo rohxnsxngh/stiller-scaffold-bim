@@ -5,7 +5,12 @@
 
       <div class="mb-8">
         <p class="text-sm mb-4 mt-8 font-semibold">Tildekking av stillas</p>
-        <button id="delete-sheeting" class="btn btn-sm mb-2 border-white text-white text-xs">Delete all</button>
+        <button
+          id="delete-sheeting"
+          class="btn btn-sm mb-2 border-white text-white text-xs"
+        >
+          Delete all
+        </button>
         <div class="grid grid-cols-3 gap-3">
           <div
             class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
@@ -76,7 +81,6 @@
         </div>
       </div> -->
 
-
       <div class="">
         <label class="form-control w-full max-w-xs">
           <div class="label">
@@ -131,7 +135,14 @@ export default {
   methods: {
     goToNextPage() {
       // @ts-ignore
-      const svgElement = document.getElementById("supply-svg");
+      const svgElement = document.getElementById("scaffold-svg");
+      const svgElementLine = document.getElementById("scaffold-svg-line");
+      if (svgElement && svgElementLine) {
+        svgElement.style.stroke = "#23E6A1";
+        svgElementLine.style.stroke = "#23E6A1";
+      } else {
+        console.error("timeline not found");
+      }
       if (svgElement) {
         svgElement.style.stroke = "#23E6A1";
       } else {
@@ -149,13 +160,25 @@ export default {
     goToPreviousPage() {
       // @ts-ignore
       window.setActiveSection("scaffold");
-      const svgElement = document.getElementById("scaffold-svg");
-      const svgElementCurrent = document.getElementById("supply-svg");
-      const svgElementLine = document.getElementById("scaffold-svg-line");
-      if (svgElement && svgElementLine && svgElementCurrent) {
+      // const svgElement = document.getElementById("scaffold-svg");
+      // const svgElementCurrent = document.getElementById("supply-svg");
+      // const svgElementLine = document.getElementById("scaffold-svg-line");
+      // if (svgElement && svgElementLine && svgElementCurrent) {
+      //   svgElement.style.stroke = "white";
+      //   svgElementLine.style.stroke = "white";
+      //   svgElementCurrent.style.stroke = "white";
+      // } else {
+      //   console.error("timeline not found");
+      // }
+      const svgElement = document.getElementById("roof-svg");
+      const svgElementLine = document.getElementById("roof-svg-line");
+      const svgElement2 = document.getElementById("scaffold-svg");
+      const svgElementLine2 = document.getElementById("scaffold-svg-line");
+      if (svgElement && svgElementLine && svgElement2 && svgElementLine2) {
         svgElement.style.stroke = "white";
         svgElementLine.style.stroke = "white";
-        svgElementCurrent.style.stroke = "white";
+        svgElement2.style.stroke = "white"
+        svgElementLine2.style.stroke = "white";
       } else {
         console.error("timeline not found");
       }

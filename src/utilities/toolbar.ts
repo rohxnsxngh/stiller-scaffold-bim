@@ -156,11 +156,11 @@ export const createToolbar = (
   topToolBar.addChild(blueprintMenuButton);
   blueprintMenuButton.onClick.add(() => {
     setStates();
-    if (titleElement) {
-      titleElement.textContent = "Plantegning og bygg";
-    }
+    // if (titleElement) {
+    //   titleElement.textContent = "Plantegning og bygg";
+    // }
     // @ts-ignore
-    window.setActiveSection("blueprint");
+    // window.setActiveSection("blueprint");
   });
   blueprintMenuButton.domElement.addEventListener("mouseover", () => {
     setStates();
@@ -183,11 +183,11 @@ export const createToolbar = (
   topToolBar.addChild(roofMenuButton);
   roofMenuButton.onClick.add(() => {
     setStates();
-    if (titleElement) {
-      titleElement.textContent = "Tak";
-    }
+    // if (titleElement) {
+    //   titleElement.textContent = "Tak";
+    // }
     // @ts-ignore
-    window.setActiveSection("roof");
+    // window.setActiveSection("roof");
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -215,11 +215,11 @@ export const createToolbar = (
   topToolBar.addChild(scaffoldMenuButton);
   scaffoldMenuButton.onClick.add(() => {
     setStates();
-    if (titleElement) {
-      titleElement.textContent = "Stillas";
-    }
+    // if (titleElement) {
+    //   titleElement.textContent = "Stillas";
+    // }
     // @ts-ignore
-    window.setActiveSection("scaffold");
+    // window.setActiveSection("scaffold");
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -259,11 +259,11 @@ export const createToolbar = (
   topToolBar.addChild(suppliesMenuButton);
   suppliesMenuButton.onClick.add(() => {
     setStates();
-    if (titleElement) {
-      titleElement.textContent = "Tillegg";
-    }
-    // @ts-ignore
-    window.setActiveSection("supply");
+    // if (titleElement) {
+    //   titleElement.textContent = "Tillegg";
+    // }
+    // // @ts-ignore
+    // window.setActiveSection("supply");
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-slate-300");

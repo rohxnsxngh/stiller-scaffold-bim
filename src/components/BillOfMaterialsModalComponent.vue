@@ -3,7 +3,7 @@
   <dialog id="my_modal_1" class="modal">
     <div class="modal-box bg-[#111115] max-w-2xl h-screen">
       <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" id="close-modal-button">
           ✕
         </button>
       </form>
@@ -63,11 +63,18 @@
       </div>
       <div>
         <div class="m-4 flex justify-end">
-          <div class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4">
-            Avbryt
-          </div>
+          <form method="dialog">
+            <div
+              class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
+              @click="goToPreviousPage"
+            >
+              Avbryt
+            </div>
+          </form>
+
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
+            @click="goToNextPage"
           >
             Få tilbud
           </div>
@@ -123,6 +130,35 @@ export default {
       squareMeterScaffoldingCoverage,
       squareMeterBuildingCoverage,
     };
+  },
+  methods: {
+    goToNextPage() {
+      // @ts-ignore
+      const svgElement = document.getElementById("supply-svg");
+      if (svgElement) {
+        svgElement.style.stroke = "#23E6A1";
+      } else {
+        console.error("timeline not found");
+      }
+    },
+    goToPreviousPage() {
+      // @ts-ignore
+      window.setActiveSection("supply");
+      const svgElement = document.getElementById("supply-svg");
+      if (svgElement) {
+        svgElement.style.stroke = "white";
+      } else {
+        console.error("timeline not found");
+      }
+
+      // Open the modal
+      const modalElement = document.getElementById("my_modal_1");
+      if (modalElement && modalElement instanceof HTMLDialogElement) {
+        modalElement.close()
+      } else {
+        console.error("Modal element not found or not an HTMLDialogElement");
+      }
+    },
   },
 };
 </script>
