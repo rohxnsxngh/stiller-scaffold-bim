@@ -107,7 +107,6 @@
         <div
           class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
           id="create-extrusion"
-          :disabled="depth > 0"
         >
           <i class="material-icons">expand</i>
         </div>

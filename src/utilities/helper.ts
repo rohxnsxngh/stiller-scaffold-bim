@@ -693,7 +693,11 @@ export function returnObjectsToOriginalState() {
   });
 }
 
-export function saveAsImage(renderer: THREE.Renderer, scene: THREE.Scene, camera: THREE.Camera) {
+export function saveAsImage(
+  renderer: THREE.Renderer,
+  scene: THREE.Scene,
+  camera: THREE.Camera
+) {
   let imgData;
 
   try {
@@ -728,3 +732,43 @@ function saveFile(strData: string, filename: string) {
   }
 }
 
+export function setTimelineToBeginningState() {
+  const svgElement = document.getElementById("general-svg");
+  const svgElementLine = document.getElementById("general-svg-line");
+  if (svgElement && svgElementLine) {
+    svgElement.style.stroke = "white";
+    svgElementLine.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+
+  const svgElementBlueprint = document.getElementById("blueprint-svg");
+  const svgElementLineBlueprint = document.getElementById("blueprint-svg-line");
+  if (svgElementBlueprint && svgElementLineBlueprint) {
+    svgElementBlueprint.style.stroke = "white";
+    svgElementLineBlueprint.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+
+  const svgElementRoof = document.getElementById("roof-svg");
+  const svgElementLineRoof = document.getElementById("roof-svg-line");
+  const svgElementScaffold = document.getElementById("scaffold-svg");
+  const svgElementLineScaffold = document.getElementById("scaffold-svg-line");
+  if (svgElementRoof && svgElementLineRoof && svgElementScaffold && svgElementLineScaffold) {
+    svgElementRoof.style.stroke = "white";
+    svgElementLineRoof.style.stroke = "white";
+    svgElementScaffold.style.stroke = "white"
+    svgElementLineScaffold.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+
+  const svgElementSupply = document.getElementById("supply-svg");
+  if (svgElementSupply) {
+    svgElementSupply.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+
+}

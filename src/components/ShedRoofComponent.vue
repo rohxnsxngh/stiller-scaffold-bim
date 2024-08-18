@@ -3,7 +3,7 @@
     <div class="col-span-3">
       <label class="form-control w-full max-w-xs">
         <div class="label">
-          <span class="label-text">Høyde (m)</span>
+          <span class="label-text">Takhøyde (m)</span>
         </div>
         <input
           type="text"
@@ -11,11 +11,11 @@
           class="input input-sm input-bordered w-full max-w-xs mt-3"
           v-model="height"
         />
-        <div class="label">
+        <!-- <div class="label">
           <span class="label-text-alt text-[#623CEA]"
             >Kalkulert vinkel: 18°</span
           >
-        </div>
+        </div> -->
       </label>
     </div>
 
@@ -43,7 +43,7 @@
     <div class="col-span-1">
       <label class="form-control w-full max-w-xs">
         <div class="label">
-          <span class="label-text text-xs">lage tak</span>
+          <span class="label-text text-xs">Generér tak</span>
         </div>
         <div
           class="btn btn-sm w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
@@ -55,7 +55,22 @@
     </div>
   </div>
 
-  <div>
+  <!-- <div class="bg-[#24242F] rounded flex flex-row my-4">
+    <div>
+      <img
+        src="../assets/images/RoofSection/Info.svg"
+        alt="Clipboard"
+        class="w-12 mt-4 mx-2"
+      />
+    </div>
+    <div>
+      <p class="text-sm text-[#9E9E9E] m-4">
+        For å rotere taket, må du trykke på taket etter å ha trykket på “Rotér tak”-knappen
+      </p>
+    </div>
+  </div> -->
+
+  <!-- <div>
     <p class="text-sm my-2">Stikker taket ut fra fasaden (overheng)?</p>
     <div class="grid grid-cols-3 gap-3">
       <div class="btn btn-xs btn-outline hover:bg-[#23E6A1]">Ja</div>
@@ -77,7 +92,7 @@
         <div class="label"></div>
       </label>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script lang="ts">

@@ -9,6 +9,7 @@ import {
 import {
   observeElementAndAddEventListener,
   removeHighlightMesh,
+  setTimelineToBeginningState,
 } from "./helper";
 import MountPoint from "../pages/MountPoint.vue";
 //@ts-ignore
@@ -363,6 +364,10 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
     selected.updateSelected("Reset Scene");
+    // @ts-ignore
+    window.setActiveSection("blueprint");
+    setTimelineToBeginningState()
+
     setStates();
   });
 
