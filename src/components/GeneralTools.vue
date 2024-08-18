@@ -5,7 +5,7 @@
         class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
         id="top-view"
       >
-        <i class="material-icons text-[#0084FF]">fullscreen</i>
+        <i class="material-icons text-[#0084FF]">fullscreen_exit</i>
       </div>
       <div><p class="text-xs text-center mt-2">Top View</p></div>
     </div>

@@ -3,11 +3,14 @@
   <dialog id="my_modal_1" class="modal">
     <div class="modal-box bg-[#111115] max-w-2xl h-screen">
       <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" id="close-modal-button">
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          id="close-modal-button"
+        >
           ✕
         </button>
       </form>
-      <h3 class="font-semibold text-4xl my-4">Få tilbud på leie</h3>
+      <h3 class="font-semibold text-4xl my-4">Oppsummering</h3>
       <div class="divider"></div>
       <div class="overflow-x-auto p-6">
         <h3 class="font-semibold text-2xl">Oppsummering</h3>
@@ -30,8 +33,14 @@
           <span class="text-green-300"> {{ squareMeterBuildingCoverage }}</span>
           square meters
         </p>
-        <table class="table table-zebra">
-          <!-- head -->
+
+        <p class="text-sm my-2 font-semibold" v-if="scaffolding > 0">
+          Total Amount of Scaffolding:
+          <span class="text-green-300"> {{ scaffolding }}</span>
+          scaffolding
+        </p>
+        <!-- <table class="table table-zebra">
+
           <thead>
             <tr>
               <th></th>
@@ -40,26 +49,26 @@
             </tr>
           </thead>
           <tbody>
-            <!-- row 1 -->
+     
             <tr>
               <th>1</th>
               <td>Light scaffolding</td>
               <td>{{ scaffolding }}</td>
             </tr>
-            <!-- row 2 -->
+        
             <tr>
               <th>2</th>
               <td>Internal Staircase</td>
               <td>{{ internalScaffolding }}</td>
             </tr>
-            <!-- row 3 -->
+        
             <tr>
               <th>3</th>
               <td>External Staircase</td>
               <td>{{ externalScaffolding }}</td>
             </tr>
           </tbody>
-        </table>
+        </table> -->
       </div>
       <div>
         <div class="m-4 flex justify-end">
@@ -76,7 +85,7 @@
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
             @click="goToNextPage"
           >
-            Få tilbud
+            Tilbake til anbudet
           </div>
         </div>
       </div>
@@ -154,7 +163,7 @@ export default {
       // Open the modal
       const modalElement = document.getElementById("my_modal_1");
       if (modalElement && modalElement instanceof HTMLDialogElement) {
-        modalElement.close()
+        modalElement.close();
       } else {
         console.error("Modal element not found or not an HTMLDialogElement");
       }

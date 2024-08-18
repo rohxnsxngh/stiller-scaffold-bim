@@ -836,7 +836,7 @@ export const createToolbar = (
 
   // menu power button
   const menuPowerButton = new OBC.Button(components);
-  menuPowerButton.materialIcon = "power_settings_new";
+  menuPowerButton.materialIcon = "fullscreen";
   menuPowerButton.id = "menu-power-button";
   drawerToolBar.addChild(menuPowerButton);
   menuPowerButton.onClick.add(() => {

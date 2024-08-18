@@ -500,16 +500,19 @@ export const createModelView = async () => {
     ) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
-        if (
-          intersectedObject !== lastHighlightedObject &&
-          intersectedObject.name !== "ground" &&
-          intersectedObject.name !== "grid"
-        ) {
-          resetLastHighlightedObject();
-          highlightObject(intersectedObject, 0x0bda51);
-          lastHighlightedObject = intersectedObject;
-        } else if (intersectedObject.name === "ground") {
-          resetLastHighlightedObject();
+
+        if (intersectedObject.name !== "scaffoldingSheet") {
+          if (
+            intersectedObject !== lastHighlightedObject &&
+            intersectedObject.name !== "ground" &&
+            intersectedObject.name !== "grid"
+          ) {
+            resetLastHighlightedObject();
+            highlightObject(intersectedObject, 0x0bda51);
+            lastHighlightedObject = intersectedObject;
+          } else if (intersectedObject.name === "ground") {
+            resetLastHighlightedObject();
+          }
         }
       } else {
         resetLastHighlightedObject();
