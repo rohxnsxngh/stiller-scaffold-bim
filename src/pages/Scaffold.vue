@@ -201,7 +201,11 @@
               <span class="label-text">Antall stillas etasjer</span>
             </div>
             <div class="flex flex-row gap-1 border-black">
-              <div class="btn text-2xl w-1/12" id="remove-scaffolding-level">
+              <div
+                class="btn text-2xl w-1/12"
+                id="remove-scaffolding-level"
+                :class="{ 'disabled-class': !isScaffolding }"
+              >
                 -
               </div>
               <div class="btn text-2xl">
@@ -211,9 +215,14 @@
                   class="w-6 bg-inherit"
                   readonly
                   disabled
+                  :class="{ 'disabled-class': !isScaffolding }"
                 />
               </div>
-              <div class="btn text-2xl w-1/12" id="add-scaffolding-level">
+              <div
+                class="btn text-2xl w-1/12"
+                id="add-scaffolding-level"
+                :class="{ 'disabled-class': !isScaffolding }"
+              >
                 +
               </div>
             </div>
@@ -246,7 +255,7 @@
 
 <script lang="ts">
 import { computed } from "vue";
-import { useStore } from "../store";
+import { supplyStore, useStore } from "../store";
 import GeneralTools from "../components/GeneralTools.vue";
 
 export default {
@@ -260,8 +269,37 @@ export default {
       set: (value) => componentStore.updateScaffoldLevel(value),
     });
 
+    const supply = supplyStore();
+
+    // Use computed properties to reactively access store state
+    const scaffolding = computed({
+      // Make length a computed property
+      get: () => supply.scaffolding,
+      set: (value) => supply.updateScaffolding(value),
+    });
+
+    const internalScaffolding = computed({
+      // Make width a computed property
+      get: () => supply.internalScaffolding,
+      set: (value) => supply.updateInternalScaffolding(value),
+    });
+
+    const externalScaffolding = computed({
+      // Make depth a computed property
+      get: () => supply.externalScaffolding,
+      set: (value) => supply.updateExternalScaffolding(value),
+    });
+
+    const isScaffolding = computed(() => {
+      return scaffolding.value > 0;
+    });
+
     return {
       level,
+      isScaffolding,
+      scaffolding,
+      internalScaffolding,
+      externalScaffolding,
     };
   },
   components: {
@@ -338,7 +376,7 @@ export default {
 </script>
 
 <style scoped>
-.disabled {
+.disabled-class {
   pointer-events: none;
   opacity: 0.5;
 }

@@ -1,6 +1,7 @@
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import * as THREE from "three";
+import { supplyStore } from "../store";
 
 export const objectsEqual = (o1: any, o2: any): boolean =>
   typeof o1 === "object" && Object.keys(o1).length > 0
@@ -755,10 +756,15 @@ export function setTimelineToBeginningState() {
   const svgElementLineRoof = document.getElementById("roof-svg-line");
   const svgElementScaffold = document.getElementById("scaffold-svg");
   const svgElementLineScaffold = document.getElementById("scaffold-svg-line");
-  if (svgElementRoof && svgElementLineRoof && svgElementScaffold && svgElementLineScaffold) {
+  if (
+    svgElementRoof &&
+    svgElementLineRoof &&
+    svgElementScaffold &&
+    svgElementLineScaffold
+  ) {
     svgElementRoof.style.stroke = "white";
     svgElementLineRoof.style.stroke = "white";
-    svgElementScaffold.style.stroke = "white"
+    svgElementScaffold.style.stroke = "white";
     svgElementLineScaffold.style.stroke = "white";
   } else {
     console.error("timeline not found");
@@ -770,5 +776,43 @@ export function setTimelineToBeginningState() {
   } else {
     console.error("timeline not found");
   }
+}
 
+export const updateScaffoldingData = (scene: THREE.Scene) => {
+  const [scaffolding, internalScaffolding, externalScaffolding] =
+    calculateTotalAmountScaffoldingInScene(scene);
+  const totalSquareFootageOfScaffolding =
+    calculateTotalSquareMetersForScaffolding(scene);
+  console.log(totalSquareFootageOfScaffolding);
+  const totalBuildingSquareMeterage =
+    calculateTotalSquareMetersForBlueprint(scene);
+
+  const supply = supplyStore();
+  supply.updateScaffolding(scaffolding);
+  supply.updateInternalScaffolding(internalScaffolding);
+  supply.updateExternalScaffolding(externalScaffolding);
+  supply.updateSquareMetersOfScaffolding(
+    totalSquareFootageOfScaffolding.toFixed(2)
+  );
+  supply.updateSquareMetersOfBuilding(totalBuildingSquareMeterage.toFixed(2));
+
+  // console.log(
+  //   supply.scaffolding,
+  //   supply.internalScaffolding,
+  //   supply.externalScaffolding,
+  //   supply.squareMetersOfScaffolding,
+  //   supply.squareMetersOfBuilding
+  // );
+};
+
+export function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function (...args: Parameters<T>) {
+    clearTimeout(timeout);
+    //@ts-ignore
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
 }

@@ -36,6 +36,7 @@ import {
   calculateTotalSquareMetersForBlueprint,
   calculateTotalSquareMetersForScaffolding,
   calculateTransformedBoundingBox,
+  debounce,
   deleteObject,
   disableOrbitControls,
   findObjectBuildingRelations,
@@ -46,6 +47,7 @@ import {
   resetScene,
   returnObjectsToOriginalState,
   saveAsImage,
+  updateScaffoldingData,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
@@ -84,6 +86,7 @@ import {
   cameraDisableOrbitalFunctionalities,
   cameraEnableOrbitalFunctionality,
 } from "./utilities/camera";
+import { SceneObserver } from "./utilities/scene";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -1352,6 +1355,8 @@ export const createModelView = async () => {
     cubeClone.forEach((cube) => {
       scene.remove(cube);
     });
+
+    updateScaffoldingData(scene);
   });
 
   // autogenerate scaffolding
@@ -1569,50 +1574,20 @@ export const createModelView = async () => {
     return [bboxWireframe, scaffoldInternalStaircaseModeling];
   }
 
-  // testButton.domElement.addEventListener("mousedown", async () => {
-  //   console.log("test button");
-  //   calculateTotalAmountScaffoldingInScene(scene);
-  //   calculateTotalSquareFootageForScaffolding(scene);
-  //   // loadSymbol(scene);
-  //   // scene.traverse((child) => {
-  //   //   if (child.name === "scaffoldLine") {
-  //   //     console.log(child.userData.level);
-  //   //   }
-  //   // });
-
-  //   scene.traverse((child) => {
-  //     if (child.name === "roof") {
-  //       console.log(child);
-  //     }
-  //   });
-  // });
-
   observeElementAndAddEventListener("generate-supply", "mousedown", () => {
-    const [scaffolding, internalScaffolding, externalScaffolding] =
-      calculateTotalAmountScaffoldingInScene(scene);
-    const totalSquareFootageOfScaffolding =
-      calculateTotalSquareMetersForScaffolding(scene);
-    console.log(totalSquareFootageOfScaffolding);
-    const totalBuildingSquareMeterage =
-      calculateTotalSquareMetersForBlueprint(scene);
-
-    const supply = supplyStore();
-    supply.updateScaffolding(scaffolding);
-    supply.updateInternalScaffolding(internalScaffolding);
-    supply.updateExternalScaffolding(externalScaffolding);
-    supply.updateSquareMetersOfScaffolding(
-      totalSquareFootageOfScaffolding.toFixed(2)
-    );
-    supply.updateSquareMetersOfBuilding(totalBuildingSquareMeterage.toFixed(2));
-
-    console.log(
-      supply.scaffolding,
-      supply.internalScaffolding,
-      supply.externalScaffolding,
-      supply.squareMetersOfScaffolding,
-      supply.squareMetersOfBuilding
-    );
+    updateScaffoldingData(scene);
   });
+
+const observer = new SceneObserver(
+  scene,
+  debounce(() => updateScaffoldingData(scene), 200)
+);
+observer.startObserving();
+
+
+  //TODO CHANGE IMPLEMENTATION SO THIS ONLY TRIGGERS WHEN THE SCENE CHANGES
+  // Set the debounce delay (e.g., 200ms)
+  // document.addEventListener("mousedown", debounce(updateScaffoldingData(scene), 500));
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
     setDeletionInProgress(false);

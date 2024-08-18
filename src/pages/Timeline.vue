@@ -6,6 +6,24 @@
     {{ value }}
   </div>
   <div
+    class="fixed -right-20 -bottom-48 mt-1 text-slate-300 font-semibold bg-[#111115] w-72 p-2 rounded-lg"
+  >
+    <p>
+      Stillas:
+      <span class="text-green-300">{{ squareMeterScaffoldingCoverage }}</span>
+      square meters
+    </p>
+    <p>
+      Stillas-seksjoner:
+      <span class="text-green-300">{{ scaffolding }} </span> scaffolding
+    </p>
+    <p>
+      Tildekning:
+      <span class="text-green-300"> {{ squareMeterBuildingCoverage }} </span>
+      square meters
+    </p>
+  </div>
+  <div
     id="scaffold-guidance"
     onclick="my_modal_3.showModal()"
     class="fixed -left-12 top-2 mt-1 btn bg-transparent border-none hover:bg-transparent text-amber-300 font-semibold shadow-lg tooltip tooltip-left"
@@ -197,7 +215,7 @@
 
 <script>
 import { ref, onMounted, computed } from "vue";
-import { selectedStore } from "../store";
+import { selectedStore, supplyStore } from "../store";
 
 export default {
   setup() {
@@ -210,8 +228,46 @@ export default {
       set: (value) => selected.updateSelected(value),
     });
 
+    const supply = supplyStore();
+
+    // Use computed properties to reactively access store state
+    const scaffolding = computed({
+      // Make length a computed property
+      get: () => supply.scaffolding,
+      set: (value) => supply.updateScaffolding(value),
+    });
+
+    const internalScaffolding = computed({
+      // Make width a computed property
+      get: () => supply.internalScaffolding,
+      set: (value) => supply.updateInternalScaffolding(value),
+    });
+
+    const externalScaffolding = computed({
+      // Make depth a computed property
+      get: () => supply.externalScaffolding,
+      set: (value) => supply.updateExternalScaffolding(value),
+    });
+
+    const squareMeterScaffoldingCoverage = computed({
+      // Make depth a computed property
+      get: () => supply.squareMetersOfScaffolding,
+      set: (value) => supply.updateSquareMetersOfScaffolding(value),
+    });
+
+    const squareMeterBuildingCoverage = computed({
+      // Make depth a computed property
+      get: () => supply.squareMetersOfBuilding,
+      set: (value) => supply.updateSquareMetersOfBuilding(value),
+    });
+
     return {
       value,
+      scaffolding,
+      internalScaffolding,
+      externalScaffolding,
+      squareMeterScaffoldingCoverage,
+      squareMeterBuildingCoverage,
     };
   },
 };
