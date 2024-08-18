@@ -48,6 +48,7 @@
         <div
           class="btn btn-sm w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
           id="create-shed-roof"
+          :class="{ 'disabled-class': !isDepthValid }"
         >
           <i class="material-icons">roofing</i>
         </div>
@@ -110,9 +111,21 @@ export default {
       set: (value) => componentStore.updateShedRoofHeight(value),
     });
 
+    const isDepthValid = computed(() => {
+      return height.value > 0;
+    });
+
     return {
       height,
+      isDepthValid,
     };
   },
 };
 </script>
+
+<style scoped>
+.disabled-class {
+  pointer-events: none;
+  opacity: 0.5;
+}
+</style>

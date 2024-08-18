@@ -107,6 +107,7 @@
         <div
           class="btn w-full btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
           id="create-extrusion"
+          :class="{ 'disabled-class': !isDepthValid }"
         >
           <i class="material-icons">expand</i>
         </div>
@@ -116,7 +117,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useStore } from "../store";
 
 export default {
@@ -154,12 +155,22 @@ export default {
       showUpload.value = false;
     };
 
+    const isDepthValid = computed(() => {
+      return depth.value > 0;
+    });
+
+    // Watch isDepthValid to see if it updates as expected
+    watch(isDepthValid, (newVal) => {
+      console.log("isDepthValid:", newVal);
+    });
+
     return {
       showDraw,
       showUpload,
       length,
       width,
       depth,
+      isDepthValid,
       showDrawBlueprint,
     };
   },
@@ -178,3 +189,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.disabled-class {
+  pointer-events: none;
+  opacity: 0.5;
+}
+</style>

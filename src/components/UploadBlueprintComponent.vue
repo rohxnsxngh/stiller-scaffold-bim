@@ -4,10 +4,11 @@
   </div>
 
   <div class="bg-[#14141C] grid grid-cols-4 gap-4 rounded">
-    <div class="flex flex-col m-4">
+    <div class="flex flex-col m-4" @click="hideBlueprintScaling">
       <div
         class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767] indicator"
         id="upload-ifc"
+        @click="hideBlueprintScaling"
       >
         <!-- <span
           class="indicator-item badge badge-transparent bg-transparent border-transparent"
@@ -17,24 +18,31 @@
             alt="Locked"
             class="scale-25"
         /></span> -->
-        <img src="../assets/images/Delete.svg" alt="Select" class="w-4" />
+        <img
+          src="../assets/images/Delete.svg"
+          alt="Select"
+          class="w-4"
+          @click="hideBlueprintScaling"
+        />
       </div>
       <div><p class="text-xs text-center mt-2">IFC</p></div>
     </div>
     <div
       class="flex flex-col m-4"
-      @click="showBlueprintScaling"
       id="upload-image-blueprint"
+      @click="showBlueprintScaling"
     >
       <div
         class="btn btn-md bg-[#3A1D23] rounded-lg border-2 border-[#E14767] indicator"
         id="upload-blueprint"
+        @click="showBlueprintScaling"
       >
         <input
           id="2D-hidden-file-input"
           type="file"
           accept="image/*"
           class="hidden"
+          @click="showBlueprintScaling"
         />
         <!-- <span
           class="indicator-item badge badge-transparent bg-transparent border-transparent"
@@ -87,7 +95,7 @@ export default {
     const scale = computed({
       // Make depth a computed property
       get: () => uploadStore.scale,
-      set: (value) =>  uploadStore.updateScale(value),
+      set: (value) => uploadStore.updateScale(value),
     });
 
     return {
@@ -103,6 +111,9 @@ export default {
   methods: {
     showBlueprintScaling() {
       this.show2DUpload = true;
+    },
+    hideBlueprintScaling() {
+      this.show2DUpload = false;
     },
   },
 };
