@@ -1,5 +1,6 @@
 <template>
   <div class="card w-full h-screen bg-inherit shadow-xl relative">
+    <ToastComponent ref="toast" message="hello"/>
     <div class="card-body p-2">
       <div>
         Tegn området rundt bygget der stillaset skal stå, eller bruk
@@ -257,6 +258,7 @@
 import { computed } from "vue";
 import { supplyStore, useStore } from "../store";
 import GeneralTools from "../components/GeneralTools.vue";
+import ToastComponent from "../components/Toast.vue";
 
 export default {
   setup() {
@@ -304,6 +306,7 @@ export default {
   },
   components: {
     GeneralTools,
+    ToastComponent
   },
   data() {
     return {
@@ -330,18 +333,11 @@ export default {
       } else {
         console.error("Element with ID 'generate-scaffolding' not found.");
       }
+      this.$refs.toast.show("Moved to the previous page", "info"); 
     },
     goToNextPage() {
       // @ts-ignore
       window.setActiveSection("supply");
-      // const svgElement = document.getElementById("scaffold-svg");
-      // const svgElementLine = document.getElementById("scaffold-svg-line");
-      // if (svgElement && svgElementLine) {
-      //   svgElement.style.stroke = "#23E6A1";
-      //   svgElementLine.style.stroke = "#23E6A1";
-      // } else {
-      //   console.error("timeline not found");
-      // }
       const svgElement = document.getElementById("roof-svg");
       const svgElementLine = document.getElementById("roof-svg-line");
       if (svgElement && svgElementLine) {
@@ -354,14 +350,6 @@ export default {
     goToPreviousPage() {
       // @ts-ignore
       window.setActiveSection("roof");
-      // const svgElement = document.getElementById("roof-svg");
-      // const svgElementLine = document.getElementById("roof-svg-line");
-      // if (svgElement && svgElementLine) {
-      //   svgElement.style.stroke = "white";
-      //   svgElementLine.style.stroke = "white";
-      // } else {
-      //   console.error("timeline not found");
-      // }
       const svgElement = document.getElementById("blueprint-svg");
       const svgElementLine = document.getElementById("blueprint-svg-line");
       if (svgElement && svgElementLine) {
