@@ -366,7 +366,7 @@ export const createToolbar = (
     selected.updateSelected("Reset Scene");
     // @ts-ignore
     window.setActiveSection("blueprint");
-    setTimelineToBeginningState()
+    setTimelineToBeginningState();
 
     setStates();
   });
@@ -604,6 +604,9 @@ export const createToolbar = (
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
     startDrawing = true;
     document.body.style.cursor = "auto";
+    cameraTopView(gsap, components.camera);
+    //@ts-ignore
+    components.camera.setProjection("Orthographic");
     removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);
