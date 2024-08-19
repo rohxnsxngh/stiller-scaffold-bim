@@ -6,6 +6,23 @@
     {{ value }}
   </div>
   <div
+    class="fixed -right-20 -bottom-80 mt-1 text-slate-300 font-semibold bg-[#111115] w-32 p-2 rounded-lg"
+  >
+    <p class="font-bold mb-2">Kamera</p>
+    <div
+      v-for="(button, index) in buttons"
+      :key="index"
+      :id="button.id"
+      :class="[
+        'btn btn-sm text-slate-300 bg-[#111115] hover:text-green-300',
+        { 'text-[#23E6A1]': activeButton === index },
+      ]"
+      @click="setActive(index)"
+    >
+      {{ button.label }}
+    </div>
+  </div>
+  <div
     class="fixed -right-20 -bottom-48 mt-1 text-slate-300 font-semibold bg-[#111115] w-72 p-2 rounded-lg"
   >
     <p>
@@ -213,7 +230,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { selectedStore, supplyStore } from "../store";
 
@@ -269,6 +286,26 @@ export default {
       squareMeterScaffoldingCoverage,
       squareMeterBuildingCoverage,
     };
+  },
+  data() {
+    return {
+      activeButton: 1,
+      buttons: [
+        {
+          label: "Orthographic",
+          id: "toggle-orthographic",
+        },
+        {
+          label: "Perspective",
+          id: "toggle-perspective",
+        },
+      ],
+    };
+  },
+  methods: {
+    setActive(index: any) {
+      this.activeButton = index;
+    },
   },
 };
 </script>

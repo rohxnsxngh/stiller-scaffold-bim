@@ -1578,12 +1578,13 @@ export const createModelView = async () => {
     updateScaffoldingData(scene);
   });
 
-const observer = new SceneObserver(
-  scene,
-  debounce(() => updateScaffoldingData(scene), 200)
-);
-observer.startObserving();
-
+  //TODO
+  //FIX FIX FIX
+  const observer = new SceneObserver(
+    scene,
+    debounce(() => updateScaffoldingData(scene), 200)
+  );
+  observer.startObserving();
 
   //TODO CHANGE IMPLEMENTATION SO THIS ONLY TRIGGERS WHEN THE SCENE CHANGES
   // Set the debounce delay (e.g., 200ms)
@@ -1867,6 +1868,16 @@ observer.startObserving();
 
   observeElementAndAddEventListener("delete-building", "mousedown", () => {
     setDeleteBuilding(true);
+  });
+
+  observeElementAndAddEventListener("toggle-orthographic", "mousedown", () => {
+    //@ts-ignore
+    components.camera.setProjection("Orthographic");
+  });
+
+  observeElementAndAddEventListener("toggle-perspective", "mousedown", () => {
+    //@ts-ignore
+    components.camera.setProjection("Perspective");
   });
 
   // @ts-ignore
