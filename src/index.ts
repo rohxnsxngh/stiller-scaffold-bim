@@ -87,6 +87,7 @@ import {
   cameraEnableOrbitalFunctionality,
 } from "./utilities/camera";
 import { SceneObserver } from "./utilities/scene";
+import Timeline from "./pages/Timeline.vue";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -1290,7 +1291,7 @@ export const createModelView = async () => {
       );
     }
   });
-
+  
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
     setDeletionInProgress(false);
     if (drawingScaffoldingInProgress) {

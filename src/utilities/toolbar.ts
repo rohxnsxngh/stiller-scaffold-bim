@@ -129,7 +129,7 @@ export const createToolbar = (
   mountPointTimeline.style.height = "0%";
 
   // Mount the Vue component instance to the new DOM element
-  vueComponentTimeline.mount(mountPointTimeline);
+  const componentInstance = vueComponentTimeline.mount(mountPointTimeline);
 
   // Append the new DOM element to topToolBar.domElement
   topToolBar.domElement.appendChild(mountPointTimeline);
@@ -607,6 +607,8 @@ export const createToolbar = (
     cameraTopView(gsap, components.camera);
     //@ts-ignore
     components.camera.setProjection("Orthographic");
+    //@ts-ignore
+    componentInstance.$data.activeButton = 0;
     removeHighlightMesh(scene);
     setDrawingInProgress(false);
     setDeletionInProgress(false);

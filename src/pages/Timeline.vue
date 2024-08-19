@@ -303,7 +303,10 @@ export default {
     };
   },
   methods: {
-    setActive(index: any) {
+    setActive(index: number) {
+      this.activeButton = index;
+    },
+    updateActiveButton(index: number) {
       this.activeButton = index;
     },
   },
