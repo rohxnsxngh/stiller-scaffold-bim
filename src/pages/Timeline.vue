@@ -231,7 +231,7 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { computed } from "vue";
 import { selectedStore, supplyStore } from "../store";
 
 export default {

@@ -1,6 +1,5 @@
 <template>
   <div class="card w-full h-screen bg-inherit shadow-xl relative">
-    <ToastComponent ref="toast" message="hello"/>
     <div class="card-body p-2">
       <div>
         Tegn området rundt bygget der stillaset skal stå, eller bruk
@@ -232,6 +231,8 @@
         </div>
       </div>
 
+      <ToastComponent ref="toast" type="info" message="Kamera endret til ‘Se ovenfra’ og ‘Isometrisk"/>
+
       <div class="card-actions justify-end">
         <div class="m-4">
           <div
@@ -333,7 +334,7 @@ export default {
       } else {
         console.error("Element with ID 'generate-scaffolding' not found.");
       }
-      this.$refs.toast.show("Moved to the previous page", "info"); 
+      this.$refs.toast.show(); 
     },
     goToNextPage() {
       // @ts-ignore
