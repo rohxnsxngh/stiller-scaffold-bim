@@ -28,6 +28,7 @@
         <div
           class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin w-72 mb-2 ml-10"
           id="autogenerate-scaffolding"
+          @click="triggerToast"
         >
           <img
             src="../assets/images/ScaffoldSection/MagicWand.svg"
@@ -37,6 +38,8 @@
           Autogenerer stillas
         </div>
       </div>
+
+      <ToastComponent ref="toastAuto" type="success" message="Voila!" />
 
       <div class="bg-[#14141C] rounded mt-4">
         <div class="card-actions justify-left">
@@ -231,7 +234,11 @@
         </div>
       </div>
 
-      <ToastComponent ref="toast" type="info" message="Kamera endret til ‘Se ovenfra’ og ‘Isometrisk"/>
+      <ToastComponent
+        ref="toast"
+        type="info"
+        message="Kamera endret til ‘Se ovenfra’ og ‘Isometrisk"
+      />
 
       <div class="card-actions justify-end">
         <div class="m-4">
@@ -307,7 +314,7 @@ export default {
   },
   components: {
     GeneralTools,
-    ToastComponent
+    ToastComponent,
   },
   data() {
     return {
@@ -335,7 +342,7 @@ export default {
         console.error("Element with ID 'generate-scaffolding' not found.");
       }
       //@ts-ignore
-      this.$refs.toast.show(); 
+      this.$refs.toast.show();
     },
     goToNextPage() {
       // @ts-ignore
@@ -360,6 +367,10 @@ export default {
       } else {
         console.error("timeline not found");
       }
+    },
+    triggerToast() {
+      //@ts-ignore
+      this.$refs.toastAuto.show();
     },
   },
 };
