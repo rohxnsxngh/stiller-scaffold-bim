@@ -52,41 +52,43 @@ export default {
 
 <style scoped>
 .alert {
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 8px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
+  border-radius: 12px;
   font-weight: bold;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 2px solid;
-  transition: all 0.3s ease;
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.8);
+  border: 4px solid;
+  transition: all 0.4s ease;
 }
 
 .alert-success {
-  background-color: #00e676;
-  color: #004d40;
-  border-color: #00c853;
+  background: linear-gradient(to right, #00e676, #00c853);
+  border-color: #008c3d;
+  box-shadow: 0 0 20px #00e676, inset 0 0 20px #00e676;
 }
 
 .alert-error {
-  background-color: #ff3d00;
-  color: #ffffff;
-  border-color: #dd2c00;
+  background: linear-gradient(to right, #ff3d00, #dd2c00);
+  border-color: #a32200;
+  box-shadow: 0 0 20px #ff3d00, inset 0 0 20px #ff3d00;
 }
 
 .alert-info {
-  background-color: #00b0ff;
-  color: #01579b;
-  border-color: #0091ea;
+  background: linear-gradient(to right, #00b0ff, #0091ea);
+  border-color: #006db3;
+  box-shadow: 0 0 20px #00b0ff, inset 0 0 20px #00b0ff;
 }
 
 .alert-warning {
-  background-color: #ffd600;
-  color: #ff6f00;
-  border-color: #ffc400;
+  background: linear-gradient(to right, #ffd600, #ffc400);
+  border-color: #b39000;
+  box-shadow: 0 0 20px #ffd600, inset 0 0 20px #ffd600;
 }
 
 .alert:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.4), inset 0 0 30px rgba(255, 255, 255, 0.8);
 }
 </style>

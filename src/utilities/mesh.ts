@@ -329,16 +329,18 @@ function attachExtrusionLabelChangeHandler(
     handleValueChange(labelElement.textContent);
   });
 
-    // Add an event listener to restrict input to numbers only
-    labelElement.addEventListener("input", () => {
-      const regex = /[^0-9m.]/g;
-      labelElement.textContent = labelElement.textContent?.replace(regex, "") ?? null;
-    });
+  // Add an event listener to restrict input to numbers only
+  labelElement.addEventListener("input", () => {
+    const regex = /[^0-9m.]/g;
+    labelElement.textContent =
+      labelElement.textContent?.replace(regex, "") ?? null;
+  });
 
   labelElement.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault(); // Prevents the default action of the Enter key
       handleValueChange(labelElement.textContent);
+      labelElement.blur();
     }
   });
 
@@ -591,8 +593,11 @@ function attachLabelChangeHandler(
   });
 
   labelElement.addEventListener("blur", () => {
-    handleValueChange(labelElement.textContent);
-    blurTriggered = false;
+    if (blurTriggered) {
+      // Only handle if blurTriggered was set
+      handleValueChange(labelElement.textContent);
+      blurTriggered = false; // Reset after handling blur
+    }
     document.body.style.cursor = "grab";
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setIsDrawingBlueprint(false);
@@ -601,6 +606,8 @@ function attachLabelChangeHandler(
 
   // Add an event listener to restrict input to numbers only
   labelElement.addEventListener("input", () => {
+    blurTriggered = true;
+    console.error(labelElement.textContent)
     const regex = /[^0-9m.]/g;
     labelElement.textContent =
       labelElement.textContent?.replace(regex, "") ?? null;
@@ -613,6 +620,8 @@ function attachLabelChangeHandler(
       if (event.key === "Enter") {
         event.preventDefault(); // Prevents the default action of the Enter key
         handleValueChange(labelElement.textContent);
+        labelElement.blur();
+        console.error("CHANGING BLUEPRINT", blurTriggered);
         blurTriggered = false;
         document.body.style.cursor = "grab";
         cameraEnableOrbitalFunctionality(gsap, components.camera);
@@ -1069,6 +1078,7 @@ function attachRoofLabelChangeHandler(
     if (event.key === "Enter") {
       event.preventDefault(); // Prevents the default action of the Enter key
       handleValueChange(labelElement.textContent);
+      labelElement.blur();
     }
   });
 
@@ -1604,6 +1614,7 @@ function attachShedRoofLabelChangeHandler(
     if (event.key === "Enter") {
       event.preventDefault(); // Prevents the default action of the Enter key
       handleValueChange(labelElement.textContent);
+      labelElement.blur();
     }
   });
 
