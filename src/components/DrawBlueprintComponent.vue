@@ -82,6 +82,12 @@
     </div>
   </div>
 
+  <Toast
+    ref="toast"
+    type="success"
+    message="Tips: Ønsker du å endre høyde kan du gjøre det ved å trykke på den svarte boksen på bygningen"
+  />
+
   <div class="grid grid-cols-6 gap-4" v-if="isActive">
     <div class="col-span-4">
       <label class="form-control w-full max-w-xs">
@@ -119,6 +125,7 @@
 <script lang="ts">
 import { ref, computed, watch } from "vue";
 import { useStore } from "../store";
+import Toast from "./Toast.vue";
 
 export default {
   setup() {
@@ -179,12 +186,17 @@ export default {
       isActive: false,
     };
   },
+  components: {
+    Toast,
+  },
   methods: {
     setActiveTrue() {
       this.isActive = true;
     },
     setActiveFalse() {
       this.isActive = false;
+      //@ts-ignore
+      this.$refs.toast.show();
     },
   },
 };

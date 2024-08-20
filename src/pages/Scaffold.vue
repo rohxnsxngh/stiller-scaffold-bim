@@ -334,6 +334,7 @@ export default {
       } else {
         console.error("Element with ID 'generate-scaffolding' not found.");
       }
+      //@ts-ignore
       this.$refs.toast.show(); 
     },
     goToNextPage() {
