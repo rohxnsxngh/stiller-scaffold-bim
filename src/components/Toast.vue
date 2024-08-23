@@ -56,39 +56,43 @@ export default {
   margin-bottom: 20px;
   border-radius: 12px;
   font-weight: bold;
-  color: white;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.8);
-  border: 4px solid;
+  color: #111115;
+  text-shadow: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), inset 0 0 5px rgba(0, 0, 0, 0.1);
+  border: 2px solid;
   transition: all 0.4s ease;
 }
 
 .alert-success {
-  background: linear-gradient(to right, #00e676, #00c853);
+  background: linear-gradient(to right, #00e676, #01200e);
   border-color: #008c3d;
-  box-shadow: 0 0 20px #00e676, inset 0 0 20px #00e676;
+  box-shadow: 0 2px 6px rgba(0, 230, 118, 0.4),
+    inset 0 0 5px rgba(0, 200, 83, 0.4);
 }
 
 .alert-error {
-  background: linear-gradient(to right, #ff3d00, #dd2c00);
+  background: linear-gradient(to right, #ff3d00, #320b01);
   border-color: #a32200;
-  box-shadow: 0 0 20px #ff3d00, inset 0 0 20px #ff3d00;
+  box-shadow: 0 2px 6px rgba(255, 61, 0, 0.4),
+    inset 0 0 5px rgba(221, 44, 0, 0.4);
 }
 
 .alert-info {
-  background: linear-gradient(to right, #00b0ff, #0091ea);
+  background: linear-gradient(to right, #00b0ff, #002034);
   border-color: #006db3;
-  box-shadow: 0 0 20px #00b0ff, inset 0 0 20px #00b0ff;
+  box-shadow: 0 2px 6px rgba(0, 176, 255, 0.4),
+    inset 0 0 5px rgba(0, 145, 234, 0.4);
 }
 
 .alert-warning {
-  background: linear-gradient(to right, #ffd600, #ffc400);
+  background: linear-gradient(to right, #ffd600, #342800);
   border-color: #b39000;
-  box-shadow: 0 0 20px #ffd600, inset 0 0 20px #ffd600;
+  box-shadow: 0 2px 6px rgba(255, 214, 0, 0.4),
+    inset 0 0 5px rgba(255, 196, 0, 0.4);
 }
 
 .alert:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.4), inset 0 0 30px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.2);
 }
 </style>

@@ -363,13 +363,29 @@ export const createToolbar = (
     }
   );
 
+  observeElementAndAddEventListener("move-geometry", "mousedown", () => {
+    selected.updateSelected("Move Buildings By Selecting");
+    // const selectedTool = document.getElementById("selected-tool");
+    // if (selectedTool) {
+    //   selectedTool.style.backgroundColor = "#111115";
+    // }
+  });
+
+  observeElementAndAddEventListener("rotate-geometry", "mousedown", () => {
+    selected.updateSelected("Rotate Buildings By Selecting");
+  });
+
+  observeElementAndAddEventListener("delete-building", "mousedown", () => {
+    selected.updateSelected("Delete Building By Selecting");
+  });
+
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
     document.body.style.cursor = "grab";
     selected.updateSelected("Free Rotate");
     startDrawing = false;
     cameraEnableOrbitalFunctionality(gsap, components.camera);
     setStates();
-  })
+  });
 
   observeElementAndAddEventListener("free-rotate", "mousedown", () => {
     document.body.style.cursor = "grab";
@@ -401,13 +417,13 @@ export const createToolbar = (
     setStates();
   });
 
-  observeElementAndAddEventListener("move-geometry", "mousedown", () => {
-    selected.updateSelected("Move Building");
-  });
+  // observeElementAndAddEventListener("move-geometry", "mousedown", () => {
+  //   selected.updateSelected("Move Building");
+  // });
 
-  observeElementAndAddEventListener("delete-building", "mousedown", () => {
-    selected.updateSelected("Delete Building");
-  });
+  // observeElementAndAddEventListener("delete-building", "mousedown", () => {
+  //   selected.updateSelected("Delete Building");
+  // });
 
   observeElementAndAddEventListener("reset-scene", "mouseover", () => {
     setStates();

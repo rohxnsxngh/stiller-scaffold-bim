@@ -508,7 +508,11 @@ export const createModelView = async () => {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
 
-        if (intersectedObject.name !== "scaffoldingSheet") {
+        if (
+          intersectedObject.name !== "scaffoldingSheet" &&
+          intersectedObject.name !== "rectangle" &&
+          intersectedObject.name !== "blueprint"
+        ) {
           if (
             intersectedObject !== lastHighlightedObject &&
             intersectedObject.name !== "ground" &&
@@ -642,10 +646,10 @@ export const createModelView = async () => {
         );
 
         // At the beginning of your transform control setup:
-        const initialGroupRotation = new THREE.Euler().copy(group.rotation);
-        const initialChildRotations = group.children.map((child) =>
-          new THREE.Euler().copy(child.rotation)
-        );
+        // const initialGroupRotation = new THREE.Euler().copy(group.rotation);
+        // const initialChildRotations = group.children.map((child) =>
+        //   new THREE.Euler().copy(child.rotation)
+        // );
 
         group.add(...geometriesToMove);
         console.warn(group);
@@ -721,15 +725,15 @@ export const createModelView = async () => {
           );
 
           // Handle rotation
-          const finalGroupRotation = new THREE.Euler().copy(group.rotation);
-          const rotationDifference = new THREE.Euler(
-            finalGroupRotation.x - initialGroupRotation.x,
-            finalGroupRotation.y - initialGroupRotation.y,
-            finalGroupRotation.z - initialGroupRotation.z
-          );
+          // const finalGroupRotation = new THREE.Euler().copy(group.rotation);
+          // const rotationDifference = new THREE.Euler(
+          //   finalGroupRotation.x - initialGroupRotation.x,
+          //   finalGroupRotation.y - initialGroupRotation.y,
+          //   finalGroupRotation.z - initialGroupRotation.z
+          // );
 
           // Reset group rotation
-          group.rotation.copy(initialGroupRotation);
+          // group.rotation.copy(initialGroupRotation);
 
           // Update children
           group.children.forEach((child) => {
@@ -738,25 +742,14 @@ export const createModelView = async () => {
               const newShape = new THREE.Shape();
               child.userData.shape.curves.forEach((curve) => {
                 if (curve instanceof THREE.LineCurve) {
-                  if (rotateObject) {
-                    // Rotate the start and end points of each curve
-                    const startPoint = rotatePoint(
-                      curve.v1,
-                      rotationDifference
-                    );
-                    const endPoint = rotatePoint(curve.v2, rotationDifference);
-                    newShape.moveTo(startPoint.x, startPoint.y);
-                    newShape.lineTo(endPoint.x, endPoint.y);
-                  } else {
-                    const startPoint = curve.v1
-                      .clone()
-                      .add(new THREE.Vector2(xDisplacement, zDisplacement));
-                    const endPoint = curve.v2
-                      .clone()
-                      .add(new THREE.Vector2(xDisplacement, zDisplacement));
-                    newShape.moveTo(startPoint.x, startPoint.y);
-                    newShape.lineTo(endPoint.x, endPoint.y);
-                  }
+                  const startPoint = curve.v1
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  const endPoint = curve.v2
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  newShape.moveTo(startPoint.x, startPoint.y);
+                  newShape.lineTo(endPoint.x, endPoint.y);
                 }
               });
               child.userData.shape = newShape;
@@ -767,16 +760,16 @@ export const createModelView = async () => {
             child.position.z += zDisplacement;
 
             // Rotate the child's position
-            const rotatedPosition = rotatePoint(
-              child.position,
-              rotationDifference
-            );
-            child.position.copy(rotatedPosition);
+            // const rotatedPosition = rotatePoint(
+            //   child.position,
+            //   rotationDifference
+            // );
+            // child.position.copy(rotatedPosition);
 
             // Apply the rotation to the child
-            child.rotation.x += rotationDifference.x;
-            child.rotation.y += rotationDifference.y;
-            child.rotation.z += rotationDifference.z;
+            // child.rotation.x += rotationDifference.x;
+            // child.rotation.y += rotationDifference.y;
+            // child.rotation.z += rotationDifference.z;
 
             // Update matrices
             child.updateMatrix();

@@ -1,6 +1,7 @@
 <template>
   <div
     ref="selected"
+    id="selected-tool"
     class="fixed -right-0 -bottom-12 mt-1 text-amber-300 font-semibold"
   >
     {{ value }}
