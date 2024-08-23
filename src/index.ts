@@ -771,25 +771,25 @@ export const createModelView = async () => {
               child.userData.shape = newShape;
             }
 
-            // if (
-            //   child.userData.shape instanceof THREE.Shape &&
-            //   rotateObject &&
-            //   child.name === "blueprint"
-            // ) {
-            //   // Example: Calculate the total rotation magnitude in radians
-            //   const totalGroupRotationMagnitude = new THREE.Vector3(
-            //     finalGroupRotation.x,
-            //     finalGroupRotation.y,
-            //     finalGroupRotation.z
-            //   ).length();
-            //   console.warn("ROTATION RADIANS", rotationDifferenceY);
-            //   rotateBlueprint(
-            //     child.userData,
-            //     scene,
-            //     -rotationDifferenceY
-            //   );
-            //   // deleteObject(child, scene);
-            // }
+            if (
+              child.userData.shape instanceof THREE.Shape &&
+              rotateObject &&
+              child.name === "blueprint"
+            ) {
+              // Example: Calculate the total rotation magnitude in radians
+              const totalGroupRotationMagnitude = new THREE.Vector3(
+                finalGroupRotation.x,
+                finalGroupRotation.y,
+                finalGroupRotation.z
+              ).length();
+              console.warn("ROTATION RADIANS", rotationDifferenceY);
+              rotateBlueprint(
+                child.userData,
+                scene,
+                -rotationDifferenceY
+              );
+              // deleteObject(child, scene);
+            }
 
             // Update position
             child.position.x += xDisplacement;
