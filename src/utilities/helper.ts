@@ -169,7 +169,7 @@ export function resetScene(
     }
   });
   objectsToRemove.forEach((object: any) => {
-    deleteObject(object, scene)
+    deleteObject(object, scene);
     scene.remove(object);
   });
 
@@ -816,4 +816,10 @@ export function debounce<T extends (...args: any[]) => void>(
     //@ts-ignore
     timeout = setTimeout(() => func.apply(this, args), delay);
   };
+}
+
+// Helper function to rotate a point or Vector3
+export function rotatePoint(point: any, rotation: any) {
+  const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(rotation);
+  return point.applyMatrix4(rotationMatrix);
 }

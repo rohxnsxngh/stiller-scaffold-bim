@@ -46,6 +46,7 @@ import {
   resetScaffolding,
   resetScene,
   returnObjectsToOriginalState,
+  rotatePoint,
   saveAsImage,
   updateScaffoldingData,
 } from "./utilities/helper";
@@ -96,6 +97,7 @@ let labels: any;
 let roofToggleState: number = 0;
 let controls: OrbitControls;
 let viewHelper: any;
+let rotateObject = false;
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -630,9 +632,6 @@ export const createModelView = async () => {
 
         // Store initial world position of the group
         const initialWorldPosition = new THREE.Vector3();
-        // if (!initialWorldPosition) {
-
-        // }
         group.getWorldPosition(initialWorldPosition);
 
         const initialWorldPositionChildren = new THREE.Vector3();
@@ -640,6 +639,12 @@ export const createModelView = async () => {
         console.log(
           "initialWorldPositionChildren",
           initialWorldPositionChildren
+        );
+
+        // At the beginning of your transform control setup:
+        const initialGroupRotation = new THREE.Euler().copy(group.rotation);
+        const initialChildRotations = group.children.map((child) =>
+          new THREE.Euler().copy(child.rotation)
         );
 
         group.add(...geometriesToMove);
@@ -653,7 +658,19 @@ export const createModelView = async () => {
           //@ts-ignore
           components.renderer._renderer.domElement
         );
-        transformControls.showY = false;
+
+        if (rotateObject) {
+          transformControls.setMode("rotate");
+          transformControls.showY = true;
+          transformControls.showX = true;
+          transformControls.showZ = true;
+        } else {
+          transformControls.setMode("translate");
+          transformControls.showY = false;
+          transformControls.showX = true;
+          transformControls.showZ = true;
+        }
+
         if (
           mesh.name !== "ground" &&
           mesh.name !== "grid" &&
@@ -703,6 +720,17 @@ export const createModelView = async () => {
             initialWorldPosition.z
           );
 
+          // Handle rotation
+          const finalGroupRotation = new THREE.Euler().copy(group.rotation);
+          const rotationDifference = new THREE.Euler(
+            finalGroupRotation.x - initialGroupRotation.x,
+            finalGroupRotation.y - initialGroupRotation.y,
+            finalGroupRotation.z - initialGroupRotation.z
+          );
+
+          // Reset group rotation
+          group.rotation.copy(initialGroupRotation);
+
           // Update children
           group.children.forEach((child) => {
             // Update shape
@@ -710,14 +738,25 @@ export const createModelView = async () => {
               const newShape = new THREE.Shape();
               child.userData.shape.curves.forEach((curve) => {
                 if (curve instanceof THREE.LineCurve) {
-                  const startPoint = curve.v1
-                    .clone()
-                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
-                  const endPoint = curve.v2
-                    .clone()
-                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
-                  newShape.moveTo(startPoint.x, startPoint.y);
-                  newShape.lineTo(endPoint.x, endPoint.y);
+                  if (rotateObject) {
+                    // Rotate the start and end points of each curve
+                    const startPoint = rotatePoint(
+                      curve.v1,
+                      rotationDifference
+                    );
+                    const endPoint = rotatePoint(curve.v2, rotationDifference);
+                    newShape.moveTo(startPoint.x, startPoint.y);
+                    newShape.lineTo(endPoint.x, endPoint.y);
+                  } else {
+                    const startPoint = curve.v1
+                      .clone()
+                      .add(new THREE.Vector2(xDisplacement, zDisplacement));
+                    const endPoint = curve.v2
+                      .clone()
+                      .add(new THREE.Vector2(xDisplacement, zDisplacement));
+                    newShape.moveTo(startPoint.x, startPoint.y);
+                    newShape.lineTo(endPoint.x, endPoint.y);
+                  }
                 }
               });
               child.userData.shape = newShape;
@@ -726,6 +765,18 @@ export const createModelView = async () => {
             // Update position
             child.position.x += xDisplacement;
             child.position.z += zDisplacement;
+
+            // Rotate the child's position
+            const rotatedPosition = rotatePoint(
+              child.position,
+              rotationDifference
+            );
+            child.position.copy(rotatedPosition);
+
+            // Apply the rotation to the child
+            child.rotation.x += rotationDifference.x;
+            child.rotation.y += rotationDifference.y;
+            child.rotation.z += rotationDifference.z;
 
             // Update matrices
             child.updateMatrix();
@@ -739,20 +790,6 @@ export const createModelView = async () => {
           group.updateMatrixWorld(true);
 
           console.log("After transformation:", group);
-        });
-
-        window.addEventListener("keydown", function (event: KeyboardEvent) {
-          switch (event.key) {
-            case "g":
-              transformControls.setMode("translate");
-              break;
-            case "r":
-              transformControls.setMode("rotate");
-              break;
-            case "s":
-              transformControls.setMode("scale");
-              break;
-          }
         });
       }
     }
@@ -1712,6 +1749,12 @@ export const createModelView = async () => {
 
   observeElementAndAddEventListener("move-geometry", "mousedown", () => {
     setMovingGeometry(true);
+    rotateObject = false;
+  });
+
+  observeElementAndAddEventListener("rotate-geometry", "mousedown", () => {
+    setMovingGeometry(true);
+    rotateObject = true;
   });
 
   // Add a basic plane

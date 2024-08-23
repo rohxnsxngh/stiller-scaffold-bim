@@ -56,6 +56,15 @@
     </div>
     <div class="flex flex-col mx-4">
       <div
+        class="btn btn-md bg-[#8B4000] rounded-lg border-2 border-[#F28C28]"
+        id="rotate-geometry"
+      >
+        <i class="material-symbols-outlined text-[#F28C28]">settings_backup_restore</i>
+      </div>
+      <div><p class="text-xs text-center mt-2">Rotate Building</p></div>
+    </div>
+    <div class="flex flex-col mx-4">
+      <div
         class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
         id="screenshot-button"
       >
