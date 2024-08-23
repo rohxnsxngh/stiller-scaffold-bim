@@ -41,7 +41,7 @@
         class="btn btn-md bg-[#355E3B] rounded-lg border-2 border-[#0BDA51]"
         id="move-geometry"
       >
-        <i class="material-symbols-outlined text-[#0BDA51]">drag_pan</i>
+        <i class="material-symbols-outlined text-[#0BDA51]">drag_click</i>
       </div>
       <div><p class="text-xs text-center mt-2">Move Building</p></div>
     </div>
@@ -72,5 +72,14 @@
       </div>
       <div><p class="text-xs text-center mt-2">Capture Scene</p></div>
     </div>
+    <!-- <div class="flex flex-col mx-4">
+      <div
+        class="btn btn-md bg-[#221F41] rounded-lg border-2 border-[#623CEA]"
+        id="free-pan"
+      >
+        <i class="material-symbols-outlined text-[#623CEA]">drag_pan</i>
+      </div>
+      <div><p class="text-xs text-center mt-2">Move Building</p></div>
+    </div> -->
   </div>
 </template>

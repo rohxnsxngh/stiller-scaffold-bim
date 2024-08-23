@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import {
   cameraDisableOrbitalFunctionality,
   cameraEnableOrbitalFunctionality,
+  cameraEnablePanningFunctionality,
   cameraTopView,
 } from "./camera";
 import {
@@ -401,6 +402,20 @@ export const createToolbar = (
     setIsDrawingBlueprint(false);
   });
 
+  observeElementAndAddEventListener("free-pan", "mousedown", () => {
+    document.body.style.cursor = "grab";
+    selected.updateSelected("Free Rotate");
+    startDrawing = false;
+    cameraEnablePanningFunctionality(gsap, components.camera);
+    setStates();
+  });
+
+  observeElementAndAddEventListener("free-pan", "mouseenter", () => {
+    setStates();
+    removeHighlightMesh(scene);
+    setIsDrawingBlueprint(false);
+  });
+
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     document.body.style.cursor = "auto";
     selected.updateSelected("Delete Object");
@@ -653,6 +668,14 @@ export const createToolbar = (
     cameraTopView(gsap, components.camera);
     //@ts-ignore
     components.camera.setProjection("Orthographic");
+    //@ts-ignore
+    components.camera.controls.mouseButtons.left = 1; // 1
+    //@ts-ignore
+    components.camera.controls.mouseButtons.middle = 8; // 8
+    //@ts-ignore
+    components.camera.controls.mouseButtons.right = 2; // 2
+    //@ts-ignore
+    components.camera.controls.mouseButtons.wheel = 8; // 8
     //@ts-ignore
     componentInstance.$data.activeButton = 0;
     removeHighlightMesh(scene);

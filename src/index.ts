@@ -124,6 +124,15 @@ export const createModelView = async () => {
     components.renderer._renderer.domElement
   );
 
+  //@ts-ignore
+  components.camera.controls.mouseButtons.left = 1; // 1
+  //@ts-ignore
+  components.camera.controls.mouseButtons.middle = 16; // 8
+  //@ts-ignore
+  components.camera.controls.mouseButtons.right = 0; // 2
+  //@ts-ignore
+  components.camera.controls.mouseButtons.wheel = 16; // 8
+
   // Obit Controls Gizmo
   viewHelper = new OrbitViewHelper(
     controls,
@@ -1907,11 +1916,27 @@ export const createModelView = async () => {
   observeElementAndAddEventListener("toggle-orthographic", "mousedown", () => {
     //@ts-ignore
     components.camera.setProjection("Orthographic");
+    //@ts-ignore
+    components.camera.controls.mouseButtons.left = 1; // 1
+    //@ts-ignore
+    components.camera.controls.mouseButtons.middle = 8; // 8
+    //@ts-ignore
+    components.camera.controls.mouseButtons.right = 2; // 2
+    //@ts-ignore
+    components.camera.controls.mouseButtons.wheel = 8; // 8
   });
 
   observeElementAndAddEventListener("toggle-perspective", "mousedown", () => {
     //@ts-ignore
     components.camera.setProjection("Perspective");
+    //@ts-ignore
+    components.camera.controls.mouseButtons.left = 1; // 1
+    //@ts-ignore
+    components.camera.controls.mouseButtons.middle = 16; // 8
+    //@ts-ignore
+    components.camera.controls.mouseButtons.right = 0; // 2
+    //@ts-ignore
+    components.camera.controls.mouseButtons.wheel = 16; // 8
   });
 
   // @ts-ignore

@@ -28,6 +28,7 @@ export function cameraPerspectiveView(gsap: any, camera: any) {
       camera.controls.enablePan = true;
       camera.controls.enableZoom = true;
       camera.controls.screenSpacePanning = true;
+      camera.controls.mouseButtons.right = 0
     },
   });
 }
@@ -79,6 +80,28 @@ export function cameraEnableOrbitalFunctionality(gsap: any, camera: any) {
       camera.controls.screenSpacePanning = true;
       camera.controls.azimuthRotateSpeed = 1;
       camera.controls.maxPolarAngle = Math.PI;
+    },
+  });
+}
+
+export function cameraEnablePanningFunctionality(gsap: any, camera: any) {
+  gsap.to(camera.activeCamera.position, {
+    duration: 0.1,
+    ease: "power1.inOut",
+    onUpdated: () => {
+      console.error(camera.controls)
+    },
+    onComplete: () => {
+      camera.controls.enabled = true;
+      camera.controls.dollyToCursor = true;
+      camera.controls.enablePan = true;
+      camera.controls.enableZoom = true;
+      camera.controls.screenSpacePanning = true;
+      camera.controls.azimuthRotateSpeed = 0;
+      // camera.controls.maxAzimuthAngle = 0
+      camera.controls.polarRotateSpeed = 0
+      camera.controls.maxPolarAngle = Math.PI;
+      camera.controls.dragToOffset = true
     },
   });
 }
