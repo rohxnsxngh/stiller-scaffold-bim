@@ -169,6 +169,7 @@ export function resetScene(
     }
   });
   objectsToRemove.forEach((object: any) => {
+    deleteObject(object, scene)
     scene.remove(object);
   });
 

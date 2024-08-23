@@ -79,6 +79,7 @@ import {
   setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
   setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
+  setStates,
 } from "./utilities/state";
 import gsap from "gsap";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
@@ -1291,7 +1292,7 @@ export const createModelView = async () => {
       );
     }
   });
-  
+
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
     setDeletionInProgress(false);
     if (drawingScaffoldingInProgress) {
@@ -1365,18 +1366,14 @@ export const createModelView = async () => {
     "autogenerate-scaffolding",
     "mousedown",
     () => {
-      setDeletionInProgress(false);
       hideAllCSS2DObjects(scene);
+
       scene.traverse((child: any) => {
         if (child instanceof THREE.Mesh && child.name === "blueprint") {
           generateScaffoldOutline(child, scene);
         }
       });
-      // scene.traverse((child: any) => {
-      //   if (child.name === "scaffoldLine") {
-      //     console.error(child)
-      //   }
-      // });
+
       generateScaffolding();
     }
   );

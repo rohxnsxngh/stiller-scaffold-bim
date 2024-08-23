@@ -109,11 +109,20 @@ export const createToolbar = (
   fragmentIfcLoader.settings.webIfc.OPTIMIZE_PROFILES = true;
   fragmentIfcLoader.setup();
 
+  const fragmentBox = new OBC.FragmentBoundingBox(components);
+  console.warn("fragment box", fragmentBox);
+
+  fragments.onFragmentsLoaded.add((model) => {
+    console.error(model);
+  });
+
   observeElementAndAddEventListener("upload-ifc", "mousedown", () => {
     setStates();
     console.log("uploading ifc model");
     selected.updateSelected(ifcButton.name);
     ifcButton.domElement.click();
+    // console.log(model)
+    // fragments.load(model)
   });
 
   const ifcButton = fragmentIfcLoader.uiElement.get("main");
@@ -157,11 +166,11 @@ export const createToolbar = (
   topToolBar.addChild(blueprintMenuButton);
   blueprintMenuButton.onClick.add(() => {
     setStates();
-    // if (titleElement) {
-    //   titleElement.textContent = "Plantegning og bygg";
-    // }
+    if (titleElement) {
+      titleElement.textContent = "Plantegning og bygg";
+    }
     // @ts-ignore
-    // window.setActiveSection("blueprint");
+    window.setActiveSection("blueprint");
   });
   blueprintMenuButton.domElement.addEventListener("mouseover", () => {
     setStates();
@@ -184,11 +193,11 @@ export const createToolbar = (
   topToolBar.addChild(roofMenuButton);
   roofMenuButton.onClick.add(() => {
     setStates();
-    // if (titleElement) {
-    //   titleElement.textContent = "Tak";
-    // }
+    if (titleElement) {
+      titleElement.textContent = "Tak";
+    }
     // @ts-ignore
-    // window.setActiveSection("roof");
+    window.setActiveSection("roof");
   });
   roofMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   roofMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -216,11 +225,11 @@ export const createToolbar = (
   topToolBar.addChild(scaffoldMenuButton);
   scaffoldMenuButton.onClick.add(() => {
     setStates();
-    // if (titleElement) {
-    //   titleElement.textContent = "Stillas";
-    // }
+    if (titleElement) {
+      titleElement.textContent = "Stillas";
+    }
     // @ts-ignore
-    // window.setActiveSection("scaffold");
+    window.setActiveSection("scaffold");
   });
   scaffoldMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   scaffoldMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -260,11 +269,11 @@ export const createToolbar = (
   topToolBar.addChild(suppliesMenuButton);
   suppliesMenuButton.onClick.add(() => {
     setStates();
-    // if (titleElement) {
-    //   titleElement.textContent = "Tillegg";
-    // }
-    // // @ts-ignore
-    // window.setActiveSection("supply");
+    if (titleElement) {
+      titleElement.textContent = "Tillegg";
+    }
+    // @ts-ignore
+    window.setActiveSection("supply");
   });
   suppliesMenuButton.domElement.classList.remove("hover:bg-ifcjs-200");
   suppliesMenuButton.domElement.classList.add("hover:bg-slate-300");
@@ -340,6 +349,27 @@ export const createToolbar = (
   observeElementAndAddEventListener("top-view", "mouseover", () => {
     // setStates();
   });
+
+  // autogenerate scaffolding
+  observeElementAndAddEventListener(
+    "autogenerate-scaffolding",
+    "mousedown",
+    () => {
+      document.body.style.cursor = "grab";
+      selected.updateSelected("Free Rotate");
+      startDrawing = false;
+      cameraEnableOrbitalFunctionality(gsap, components.camera);
+      setStates();
+    }
+  );
+
+  observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
+    document.body.style.cursor = "grab";
+    selected.updateSelected("Free Rotate");
+    startDrawing = false;
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    setStates();
+  })
 
   observeElementAndAddEventListener("free-rotate", "mousedown", () => {
     document.body.style.cursor = "grab";
