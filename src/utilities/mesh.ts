@@ -1924,12 +1924,13 @@ export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {
 }
 
 export function rotateBlueprint(
-  shape: THREE.Shape,
+  blueprint: any,
   scene: THREE.Scene,
   angle: number
 ) {
   // 1. Calculate the center of the shape
-  const boundingBox = new THREE.Box2().setFromPoints(shape.getPoints());
+  const oldShape = blueprint.shape;
+  const boundingBox = new THREE.Box2().setFromPoints(oldShape.getPoints());
   const center = boundingBox.getCenter(new THREE.Vector2());
 
   // 2. Define the angle of rotation (in radians)
@@ -1938,7 +1939,7 @@ export function rotateBlueprint(
   const shapePoints: { x: number; y: number }[] = [];
 
   // 3. Rotate the points around the center
-  shape.getPoints().forEach((point) => {
+  oldShape.getPoints().forEach((point: any) => {
     const translatedPoint = new THREE.Vector2(
       point.x - center.x,
       point.y - center.y
@@ -1956,28 +1957,7 @@ export function rotateBlueprint(
     });
   });
 
-  console.warn("shape points after rotation", shapePoints, shape);
-
-  // 5. Update the shape with the new points (if necessary)
-  // shape.setFromPoints(shapePoints.map(p => new THREE.Vector2(p.x, p.y)));
-
-  // // 5. Create a new shape from the rotated points
-  // const newShape = new THREE.Shape(
-  //   shapePoints.map((p) => new THREE.Vector2(p.x, p.y))
-  // );
-
-  // // 6. Create a geometry from the new shape
-  // const geometry = new THREE.ShapeGeometry(newShape);
-
-  // // 7. Create a material for the mesh
-  // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide }); // Example: green color
-
-  // // 8. Create a mesh from the geometry and material
-  // const mesh = new THREE.Mesh(geometry, material);
-  // mesh.rotateX(Math.PI / 2);
-
-  // // 9. Add the mesh to the scene
-  // scene.add(mesh);
+  console.warn("shape points after rotation", shapePoints, oldShape);
 
   // Create shape
   if (shapePoints.length >= 3) {
@@ -1998,22 +1978,23 @@ export function rotateBlueprint(
     meshShape.rotateX(Math.PI / 2);
     meshShape.position.y = 0.025;
     meshShape.name = "blueprint";
-    meshShape.userData = { shape: shape, blueprintHasBeenUpdated: false };
-    const isBlueprintAlreadyPlaced = scene.children.some((child) => {
-      return (
-        child.name === "blueprint" &&
-        child.userData.shape.currentPoint.equals(
-          meshShape.userData.shape.currentPoint
-        )
-      );
-    });
-    if (!isBlueprintAlreadyPlaced) {
-      scene.add(meshShape);
-    }
-    scene.traverse((child) => {
-      if (child.name === "blueprint") {
-        console.log("blueprint", child);
-      }
-    });
+    blueprint.shape = shape;
+    // meshShape.userData = { shape: shape, blueprintHasBeenUpdated: false };
+    // const isBlueprintAlreadyPlaced = scene.children.some((child) => {
+    //   return (
+    //     child.name === "blueprint" &&
+    //     child.userData.shape.currentPoint.equals(
+    //       meshShape.userData.shape.currentPoint
+    //     )
+    //   );
+    // });
+    // if (!isBlueprintAlreadyPlaced) {
+    //   // scene.add(meshShape);
+    // }
+    // scene.traverse((child) => {
+    //   if (child.name === "blueprint") {
+    //     console.log("blueprint", child);
+    //   }
+    // });
   }
 }

@@ -737,6 +737,9 @@ export const createModelView = async () => {
             finalGroupRotation.y - initialGroupRotation.y,
             finalGroupRotation.z - initialGroupRotation.z
           );
+          // Calculate the difference in rotation around the y-axis only
+          const rotationDifferenceY =
+            finalGroupRotation.y - initialGroupRotation.y;
 
           console.warn(
             "ROTATION DEBUG: ",
@@ -768,17 +771,25 @@ export const createModelView = async () => {
               child.userData.shape = newShape;
             }
 
-            if (child.userData.shape instanceof THREE.Shape && rotateObject) {
-              // Example: Calculate the total rotation magnitude in radians
-              const totalGroupRotationMagnitude = new THREE.Vector3(
-                finalGroupRotation.x,
-                finalGroupRotation.y,
-                finalGroupRotation.z
-              ).length();
-              console.warn("ROTATION RADIANS",totalGroupRotationMagnitude);
-              rotateBlueprint(child.userData.shape, scene, -totalGroupRotationMagnitude);
-              deleteObject(child, scene);
-            }
+            // if (
+            //   child.userData.shape instanceof THREE.Shape &&
+            //   rotateObject &&
+            //   child.name === "blueprint"
+            // ) {
+            //   // Example: Calculate the total rotation magnitude in radians
+            //   const totalGroupRotationMagnitude = new THREE.Vector3(
+            //     finalGroupRotation.x,
+            //     finalGroupRotation.y,
+            //     finalGroupRotation.z
+            //   ).length();
+            //   console.warn("ROTATION RADIANS", rotationDifferenceY);
+            //   rotateBlueprint(
+            //     child.userData,
+            //     scene,
+            //     -rotationDifferenceY
+            //   );
+            //   // deleteObject(child, scene);
+            // }
 
             // Update position
             child.position.x += xDisplacement;
