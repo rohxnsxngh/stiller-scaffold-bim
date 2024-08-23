@@ -11,6 +11,7 @@ import {
   editBlueprint,
   createBlueprintFromMarkup,
   createFlatRoof,
+  rotateBlueprint,
 } from "./utilities/mesh";
 import {
   createScaffoldingShapeIsOutlined,
@@ -32,9 +33,6 @@ import {
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
-  calculateTotalAmountScaffoldingInScene,
-  calculateTotalSquareMetersForBlueprint,
-  calculateTotalSquareMetersForScaffolding,
   calculateTransformedBoundingBox,
   debounce,
   deleteObject,
@@ -46,13 +44,12 @@ import {
   resetScaffolding,
   resetScene,
   returnObjectsToOriginalState,
-  rotatePoint,
   saveAsImage,
   updateScaffoldingData,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
-import { supplyStore, uploadImageStore, useStore } from "./store";
+import { uploadImageStore, useStore } from "./store";
 import {
   deleteBuilding,
   deletionInProgress,
@@ -655,10 +652,10 @@ export const createModelView = async () => {
         );
 
         // At the beginning of your transform control setup:
-        // const initialGroupRotation = new THREE.Euler().copy(group.rotation);
-        // const initialChildRotations = group.children.map((child) =>
-        //   new THREE.Euler().copy(child.rotation)
-        // );
+        const initialGroupRotation = new THREE.Euler().copy(group.rotation);
+        const initialChildRotations = group.children.map((child) =>
+          new THREE.Euler().copy(child.rotation)
+        );
 
         group.add(...geometriesToMove);
         console.warn(group);
@@ -675,8 +672,8 @@ export const createModelView = async () => {
         if (rotateObject) {
           transformControls.setMode("rotate");
           transformControls.showY = true;
-          transformControls.showX = true;
-          transformControls.showZ = true;
+          transformControls.showX = false;
+          transformControls.showZ = false;
         } else {
           transformControls.setMode("translate");
           transformControls.showY = false;
@@ -734,12 +731,19 @@ export const createModelView = async () => {
           );
 
           // Handle rotation
-          // const finalGroupRotation = new THREE.Euler().copy(group.rotation);
-          // const rotationDifference = new THREE.Euler(
-          //   finalGroupRotation.x - initialGroupRotation.x,
-          //   finalGroupRotation.y - initialGroupRotation.y,
-          //   finalGroupRotation.z - initialGroupRotation.z
-          // );
+          const finalGroupRotation = new THREE.Euler().copy(group.rotation);
+          const rotationDifference = new THREE.Euler(
+            finalGroupRotation.x - initialGroupRotation.x,
+            finalGroupRotation.y - initialGroupRotation.y,
+            finalGroupRotation.z - initialGroupRotation.z
+          );
+
+          console.warn(
+            "ROTATION DEBUG: ",
+            initialGroupRotation,
+            finalGroupRotation,
+            rotationDifference
+          );
 
           // Reset group rotation
           // group.rotation.copy(initialGroupRotation);
@@ -762,6 +766,18 @@ export const createModelView = async () => {
                 }
               });
               child.userData.shape = newShape;
+            }
+
+            if (child.userData.shape instanceof THREE.Shape && rotateObject) {
+              // Example: Calculate the total rotation magnitude in radians
+              const totalGroupRotationMagnitude = new THREE.Vector3(
+                finalGroupRotation.x,
+                finalGroupRotation.y,
+                finalGroupRotation.z
+              ).length();
+              console.warn("ROTATION RADIANS",totalGroupRotationMagnitude);
+              rotateBlueprint(child.userData.shape, scene, -totalGroupRotationMagnitude);
+              deleteObject(child, scene);
             }
 
             // Update position

@@ -607,7 +607,7 @@ function attachLabelChangeHandler(
   // Add an event listener to restrict input to numbers only
   labelElement.addEventListener("input", () => {
     blurTriggered = true;
-    console.error(labelElement.textContent)
+    console.error(labelElement.textContent);
     const regex = /[^0-9m.]/g;
     labelElement.textContent =
       labelElement.textContent?.replace(regex, "") ?? null;
@@ -1920,5 +1920,100 @@ export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {
     //  markupGroup.add(markup);
 
     //  return [markup, labels];
+  }
+}
+
+export function rotateBlueprint(
+  shape: THREE.Shape,
+  scene: THREE.Scene,
+  angle: number
+) {
+  // 1. Calculate the center of the shape
+  const boundingBox = new THREE.Box2().setFromPoints(shape.getPoints());
+  const center = boundingBox.getCenter(new THREE.Vector2());
+
+  // 2. Define the angle of rotation (in radians)
+  // const angle = Math.PI / 4; // Example: rotate by 45 degrees
+
+  const shapePoints: { x: number; y: number }[] = [];
+
+  // 3. Rotate the points around the center
+  shape.getPoints().forEach((point) => {
+    const translatedPoint = new THREE.Vector2(
+      point.x - center.x,
+      point.y - center.y
+    );
+    const rotatedX =
+      translatedPoint.x * Math.cos(angle) - translatedPoint.y * Math.sin(angle);
+    const rotatedY =
+      translatedPoint.x * Math.sin(angle) + translatedPoint.y * Math.cos(angle);
+
+    // 4. Update your data structure
+    // Assuming shapePoints is an array of { x: number, y: number }
+    shapePoints.push({
+      x: rotatedX + center.x,
+      y: rotatedY + center.y,
+    });
+  });
+
+  console.warn("shape points after rotation", shapePoints, shape);
+
+  // 5. Update the shape with the new points (if necessary)
+  // shape.setFromPoints(shapePoints.map(p => new THREE.Vector2(p.x, p.y)));
+
+  // // 5. Create a new shape from the rotated points
+  // const newShape = new THREE.Shape(
+  //   shapePoints.map((p) => new THREE.Vector2(p.x, p.y))
+  // );
+
+  // // 6. Create a geometry from the new shape
+  // const geometry = new THREE.ShapeGeometry(newShape);
+
+  // // 7. Create a material for the mesh
+  // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide }); // Example: green color
+
+  // // 8. Create a mesh from the geometry and material
+  // const mesh = new THREE.Mesh(geometry, material);
+  // mesh.rotateX(Math.PI / 2);
+
+  // // 9. Add the mesh to the scene
+  // scene.add(mesh);
+
+  // Create shape
+  if (shapePoints.length >= 3) {
+    let shape = new THREE.Shape();
+    shape.moveTo(shapePoints[0].x, shapePoints[0].y);
+    for (let i = 1; i < shapePoints.length; i++) {
+      shape.lineTo(shapePoints[i].x, shapePoints[i].y);
+    }
+    shape.lineTo(shapePoints[0].x, shapePoints[0].y); // close the shape
+
+    // Create mesh from shape
+    const geometryShape = new THREE.ShapeGeometry(shape);
+    const materialShape = new THREE.MeshBasicMaterial({
+      color: 0x7f1d1d,
+      side: THREE.DoubleSide,
+    });
+    const meshShape = new THREE.Mesh(geometryShape, materialShape);
+    meshShape.rotateX(Math.PI / 2);
+    meshShape.position.y = 0.025;
+    meshShape.name = "blueprint";
+    meshShape.userData = { shape: shape, blueprintHasBeenUpdated: false };
+    const isBlueprintAlreadyPlaced = scene.children.some((child) => {
+      return (
+        child.name === "blueprint" &&
+        child.userData.shape.currentPoint.equals(
+          meshShape.userData.shape.currentPoint
+        )
+      );
+    });
+    if (!isBlueprintAlreadyPlaced) {
+      scene.add(meshShape);
+    }
+    scene.traverse((child) => {
+      if (child.name === "blueprint") {
+        console.log("blueprint", child);
+      }
+    });
   }
 }

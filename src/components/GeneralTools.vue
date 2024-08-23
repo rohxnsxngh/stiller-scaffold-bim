@@ -61,7 +61,7 @@
       >
         <i class="material-symbols-outlined text-[#FF8C00]">settings_backup_restore</i>
       </div>
-      <div><p class="text-xs text-center mt-2">Rotate Building</p></div>
+      <div><p class="text-xs text-center mt-2">Rotate Blueprint</p></div>
     </div>
     <div class="flex flex-col mx-4">
       <div
