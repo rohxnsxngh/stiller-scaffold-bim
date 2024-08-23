@@ -365,7 +365,7 @@ export const createToolbar = (
   );
 
   observeElementAndAddEventListener("move-geometry", "mousedown", () => {
-    selected.updateSelected("Move Buildings By Selecting");
+    selected.updateSelected("Flytt bygning valgt, klikk på en bygning");
     // const selectedTool = document.getElementById("selected-tool");
     // if (selectedTool) {
     //   selectedTool.style.backgroundColor = "#111115";
@@ -373,11 +373,11 @@ export const createToolbar = (
   });
 
   observeElementAndAddEventListener("rotate-geometry", "mousedown", () => {
-    selected.updateSelected("Rotate Buildings By Selecting");
+    selected.updateSelected("Roter valgt bygning, klikk på en bygning");
   });
 
   observeElementAndAddEventListener("delete-building", "mousedown", () => {
-    selected.updateSelected("Delete Building By Selecting");
+    selected.updateSelected("Slett valgt bygning, klikk på en bygning");
   });
 
   observeElementAndAddEventListener("generate-scaffolding", "mousedown", () => {
