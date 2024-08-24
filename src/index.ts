@@ -423,7 +423,8 @@ export const createModelView = async () => {
         if (
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
-          intersectedObject.name !== "grid"
+          intersectedObject.name !== "grid" &&
+          intersectedObject.name !== "scaffoldingSheet"
         ) {
           console.warn("highlighting");
           resetLastHighlightedObject();
@@ -540,12 +541,16 @@ export const createModelView = async () => {
   let points: THREE.Vector3[] = [];
   let scaffoldPoints: THREE.Vector3[] = [];
 
-  window.addEventListener("mousedown", async () => {
+  observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
+    scaffoldPoints = [];
+  });
+
+  window.addEventListener("mousedown", async (event) => {
     if (drawingInProgress && drawingInProgressSwitch) {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
-    if (drawingScaffoldingInProgress) {
+    if (drawingScaffoldingInProgress && event.button === 0) {
       // create blueprint on screen after the shape has been outlined by the user
       createScaffoldingShapeIsOutlined(
         intersects,
@@ -783,11 +788,7 @@ export const createModelView = async () => {
                 finalGroupRotation.z
               ).length();
               console.warn("ROTATION RADIANS", rotationDifferenceY);
-              rotateBlueprint(
-                child.userData,
-                scene,
-                -rotationDifferenceY
-              );
+              rotateBlueprint(child.userData, scene, -rotationDifferenceY);
               // deleteObject(child, scene);
             }
 
@@ -1950,7 +1951,9 @@ export const createModelView = async () => {
     //@ts-ignore
     components.camera.controls.mouseButtons.right = 2; // 2
     //@ts-ignore
-    components.camera.controls.mouseButtons.wheel = 8; // 8
+    components.camera.controls.mouseButtons.wheel = 0; // 8
+    //@ts-ignore
+    components.camera.controls.enableZoom = false;
   });
 
   observeElementAndAddEventListener("toggle-perspective", "mousedown", () => {
@@ -1964,6 +1967,8 @@ export const createModelView = async () => {
     components.camera.controls.mouseButtons.right = 0; // 2
     //@ts-ignore
     components.camera.controls.mouseButtons.wheel = 16; // 8
+    //@ts-ignore
+    components.camera.controls.enableZoom = true;
   });
 
   // @ts-ignore

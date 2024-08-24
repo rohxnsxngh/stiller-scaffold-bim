@@ -182,6 +182,7 @@ export function resetScene(
   });
   scaffoldPlacedPosition.clear();
   console.log(scene, components, shadows, scaffoldPlacedPosition);
+  window.location.reload()
 }
 
 // helper function to measure line length

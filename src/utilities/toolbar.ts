@@ -432,13 +432,9 @@ export const createToolbar = (
     setStates();
   });
 
-  // observeElementAndAddEventListener("move-geometry", "mousedown", () => {
-  //   selected.updateSelected("Move Building");
-  // });
-
-  // observeElementAndAddEventListener("delete-building", "mousedown", () => {
-  //   selected.updateSelected("Delete Building");
-  // });
+  observeElementAndAddEventListener("rotate-roof", "mousedown", () => {
+    selected.updateSelected("Rotér tak");
+  })
 
   observeElementAndAddEventListener("reset-scene", "mouseover", () => {
     setStates();
@@ -675,7 +671,9 @@ export const createToolbar = (
     //@ts-ignore
     components.camera.controls.mouseButtons.right = 2; // 2
     //@ts-ignore
-    components.camera.controls.mouseButtons.wheel = 8; // 8
+    components.camera.controls.mouseButtons.wheel = 0; // 8
+    //@ts-ignore
+    components.camera.controls.enableZoom = false;
     //@ts-ignore
     componentInstance.$data.activeButton = 0;
     removeHighlightMesh(scene);
