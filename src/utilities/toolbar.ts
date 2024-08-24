@@ -950,8 +950,15 @@ export const createToolbar = (
   drawer.domElement.addEventListener("mouseleave", () => {
     if (startDrawing) {
       setDrawingInProgress(true);
+      setDrawingScaffoldingInProgress(true)
     }
   });
+  drawer.domElement.addEventListener("mouseenter", () => {
+    if (startDrawing) {
+      // setDrawingInProgress(false);
+      setDrawingScaffoldingInProgress(false)
+    }
+  })
   components.ui.add(drawer);
   console.log(drawer);
 
