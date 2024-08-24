@@ -424,7 +424,8 @@ export const createModelView = async () => {
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
           intersectedObject.name !== "grid" &&
-          intersectedObject.name !== "scaffoldingSheet"
+          intersectedObject.name !== "scaffoldingSheet" &&
+          intersectedObject.name !== "blueprint"
         ) {
           console.warn("highlighting");
           resetLastHighlightedObject();
