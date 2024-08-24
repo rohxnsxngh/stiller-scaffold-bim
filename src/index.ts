@@ -550,15 +550,23 @@ export const createModelView = async () => {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
-    if (drawingScaffoldingInProgress && event.button === 0) {
+    if (drawingScaffoldingInProgress) {
+      event.preventDefault()
       // create blueprint on screen after the shape has been outlined by the user
-      createScaffoldingShapeIsOutlined(
-        intersects,
-        scaffoldPoints,
-        highlightMesh,
-        scene,
-        cube
-      );
+      if (event.button === 0) {
+        createScaffoldingShapeIsOutlined(
+          intersects,
+          scaffoldPoints,
+          highlightMesh,
+          scene,
+          cube
+        );
+      }
+      if (event.button === 2) {
+        document.addEventListener("contextmenu", (event) => {
+          event.preventDefault(); // Prevent the context menu from appearing
+        });
+      }
     }
     if (deletionInProgress && !drawingInProgress) {
       if (intersects.length > 0) {
