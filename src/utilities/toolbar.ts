@@ -6,6 +6,8 @@ import {
   cameraEnableOrbitalFunctionality,
   cameraEnablePanningFunctionality,
   cameraTopView,
+  toggleCameraOrthographic,
+  toggleCameraPerspective,
 } from "./camera";
 import {
   observeElementAndAddEventListener,
@@ -417,6 +419,9 @@ export const createToolbar = (
   });
 
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
+    startDrawing = false;
+    cameraEnableOrbitalFunctionality(gsap, components.camera);
+    toggleCameraPerspective(components)
     document.body.style.cursor = "auto";
     selected.updateSelected("Delete Object");
     removeHighlightMesh(scene);
@@ -434,7 +439,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("rotate-roof", "mousedown", () => {
     selected.updateSelected("Rotér tak");
-  })
+  });
 
   observeElementAndAddEventListener("reset-scene", "mouseover", () => {
     setStates();
@@ -658,38 +663,32 @@ export const createToolbar = (
   drawScaffoldButton.domElement.classList.remove("hover:bg-ifcjs-200");
   drawScaffoldButton.domElement.classList.add("hover:bg-slate-300");
 
+  observeElementAndAddEventListener("toggle-orthographic", "mousedown", () => {
+    //@ts-ignore
+    componentInstance.$data.activeButton = 0;
+  });
+
+  observeElementAndAddEventListener("toggle-perspective", "mousedown", () => {
+    //@ts-ignore
+    componentInstance.$data.activeButton = 1;
+  });
+
   observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
     startDrawing = true;
     document.body.style.cursor = "auto";
     cameraTopView(gsap, components.camera);
-    //@ts-ignore
-    components.camera.setProjection("Orthographic");
-    //@ts-ignore
-    components.camera.controls.mouseButtons.left = 1; // 1
-    //@ts-ignore
-    components.camera.controls.mouseButtons.middle = 8; // 8
-    //@ts-ignore
-    components.camera.controls.mouseButtons.right = 2; // 2
-    //@ts-ignore
-    components.camera.controls.mouseButtons.wheel = 0; // 8
-    //@ts-ignore
-    components.camera.controls.enableZoom = false;
+    toggleCameraOrthographic(components);
     //@ts-ignore
     componentInstance.$data.activeButton = 0;
     removeHighlightMesh(scene);
-    setDrawingInProgress(false);
-    setDeletionInProgress(false);
-    setDrawingScaffoldingInProgress(false);
-    setDrawingInProgressSwitch(false);
+    setStates();
   });
 
   observeElementAndAddEventListener("draw-scaffold", "mouseleave", () => {
     if (startDrawing) {
       document.body.style.cursor = "auto";
       removeHighlightMesh(scene);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setDrawingScaffoldingInProgress(true);
+      setStates({drawingScaffoldingInProgress: true, drawingInProgress: true})
     }
   });
 
@@ -950,15 +949,15 @@ export const createToolbar = (
   drawer.domElement.addEventListener("mouseleave", () => {
     if (startDrawing) {
       setDrawingInProgress(true);
-      setDrawingScaffoldingInProgress(true)
+      setDrawingScaffoldingInProgress(true);
     }
   });
   drawer.domElement.addEventListener("mouseenter", () => {
     if (startDrawing) {
-      // setDrawingInProgress(false);
-      setDrawingScaffoldingInProgress(false)
+      setDrawingInProgress(false);
+      setDrawingScaffoldingInProgress(false);
     }
-  })
+  });
   components.ui.add(drawer);
   console.log(drawer);
 

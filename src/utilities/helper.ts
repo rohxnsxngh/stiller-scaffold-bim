@@ -182,7 +182,7 @@ export function resetScene(
   });
   scaffoldPlacedPosition.clear();
   console.log(scene, components, shadows, scaffoldPlacedPosition);
-  window.location.reload()
+  window.location.reload();
 }
 
 // helper function to measure line length
@@ -262,6 +262,8 @@ function removeFromScene(object: any, scene: THREE.Scene) {
       } else {
         object.material.dispose();
       }
+    } else {
+      console.warn("Cannot read properties of null:", object.material);
     }
 
     object.parent.remove(object);
@@ -424,7 +426,7 @@ export function calculateTotalSquareMetersForScaffolding(scene: THREE.Scene) {
     }
   });
 
-  console.log("total square meters", totalSquareFootage);
+  // console.log("total square meters", totalSquareFootage);
 
   return totalSquareFootage;
 }
@@ -445,15 +447,15 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
     }
   });
 
-  console.log(
-    `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
-  );
-  console.log(
-    `There are ${scaffoldingExternalStaircaseCount} scaffoldingExternalStaircaseCount objects in the scene.`
-  );
-  console.log(
-    `There are ${scaffoldingInternalStaircaseCount} scaffoldingInternalStaircaseModel objects in the scene.`
-  );
+  // console.log(
+  //   `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
+  // );
+  // console.log(
+  //   `There are ${scaffoldingExternalStaircaseCount} scaffoldingExternalStaircaseCount objects in the scene.`
+  // );
+  // console.log(
+  //   `There are ${scaffoldingInternalStaircaseCount} scaffoldingInternalStaircaseModel objects in the scene.`
+  // );
   return [
     scaffoldingModelCount,
     scaffoldingInternalStaircaseCount,
@@ -797,14 +799,6 @@ export const updateScaffoldingData = (scene: THREE.Scene) => {
     totalSquareFootageOfScaffolding.toFixed(2)
   );
   supply.updateSquareMetersOfBuilding(totalBuildingSquareMeterage.toFixed(2));
-
-  // console.log(
-  //   supply.scaffolding,
-  //   supply.internalScaffolding,
-  //   supply.externalScaffolding,
-  //   supply.squareMetersOfScaffolding,
-  //   supply.squareMetersOfBuilding
-  // );
 };
 
 export function debounce<T extends (...args: any[]) => void>(

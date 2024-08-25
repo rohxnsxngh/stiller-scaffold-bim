@@ -84,6 +84,8 @@ import { TransformControls } from "three/addons/controls/TransformControls.js";
 import {
   cameraDisableOrbitalFunctionalities,
   cameraEnableOrbitalFunctionality,
+  toggleCameraOrthographic,
+  toggleCameraPerspective,
 } from "./utilities/camera";
 import { SceneObserver } from "./utilities/scene";
 import Timeline from "./pages/Timeline.vue";
@@ -404,20 +406,11 @@ export const createModelView = async () => {
               .addScalar(0.5);
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
             break;
-          case "extrusion":
-          case "roof":
-          case "shedRoof":
-          case "blueprint":
-          case "line":
-          case "cubeClone":
-          case "rectangleLine":
-            // Handle other cases if necessary
-            break;
         }
       });
     }
 
-    if (deletionInProgress && !drawingInProgress) {
+    if (deletionInProgress && !drawingInProgress && !drawingScaffoldingInProgress) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
@@ -551,8 +544,8 @@ export const createModelView = async () => {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
-    if (drawingScaffoldingInProgress) {
-      event.preventDefault()
+    if (drawingScaffoldingInProgress && !deletionInProgress) {
+      event.preventDefault();
       // create blueprint on screen after the shape has been outlined by the user
       if (event.button === 0) {
         createScaffoldingShapeIsOutlined(
@@ -1369,18 +1362,38 @@ export const createModelView = async () => {
     }
   });
 
-  observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
-    setDeletionInProgress(false);
-    if (drawingScaffoldingInProgress) {
-      // create blueprint on screen after the shape has been outlined by the user
-      createScaffoldingShapeIsOutlined(
-        intersects,
-        points,
-        highlightMesh,
-        scene,
-        cube
-      );
-    }
+  // observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
+  //   setDeletionInProgress(false);
+  //   console.warn("drawing scaffolding PRETRIGGER", drawingScaffoldingInProgress)
+  //   if (drawingScaffoldingInProgress) {
+  //     console.warn("drawing scaffolding in PROGRESS")
+  //     // create blueprint on screen after the shape has been outlined by the user
+  //     createScaffoldingShapeIsOutlined(
+  //       intersects,
+  //       points,
+  //       highlightMesh,
+  //       scene,
+  //       cube
+  //     );
+  //   }
+  // });
+
+  observeElementAndAddEventListener("draw-scaffold", "mouseleave", () => {
+    console.warn(
+      "drawing scaffolding PRETRIGGER",
+      drawingScaffoldingInProgress
+    );
+    // if (drawingScaffoldingInProgress) {
+    //   console.warn("drawing scaffolding in PROGRESS");
+    //   // create blueprint on screen after the shape has been outlined by the user
+    //   createScaffoldingShapeIsOutlined(
+    //     intersects,
+    //     points,
+    //     highlightMesh,
+    //     scene,
+    //     cube
+    //   );
+    // }
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
@@ -1584,33 +1597,33 @@ export const createModelView = async () => {
 
   const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
 
-  document.addEventListener("mousedown", () => {
-    scene.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        let shadowId: string;
-        if (object.name === "cubeClone") {
-          shadowId = object.uuid;
-        } else if (object.name === "line") {
-          shadowId = object.uuid;
-        } else if (object.name === "blueprint") {
-          shadowId = object.uuid;
-        } else if (object.name === "extrusion") {
-          shadowId = object.uuid;
-        } else if (object.name === "scaffoldingModel") {
-          shadowId = object.uuid;
-        } else {
-          // Skip if the object name is not one of the specified types
-          return;
-        }
+  // document.addEventListener("mousedown", () => {
+  //   scene.traverse((object) => {
+  //     if (object instanceof THREE.Mesh) {
+  //       let shadowId: string;
+  //       if (object.name === "cubeClone") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "line") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "blueprint") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "extrusion") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "scaffoldingModel") {
+  //         shadowId = object.uuid;
+  //       } else {
+  //         // Skip if the object name is not one of the specified types
+  //         return;
+  //       }
 
-        // Check if the shadow ID already exists in the set
-        if (!shadowIds.has(shadowId)) {
-          shadows.renderShadow([object], shadowId);
-          shadowIds.add(shadowId); // Add the shadow ID to the set
-        }
-      }
-    });
-  });
+  //       // Check if the shadow ID already exists in the set
+  //       if (!shadowIds.has(shadowId)) {
+  //         shadows.renderShadow([object], shadowId);
+  //         shadowIds.add(shadowId); // Add the shadow ID to the set
+  //       }
+  //     }
+  //   });
+  // });
 
   // clearSceneButton.domElement.addEventListener("mousedown", () => {
   //   resetScaffolding(scene);
@@ -1951,33 +1964,11 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("toggle-orthographic", "mousedown", () => {
-    //@ts-ignore
-    components.camera.setProjection("Orthographic");
-    //@ts-ignore
-    components.camera.controls.mouseButtons.left = 1; // 1
-    //@ts-ignore
-    components.camera.controls.mouseButtons.middle = 8; // 8
-    //@ts-ignore
-    components.camera.controls.mouseButtons.right = 2; // 2
-    //@ts-ignore
-    components.camera.controls.mouseButtons.wheel = 0; // 8
-    //@ts-ignore
-    components.camera.controls.enableZoom = false;
+    toggleCameraOrthographic(components);
   });
 
   observeElementAndAddEventListener("toggle-perspective", "mousedown", () => {
-    //@ts-ignore
-    components.camera.setProjection("Perspective");
-    //@ts-ignore
-    components.camera.controls.mouseButtons.left = 1; // 1
-    //@ts-ignore
-    components.camera.controls.mouseButtons.middle = 16; // 8
-    //@ts-ignore
-    components.camera.controls.mouseButtons.right = 0; // 2
-    //@ts-ignore
-    components.camera.controls.mouseButtons.wheel = 16; // 8
-    //@ts-ignore
-    components.camera.controls.enableZoom = true;
+    toggleCameraPerspective(components);
   });
 
   // @ts-ignore
