@@ -186,6 +186,7 @@ export const createModelView = async () => {
   const planeMaterial = new THREE.MeshStandardMaterial({
     side: THREE.DoubleSide,
     visible: false,
+    // color: 0x000000
   }); // add visible: false to remove from visibility
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
@@ -394,12 +395,12 @@ export const createModelView = async () => {
     //@ts-ignore
     raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
     intersects = raycaster.intersectObjects(scene.children);
-
     if (drawingInProgress) {
       scene.add(highlightMesh);
       intersects.forEach(function (intersect: any) {
         switch (intersect.object.name) {
           case "ground":
+            console.warn("highlightmesh", highlightMesh)
             const highlightPos = new THREE.Vector3()
               .copy(intersect.point)
               .floor()
@@ -1381,7 +1382,7 @@ export const createModelView = async () => {
   observeElementAndAddEventListener("draw-scaffold", "mouseleave", () => {
     console.warn(
       "drawing scaffolding PRETRIGGER",
-      drawingScaffoldingInProgress
+      drawingScaffoldingInProgress, drawingInProgress, drawingInProgressSwitch, deletionInProgress
     );
     // if (drawingScaffoldingInProgress) {
     //   console.warn("drawing scaffolding in PROGRESS");

@@ -19,6 +19,10 @@ import MountPoint from "../pages/MountPoint.vue";
 import Timeline from "../pages/Timeline.vue";
 import { createApp } from "vue";
 import {
+  deletionInProgress,
+  drawingInProgress,
+  drawingInProgressSwitch,
+  drawingScaffoldingInProgress,
   setDeletionInProgress,
   setDrawingInProgress,
   setDrawingInProgressSwitch,
@@ -951,6 +955,10 @@ export const createToolbar = (
       setDrawingInProgress(true);
       setDrawingScaffoldingInProgress(true);
     }
+    console.warn(
+      "drawer mouseleave event tracking",
+      drawingScaffoldingInProgress, drawingInProgress, drawingInProgressSwitch, deletionInProgress
+    );
   });
   drawer.domElement.addEventListener("mouseenter", () => {
     if (startDrawing) {

@@ -216,6 +216,9 @@ export function disableOrbitControls(controls: any) {
 export function deleteObject(object: any, scene: THREE.Scene) {
   hideAllCSS2DObjects(scene);
   console.warn("OBJECT TO BE DELETED", object);
+  if (object.name === "ground") {
+    return
+  }
   // special instance for dealing with blueprints and shaderMaterials
   if (object.name === "rectanglePlane" && object.userData.shape) {
     object.visible = false;
