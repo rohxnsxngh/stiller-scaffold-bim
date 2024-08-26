@@ -5,7 +5,7 @@
       <GeneralTools />
 
       <div class="mb-8">
-        <p class="text-sm mb-2 mt-8">Velg et alternativ</p>
+        <p class="text-sm mb-2 mt-8 font-semibold">Velg et alternativ</p>
         <div class="grid grid-cols-3 gap-3">
           <div
             class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"

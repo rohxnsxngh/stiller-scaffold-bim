@@ -679,6 +679,7 @@ export const createModelView = async () => {
 
         if (rotateObject) {
           transformControls.setMode("rotate");
+          transformControls.setSpace("local");
           transformControls.showY = true;
           transformControls.showX = false;
           transformControls.showZ = false;
@@ -692,7 +693,7 @@ export const createModelView = async () => {
         if (
           mesh.name !== "ground" &&
           mesh.name !== "grid" &&
-          mesh.name.indexOf("label") === -1
+          mesh.name.indexOf("label") === -1 && !rotateObject
         ) {
           console.log("SELECTED mESH", mesh);
           transformControls.enabled = true;
@@ -762,7 +763,7 @@ export const createModelView = async () => {
           // Update children
           group.children.forEach((child) => {
             // Update shape
-            if (child.userData.shape instanceof THREE.Shape) {
+            if (child.userData.shape instanceof THREE.Shape && !rotateObject) {
               const newShape = new THREE.Shape();
               child.userData.shape.curves.forEach((curve) => {
                 if (curve instanceof THREE.LineCurve) {
@@ -785,13 +786,13 @@ export const createModelView = async () => {
               child.name === "blueprint"
             ) {
               // Example: Calculate the total rotation magnitude in radians
-              const totalGroupRotationMagnitude = new THREE.Vector3(
-                finalGroupRotation.x,
-                finalGroupRotation.y,
-                finalGroupRotation.z
-              ).length();
-              console.warn("ROTATION RADIANS", rotationDifferenceY);
-              rotateBlueprint(child.userData, scene, -rotationDifferenceY);
+              // const totalGroupRotationMagnitude = new THREE.Vector3(
+              //   finalGroupRotation.x,
+              //   finalGroupRotation.y,
+              //   finalGroupRotation.z
+              // ).length();
+              // console.warn("ROTATION RADIANS", rotationDifferenceY);
+              // rotateBlueprint(child.userData, scene, -rotationDifferenceY);
               // deleteObject(child, scene);
             }
 
