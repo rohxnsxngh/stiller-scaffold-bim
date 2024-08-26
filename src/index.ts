@@ -1452,6 +1452,11 @@ export const createModelView = async () => {
     scaffoldPoints.length = 0;
   });
 
+  observeElementAndAddEventListener("delete-object", "mousedown", () => {
+    scaffoldPoints.length = 0;
+    points.length = 0
+  })
+
   // autogenerate scaffolding
   observeElementAndAddEventListener(
     "autogenerate-scaffolding",
