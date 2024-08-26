@@ -1449,6 +1449,7 @@ export const createModelView = async () => {
     });
 
     updateScaffoldingData(scene);
+    scaffoldPoints.length = 0;
   });
 
   // autogenerate scaffolding
