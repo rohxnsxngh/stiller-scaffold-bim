@@ -68,14 +68,10 @@ import {
   setDeleteBuilding,
   setDeletionInProgress,
   setDeletionScaffoldingColumnInProgress,
-  setDeletionScaffoldingRowInProgress,
   setDrawingInProgress,
   setDrawingScaffoldingInProgress,
   setEditingBlueprint,
   setIsDrawingBlueprint,
-  setMovingGeometry,
-  setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
-  setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
   setStates,
 } from "./utilities/state";
@@ -88,7 +84,6 @@ import {
   toggleCameraPerspective,
 } from "./utilities/camera";
 import { SceneObserver } from "./utilities/scene";
-import Timeline from "./pages/Timeline.vue";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -400,7 +395,7 @@ export const createModelView = async () => {
       intersects.forEach(function (intersect: any) {
         switch (intersect.object.name) {
           case "ground":
-            console.warn("highlightmesh", highlightMesh)
+            console.warn("highlightmesh", highlightMesh);
             const highlightPos = new THREE.Vector3()
               .copy(intersect.point)
               .floor()
@@ -411,7 +406,11 @@ export const createModelView = async () => {
       });
     }
 
-    if (deletionInProgress && !drawingInProgress && !drawingScaffoldingInProgress) {
+    if (
+      deletionInProgress &&
+      !drawingInProgress &&
+      !drawingScaffoldingInProgress
+    ) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
@@ -635,10 +634,9 @@ export const createModelView = async () => {
         }
       });
     }
-    if (movingGeometry && !drawingInProgress) {
+    if (movingGeometry && !drawingInProgress && !rotateObject) {
       if (intersects.length > 0) {
         document.body.style.cursor = "grab";
-        // cameraEnableOrbitalFunctionality(gsap, components.camera);
         const mesh = intersects[0].object;
         console.log(mesh);
         hideAllCSS2DObjects(scene);
@@ -659,12 +657,6 @@ export const createModelView = async () => {
           initialWorldPositionChildren
         );
 
-        // At the beginning of your transform control setup:
-        const initialGroupRotation = new THREE.Euler().copy(group.rotation);
-        const initialChildRotations = group.children.map((child) =>
-          new THREE.Euler().copy(child.rotation)
-        );
-
         group.add(...geometriesToMove);
         console.warn(group);
 
@@ -677,13 +669,7 @@ export const createModelView = async () => {
           components.renderer._renderer.domElement
         );
 
-        if (rotateObject) {
-          transformControls.setMode("rotate");
-          transformControls.setSpace("local");
-          transformControls.showY = true;
-          transformControls.showX = false;
-          transformControls.showZ = false;
-        } else {
+        if (!rotateObject) {
           transformControls.setMode("translate");
           transformControls.showY = false;
           transformControls.showX = true;
@@ -693,9 +679,10 @@ export const createModelView = async () => {
         if (
           mesh.name !== "ground" &&
           mesh.name !== "grid" &&
-          mesh.name.indexOf("label") === -1 && !rotateObject
+          mesh.name.indexOf("label") === -1 &&
+          !rotateObject
         ) {
-          console.log("SELECTED mESH", mesh);
+          console.log("SELECTED MESH", mesh);
           transformControls.enabled = true;
           transformControls.attach(group);
           transformControls.position.x = mesh.userData.shape.currentPoint.x;
@@ -704,8 +691,6 @@ export const createModelView = async () => {
         }
 
         console.log(geometriesToMove, group, transformControls);
-
-        // transformControls.addEventListener("change", render);
 
         transformControls.addEventListener("mouseDown", function () {
           cameraDisableOrbitalFunctionalities(gsap, components.camera);
@@ -739,27 +724,6 @@ export const createModelView = async () => {
             initialWorldPosition.z
           );
 
-          // Handle rotation
-          const finalGroupRotation = new THREE.Euler().copy(group.rotation);
-          const rotationDifference = new THREE.Euler(
-            finalGroupRotation.x - initialGroupRotation.x,
-            finalGroupRotation.y - initialGroupRotation.y,
-            finalGroupRotation.z - initialGroupRotation.z
-          );
-          // Calculate the difference in rotation around the y-axis only
-          const rotationDifferenceY =
-            finalGroupRotation.y - initialGroupRotation.y;
-
-          console.warn(
-            "ROTATION DEBUG: ",
-            initialGroupRotation,
-            finalGroupRotation,
-            rotationDifference
-          );
-
-          // Reset group rotation
-          // group.rotation.copy(initialGroupRotation);
-
           // Update children
           group.children.forEach((child) => {
             // Update shape
@@ -780,37 +744,9 @@ export const createModelView = async () => {
               child.userData.shape = newShape;
             }
 
-            if (
-              child.userData.shape instanceof THREE.Shape &&
-              rotateObject &&
-              child.name === "blueprint"
-            ) {
-              // Example: Calculate the total rotation magnitude in radians
-              // const totalGroupRotationMagnitude = new THREE.Vector3(
-              //   finalGroupRotation.x,
-              //   finalGroupRotation.y,
-              //   finalGroupRotation.z
-              // ).length();
-              // console.warn("ROTATION RADIANS", rotationDifferenceY);
-              // rotateBlueprint(child.userData, scene, -rotationDifferenceY);
-              // deleteObject(child, scene);
-            }
-
             // Update position
             child.position.x += xDisplacement;
             child.position.z += zDisplacement;
-
-            // Rotate the child's position
-            // const rotatedPosition = rotatePoint(
-            //   child.position,
-            //   rotationDifference
-            // );
-            // child.position.copy(rotatedPosition);
-
-            // Apply the rotation to the child
-            // child.rotation.x += rotationDifference.x;
-            // child.rotation.y += rotationDifference.y;
-            // child.rotation.z += rotationDifference.z;
 
             // Update matrices
             child.updateMatrix();
@@ -825,6 +761,78 @@ export const createModelView = async () => {
 
           console.log("After transformation:", group);
         });
+      }
+    }
+
+    if (movingGeometry && !drawingInProgress && rotateObject) {
+      if (intersects.length > 0) {
+        document.body.style.cursor = "grab";
+        const mesh = intersects[0].object;
+        console.log(mesh);
+        hideAllCSS2DObjects(scene);
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        const geometriesToMove = findObjectBuildingRelations(mesh, scene);
+
+        if (
+          mesh.name !== "ground" &&
+          mesh.name !== "grid" &&
+          mesh.name.indexOf("label") === -1 &&
+          rotateObject
+        ) {
+          // Calculate the center of the shape
+          const shape = mesh.userData.shape;
+          const boundingBox = new THREE.Box3().setFromObject(mesh);
+          const shapeCenter = new THREE.Vector3();
+          boundingBox.getCenter(shapeCenter);
+
+          // Visualize the bounding box
+          const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
+          // scene.add(boundingBoxHelper);
+
+          // Translate group to align rotation center with shape center
+          group.position.copy(shapeCenter);
+          group.updateMatrixWorld(true); // Ensure the transformation is updated
+
+          // Add geometries to the group
+          group.add(...geometriesToMove);
+
+          // Rotate the group by 45 degrees (converted to radians)
+          const rotationAngle = THREE.MathUtils.degToRad(45);
+          group.rotation.y += rotationAngle;
+
+          // Translate group back to its original position
+          group.position.sub(shapeCenter);
+
+          // Apply the same rotation to the shape's points
+          const rotationMatrix = new THREE.Matrix4().makeRotationY(
+            rotationAngle
+          );
+
+          // Update children
+          group.children.forEach((child) => {
+            // Update shape
+            if (child.userData.shape instanceof THREE.Shape) {
+              const groupShape = child.userData.shape;
+              const shapePoints = groupShape.getPoints();
+              const updatedShapePoints = shapePoints.map(
+                (point: { x: number | undefined; y: number | undefined }) => {
+                  const vector = new THREE.Vector3(point.x, 0, point.y);
+                  vector.applyMatrix4(rotationMatrix);
+                  return new THREE.Vector2(vector.x, vector.z);
+                }
+              );
+
+              // Create a new shape with the updated points
+              const updatedShape = new THREE.Shape(updatedShapePoints);
+              child.userData.shape = updatedShape;
+            }
+          });
+
+          console.warn(group);
+        }
       }
     }
 
@@ -1364,38 +1372,14 @@ export const createModelView = async () => {
     }
   });
 
-  // observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
-  //   setDeletionInProgress(false);
-  //   console.warn("drawing scaffolding PRETRIGGER", drawingScaffoldingInProgress)
-  //   if (drawingScaffoldingInProgress) {
-  //     console.warn("drawing scaffolding in PROGRESS")
-  //     // create blueprint on screen after the shape has been outlined by the user
-  //     createScaffoldingShapeIsOutlined(
-  //       intersects,
-  //       points,
-  //       highlightMesh,
-  //       scene,
-  //       cube
-  //     );
-  //   }
-  // });
-
   observeElementAndAddEventListener("draw-scaffold", "mouseleave", () => {
     console.warn(
       "drawing scaffolding PRETRIGGER",
-      drawingScaffoldingInProgress, drawingInProgress, drawingInProgressSwitch, deletionInProgress
+      drawingScaffoldingInProgress,
+      drawingInProgress,
+      drawingInProgressSwitch,
+      deletionInProgress
     );
-    // if (drawingScaffoldingInProgress) {
-    //   console.warn("drawing scaffolding in PROGRESS");
-    //   // create blueprint on screen after the shape has been outlined by the user
-    //   createScaffoldingShapeIsOutlined(
-    //     intersects,
-    //     points,
-    //     highlightMesh,
-    //     scene,
-    //     cube
-    //   );
-    // }
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
@@ -1455,8 +1439,8 @@ export const createModelView = async () => {
 
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     scaffoldPoints.length = 0;
-    points.length = 0
-  })
+    points.length = 0;
+  });
 
   // autogenerate scaffolding
   observeElementAndAddEventListener(
@@ -1735,12 +1719,7 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("delete row of scaffolding");
-      setDeletionScaffoldingRowInProgress(true);
-      setDeletionScaffoldingColumnInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
+      setStates({ deletionScaffoldingRowInProgress: true });
     }
   );
 
@@ -1749,14 +1728,7 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("delete column of scaffolding");
-      setDeletionScaffoldingColumnInProgress(true);
-      setDeletionScaffoldingRowInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
+      setStates({ deletionScaffoldingColumnInProgress: true });
     }
   );
 
@@ -1765,14 +1737,10 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("scaffold-external-staircase");
-      setDeletionScaffoldingColumnInProgress(true);
-      setDeletionScaffoldingRowInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(true);
-      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
+      setStates({
+        replaceScaffoldingColumnWithExternalStaircaseInProgress: true,
+        deletionScaffoldingColumnInProgress: true,
+      });
     }
   );
 
@@ -1781,14 +1749,10 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("scaffold-internal-staircase");
-      setDeletionScaffoldingColumnInProgress(true);
-      setDeletionScaffoldingRowInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(true);
+      setStates({
+        replaceScaffoldingColumnWithInternalStaircaseInProgress: true,
+        deletionScaffoldingColumnInProgress: true,
+      });
     }
   );
 
@@ -1808,12 +1772,12 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("move-geometry", "mousedown", () => {
-    setMovingGeometry(true);
+    setStates({ movingGeometry: true });
     rotateObject = false;
   });
 
   observeElementAndAddEventListener("rotate-geometry", "mousedown", () => {
-    setMovingGeometry(true);
+    setStates({ movingGeometry: true });
     rotateObject = true;
   });
 

@@ -372,10 +372,6 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("move-geometry", "mousedown", () => {
     selected.updateSelected("Flytt bygning valgt, klikk på en bygning");
-    // const selectedTool = document.getElementById("selected-tool");
-    // if (selectedTool) {
-    //   selectedTool.style.backgroundColor = "#111115";
-    // }
   });
 
   observeElementAndAddEventListener("rotate-geometry", "mousedown", () => {

@@ -44,7 +44,7 @@
   <div
     id="scaffold-guidance"
     onclick="my_modal_3.showModal()"
-    class="fixed -left-12 top-2 mt-1 btn bg-transparent border-none hover:bg-transparent text-amber-300 font-semibold shadow-lg tooltip tooltip-left"
+    class="fixed -left-12 top-2 mt-1 btn bg-transparent border-none hover:bg-transparent text-amber-300 font-semibold tooltip tooltip-left"
     data-tip="help"
   >
     <span class="material-symbols-outlined"> help </span>
