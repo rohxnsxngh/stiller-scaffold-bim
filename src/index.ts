@@ -776,63 +776,89 @@ export const createModelView = async () => {
 
         const geometriesToMove = findObjectBuildingRelations(mesh, scene);
 
-        if (
-          mesh.name !== "ground" &&
-          mesh.name !== "grid" &&
-          mesh.name.indexOf("label") === -1 &&
-          rotateObject
-        ) {
-          // Calculate the center of the shape
-          const shape = mesh.userData.shape;
-          const boundingBox = new THREE.Box3().setFromObject(mesh);
-          const shapeCenter = new THREE.Vector3();
-          boundingBox.getCenter(shapeCenter);
+        const transformControls = new TransformControls(
+          //@ts-ignore
+          components.camera.activeCamera,
+          //@ts-ignore
+          components.renderer._renderer.domElement
+        );
 
-          // Visualize the bounding box
-          const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
-          // scene.add(boundingBoxHelper);
-
-          // Translate group to align rotation center with shape center
-          group.position.copy(shapeCenter);
-          group.updateMatrixWorld(true); // Ensure the transformation is updated
-
-          // Add geometries to the group
-          group.add(...geometriesToMove);
-
-          // Rotate the group by 45 degrees (converted to radians)
-          const rotationAngle = THREE.MathUtils.degToRad(45);
-          group.rotation.y += rotationAngle;
-
-          // Translate group back to its original position
-          group.position.sub(shapeCenter);
-
-          // Apply the same rotation to the shape's points
-          const rotationMatrix = new THREE.Matrix4().makeRotationY(
-            rotationAngle
-          );
-
-          // Update children
-          group.children.forEach((child) => {
-            // Update shape
-            if (child.userData.shape instanceof THREE.Shape) {
-              const groupShape = child.userData.shape;
-              const shapePoints = groupShape.getPoints();
-              const updatedShapePoints = shapePoints.map(
-                (point: { x: number | undefined; y: number | undefined }) => {
-                  const vector = new THREE.Vector3(point.x, 0, point.y);
-                  vector.applyMatrix4(rotationMatrix);
-                  return new THREE.Vector2(vector.x, vector.z);
-                }
-              );
-
-              // Create a new shape with the updated points
-              const updatedShape = new THREE.Shape(updatedShapePoints);
-              child.userData.shape = updatedShape;
-            }
-          });
-
-          console.warn(group);
+        if (rotateObject) {
+          transformControls.setMode("rotate");
+          transformControls.showY = true;
+          transformControls.showX = false;
+          transformControls.showZ = false;
         }
+
+        /////////////////////////////////////////
+
+        // if (
+        //   mesh.name !== "ground" &&
+        //   mesh.name !== "grid" &&
+        //   mesh.name.indexOf("label") === -1 &&
+        //   rotateObject
+        // ) {
+        //   // Calculate the center of the shape
+        //   const shape = mesh.userData.shape;
+        //   const boundingBox = new THREE.Box3().setFromObject(mesh);
+        //   const shapeCenter = new THREE.Vector3();
+        //   boundingBox.getCenter(shapeCenter);
+
+        //   // Visualize the bounding box
+        //   const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
+        //   scene.add(boundingBoxHelper);
+
+        //   // Translate group to align rotation center with shape center
+        //   group.position.copy(shapeCenter);
+        //   group.updateMatrixWorld(true); // Ensure the transformation is updated
+
+        //   // Add geometries to the group
+        //   group.add(...geometriesToMove);
+
+        //   /////////////////////////////////////////////////////////
+
+        //   // Rotate the group by 45 degrees (converted to radians)
+        //   const rotationAngle = THREE.MathUtils.degToRad(45);
+        //   group.rotation.y += rotationAngle;
+
+        //   // Translate group back to its original position
+        //   group.position.sub(shapeCenter);
+
+        //   // Apply the same rotation to the shape's points
+        //   const rotationMatrix = new THREE.Matrix4().makeRotationY(
+        //     rotationAngle
+        //   );
+
+        //   // Update children
+        //   group.children.forEach((child) => {
+        //     // Update shape
+        //     if (child.userData.shape instanceof THREE.Shape) {
+        //       const groupShape = child.userData.shape;
+        //       const shapePoints = groupShape.getPoints();
+        //       const updatedShapePoints = shapePoints.map(
+        //         (point: { x: number | undefined; y: number | undefined }) => {
+        //           const vector = new THREE.Vector3(point.x, 0, point.y);
+        //           vector.applyMatrix4(rotationMatrix);
+        //           return new THREE.Vector2(vector.x, vector.z);
+        //         }
+        //       );
+
+        //       // Create a new shape with the updated points
+        //       const updatedShape = new THREE.Shape(updatedShapePoints);
+        //       child.userData.shape = updatedShape;
+
+        //       // Update matrices
+        //       child.updateMatrix();
+        //       child.updateMatrixWorld(true);
+        //     }
+        //   });
+
+        //   // Update group matrix
+        //   group.updateMatrix();
+        //   group.updateMatrixWorld(true);
+
+        //   console.warn(group);
+        // }
       }
     }
 
