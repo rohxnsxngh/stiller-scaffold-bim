@@ -121,11 +121,11 @@ export const createModelView = async () => {
   //@ts-ignore
   components.camera.controls.mouseButtons.left = 1; // 1
   //@ts-ignore
-  components.camera.controls.mouseButtons.middle = 16; // 8
+  components.camera.controls.mouseButtons.middle = 8; // 8
   //@ts-ignore
-  components.camera.controls.mouseButtons.right = 0; // 2
+  components.camera.controls.mouseButtons.right = 2; // 2
   //@ts-ignore
-  components.camera.controls.mouseButtons.wheel = 16; // 8
+  components.camera.controls.mouseButtons.wheel = 8; // 8
 
   // Obit Controls Gizmo
   viewHelper = new OrbitViewHelper(

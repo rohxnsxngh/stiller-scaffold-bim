@@ -5,6 +5,7 @@ import {
   cameraDisableOrbitalFunctionality,
   cameraEnableOrbitalFunctionality,
   cameraEnablePanningFunctionality,
+  cameraPerspectiveView,
   cameraTopView,
   toggleCameraOrthographic,
   toggleCameraPerspective,
@@ -125,6 +126,7 @@ export const createToolbar = (
 
   observeElementAndAddEventListener("upload-ifc", "mousedown", () => {
     setStates();
+    // toggleCameraOrthographic(components);
     console.log("uploading ifc model");
     selected.updateSelected(ifcButton.name);
     ifcButton.domElement.click();
@@ -421,7 +423,7 @@ export const createToolbar = (
   observeElementAndAddEventListener("delete-object", "mousedown", () => {
     startDrawing = false;
     cameraEnableOrbitalFunctionality(gsap, components.camera);
-    toggleCameraPerspective(components)
+    toggleCameraPerspective(components);
     document.body.style.cursor = "auto";
     selected.updateSelected("Delete Object");
     removeHighlightMesh(scene);
@@ -688,7 +690,10 @@ export const createToolbar = (
     if (startDrawing) {
       document.body.style.cursor = "auto";
       removeHighlightMesh(scene);
-      setStates({drawingScaffoldingInProgress: true, drawingInProgress: true})
+      setStates({
+        drawingScaffoldingInProgress: true,
+        drawingInProgress: true,
+      });
     }
   });
 
@@ -953,7 +958,10 @@ export const createToolbar = (
     }
     console.warn(
       "drawer mouseleave event tracking",
-      drawingScaffoldingInProgress, drawingInProgress, drawingInProgressSwitch, deletionInProgress
+      drawingScaffoldingInProgress,
+      drawingInProgress,
+      drawingInProgressSwitch,
+      deletionInProgress
     );
   });
   drawer.domElement.addEventListener("mouseenter", () => {
