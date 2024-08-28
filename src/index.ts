@@ -1656,6 +1656,7 @@ export const createModelView = async () => {
   // });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    window.location.reload();
     resetScaffolding(scene);
 
     const store = useStore();
