@@ -158,6 +158,66 @@ export function createBlueprintFromShapeOutline(
   }
 }
 
+// Create Blueprint from Shape Outline
+export function createBlueprintFromRotation(points: any, scene: THREE.Scene) {
+  let highlightedMesh: THREE.Mesh<any, any, any>[] = [];
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh && child.name === "highlightMesh") {
+      highlightedMesh.push(child);
+    }
+    if (child instanceof CSS2DObject && child.name === "rectangleLabel") {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
+  highlightedMesh.forEach((mesh) => {
+    scene.remove(mesh);
+  });
+
+  // Create shape
+  if (points.length >= 3) {
+    let shape = new THREE.Shape();
+    shape.moveTo(points[0].x, points[0].z);
+    for (let i = 1; i < points.length; i++) {
+      shape.lineTo(points[i].x, points[i].z);
+    }
+    shape.lineTo(points[0].x, points[0].z); // close the shape
+
+    // Create mesh from shape
+    const geometryShape = new THREE.ShapeGeometry(shape);
+    const materialShape = new THREE.MeshBasicMaterial({
+      color: 0x7f1d1d,
+      side: THREE.DoubleSide,
+    });
+    const meshShape = new THREE.Mesh(geometryShape, materialShape);
+    meshShape.rotateX(Math.PI / 2);
+    meshShape.position.y = 0.025;
+    meshShape.name = "blueprint";
+    meshShape.userData = { shape: shape, blueprintHasBeenUpdated: true };
+    const isBlueprintAlreadyPlaced = scene.children.some((child) => {
+      return (
+        child.name === "blueprint" &&
+        child.userData.shape.currentPoint.equals(
+          meshShape.userData.shape.currentPoint
+        )
+      );
+    });
+    if (!isBlueprintAlreadyPlaced) {
+      scene.add(meshShape);
+    }
+    scene.traverse((child) => {
+      if (child.name === "blueprint") {
+        console.log("blueprint", child);
+      }
+    });
+  }
+
+  points.length = 0;
+
+  return points;
+}
+
 export function createBlueprintFromMarkup(
   points: any,
   blueprintUpdatedState: boolean,
@@ -278,6 +338,8 @@ export function createExtrusionFromBlueprint(
   meshExtrude.userData.label = label;
 
   label.userData = meshExtrude;
+
+  return meshExtrude
 }
 
 interface IntersectionResult {

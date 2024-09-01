@@ -12,6 +12,7 @@ import {
   createBlueprintFromMarkup,
   createFlatRoof,
   rotateBlueprint,
+  createBlueprintFromRotation,
 } from "./utilities/mesh";
 import {
   createScaffoldingShapeIsOutlined,
@@ -84,6 +85,7 @@ import {
   toggleCameraPerspective,
 } from "./utilities/camera";
 import { SceneObserver } from "./utilities/scene";
+import { Store } from "pinia";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -764,195 +766,230 @@ export const createModelView = async () => {
       }
     }
 
-    if (movingGeometry && !drawingInProgress && rotateObject) {
-      if (intersects.length > 0) {
-        document.body.style.cursor = "grab";
-        const mesh = intersects[0].object;
-        console.log(mesh);
-        hideAllCSS2DObjects(scene);
+    // if (movingGeometry && !drawingInProgress && rotateObject) {
+    //   if (intersects.length > 0) {
+    //     document.body.style.cursor = "grab";
+    //     const mesh = intersects[0].object;
+    //     console.log(mesh);
+    //     hideAllCSS2DObjects(scene);
 
-        const group = new THREE.Group();
-        scene.add(group);
+    //     const group = new THREE.Group();
+    //     scene.add(group);
 
-        const geometriesToMove = findObjectBuildingRelations(mesh, scene);
+    //     const geometriesToMove = findObjectBuildingRelations(mesh, scene);
 
-        // Store initial world position of the group
-        const initialWorldPosition = new THREE.Vector3();
-        group.getWorldPosition(initialWorldPosition);
+    //     // Store initial world position of the group
+    //     const initialWorldPosition = new THREE.Vector3();
+    //     group.getWorldPosition(initialWorldPosition);
 
-        /////////////////////////////////////////
+    //     /////////////////////////////////////////
 
-        if (
-          mesh.name !== "ground" &&
-          mesh.name !== "grid" &&
-          mesh.name.indexOf("label") === -1 &&
-          rotateObject
-        ) {
-          group.add(...geometriesToMove);
+    //     if (
+    //       mesh.name !== "ground" &&
+    //       mesh.name !== "grid" &&
+    //       mesh.name.indexOf("label") === -1 &&
+    //       rotateObject
+    //     ) {
+    //       group.add(...geometriesToMove);
 
-          // Calculate the center of the shape
-          const shape = mesh.userData.shape;
-          const boundingBox = new THREE.Box3().setFromObject(mesh);
-          const shapeCenter = new THREE.Vector3();
-          boundingBox.getCenter(shapeCenter);
+    //       // Calculate the center of the shape
+    //       const shape = mesh.userData.shape;
+    //       const boundingBox = new THREE.Box3().setFromObject(mesh);
+    //       const shapeCenter = new THREE.Vector3();
+    //       boundingBox.getCenter(shapeCenter);
 
-          // Axis Helper for Center of Bounding Box
-          const axesHelper = new THREE.AxesHelper(5);
-          axesHelper.position.copy(shapeCenter);
-          scene.add(axesHelper);
+    //       // Axis Helper for Center of Bounding Box
+    //       const axesHelper = new THREE.AxesHelper(5);
+    //       axesHelper.position.copy(shapeCenter);
+    //       scene.add(axesHelper);
 
-          // Visualize the bounding box
-          const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
-          scene.add(boundingBoxHelper);
+    //       // Visualize the bounding box
+    //       const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
+    //       // scene.add(boundingBoxHelper);
 
-          // Get the min and max points of the bounding box
-          const min = boundingBox.min;
-          const max = boundingBox.max;
+    //       // Get the min and max points of the bounding box
+    //       const min = boundingBox.min;
+    //       const max = boundingBox.max;
 
-          // Define the 8 corners of the bounding box
-          const corners = [
-            new THREE.Vector3(min.x, min.y, min.z),
-            new THREE.Vector3(max.x, min.y, min.z),
-            new THREE.Vector3(max.x, min.y, max.z),
-            new THREE.Vector3(min.x, min.y, max.z),
-          ];
+    //       // Define the 8 corners of the bounding box
+    //       const corners = [
+    //         new THREE.Vector3(min.x, min.y, min.z),
+    //         new THREE.Vector3(max.x, min.y, min.z),
+    //         new THREE.Vector3(max.x, min.y, max.z),
+    //         new THREE.Vector3(min.x, min.y, max.z),
+    //       ];
 
-          const rotationAngle = THREE.MathUtils.degToRad(45);
-          const rotationMatrix = new THREE.Matrix4().makeRotationY(
-            rotationAngle
-          );
+    //       const rotationAngle = THREE.MathUtils.degToRad(45);
+    //       const rotationMatrix = new THREE.Matrix4().makeRotationY(
+    //         rotationAngle
+    //       );
 
-          // Translate corners so that shapeCenter is at the origin (0, 0, 0)
-          corners.forEach((corner) => {
-            corner.sub(shapeCenter);
-          });
+    //       // Translate corners so that shapeCenter is at the origin (0, 0, 0)
+    //       corners.forEach((corner) => {
+    //         corner.sub(shapeCenter);
+    //       });
 
-          corners.forEach((corner) => {
-            corner.applyMatrix4(rotationMatrix);
-          });
+    //       corners.forEach((corner) => {
+    //         corner.applyMatrix4(rotationMatrix);
+    //       });
 
-          // Translate corners back to their original position
-          corners.forEach((corner) => {
-            corner.add(shapeCenter);
-          });
+    //       // Translate corners back to their original position
+    //       corners.forEach((corner) => {
+    //         corner.add(shapeCenter);
+    //       });
 
-          const newShape = new THREE.Shape();
-          newShape.moveTo(corners[0].x, corners[0].z);
-          newShape.lineTo(corners[1].x, corners[1].z);
-          newShape.lineTo(corners[2].x, corners[2].z);
-          newShape.lineTo(corners[3].x, corners[3].z);
-          newShape.lineTo(corners[0].x, corners[0].z);
+    //       const newShape = new THREE.Shape();
+    //       newShape.moveTo(corners[0].x, corners[0].z);
+    //       newShape.lineTo(corners[1].x, corners[1].z);
+    //       newShape.lineTo(corners[2].x, corners[2].z);
+    //       newShape.lineTo(corners[3].x, corners[3].z);
+    //       newShape.lineTo(corners[0].x, corners[0].z);
 
-          const geometry = new THREE.ShapeGeometry(newShape);
-          const material = new THREE.MeshBasicMaterial({
-            color: 0x00ff00,
-            wireframe: true,
-          });
-          const newMesh = new THREE.Mesh(geometry, material);
-          newMesh.rotation.x = Math.PI / 2;
-          scene.add(newMesh);
+    //       const geometry = new THREE.ShapeGeometry(newShape);
+    //       const material = new THREE.MeshBasicMaterial({
+    //         color: 0x00ff00,
+    //         wireframe: true,
+    //       });
+    //       const newMesh = new THREE.Mesh(geometry, material);
+    //       newMesh.rotation.x = Math.PI / 2;
+    //       // scene.add(newMesh);
 
-          // Rotate the group around the shapeCenter
-          // Translate group to the shape's center
-          // group.position.sub(shapeCenter);
+    //       console.warn("create blueprint shape from corners");
+    //       let roofType;
+    //       group.children.forEach((child) => {
+    //         // Update shape
+    //         if (child.userData.shape instanceof THREE.Shape) {
+    //           if (child.name.includes("roof") || child.name.includes("Roof")) {
+    //             roofType = child.name;
+    //             console.error("roof type in rotation:", roofType);
+    //           }
+    //           console.warn("removing children");
+    //           scene.remove(child);
+              
+    //           // child.userData.shape = newShape;
 
-          // Apply the rotation using Quaternion
-          const rotationAxis = new THREE.Vector3(0, 1, 0); // Rotate around Y-axis
-          const quaternion = new THREE.Quaternion();
-          quaternion.setFromAxisAngle(rotationAxis, rotationAngle);
-          group.quaternion.premultiply(quaternion);
+    //           // // // Update matrices
+    //           // child.updateMatrix();
+    //           // child.updateMatrixWorld(true);
+    //         }
+    //       });
 
-          // Translate group back to its original position
-          group.position.add(shapeCenter);
+    //       scene.remove(group)
 
-          // Reset group position
-          group.position.set(
-            initialWorldPosition.x,
-            initialWorldPosition.y,
-            initialWorldPosition.z
-          );
+    //       points = createBlueprintFromRotation(corners, scene);
+    //       createExtrusion(scene, componentStore);
 
-          // Update group matrix
-          group.updateMatrix();
-          group.updateMatrixWorld(true);
+    //       if (roofType === "flatRoof") {
+    //         createFlatRoofModule(scene);
+    //       }
+    //       if (roofType === "shedRoof") {
+    //         createShedRoofModule(scene, componentStore);
+    //       }
+    //       if (roofType === "roof") {
+    //         createRoofModule(scene, componentStore);
+    //       }
 
-          // // Update children
-          group.children.forEach((child) => {
-            // Update shape
-            if (child.userData.shape instanceof THREE.Shape) {
-              child.userData.shape = newShape;
+    //       // Rotate the group around the shapeCenter
+    //       // Translate group to the shape's center
+    //       // group.position.sub(shapeCenter);
 
-              // Update matrices
-              child.updateMatrix();
-              child.updateMatrixWorld(true);
-            }
-          });
+    //       // Apply the rotation using Quaternion
+    //       // const rotationAxis = new THREE.Vector3(0, 1, 0); // Rotate around Y-axis
+    //       // const quaternion = new THREE.Quaternion();
+    //       // quaternion.setFromAxisAngle(rotationAxis, rotationAngle);
+    //       // group.quaternion.premultiply(quaternion);
 
-          // const afterBoundingBoxHelper = boundingBoxHelper.clone()
-          // afterBoundingBoxHelper.rotation.y += rotationAngle;
-          // scene.add(afterBoundingBoxHelper)
+    //       // // Translate group back to its original position
+    //       // group.position.add(shapeCenter);
 
-          // Translate group to align rotation center with shape center
-          // group.position.copy(shapeCenter);
-          // group.updateMatrixWorld(true); // Ensure the transformation is updated
+    //       // // Reset group position
+    //       // group.position.set(
+    //       //   initialWorldPosition.x,
+    //       //   initialWorldPosition.y,
+    //       //   initialWorldPosition.z
+    //       // );
 
-          // // Add geometries to the group
-          // group.add(...geometriesToMove);
+    //       // // Update group matrix
+    //       // group.updateMatrix();
+    //       // group.updateMatrixWorld(true);
 
-          /////////////////////////////////////////////////////////
+    //       // // Update children
+    //       // group.children.forEach((child) => {
+    //       //   // Update shape
+    //       //   if (child.userData.shape instanceof THREE.Shape) {
+    //       //     child.userData.shape = newShape;
 
-          // // Rotate the group by 45 degrees (converted to radians)
-          // const rotationAngle = THREE.MathUtils.degToRad(45);
-          // group.rotation.y += rotationAngle;
+    //       //     // Update matrices
+    //       //     child.updateMatrix();
+    //       //     child.updateMatrixWorld(true);
+    //       //   }
+    //       // });
 
-          // // Translate group back to its original position
-          // group.position.sub(shapeCenter);
+    //       // const afterBoundingBoxHelper = boundingBoxHelper.clone()
+    //       // afterBoundingBoxHelper.rotation.y += rotationAngle;
+    //       // scene.add(afterBoundingBoxHelper)
 
-          // // Apply the same rotation to the shape's points
-          // const rotationMatrix = new THREE.Matrix4().makeRotationY(
-          //   rotationAngle
-          // );
+    //       // Translate group to align rotation center with shape center
+    //       // group.position.copy(shapeCenter);
+    //       // group.updateMatrixWorld(true); // Ensure the transformation is updated
 
-          // // Update children
-          // group.children.forEach((child) => {
-          //   // Update shape
-          //   if (child.userData.shape instanceof THREE.Shape) {
-          //     const groupShape = child.userData.shape;
-          //     const shapePoints = groupShape.getPoints();
-          //     const updatedShapePoints = shapePoints.map(
-          //       (point: { x: number | undefined; y: number | undefined }) => {
-          //         const vector = new THREE.Vector3(point.x, 0, point.y);
-          //         vector.applyMatrix4(rotationMatrix);
-          //         return new THREE.Vector2(vector.x, vector.z);
-          //       }
-          //     );
+    //       // // Add geometries to the group
+    //       // group.add(...geometriesToMove);
 
-          //     // Create a new shape with the updated points
-          //     const updatedShape = new THREE.Shape(updatedShapePoints);
-          //     child.userData.shape = updatedShape;
+    //       /////////////////////////////////////////////////////////
 
-          //     const boundingBox = new THREE.Box3().setFromObject(child.userData.shape);
-          //     const shapeCenter = new THREE.Vector3();
-          //     boundingBox.getCenter(shapeCenter);
+    //       // // Rotate the group by 45 degrees (converted to radians)
+    //       // const rotationAngle = THREE.MathUtils.degToRad(45);
+    //       // group.rotation.y += rotationAngle;
 
-          //     // Visualize the bounding box
-          //     const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
-          //     scene.add(boundingBoxHelper);
+    //       // // Translate group back to its original position
+    //       // group.position.sub(shapeCenter);
 
-          //     // Update matrices
-          //     child.updateMatrix();
-          //     child.updateMatrixWorld(true);
-          //   }
-          // });
+    //       // // Apply the same rotation to the shape's points
+    //       // const rotationMatrix = new THREE.Matrix4().makeRotationY(
+    //       //   rotationAngle
+    //       // );
 
-          // // Update group matrix
-          // group.updateMatrix();
-          // group.updateMatrixWorld(true);
+    //       // // Update children
+    //       // group.children.forEach((child) => {
+    //       //   // Update shape
+    //       //   if (child.userData.shape instanceof THREE.Shape) {
+    //       //     const groupShape = child.userData.shape;
+    //       //     const shapePoints = groupShape.getPoints();
+    //       //     const updatedShapePoints = shapePoints.map(
+    //       //       (point: { x: number | undefined; y: number | undefined }) => {
+    //       //         const vector = new THREE.Vector3(point.x, 0, point.y);
+    //       //         vector.applyMatrix4(rotationMatrix);
+    //       //         return new THREE.Vector2(vector.x, vector.z);
+    //       //       }
+    //       //     );
 
-          // console.warn(group);
-        }
-      }
-    }
+    //       //     // Create a new shape with the updated points
+    //       //     const updatedShape = new THREE.Shape(updatedShapePoints);
+    //       //     child.userData.shape = updatedShape;
+
+    //       //     const boundingBox = new THREE.Box3().setFromObject(child.userData.shape);
+    //       //     const shapeCenter = new THREE.Vector3();
+    //       //     boundingBox.getCenter(shapeCenter);
+
+    //       //     // Visualize the bounding box
+    //       //     const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
+    //       //     scene.add(boundingBoxHelper);
+
+    //       //     // Update matrices
+    //       //     child.updateMatrix();
+    //       //     child.updateMatrixWorld(true);
+    //       //   }
+    //       // });
+
+    //       // // Update group matrix
+    //       // group.updateMatrix();
+    //       // group.updateMatrixWorld(true);
+
+    //       // console.warn(group);
+    //     }
+    //   }
+    // }
 
     if (rotatingRoofInProgress && !drawingInProgressSwitch) {
       console.log("ROTATING ROOFS", intersects[0].object);
@@ -1131,34 +1168,7 @@ export const createModelView = async () => {
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   observeElementAndAddEventListener("create-extrusion", "mousedown", () => {
     setDeletionInProgress(false);
-    let blueprints: THREE.Mesh[] = [];
-    let extrusions: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "blueprint") {
-          blueprints.push(child);
-        } else if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-    });
-
-    blueprints.forEach((blueprint) => {
-      let hasExtrusion = extrusions.some((extrusion) =>
-        Object.is(blueprint.userData.shape, extrusion.userData.shape)
-      );
-      if (!hasExtrusion) {
-        const depthValue = componentStore.depth;
-        console.log(depthValue);
-        if (depthValue !== 0) {
-          createExtrusionFromBlueprint(blueprint.userData, scene, depthValue);
-        }
-      }
-    });
-
-    blueprints = [];
-    extrusions = [];
+    createExtrusion(scene, componentStore);
   });
 
   createGableRoofButton.domElement.addEventListener("mousedown", () => {
@@ -1209,89 +1219,11 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-gable-roof", "mousedown", () => {
-    setDeletionInProgress(false);
-    let extrusions: THREE.Mesh[] = [];
-    let roofs: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "roof" || child.name === "shedRoof") {
-          roofs.push(child);
-        } else if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-      if (
-        child.name === "rectangleExtrusionLabel" &&
-        child instanceof CSS2DObject
-      ) {
-        child.element.style.pointerEvents = "none";
-        child.visible = false;
-      }
-    });
-
-    extrusions.forEach((extrusion) => {
-      let hasRoof = roofs.some(
-        (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v2.y
-      );
-      if (!hasRoof) {
-        const heightValue = componentStore.height;
-        if (heightValue !== 0) {
-          createRoof(extrusion, scene, 0, heightValue);
-        }
-      }
-    });
-
-    roofs = [];
-    extrusions = [];
+    createRoofModule(scene, componentStore);
   });
 
   observeElementAndAddEventListener("create-flat-roof", "mousedown", () => {
-    setDeletionInProgress(false);
-    let extrusions: THREE.Mesh[] = [];
-    let roofs: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "roof" || child.name === "shedRoof") {
-          roofs.push(child);
-        } else if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-      if (
-        child.name === "rectangleExtrusionLabel" &&
-        child instanceof CSS2DObject
-      ) {
-        child.element.style.pointerEvents = "none";
-        child.visible = false;
-      }
-    });
-
-    extrusions.forEach((extrusion) => {
-      let hasRoof = roofs.some(
-        (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.currentPoint.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.currentPoint.y
-      );
-      if (!hasRoof) {
-        createFlatRoof(extrusion, scene);
-      }
-    });
-
-    hideAllCSS2DObjects(scene);
-    roofs = [];
-    extrusions = [];
+    createFlatRoofModule(scene);
   });
 
   createShedRoofButton.domElement.addEventListener("mousedown", () => {
@@ -1340,52 +1272,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-shed-roof", "mousedown", () => {
-    setDeletionInProgress(false);
-    let extrusions: THREE.Mesh[] = [];
-    let roofs: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "roof" || child.name === "shedRoof") {
-          roofs.push(child);
-        }
-        if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-      if (
-        child.name === "rectangleExtrusionLabel" &&
-        child instanceof CSS2DObject
-      ) {
-        child.element.style.pointerEvents = "none";
-        child.visible = false;
-      }
-    });
-
-    extrusions.forEach((extrusion) => {
-      let hasRoof = roofs.some(
-        (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v2.y
-      );
-      if (!hasRoof) {
-        const heightValue = parseFloat(
-          componentStore.shedHeight as unknown as string
-        );
-        if (heightValue !== 0) {
-          createShedRoof(extrusion, scene, 0, heightValue);
-        }
-      }
-    });
-
-    roofs = [];
-    extrusions = [];
+    createShedRoofModule(scene, componentStore);
   });
 
   // edit extrusion after roof as been created
@@ -2109,3 +1996,242 @@ export const createModelView = async () => {
 
   animate();
 };
+
+function createShedRoofModule(
+  scene: THREE.Scene,
+  componentStore: Store<
+    "component",
+    {
+      length: number;
+      width: number;
+      depth: number;
+      height: number;
+      shedHeight: number;
+      level: number;
+    },
+    {},
+    {
+      updateLength(value: any): void;
+      updateWidth(value: any): void;
+      updateDepth(value: any): void;
+      updateRoofHeight(value: any): void;
+      updateShedRoofHeight(value: any): void;
+      updateScaffoldLevel(value: any): void;
+    }
+  >
+) {
+  setDeletionInProgress(false);
+  let extrusions: THREE.Mesh[] = [];
+  let roofs: THREE.Mesh[] = [];
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "roof" || child.name === "shedRoof") {
+        roofs.push(child);
+      }
+      if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+    if (
+      child.name === "rectangleExtrusionLabel" &&
+      child instanceof CSS2DObject
+    ) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
+  extrusions.forEach((extrusion) => {
+    let hasRoof = roofs.some(
+      (roof) =>
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v1.x ||
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v2.x ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v1.y ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v2.y
+    );
+    if (!hasRoof) {
+      const heightValue = parseFloat(
+        componentStore.shedHeight as unknown as string
+      );
+      if (heightValue !== 0) {
+        createShedRoof(extrusion, scene, 0, heightValue);
+      }
+    }
+  });
+
+  roofs = [];
+  extrusions = [];
+}
+
+function createFlatRoofModule(scene: THREE.Scene) {
+  setDeletionInProgress(false);
+  let extrusions: THREE.Mesh[] = [];
+  let roofs: THREE.Mesh[] = [];
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "roof" || child.name === "shedRoof") {
+        roofs.push(child);
+      } else if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+    if (
+      child.name === "rectangleExtrusionLabel" &&
+      child instanceof CSS2DObject
+    ) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
+  extrusions.forEach((extrusion) => {
+    let hasRoof = roofs.some(
+      (roof) =>
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.currentPoint.x ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.currentPoint.y
+    );
+    if (!hasRoof) {
+      createFlatRoof(extrusion, scene);
+    }
+  });
+
+  hideAllCSS2DObjects(scene);
+  roofs = [];
+  extrusions = [];
+}
+
+function createRoofModule(
+  scene: THREE.Scene,
+  componentStore: Store<
+    "component",
+    {
+      length: number;
+      width: number;
+      depth: number;
+      height: number;
+      shedHeight: number;
+      level: number;
+    },
+    {},
+    {
+      updateLength(value: any): void;
+      updateWidth(value: any): void;
+      updateDepth(value: any): void;
+      updateRoofHeight(value: any): void;
+      updateShedRoofHeight(value: any): void;
+      updateScaffoldLevel(value: any): void;
+    }
+  >
+) {
+  setDeletionInProgress(false);
+  let extrusions: THREE.Mesh[] = [];
+  let roofs: THREE.Mesh[] = [];
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "roof" || child.name === "shedRoof") {
+        roofs.push(child);
+      } else if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+    if (
+      child.name === "rectangleExtrusionLabel" &&
+      child instanceof CSS2DObject
+    ) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
+  extrusions.forEach((extrusion) => {
+    let hasRoof = roofs.some(
+      (roof) =>
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v1.x ||
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v2.x ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v1.y ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v2.y
+    );
+    if (!hasRoof) {
+      const heightValue = componentStore.height;
+      if (heightValue !== 0) {
+        createRoof(extrusion, scene, 0, heightValue);
+      }
+    }
+  });
+
+  roofs = [];
+  extrusions = [];
+}
+
+function createExtrusion(
+  scene: THREE.Scene,
+  componentStore: Store<
+    "component",
+    {
+      length: number;
+      width: number;
+      depth: number;
+      height: number;
+      shedHeight: number;
+      level: number;
+    },
+    {},
+    {
+      updateLength(value: any): void;
+      updateWidth(value: any): void;
+      updateDepth(value: any): void;
+      updateRoofHeight(value: any): void;
+      updateShedRoofHeight(value: any): void;
+      updateScaffoldLevel(value: any): void;
+    }
+  >
+) {
+  let blueprints: THREE.Mesh[] = [];
+  let extrusions: THREE.Mesh[] = [];
+  let meshExtrude;
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "blueprint") {
+        blueprints.push(child);
+      } else if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+  });
+
+  blueprints.forEach((blueprint) => {
+    let hasExtrusion = extrusions.some((extrusion) =>
+      Object.is(blueprint.userData.shape, extrusion.userData.shape)
+    );
+    if (!hasExtrusion) {
+      const depthValue = componentStore.depth;
+      console.log(depthValue);
+      if (depthValue !== 0) {
+        meshExtrude = createExtrusionFromBlueprint(
+          blueprint.userData,
+          scene,
+          depthValue
+        );
+      }
+    }
+  });
+
+  blueprints = [];
+  extrusions = [];
+
+  return meshExtrude;
+}

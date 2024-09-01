@@ -54,7 +54,7 @@
       </div>
       <div><p class="text-xs text-center mt-2">Delete Building</p></div>
     </div>
-    <div class="flex flex-col mx-4">
+    <!-- <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#592E00] rounded-lg border-2 border-[#FF8C00]"
         id="rotate-geometry"
@@ -62,7 +62,7 @@
         <i class="material-symbols-outlined text-[#FF8C00]">settings_backup_restore</i>
       </div>
       <div><p class="text-xs text-center mt-2">Rotate Blueprint</p></div>
-    </div>
+    </div> -->
     <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
