@@ -11,8 +11,6 @@ import {
   editBlueprint,
   createBlueprintFromMarkup,
   createFlatRoof,
-  rotateBlueprint,
-  createBlueprintFromRotation,
 } from "./utilities/mesh";
 import {
   createScaffoldingShapeIsOutlined,
@@ -1592,7 +1590,7 @@ export const createModelView = async () => {
   shadows.resolution = 7.75;
   // Collect all meshes in the scene that you want to have shadows
 
-  const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
+  // const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
 
   // document.addEventListener("mousedown", () => {
   //   scene.traverse((object) => {
