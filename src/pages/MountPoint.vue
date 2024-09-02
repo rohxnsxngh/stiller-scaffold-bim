@@ -3,7 +3,7 @@
     id="label-component"
     class="bg-[#111115] text-white px-2 flex pointer-events-auto rounded"
   >
-    <General v-if="activeSection === 'general'" />
+    <!-- <General v-if="activeSection === 'general'" /> -->
     <Blueprint v-if="activeSection === 'blueprint'" />
     <Scaffold v-if="activeSection === 'scaffold'" />
     <Roof v-if="activeSection === 'roof'" />
@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-const activeSection = ref("general"); // Default active section
+const activeSection = ref("blueprint"); // Default active section
 
 const setActiveSection = (section: string) => {
   activeSection.value = section;
@@ -26,7 +26,7 @@ window.setActiveSection = setActiveSection;
 </script>
 
 <script lang="ts">
-import General from "./General.vue";
+// import General from "./General.vue";
 import Blueprint from "./Blueprint.vue";
 import Scaffold from "./Scaffold.vue";
 import Roof from "./Roof.vue";
@@ -34,7 +34,7 @@ import Supply from "./Supply.vue";
 
 export default {
   components: {
-    General,
+    // General,
     Blueprint,
     Scaffold,
     Roof,
@@ -42,7 +42,7 @@ export default {
   },
   data() {
     return {
-      activeSection: "general", // Default active section
+      activeSection: "blueprint", // Default active section
     };
   },
   methods: {

@@ -11,6 +11,8 @@ import {
   editBlueprint,
   createBlueprintFromMarkup,
   createFlatRoof,
+  rotateBlueprint,
+  createBlueprintFromRotation,
 } from "./utilities/mesh";
 import {
   createScaffoldingShapeIsOutlined,
@@ -32,10 +34,8 @@ import {
   CSS2DRenderer,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import {
-  calculateTotalAmountScaffoldingInScene,
-  calculateTotalSquareMetersForBlueprint,
-  calculateTotalSquareMetersForScaffolding,
   calculateTransformedBoundingBox,
+  debounce,
   deleteObject,
   disableOrbitControls,
   findObjectBuildingRelations,
@@ -46,10 +46,11 @@ import {
   resetScene,
   returnObjectsToOriginalState,
   saveAsImage,
+  updateScaffoldingData,
 } from "./utilities/helper";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OrbitViewHelper } from "./utilities/orbit";
-import { supplyStore, uploadImageStore, useStore } from "./store";
+import { uploadImageStore, useStore } from "./store";
 import {
   deleteBuilding,
   deletionInProgress,
@@ -68,22 +69,23 @@ import {
   setDeleteBuilding,
   setDeletionInProgress,
   setDeletionScaffoldingColumnInProgress,
-  setDeletionScaffoldingRowInProgress,
   setDrawingInProgress,
   setDrawingScaffoldingInProgress,
   setEditingBlueprint,
   setIsDrawingBlueprint,
-  setMovingGeometry,
-  setReplaceScaffoldingColumnWithExternalStaircaseInProgress,
-  setReplaceScaffoldingColumnWithInternalStaircaseInProgress,
   setRotatingRoofInProgress,
+  setStates,
 } from "./utilities/state";
 import gsap from "gsap";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import {
   cameraDisableOrbitalFunctionalities,
   cameraEnableOrbitalFunctionality,
+  toggleCameraOrthographic,
+  toggleCameraPerspective,
 } from "./utilities/camera";
+import { SceneObserver } from "./utilities/scene";
+import { Store } from "pinia";
 
 let intersects: any[], components: OBC.Components;
 let rectangleBlueprint: any;
@@ -91,6 +93,7 @@ let labels: any;
 let roofToggleState: number = 0;
 let controls: OrbitControls;
 let viewHelper: any;
+let rotateObject = false;
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -116,6 +119,15 @@ export const createModelView = async () => {
     // @ts-ignore
     components.renderer._renderer.domElement
   );
+
+  //@ts-ignore
+  components.camera.controls.mouseButtons.left = 1; // 1
+  //@ts-ignore
+  components.camera.controls.mouseButtons.middle = 8; // 8
+  //@ts-ignore
+  components.camera.controls.mouseButtons.right = 2; // 2
+  //@ts-ignore
+  components.camera.controls.mouseButtons.wheel = 8; // 8
 
   // Obit Controls Gizmo
   viewHelper = new OrbitViewHelper(
@@ -171,6 +183,7 @@ export const createModelView = async () => {
   const planeMaterial = new THREE.MeshStandardMaterial({
     side: THREE.DoubleSide,
     visible: false,
+    // color: 0x000000
   }); // add visible: false to remove from visibility
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
@@ -379,38 +392,35 @@ export const createModelView = async () => {
     //@ts-ignore
     raycaster.setFromCamera(mousePosition, components.camera.activeCamera);
     intersects = raycaster.intersectObjects(scene.children);
-
     if (drawingInProgress) {
       scene.add(highlightMesh);
       intersects.forEach(function (intersect: any) {
         switch (intersect.object.name) {
           case "ground":
+            console.warn("highlightmesh", highlightMesh);
             const highlightPos = new THREE.Vector3()
               .copy(intersect.point)
               .floor()
               .addScalar(0.5);
             highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
             break;
-          case "extrusion":
-          case "roof":
-          case "shedRoof":
-          case "blueprint":
-          case "line":
-          case "cubeClone":
-          case "rectangleLine":
-            // Handle other cases if necessary
-            break;
         }
       });
     }
 
-    if (deletionInProgress && !drawingInProgress) {
+    if (
+      deletionInProgress &&
+      !drawingInProgress &&
+      !drawingScaffoldingInProgress
+    ) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
         if (
           intersectedObject !== lastHighlightedObject &&
           intersectedObject.name !== "ground" &&
-          intersectedObject.name !== "grid"
+          intersectedObject.name !== "grid" &&
+          intersectedObject.name !== "scaffoldingSheet" &&
+          intersectedObject.name !== "blueprint"
         ) {
           console.warn("highlighting");
           resetLastHighlightedObject();
@@ -500,16 +510,23 @@ export const createModelView = async () => {
     ) {
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object as THREE.Mesh;
+
         if (
-          intersectedObject !== lastHighlightedObject &&
-          intersectedObject.name !== "ground" &&
-          intersectedObject.name !== "grid"
+          intersectedObject.name !== "scaffoldingSheet" &&
+          intersectedObject.name !== "rectangle" &&
+          intersectedObject.name !== "blueprint"
         ) {
-          resetLastHighlightedObject();
-          highlightObject(intersectedObject, 0x0bda51);
-          lastHighlightedObject = intersectedObject;
-        } else if (intersectedObject.name === "ground") {
-          resetLastHighlightedObject();
+          if (
+            intersectedObject !== lastHighlightedObject &&
+            intersectedObject.name !== "ground" &&
+            intersectedObject.name !== "grid"
+          ) {
+            resetLastHighlightedObject();
+            highlightObject(intersectedObject, 0x0bda51);
+            lastHighlightedObject = intersectedObject;
+          } else if (intersectedObject.name === "ground") {
+            resetLastHighlightedObject();
+          }
         }
       } else {
         resetLastHighlightedObject();
@@ -520,20 +537,32 @@ export const createModelView = async () => {
   let points: THREE.Vector3[] = [];
   let scaffoldPoints: THREE.Vector3[] = [];
 
-  window.addEventListener("mousedown", async () => {
+  observeElementAndAddEventListener("reset-scaffolding", "mousedown", () => {
+    scaffoldPoints = [];
+  });
+
+  window.addEventListener("mousedown", async (event) => {
     if (drawingInProgress && drawingInProgressSwitch) {
       // create blueprint on screen after the shape has been outlined by the user
       createShapeIsOutlined(intersects, points, highlightMesh, scene, cube);
     }
-    if (drawingScaffoldingInProgress) {
+    if (drawingScaffoldingInProgress && !deletionInProgress) {
+      event.preventDefault();
       // create blueprint on screen after the shape has been outlined by the user
-      createScaffoldingShapeIsOutlined(
-        intersects,
-        scaffoldPoints,
-        highlightMesh,
-        scene,
-        cube
-      );
+      if (event.button === 0) {
+        createScaffoldingShapeIsOutlined(
+          intersects,
+          scaffoldPoints,
+          highlightMesh,
+          scene,
+          cube
+        );
+      }
+      if (event.button === 2) {
+        document.addEventListener("contextmenu", (event) => {
+          event.preventDefault(); // Prevent the context menu from appearing
+        });
+      }
     }
     if (deletionInProgress && !drawingInProgress) {
       if (intersects.length > 0) {
@@ -607,10 +636,9 @@ export const createModelView = async () => {
         }
       });
     }
-    if (movingGeometry && !drawingInProgress) {
+    if (movingGeometry && !drawingInProgress && !rotateObject) {
       if (intersects.length > 0) {
         document.body.style.cursor = "grab";
-        // cameraEnableOrbitalFunctionality(gsap, components.camera);
         const mesh = intersects[0].object;
         console.log(mesh);
         hideAllCSS2DObjects(scene);
@@ -622,9 +650,6 @@ export const createModelView = async () => {
 
         // Store initial world position of the group
         const initialWorldPosition = new THREE.Vector3();
-        // if (!initialWorldPosition) {
-
-        // }
         group.getWorldPosition(initialWorldPosition);
 
         const initialWorldPositionChildren = new THREE.Vector3();
@@ -645,13 +670,21 @@ export const createModelView = async () => {
           //@ts-ignore
           components.renderer._renderer.domElement
         );
-        transformControls.showY = false;
+
+        if (!rotateObject) {
+          transformControls.setMode("translate");
+          transformControls.showY = false;
+          transformControls.showX = true;
+          transformControls.showZ = true;
+        }
+
         if (
           mesh.name !== "ground" &&
           mesh.name !== "grid" &&
-          mesh.name.indexOf("label") === -1
+          mesh.name.indexOf("label") === -1 &&
+          !rotateObject
         ) {
-          console.log("SELECTED mESH", mesh);
+          console.log("SELECTED MESH", mesh);
           transformControls.enabled = true;
           transformControls.attach(group);
           transformControls.position.x = mesh.userData.shape.currentPoint.x;
@@ -660,8 +693,6 @@ export const createModelView = async () => {
         }
 
         console.log(geometriesToMove, group, transformControls);
-
-        // transformControls.addEventListener("change", render);
 
         transformControls.addEventListener("mouseDown", function () {
           cameraDisableOrbitalFunctionalities(gsap, components.camera);
@@ -676,70 +707,289 @@ export const createModelView = async () => {
           scene.remove(transformControls);
           freeRotateButton.domElement.click();
           returnObjectsToOriginalState();
-        
+
           // Calculate displacement
           const finalGroupPosition = new THREE.Vector3();
           group.getWorldPosition(finalGroupPosition);
-        
+
           const xDisplacement = finalGroupPosition.x - initialWorldPosition.x;
           const zDisplacement = finalGroupPosition.z - initialWorldPosition.z;
-        
+
           console.log("Initial Group Position:", initialWorldPosition);
           console.log("Final Group Position:", finalGroupPosition);
           console.log("Displacement X:", xDisplacement, "Z:", zDisplacement);
-        
+
           // Reset group position
-          group.position.set(initialWorldPosition.x, initialWorldPosition.y, initialWorldPosition.z);
-        
+          group.position.set(
+            initialWorldPosition.x,
+            initialWorldPosition.y,
+            initialWorldPosition.z
+          );
+
           // Update children
           group.children.forEach((child) => {
             // Update shape
-            if (child.userData.shape instanceof THREE.Shape) {
+            if (child.userData.shape instanceof THREE.Shape && !rotateObject) {
               const newShape = new THREE.Shape();
               child.userData.shape.curves.forEach((curve) => {
                 if (curve instanceof THREE.LineCurve) {
-                  const startPoint = curve.v1.clone().add(new THREE.Vector2(xDisplacement, zDisplacement));
-                  const endPoint = curve.v2.clone().add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  const startPoint = curve.v1
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
+                  const endPoint = curve.v2
+                    .clone()
+                    .add(new THREE.Vector2(xDisplacement, zDisplacement));
                   newShape.moveTo(startPoint.x, startPoint.y);
                   newShape.lineTo(endPoint.x, endPoint.y);
                 }
               });
               child.userData.shape = newShape;
             }
-        
+
             // Update position
             child.position.x += xDisplacement;
             child.position.z += zDisplacement;
-            
+
             // Update matrices
             child.updateMatrix();
             child.updateMatrixWorld(true);
-        
+
             console.log(`Child ${child.name} new position:`, child.position);
           });
-        
+
           // Update group matrix
           group.updateMatrix();
           group.updateMatrixWorld(true);
-        
-          console.log("After transformation:", group);
-        });
 
-        window.addEventListener("keydown", function (event: KeyboardEvent) {
-          switch (event.key) {
-            case "g":
-              transformControls.setMode("translate");
-              break;
-            case "r":
-              transformControls.setMode("rotate");
-              break;
-            case "s":
-              transformControls.setMode("scale");
-              break;
-          }
+          console.log("After transformation:", group);
         });
       }
     }
+
+    // if (movingGeometry && !drawingInProgress && rotateObject) {
+    //   if (intersects.length > 0) {
+    //     document.body.style.cursor = "grab";
+    //     const mesh = intersects[0].object;
+    //     console.log(mesh);
+    //     hideAllCSS2DObjects(scene);
+
+    //     const group = new THREE.Group();
+    //     scene.add(group);
+
+    //     const geometriesToMove = findObjectBuildingRelations(mesh, scene);
+
+    //     // Store initial world position of the group
+    //     const initialWorldPosition = new THREE.Vector3();
+    //     group.getWorldPosition(initialWorldPosition);
+
+    //     /////////////////////////////////////////
+
+    //     if (
+    //       mesh.name !== "ground" &&
+    //       mesh.name !== "grid" &&
+    //       mesh.name.indexOf("label") === -1 &&
+    //       rotateObject
+    //     ) {
+    //       group.add(...geometriesToMove);
+
+    //       // Calculate the center of the shape
+    //       const shape = mesh.userData.shape;
+    //       const boundingBox = new THREE.Box3().setFromObject(mesh);
+    //       const shapeCenter = new THREE.Vector3();
+    //       boundingBox.getCenter(shapeCenter);
+
+    //       // Axis Helper for Center of Bounding Box
+    //       const axesHelper = new THREE.AxesHelper(5);
+    //       axesHelper.position.copy(shapeCenter);
+    //       scene.add(axesHelper);
+
+    //       // Visualize the bounding box
+    //       const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
+    //       // scene.add(boundingBoxHelper);
+
+    //       // Get the min and max points of the bounding box
+    //       const min = boundingBox.min;
+    //       const max = boundingBox.max;
+
+    //       // Define the 8 corners of the bounding box
+    //       const corners = [
+    //         new THREE.Vector3(min.x, min.y, min.z),
+    //         new THREE.Vector3(max.x, min.y, min.z),
+    //         new THREE.Vector3(max.x, min.y, max.z),
+    //         new THREE.Vector3(min.x, min.y, max.z),
+    //       ];
+
+    //       const rotationAngle = THREE.MathUtils.degToRad(45);
+    //       const rotationMatrix = new THREE.Matrix4().makeRotationY(
+    //         rotationAngle
+    //       );
+
+    //       // Translate corners so that shapeCenter is at the origin (0, 0, 0)
+    //       corners.forEach((corner) => {
+    //         corner.sub(shapeCenter);
+    //       });
+
+    //       corners.forEach((corner) => {
+    //         corner.applyMatrix4(rotationMatrix);
+    //       });
+
+    //       // Translate corners back to their original position
+    //       corners.forEach((corner) => {
+    //         corner.add(shapeCenter);
+    //       });
+
+    //       const newShape = new THREE.Shape();
+    //       newShape.moveTo(corners[0].x, corners[0].z);
+    //       newShape.lineTo(corners[1].x, corners[1].z);
+    //       newShape.lineTo(corners[2].x, corners[2].z);
+    //       newShape.lineTo(corners[3].x, corners[3].z);
+    //       newShape.lineTo(corners[0].x, corners[0].z);
+
+    //       const geometry = new THREE.ShapeGeometry(newShape);
+    //       const material = new THREE.MeshBasicMaterial({
+    //         color: 0x00ff00,
+    //         wireframe: true,
+    //       });
+    //       const newMesh = new THREE.Mesh(geometry, material);
+    //       newMesh.rotation.x = Math.PI / 2;
+    //       // scene.add(newMesh);
+
+    //       console.warn("create blueprint shape from corners");
+    //       let roofType;
+    //       group.children.forEach((child) => {
+    //         // Update shape
+    //         if (child.userData.shape instanceof THREE.Shape) {
+    //           if (child.name.includes("roof") || child.name.includes("Roof")) {
+    //             roofType = child.name;
+    //             console.error("roof type in rotation:", roofType);
+    //           }
+    //           console.warn("removing children");
+    //           scene.remove(child);
+              
+    //           // child.userData.shape = newShape;
+
+    //           // // // Update matrices
+    //           // child.updateMatrix();
+    //           // child.updateMatrixWorld(true);
+    //         }
+    //       });
+
+    //       scene.remove(group)
+
+    //       points = createBlueprintFromRotation(corners, scene);
+    //       createExtrusion(scene, componentStore);
+
+    //       if (roofType === "flatRoof") {
+    //         createFlatRoofModule(scene);
+    //       }
+    //       if (roofType === "shedRoof") {
+    //         createShedRoofModule(scene, componentStore);
+    //       }
+    //       if (roofType === "roof") {
+    //         createRoofModule(scene, componentStore);
+    //       }
+
+    //       // Rotate the group around the shapeCenter
+    //       // Translate group to the shape's center
+    //       // group.position.sub(shapeCenter);
+
+    //       // Apply the rotation using Quaternion
+    //       // const rotationAxis = new THREE.Vector3(0, 1, 0); // Rotate around Y-axis
+    //       // const quaternion = new THREE.Quaternion();
+    //       // quaternion.setFromAxisAngle(rotationAxis, rotationAngle);
+    //       // group.quaternion.premultiply(quaternion);
+
+    //       // // Translate group back to its original position
+    //       // group.position.add(shapeCenter);
+
+    //       // // Reset group position
+    //       // group.position.set(
+    //       //   initialWorldPosition.x,
+    //       //   initialWorldPosition.y,
+    //       //   initialWorldPosition.z
+    //       // );
+
+    //       // // Update group matrix
+    //       // group.updateMatrix();
+    //       // group.updateMatrixWorld(true);
+
+    //       // // Update children
+    //       // group.children.forEach((child) => {
+    //       //   // Update shape
+    //       //   if (child.userData.shape instanceof THREE.Shape) {
+    //       //     child.userData.shape = newShape;
+
+    //       //     // Update matrices
+    //       //     child.updateMatrix();
+    //       //     child.updateMatrixWorld(true);
+    //       //   }
+    //       // });
+
+    //       // const afterBoundingBoxHelper = boundingBoxHelper.clone()
+    //       // afterBoundingBoxHelper.rotation.y += rotationAngle;
+    //       // scene.add(afterBoundingBoxHelper)
+
+    //       // Translate group to align rotation center with shape center
+    //       // group.position.copy(shapeCenter);
+    //       // group.updateMatrixWorld(true); // Ensure the transformation is updated
+
+    //       // // Add geometries to the group
+    //       // group.add(...geometriesToMove);
+
+    //       /////////////////////////////////////////////////////////
+
+    //       // // Rotate the group by 45 degrees (converted to radians)
+    //       // const rotationAngle = THREE.MathUtils.degToRad(45);
+    //       // group.rotation.y += rotationAngle;
+
+    //       // // Translate group back to its original position
+    //       // group.position.sub(shapeCenter);
+
+    //       // // Apply the same rotation to the shape's points
+    //       // const rotationMatrix = new THREE.Matrix4().makeRotationY(
+    //       //   rotationAngle
+    //       // );
+
+    //       // // Update children
+    //       // group.children.forEach((child) => {
+    //       //   // Update shape
+    //       //   if (child.userData.shape instanceof THREE.Shape) {
+    //       //     const groupShape = child.userData.shape;
+    //       //     const shapePoints = groupShape.getPoints();
+    //       //     const updatedShapePoints = shapePoints.map(
+    //       //       (point: { x: number | undefined; y: number | undefined }) => {
+    //       //         const vector = new THREE.Vector3(point.x, 0, point.y);
+    //       //         vector.applyMatrix4(rotationMatrix);
+    //       //         return new THREE.Vector2(vector.x, vector.z);
+    //       //       }
+    //       //     );
+
+    //       //     // Create a new shape with the updated points
+    //       //     const updatedShape = new THREE.Shape(updatedShapePoints);
+    //       //     child.userData.shape = updatedShape;
+
+    //       //     const boundingBox = new THREE.Box3().setFromObject(child.userData.shape);
+    //       //     const shapeCenter = new THREE.Vector3();
+    //       //     boundingBox.getCenter(shapeCenter);
+
+    //       //     // Visualize the bounding box
+    //       //     const boundingBoxHelper = new THREE.Box3Helper(boundingBox, 0x00ff00);
+    //       //     scene.add(boundingBoxHelper);
+
+    //       //     // Update matrices
+    //       //     child.updateMatrix();
+    //       //     child.updateMatrixWorld(true);
+    //       //   }
+    //       // });
+
+    //       // // Update group matrix
+    //       // group.updateMatrix();
+    //       // group.updateMatrixWorld(true);
+
+    //       // console.warn(group);
+    //     }
+    //   }
+    // }
 
     if (rotatingRoofInProgress && !drawingInProgressSwitch) {
       console.log("ROTATING ROOFS", intersects[0].object);
@@ -918,34 +1168,7 @@ export const createModelView = async () => {
   // create extrusion once from Blueprint THREE.Shape which has been stored in mesh.userData
   observeElementAndAddEventListener("create-extrusion", "mousedown", () => {
     setDeletionInProgress(false);
-    let blueprints: THREE.Mesh[] = [];
-    let extrusions: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "blueprint") {
-          blueprints.push(child);
-        } else if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-    });
-
-    blueprints.forEach((blueprint) => {
-      let hasExtrusion = extrusions.some((extrusion) =>
-        Object.is(blueprint.userData.shape, extrusion.userData.shape)
-      );
-      if (!hasExtrusion) {
-        const depthValue = componentStore.depth;
-        console.log(depthValue);
-        if (depthValue !== 0) {
-          createExtrusionFromBlueprint(blueprint.userData, scene, depthValue);
-        }
-      }
-    });
-
-    blueprints = [];
-    extrusions = [];
+    createExtrusion(scene, componentStore);
   });
 
   createGableRoofButton.domElement.addEventListener("mousedown", () => {
@@ -996,89 +1219,11 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-gable-roof", "mousedown", () => {
-    setDeletionInProgress(false);
-    let extrusions: THREE.Mesh[] = [];
-    let roofs: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "roof" || child.name === "shedRoof") {
-          roofs.push(child);
-        } else if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-      if (
-        child.name === "rectangleExtrusionLabel" &&
-        child instanceof CSS2DObject
-      ) {
-        child.element.style.pointerEvents = "none";
-        child.visible = false;
-      }
-    });
-
-    extrusions.forEach((extrusion) => {
-      let hasRoof = roofs.some(
-        (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v2.y
-      );
-      if (!hasRoof) {
-        const heightValue = componentStore.height;
-        if (heightValue !== 0) {
-          createRoof(extrusion, scene, 0, heightValue);
-        }
-      }
-    });
-
-    roofs = [];
-    extrusions = [];
+    createRoofModule(scene, componentStore);
   });
 
   observeElementAndAddEventListener("create-flat-roof", "mousedown", () => {
-    setDeletionInProgress(false);
-    let extrusions: THREE.Mesh[] = [];
-    let roofs: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "roof" || child.name === "shedRoof") {
-          roofs.push(child);
-        } else if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-      if (
-        child.name === "rectangleExtrusionLabel" &&
-        child instanceof CSS2DObject
-      ) {
-        child.element.style.pointerEvents = "none";
-        child.visible = false;
-      }
-    });
-
-    extrusions.forEach((extrusion) => {
-      let hasRoof = roofs.some(
-        (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.currentPoint.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.currentPoint.y
-      );
-      if (!hasRoof) {
-        createFlatRoof(extrusion, scene);
-      }
-    });
-
-    hideAllCSS2DObjects(scene);
-    roofs = [];
-    extrusions = [];
+    createFlatRoofModule(scene);
   });
 
   createShedRoofButton.domElement.addEventListener("mousedown", () => {
@@ -1127,52 +1272,7 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("create-shed-roof", "mousedown", () => {
-    setDeletionInProgress(false);
-    let extrusions: THREE.Mesh[] = [];
-    let roofs: THREE.Mesh[] = [];
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        if (child.name === "roof" || child.name === "shedRoof") {
-          roofs.push(child);
-        }
-        if (child.name === "extrusion") {
-          extrusions.push(child);
-        }
-      }
-      if (
-        child.name === "rectangleExtrusionLabel" &&
-        child instanceof CSS2DObject
-      ) {
-        child.element.style.pointerEvents = "none";
-        child.visible = false;
-      }
-    });
-
-    extrusions.forEach((extrusion) => {
-      let hasRoof = roofs.some(
-        (roof) =>
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v1.x ||
-          extrusion.userData.shape.currentPoint.x ===
-            roof.userData.shape.curves[0].v2.x ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v1.y ||
-          extrusion.userData.shape.currentPoint.y ===
-            roof.userData.shape.curves[0].v2.y
-      );
-      if (!hasRoof) {
-        const heightValue = parseFloat(
-          componentStore.shedHeight as unknown as string
-        );
-        if (heightValue !== 0) {
-          createShedRoof(extrusion, scene, 0, heightValue);
-        }
-      }
-    });
-
-    roofs = [];
-    extrusions = [];
+    createShedRoofModule(scene, componentStore);
   });
 
   // edit extrusion after roof as been created
@@ -1277,18 +1377,14 @@ export const createModelView = async () => {
     }
   });
 
-  observeElementAndAddEventListener("draw-scaffold", "mousedown", () => {
-    setDeletionInProgress(false);
-    if (drawingScaffoldingInProgress) {
-      // create blueprint on screen after the shape has been outlined by the user
-      createScaffoldingShapeIsOutlined(
-        intersects,
-        points,
-        highlightMesh,
-        scene,
-        cube
-      );
-    }
+  observeElementAndAddEventListener("draw-scaffold", "mouseleave", () => {
+    console.warn(
+      "drawing scaffolding PRETRIGGER",
+      drawingScaffoldingInProgress,
+      drawingInProgress,
+      drawingInProgressSwitch,
+      deletionInProgress
+    );
   });
 
   generateScaffoldButton.domElement.addEventListener("mousedown", () => {
@@ -1341,6 +1437,14 @@ export const createModelView = async () => {
     cubeClone.forEach((cube) => {
       scene.remove(cube);
     });
+
+    updateScaffoldingData(scene);
+    scaffoldPoints.length = 0;
+  });
+
+  observeElementAndAddEventListener("delete-object", "mousedown", () => {
+    scaffoldPoints.length = 0;
+    points.length = 0;
   });
 
   // autogenerate scaffolding
@@ -1348,18 +1452,14 @@ export const createModelView = async () => {
     "autogenerate-scaffolding",
     "mousedown",
     () => {
-      setDeletionInProgress(false);
       hideAllCSS2DObjects(scene);
+
       scene.traverse((child: any) => {
         if (child instanceof THREE.Mesh && child.name === "blueprint") {
           generateScaffoldOutline(child, scene);
         }
       });
-      // scene.traverse((child: any) => {
-      //   if (child.name === "scaffoldLine") {
-      //     console.error(child)
-      //   }
-      // });
+
       generateScaffolding();
     }
   );
@@ -1494,33 +1594,33 @@ export const createModelView = async () => {
 
   const shadowIds = new Set<string>(); // Set to keep track of used shadow IDs
 
-  document.addEventListener("mousedown", () => {
-    scene.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        let shadowId: string;
-        if (object.name === "cubeClone") {
-          shadowId = object.uuid;
-        } else if (object.name === "line") {
-          shadowId = object.uuid;
-        } else if (object.name === "blueprint") {
-          shadowId = object.uuid;
-        } else if (object.name === "extrusion") {
-          shadowId = object.uuid;
-        } else if (object.name === "scaffoldingModel") {
-          shadowId = object.uuid;
-        } else {
-          // Skip if the object name is not one of the specified types
-          return;
-        }
+  // document.addEventListener("mousedown", () => {
+  //   scene.traverse((object) => {
+  //     if (object instanceof THREE.Mesh) {
+  //       let shadowId: string;
+  //       if (object.name === "cubeClone") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "line") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "blueprint") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "extrusion") {
+  //         shadowId = object.uuid;
+  //       } else if (object.name === "scaffoldingModel") {
+  //         shadowId = object.uuid;
+  //       } else {
+  //         // Skip if the object name is not one of the specified types
+  //         return;
+  //       }
 
-        // Check if the shadow ID already exists in the set
-        if (!shadowIds.has(shadowId)) {
-          shadows.renderShadow([object], shadowId);
-          shadowIds.add(shadowId); // Add the shadow ID to the set
-        }
-      }
-    });
-  });
+  //       // Check if the shadow ID already exists in the set
+  //       if (!shadowIds.has(shadowId)) {
+  //         shadows.renderShadow([object], shadowId);
+  //         shadowIds.add(shadowId); // Add the shadow ID to the set
+  //       }
+  //     }
+  //   });
+  // });
 
   // clearSceneButton.domElement.addEventListener("mousedown", () => {
   //   resetScaffolding(scene);
@@ -1535,6 +1635,7 @@ export const createModelView = async () => {
   // });
 
   observeElementAndAddEventListener("reset-scene", "mousedown", () => {
+    window.location.reload();
     resetScaffolding(scene);
 
     const store = useStore();
@@ -1558,50 +1659,21 @@ export const createModelView = async () => {
     return [bboxWireframe, scaffoldInternalStaircaseModeling];
   }
 
-  // testButton.domElement.addEventListener("mousedown", async () => {
-  //   console.log("test button");
-  //   calculateTotalAmountScaffoldingInScene(scene);
-  //   calculateTotalSquareFootageForScaffolding(scene);
-  //   // loadSymbol(scene);
-  //   // scene.traverse((child) => {
-  //   //   if (child.name === "scaffoldLine") {
-  //   //     console.log(child.userData.level);
-  //   //   }
-  //   // });
-
-  //   scene.traverse((child) => {
-  //     if (child.name === "roof") {
-  //       console.log(child);
-  //     }
-  //   });
-  // });
-
   observeElementAndAddEventListener("generate-supply", "mousedown", () => {
-    const [scaffolding, internalScaffolding, externalScaffolding] =
-      calculateTotalAmountScaffoldingInScene(scene);
-    const totalSquareFootageOfScaffolding =
-      calculateTotalSquareMetersForScaffolding(scene);
-    console.log(totalSquareFootageOfScaffolding);
-    const totalBuildingSquareMeterage =
-      calculateTotalSquareMetersForBlueprint(scene);
-
-    const supply = supplyStore();
-    supply.updateScaffolding(scaffolding);
-    supply.updateInternalScaffolding(internalScaffolding);
-    supply.updateExternalScaffolding(externalScaffolding);
-    supply.updateSquareMetersOfScaffolding(
-      totalSquareFootageOfScaffolding.toFixed(2)
-    );
-    supply.updateSquareMetersOfBuilding(totalBuildingSquareMeterage.toFixed(2));
-
-    console.log(
-      supply.scaffolding,
-      supply.internalScaffolding,
-      supply.externalScaffolding,
-      supply.squareMetersOfScaffolding,
-      supply.squareMetersOfBuilding
-    );
+    updateScaffoldingData(scene);
   });
+
+  //TODO
+  //FIX FIX FIX
+  const observer = new SceneObserver(
+    scene,
+    debounce(() => updateScaffoldingData(scene), 200)
+  );
+  observer.startObserving();
+
+  //TODO CHANGE IMPLEMENTATION SO THIS ONLY TRIGGERS WHEN THE SCENE CHANGES
+  // Set the debounce delay (e.g., 200ms)
+  // document.addEventListener("mousedown", debounce(updateScaffoldingData(scene), 500));
 
   observeElementAndAddEventListener("cloth-sheet", "mousedown", () => {
     setDeletionInProgress(false);
@@ -1653,12 +1725,7 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("delete row of scaffolding");
-      setDeletionScaffoldingRowInProgress(true);
-      setDeletionScaffoldingColumnInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
+      setStates({ deletionScaffoldingRowInProgress: true });
     }
   );
 
@@ -1667,14 +1734,7 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("delete column of scaffolding");
-      setDeletionScaffoldingColumnInProgress(true);
-      setDeletionScaffoldingRowInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
+      setStates({ deletionScaffoldingColumnInProgress: true });
     }
   );
 
@@ -1683,14 +1743,10 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("scaffold-external-staircase");
-      setDeletionScaffoldingColumnInProgress(true);
-      setDeletionScaffoldingRowInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(true);
-      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(false);
+      setStates({
+        replaceScaffoldingColumnWithExternalStaircaseInProgress: true,
+        deletionScaffoldingColumnInProgress: true,
+      });
     }
   );
 
@@ -1699,14 +1755,10 @@ export const createModelView = async () => {
     "mousedown",
     () => {
       console.log("scaffold-internal-staircase");
-      setDeletionScaffoldingColumnInProgress(true);
-      setDeletionScaffoldingRowInProgress(false);
-      setDrawingInProgress(false);
-      setDeletionInProgress(false);
-      setEditingBlueprint(false);
-      setDrawingScaffoldingInProgress(false);
-      setReplaceScaffoldingColumnWithExternalStaircaseInProgress(false);
-      setReplaceScaffoldingColumnWithInternalStaircaseInProgress(true);
+      setStates({
+        replaceScaffoldingColumnWithInternalStaircaseInProgress: true,
+        deletionScaffoldingColumnInProgress: true,
+      });
     }
   );
 
@@ -1726,7 +1778,13 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener("move-geometry", "mousedown", () => {
-    setMovingGeometry(true);
+    setStates({ movingGeometry: true });
+    rotateObject = false;
+  });
+
+  observeElementAndAddEventListener("rotate-geometry", "mousedown", () => {
+    setStates({ movingGeometry: true });
+    rotateObject = true;
   });
 
   // Add a basic plane
@@ -1783,6 +1841,9 @@ export const createModelView = async () => {
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+      return reader;
+    } else {
+      return null;
     }
   }
 
@@ -1823,6 +1884,32 @@ export const createModelView = async () => {
   });
 
   observeElementAndAddEventListener(
+    "scale-image-blueprint-button",
+    "mousedown",
+    () => {
+      console.log("blur");
+      const uploadStore = uploadImageStore();
+      const uploadedBlueprints: THREE.Object3D<THREE.Object3DEventMap>[] = [];
+      scene.traverse((child) => {
+        if (child.name === "uploaded-blueprint") {
+          uploadedBlueprints.push(child);
+        }
+      });
+
+      console.log(uploadedBlueprints);
+
+      uploadedBlueprints.forEach((blueprint: any) => {
+        console.log(uploadStore.scale);
+        blueprint.scale.set(
+          uploadStore.scale,
+          uploadStore.scale,
+          uploadStore.scale
+        );
+      });
+    }
+  );
+
+  observeElementAndAddEventListener(
     "scale-image-blueprint",
     "keydown",
     (event) => {
@@ -1852,6 +1939,14 @@ export const createModelView = async () => {
 
   observeElementAndAddEventListener("delete-building", "mousedown", () => {
     setDeleteBuilding(true);
+  });
+
+  observeElementAndAddEventListener("toggle-orthographic", "mousedown", () => {
+    toggleCameraOrthographic(components);
+  });
+
+  observeElementAndAddEventListener("toggle-perspective", "mousedown", () => {
+    toggleCameraPerspective(components);
   });
 
   // @ts-ignore
@@ -1901,3 +1996,242 @@ export const createModelView = async () => {
 
   animate();
 };
+
+function createShedRoofModule(
+  scene: THREE.Scene,
+  componentStore: Store<
+    "component",
+    {
+      length: number;
+      width: number;
+      depth: number;
+      height: number;
+      shedHeight: number;
+      level: number;
+    },
+    {},
+    {
+      updateLength(value: any): void;
+      updateWidth(value: any): void;
+      updateDepth(value: any): void;
+      updateRoofHeight(value: any): void;
+      updateShedRoofHeight(value: any): void;
+      updateScaffoldLevel(value: any): void;
+    }
+  >
+) {
+  setDeletionInProgress(false);
+  let extrusions: THREE.Mesh[] = [];
+  let roofs: THREE.Mesh[] = [];
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "roof" || child.name === "shedRoof") {
+        roofs.push(child);
+      }
+      if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+    if (
+      child.name === "rectangleExtrusionLabel" &&
+      child instanceof CSS2DObject
+    ) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
+  extrusions.forEach((extrusion) => {
+    let hasRoof = roofs.some(
+      (roof) =>
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v1.x ||
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v2.x ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v1.y ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v2.y
+    );
+    if (!hasRoof) {
+      const heightValue = parseFloat(
+        componentStore.shedHeight as unknown as string
+      );
+      if (heightValue !== 0) {
+        createShedRoof(extrusion, scene, 0, heightValue);
+      }
+    }
+  });
+
+  roofs = [];
+  extrusions = [];
+}
+
+function createFlatRoofModule(scene: THREE.Scene) {
+  setDeletionInProgress(false);
+  let extrusions: THREE.Mesh[] = [];
+  let roofs: THREE.Mesh[] = [];
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "roof" || child.name === "shedRoof") {
+        roofs.push(child);
+      } else if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+    if (
+      child.name === "rectangleExtrusionLabel" &&
+      child instanceof CSS2DObject
+    ) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
+  extrusions.forEach((extrusion) => {
+    let hasRoof = roofs.some(
+      (roof) =>
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.currentPoint.x ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.currentPoint.y
+    );
+    if (!hasRoof) {
+      createFlatRoof(extrusion, scene);
+    }
+  });
+
+  hideAllCSS2DObjects(scene);
+  roofs = [];
+  extrusions = [];
+}
+
+function createRoofModule(
+  scene: THREE.Scene,
+  componentStore: Store<
+    "component",
+    {
+      length: number;
+      width: number;
+      depth: number;
+      height: number;
+      shedHeight: number;
+      level: number;
+    },
+    {},
+    {
+      updateLength(value: any): void;
+      updateWidth(value: any): void;
+      updateDepth(value: any): void;
+      updateRoofHeight(value: any): void;
+      updateShedRoofHeight(value: any): void;
+      updateScaffoldLevel(value: any): void;
+    }
+  >
+) {
+  setDeletionInProgress(false);
+  let extrusions: THREE.Mesh[] = [];
+  let roofs: THREE.Mesh[] = [];
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "roof" || child.name === "shedRoof") {
+        roofs.push(child);
+      } else if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+    if (
+      child.name === "rectangleExtrusionLabel" &&
+      child instanceof CSS2DObject
+    ) {
+      child.element.style.pointerEvents = "none";
+      child.visible = false;
+    }
+  });
+
+  extrusions.forEach((extrusion) => {
+    let hasRoof = roofs.some(
+      (roof) =>
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v1.x ||
+        extrusion.userData.shape.currentPoint.x ===
+          roof.userData.shape.curves[0].v2.x ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v1.y ||
+        extrusion.userData.shape.currentPoint.y ===
+          roof.userData.shape.curves[0].v2.y
+    );
+    if (!hasRoof) {
+      const heightValue = componentStore.height;
+      if (heightValue !== 0) {
+        createRoof(extrusion, scene, 0, heightValue);
+      }
+    }
+  });
+
+  roofs = [];
+  extrusions = [];
+}
+
+function createExtrusion(
+  scene: THREE.Scene,
+  componentStore: Store<
+    "component",
+    {
+      length: number;
+      width: number;
+      depth: number;
+      height: number;
+      shedHeight: number;
+      level: number;
+    },
+    {},
+    {
+      updateLength(value: any): void;
+      updateWidth(value: any): void;
+      updateDepth(value: any): void;
+      updateRoofHeight(value: any): void;
+      updateShedRoofHeight(value: any): void;
+      updateScaffoldLevel(value: any): void;
+    }
+  >
+) {
+  let blueprints: THREE.Mesh[] = [];
+  let extrusions: THREE.Mesh[] = [];
+  let meshExtrude;
+
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      if (child.name === "blueprint") {
+        blueprints.push(child);
+      } else if (child.name === "extrusion") {
+        extrusions.push(child);
+      }
+    }
+  });
+
+  blueprints.forEach((blueprint) => {
+    let hasExtrusion = extrusions.some((extrusion) =>
+      Object.is(blueprint.userData.shape, extrusion.userData.shape)
+    );
+    if (!hasExtrusion) {
+      const depthValue = componentStore.depth;
+      console.log(depthValue);
+      if (depthValue !== 0) {
+        meshExtrude = createExtrusionFromBlueprint(
+          blueprint.userData,
+          scene,
+          depthValue
+        );
+      }
+    }
+  });
+
+  blueprints = [];
+  extrusions = [];
+
+  return meshExtrude;
+}

@@ -1,6 +1,7 @@
 import * as OBC from "openbim-components";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import * as THREE from "three";
+import { supplyStore } from "../store";
 
 export const objectsEqual = (o1: any, o2: any): boolean =>
   typeof o1 === "object" && Object.keys(o1).length > 0
@@ -168,6 +169,7 @@ export function resetScene(
     }
   });
   objectsToRemove.forEach((object: any) => {
+    deleteObject(object, scene);
     scene.remove(object);
   });
 
@@ -180,6 +182,7 @@ export function resetScene(
   });
   scaffoldPlacedPosition.clear();
   console.log(scene, components, shadows, scaffoldPlacedPosition);
+  window.location.reload();
 }
 
 // helper function to measure line length
@@ -213,6 +216,9 @@ export function disableOrbitControls(controls: any) {
 export function deleteObject(object: any, scene: THREE.Scene) {
   hideAllCSS2DObjects(scene);
   console.warn("OBJECT TO BE DELETED", object);
+  if (object.name === "ground") {
+    return
+  }
   // special instance for dealing with blueprints and shaderMaterials
   if (object.name === "rectanglePlane" && object.userData.shape) {
     object.visible = false;
@@ -259,6 +265,8 @@ function removeFromScene(object: any, scene: THREE.Scene) {
       } else {
         object.material.dispose();
       }
+    } else {
+      console.warn("Cannot read properties of null:", object.material);
     }
 
     object.parent.remove(object);
@@ -421,7 +429,7 @@ export function calculateTotalSquareMetersForScaffolding(scene: THREE.Scene) {
     }
   });
 
-  console.log("total square meters", totalSquareFootage);
+  // console.log("total square meters", totalSquareFootage);
 
   return totalSquareFootage;
 }
@@ -442,15 +450,15 @@ export function calculateTotalAmountScaffoldingInScene(scene: THREE.Scene) {
     }
   });
 
-  console.log(
-    `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
-  );
-  console.log(
-    `There are ${scaffoldingExternalStaircaseCount} scaffoldingExternalStaircaseCount objects in the scene.`
-  );
-  console.log(
-    `There are ${scaffoldingInternalStaircaseCount} scaffoldingInternalStaircaseModel objects in the scene.`
-  );
+  // console.log(
+  //   `There are ${scaffoldingModelCount} scaffoldingModel objects in the scene.`
+  // );
+  // console.log(
+  //   `There are ${scaffoldingExternalStaircaseCount} scaffoldingExternalStaircaseCount objects in the scene.`
+  // );
+  // console.log(
+  //   `There are ${scaffoldingInternalStaircaseCount} scaffoldingInternalStaircaseModel objects in the scene.`
+  // );
   return [
     scaffoldingModelCount,
     scaffoldingInternalStaircaseCount,
@@ -693,7 +701,11 @@ export function returnObjectsToOriginalState() {
   });
 }
 
-export function saveAsImage(renderer: THREE.Renderer, scene: THREE.Scene, camera: THREE.Camera) {
+export function saveAsImage(
+  renderer: THREE.Renderer,
+  scene: THREE.Scene,
+  camera: THREE.Camera
+) {
   let imgData;
 
   try {
@@ -728,3 +740,84 @@ function saveFile(strData: string, filename: string) {
   }
 }
 
+export function setTimelineToBeginningState() {
+  const svgElement = document.getElementById("general-svg");
+  const svgElementLine = document.getElementById("general-svg-line");
+  if (svgElement && svgElementLine) {
+    svgElement.style.stroke = "white";
+    svgElementLine.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+
+  const svgElementBlueprint = document.getElementById("blueprint-svg");
+  const svgElementLineBlueprint = document.getElementById("blueprint-svg-line");
+  if (svgElementBlueprint && svgElementLineBlueprint) {
+    svgElementBlueprint.style.stroke = "white";
+    svgElementLineBlueprint.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+
+  const svgElementRoof = document.getElementById("roof-svg");
+  const svgElementLineRoof = document.getElementById("roof-svg-line");
+  const svgElementScaffold = document.getElementById("scaffold-svg");
+  const svgElementLineScaffold = document.getElementById("scaffold-svg-line");
+  if (
+    svgElementRoof &&
+    svgElementLineRoof &&
+    svgElementScaffold &&
+    svgElementLineScaffold
+  ) {
+    svgElementRoof.style.stroke = "white";
+    svgElementLineRoof.style.stroke = "white";
+    svgElementScaffold.style.stroke = "white";
+    svgElementLineScaffold.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+
+  const svgElementSupply = document.getElementById("supply-svg");
+  if (svgElementSupply) {
+    svgElementSupply.style.stroke = "white";
+  } else {
+    console.error("timeline not found");
+  }
+}
+
+export const updateScaffoldingData = (scene: THREE.Scene) => {
+  const [scaffolding, internalScaffolding, externalScaffolding] =
+    calculateTotalAmountScaffoldingInScene(scene);
+  const totalSquareFootageOfScaffolding =
+    calculateTotalSquareMetersForScaffolding(scene);
+  console.log(totalSquareFootageOfScaffolding);
+  const totalBuildingSquareMeterage =
+    calculateTotalSquareMetersForBlueprint(scene);
+
+  const supply = supplyStore();
+  supply.updateScaffolding(scaffolding);
+  supply.updateInternalScaffolding(internalScaffolding);
+  supply.updateExternalScaffolding(externalScaffolding);
+  supply.updateSquareMetersOfScaffolding(
+    totalSquareFootageOfScaffolding.toFixed(2)
+  );
+  supply.updateSquareMetersOfBuilding(totalBuildingSquareMeterage.toFixed(2));
+};
+
+export function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function (...args: Parameters<T>) {
+    clearTimeout(timeout);
+    //@ts-ignore
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Helper function to rotate a point or Vector3
+export function rotatePoint(point: any, rotation: any) {
+  const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(rotation);
+  return point.applyMatrix4(rotationMatrix);
+}

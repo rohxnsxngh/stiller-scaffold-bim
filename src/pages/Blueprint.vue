@@ -5,7 +5,7 @@
       <GeneralTools />
 
       <div class="mb-8">
-        <p class="text-sm mb-2 mt-8">Velg et alternativ</p>
+        <p class="text-sm mb-2 mt-8 font-semibold">Velg et alternativ</p>
         <div class="grid grid-cols-3 gap-3">
           <div
             class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
@@ -36,13 +36,13 @@
 
       <div class="card-actions justify-end">
         <div class="m-4">
-          <div
+          <!-- <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] mr-4"
             @click="goToPreviousPage"
             id="go-to-previous-general"
           >
             Tilbake
-          </div>
+          </div> -->
           <div
             class="btn btn-sm btn-outline hover:bg-[#23E6A1] border-2 border-[#23E6A1] hover:border-[#23E6A1]"
             @click="goToNextPage"
@@ -85,8 +85,16 @@ export default {
     goToNextPage() {
       // @ts-ignore
       window.setActiveSection("roof");
-      const svgElement = document.getElementById("blueprint-svg");
-      const svgElementLine = document.getElementById("blueprint-svg-line");
+      // const svgElement = document.getElementById("blueprint-svg");
+      // const svgElementLine = document.getElementById("blueprint-svg-line");
+      // if (svgElement && svgElementLine) {
+      //   svgElement.style.stroke = "#23E6A1";
+      //   svgElementLine.style.stroke = "#23E6A1";
+      // } else {
+      //   console.error("timeline not found");
+      // }
+      const svgElement = document.getElementById("general-svg");
+      const svgElementLine = document.getElementById("general-svg-line");
       if (svgElement && svgElementLine) {
         svgElement.style.stroke = "#23E6A1";
         svgElementLine.style.stroke = "#23E6A1";
@@ -94,18 +102,18 @@ export default {
         console.error("timeline not found");
       }
     },
-    goToPreviousPage() {
-      // @ts-ignore
-      window.setActiveSection("general");
-      const svgElement = document.getElementById("general-svg");
-      const svgElementLine = document.getElementById("general-svg-line");
-      if (svgElement && svgElementLine) {
-        svgElement.style.stroke = "white";
-        svgElementLine.style.stroke = "white";
-      } else {
-        console.error("timeline not found");
-      }
-    },
+    // goToPreviousPage() {
+    //   // @ts-ignore
+    //   window.setActiveSection("general");
+    //   const svgElement = document.getElementById("general-svg");
+    //   const svgElementLine = document.getElementById("general-svg-line");
+    //   if (svgElement && svgElementLine) {
+    //     svgElement.style.stroke = "white";
+    //     svgElementLine.style.stroke = "white";
+    //   } else {
+    //     console.error("timeline not found");
+    //   }
+    // },
   },
 };
 </script>

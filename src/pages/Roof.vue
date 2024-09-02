@@ -45,6 +45,22 @@
       <GableRoofComponent v-if="showGable" />
       <FlatRoofComponent v-if="showFlat" />
 
+      <div class="bg-[#24242F] rounded flex flex-row my-4">
+        <div>
+          <img
+            src="../assets/images/RoofSection/Info.svg"
+            alt="Clipboard"
+            class="w-12 mt-4 mx-2"
+          />
+        </div>
+        <div>
+          <p class="text-sm text-[#9E9E9E] m-4">
+            For å rotere taket, må du trykke på taket etter å ha trykket på
+            “Rotér tak”-knappen
+          </p>
+        </div>
+      </div>
+
       <div class="card-actions justify-end">
         <div class="m-4">
           <div
@@ -106,8 +122,16 @@ export default {
     goToNextPage() {
       // @ts-ignore
       window.setActiveSection("scaffold");
-      const svgElement = document.getElementById("roof-svg");
-      const svgElementLine = document.getElementById("roof-svg-line");
+      // const svgElement = document.getElementById("roof-svg");
+      // const svgElementLine = document.getElementById("roof-svg-line");
+      // if (svgElement && svgElementLine) {
+      //   svgElement.style.stroke = "#23E6A1";
+      //   svgElementLine.style.stroke = "#23E6A1";
+      // } else {
+      //   console.error("timeline not found");
+      // }
+      const svgElement = document.getElementById("blueprint-svg");
+      const svgElementLine = document.getElementById("blueprint-svg-line");
       if (svgElement && svgElementLine) {
         svgElement.style.stroke = "#23E6A1";
         svgElementLine.style.stroke = "#23E6A1";
@@ -118,8 +142,16 @@ export default {
     goToPreviousPage() {
       // @ts-ignore
       window.setActiveSection("blueprint");
-      const svgElement = document.getElementById("blueprint-svg");
-      const svgElementLine = document.getElementById("blueprint-svg-line");
+      // const svgElement = document.getElementById("blueprint-svg");
+      // const svgElementLine = document.getElementById("blueprint-svg-line");
+      // if (svgElement && svgElementLine) {
+      //   svgElement.style.stroke = "white";
+      //   svgElementLine.style.stroke = "white";
+      // } else {
+      //   console.error("timeline not found");
+      // }
+      const svgElement = document.getElementById("general-svg");
+      const svgElementLine = document.getElementById("general-svg-line");
       if (svgElement && svgElementLine) {
         svgElement.style.stroke = "white";
         svgElementLine.style.stroke = "white";

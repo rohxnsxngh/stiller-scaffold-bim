@@ -1,14 +1,50 @@
 <template>
   <div
     ref="selected"
+    id="selected-tool"
     class="fixed -right-0 -bottom-12 mt-1 text-amber-300 font-semibold"
   >
     {{ value }}
   </div>
   <div
+    class="fixed -right-20 -bottom-80 mt-1 text-slate-300 font-semibold bg-[#111115] w-32 p-2 rounded-lg"
+  >
+    <p class="font-bold mb-2">Kamera</p>
+    <div
+      v-for="(button, index) in buttons"
+      :key="index"
+      :id="button.id"
+      :class="[
+        'btn btn-sm text-slate-300 bg-[#111115] hover:text-green-300',
+        { 'text-[#23E6A1]': activeButton === index },
+      ]"
+      @click="setActive(index)"
+    >
+      {{ button.label }}
+    </div>
+  </div>
+  <div
+    class="fixed -right-20 -bottom-48 mt-1 text-slate-300 font-semibold bg-[#111115] w-72 p-2 rounded-lg"
+  >
+    <p>
+      Stillas:
+      <span class="text-green-300">{{ squareMeterScaffoldingCoverage }}</span>
+      square meters
+    </p>
+    <p>
+      Stillas-seksjoner:
+      <span class="text-green-300">{{ scaffolding }} </span> scaffolding
+    </p>
+    <p>
+      Tildekning:
+      <span class="text-green-300"> {{ squareMeterBuildingCoverage }} </span>
+      square meters
+    </p>
+  </div>
+  <div
     id="scaffold-guidance"
     onclick="my_modal_3.showModal()"
-    class="fixed -left-12 top-2 mt-1 btn bg-transparent border-none hover:bg-transparent text-amber-300 font-semibold shadow-lg tooltip tooltip-left"
+    class="fixed -left-12 top-2 mt-1 btn bg-transparent border-none hover:bg-transparent text-amber-300 font-semibold tooltip tooltip-left"
     data-tip="help"
   >
     <span class="material-symbols-outlined"> help </span>
@@ -26,7 +62,7 @@
   </dialog>
   <div class="w-2">
     <ul class="timeline">
-      <li class="ml-10 -top-4">
+      <li class="ml-6 -top-4">
         <div class="timeline-middle">
           <div class="">
             <svg
@@ -55,13 +91,13 @@
               stroke="white"
               stroke-width="2"
             >
-              <line x1="-32" y1="0" x2="100" y2="0" />
+              <line x1="-32" y1="0" x2="132" y2="0" />
             </svg>
           </div>
         </div>
         <hr />
       </li>
-      <li class="ml-32 -top-4">
+      <li class="ml-40 -top-4">
         <hr />
         <div class="timeline-middle">
           <div class="">
@@ -91,13 +127,13 @@
               stroke-width="2"
               id="blueprint-svg-line"
             >
-              <line x1="18" y1="0" x2="102" y2="0" />
+              <line x1="18" y1="0" x2="60" y2="0" />
             </svg>
           </div>
         </div>
         <hr />
       </li>
-      <li class="ml-20 -top-4">
+      <li class="ml-10 -top-4">
         <hr />
         <div class="timeline-middle">
           <div class="">
@@ -195,9 +231,9 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted, computed } from "vue";
-import { selectedStore } from "../store";
+<script lang="ts">
+import { computed } from "vue";
+import { selectedStore, supplyStore } from "../store";
 
 export default {
   setup() {
@@ -210,9 +246,70 @@ export default {
       set: (value) => selected.updateSelected(value),
     });
 
+    const supply = supplyStore();
+
+    // Use computed properties to reactively access store state
+    const scaffolding = computed({
+      // Make length a computed property
+      get: () => supply.scaffolding,
+      set: (value) => supply.updateScaffolding(value),
+    });
+
+    const internalScaffolding = computed({
+      // Make width a computed property
+      get: () => supply.internalScaffolding,
+      set: (value) => supply.updateInternalScaffolding(value),
+    });
+
+    const externalScaffolding = computed({
+      // Make depth a computed property
+      get: () => supply.externalScaffolding,
+      set: (value) => supply.updateExternalScaffolding(value),
+    });
+
+    const squareMeterScaffoldingCoverage = computed({
+      // Make depth a computed property
+      get: () => supply.squareMetersOfScaffolding,
+      set: (value) => supply.updateSquareMetersOfScaffolding(value),
+    });
+
+    const squareMeterBuildingCoverage = computed({
+      // Make depth a computed property
+      get: () => supply.squareMetersOfBuilding,
+      set: (value) => supply.updateSquareMetersOfBuilding(value),
+    });
+
     return {
       value,
+      scaffolding,
+      internalScaffolding,
+      externalScaffolding,
+      squareMeterScaffoldingCoverage,
+      squareMeterBuildingCoverage,
     };
+  },
+  data() {
+    return {
+      activeButton: 1,
+      buttons: [
+        {
+          label: "Orthographic",
+          id: "toggle-orthographic",
+        },
+        {
+          label: "Perspective",
+          id: "toggle-perspective",
+        },
+      ],
+    };
+  },
+  methods: {
+    setActive(index: number) {
+      this.activeButton = index;
+    },
+    updateActiveButton(index: number) {
+      this.activeButton = index;
+    },
   },
 };
 </script>

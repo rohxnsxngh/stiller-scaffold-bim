@@ -8,46 +8,64 @@
       <div class="divider"></div>
       <GeneralTools />
 
-      <!-- <div class="bg-[#24242F] rounded flex flex-row my-4">
-        <div>
+      <div class="bg-[#24242F] rounded">
+        <div class="flex flex-row mt-4">
+          <div>
+            <img
+              src="../assets/images/GeneralSection/Clipboard.svg"
+              alt="Clipboard"
+              class="w-20 mt-4 mx-2"
+            />
+          </div>
+          <div>
+            <p class="text-sm text-[#9E9E9E] m-4">
+              BETA: Bruk ‘Autogenerer stillas’ til å automatisk generere stillas
+              rundt hele bygningen du har tegnet! PS: Fungerer ikke på
+              BIM-objekter
+            </p>
+          </div>
+        </div>
+        <div
+          class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin w-72 mb-2 ml-10"
+          id="autogenerate-scaffolding"
+          @click="triggerToast"
+        >
           <img
-            src="../assets/images/GeneralSection/Clipboard.svg"
-            alt="Clipboard"
-            class="w-20 mt-4 mx-2"
+            src="../assets/images/ScaffoldSection/MagicWand.svg"
+            alt="Magic Wand"
+            class="w-4 mx-0.5"
           />
+          Autogenerer stillas
         </div>
-        <div>
-          <p class="text-sm text-[#9E9E9E] m-4">
-            Dersom avstanden mellom gulvet og fasaden er mer enn 30 cm - kreves
-            rekkverk motfasaden
-          </p>
-        </div>
-      </div> -->
+      </div>
+
+      <ToastComponent ref="toastAuto" type="success" message="Voila!" />
 
       <div class="bg-[#14141C] rounded mt-4">
-        <div class="card-actions justify-end">
+        <div class="card-actions justify-left">
           <div class="p-4">
+            <div class="text-sm font-semibold my-1">Slett stillas</div>
             <div class="join join-horizontal my-2">
               <button
                 class="btn btn-sm join-item order-1 border-white text-white"
                 id="delete-row-scaffolding"
               >
-                Delete Row
+                Slett rad
               </button>
               <button
                 class="btn btn-sm join-item order-1 border-white text-white"
                 id="delete-column-scaffolding"
               >
-                Delete Column
+                Slett kolonne
               </button>
               <button
                 class="btn btn-sm join-item order-1 border-white text-white"
                 id="reset-scaffolding"
               >
-                Delete All
+                Slett all stillas
               </button>
             </div>
-            <div
+            <!-- <div
               class="btn btn-sm btn-outline bg-[#623CEA] border-1 border-white text-white font-thin w-full mt-3"
               id="autogenerate-scaffolding"
             >
@@ -57,7 +75,7 @@
                 class="w-4 mx-0.5"
               />
               Autogenerer stillas
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -86,7 +104,7 @@
             />
             <p>Generer stillas fra omriss</p>
           </div>
-          <div
+          <!-- <div
             class="btn btn-xl h-32 btn-outline hover:bg-[#23E6A1] m-2"
             @click="toggleDrawer"
           >
@@ -95,7 +113,7 @@
               class="object-contain"
             />
             <p>Plasser individuelle elementer</p>
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -161,7 +179,7 @@
       </div>
 
       <div class="grid grid-cols-2 gap-8">
-        <div>
+        <!-- <div>
           <label class="form-control w-full max-w-xs">
             <div class="label">
               <span class="label-text"
@@ -178,7 +196,7 @@
             />
             <div class="label"></div>
           </label>
-        </div>
+        </div> -->
 
         <div>
           <label class="form-control w-full max-w-xs">
@@ -186,7 +204,11 @@
               <span class="label-text">Antall stillas etasjer</span>
             </div>
             <div class="flex flex-row gap-1 border-black">
-              <div class="btn text-2xl w-1/12" id="remove-scaffolding-level">
+              <div
+                class="btn text-2xl w-1/12"
+                id="remove-scaffolding-level"
+                :class="{ 'disabled-class': !isScaffolding }"
+              >
                 -
               </div>
               <div class="btn text-2xl">
@@ -196,9 +218,14 @@
                   class="w-6 bg-inherit"
                   readonly
                   disabled
+                  :class="{ 'disabled-class': !isScaffolding }"
                 />
               </div>
-              <div class="btn text-2xl w-1/12" id="add-scaffolding-level">
+              <div
+                class="btn text-2xl w-1/12"
+                id="add-scaffolding-level"
+                :class="{ 'disabled-class': !isScaffolding }"
+              >
                 +
               </div>
             </div>
@@ -206,6 +233,12 @@
           </label>
         </div>
       </div>
+
+      <ToastComponent
+        ref="toast"
+        type="info"
+        message="Kamera endret til ‘Se ovenfra’ og ‘Isometrisk"
+      />
 
       <div class="card-actions justify-end">
         <div class="m-4">
@@ -231,8 +264,9 @@
 
 <script lang="ts">
 import { computed } from "vue";
-import { useStore } from "../store";
+import { supplyStore, useStore } from "../store";
 import GeneralTools from "../components/GeneralTools.vue";
+import ToastComponent from "../components/Toast.vue";
 
 export default {
   setup() {
@@ -245,12 +279,42 @@ export default {
       set: (value) => componentStore.updateScaffoldLevel(value),
     });
 
+    const supply = supplyStore();
+
+    // Use computed properties to reactively access store state
+    const scaffolding = computed({
+      // Make length a computed property
+      get: () => supply.scaffolding,
+      set: (value) => supply.updateScaffolding(value),
+    });
+
+    const internalScaffolding = computed({
+      // Make width a computed property
+      get: () => supply.internalScaffolding,
+      set: (value) => supply.updateInternalScaffolding(value),
+    });
+
+    const externalScaffolding = computed({
+      // Make depth a computed property
+      get: () => supply.externalScaffolding,
+      set: (value) => supply.updateExternalScaffolding(value),
+    });
+
+    const isScaffolding = computed(() => {
+      return scaffolding.value > 0;
+    });
+
     return {
       level,
+      isScaffolding,
+      scaffolding,
+      internalScaffolding,
+      externalScaffolding,
     };
   },
   components: {
     GeneralTools,
+    ToastComponent,
   },
   data() {
     return {
@@ -277,12 +341,14 @@ export default {
       } else {
         console.error("Element with ID 'generate-scaffolding' not found.");
       }
+      //@ts-ignore
+      this.$refs.toast.show();
     },
     goToNextPage() {
       // @ts-ignore
       window.setActiveSection("supply");
-      const svgElement = document.getElementById("scaffold-svg");
-      const svgElementLine = document.getElementById("scaffold-svg-line");
+      const svgElement = document.getElementById("roof-svg");
+      const svgElementLine = document.getElementById("roof-svg-line");
       if (svgElement && svgElementLine) {
         svgElement.style.stroke = "#23E6A1";
         svgElementLine.style.stroke = "#23E6A1";
@@ -293,8 +359,8 @@ export default {
     goToPreviousPage() {
       // @ts-ignore
       window.setActiveSection("roof");
-      const svgElement = document.getElementById("roof-svg");
-      const svgElementLine = document.getElementById("roof-svg-line");
+      const svgElement = document.getElementById("blueprint-svg");
+      const svgElementLine = document.getElementById("blueprint-svg-line");
       if (svgElement && svgElementLine) {
         svgElement.style.stroke = "white";
         svgElementLine.style.stroke = "white";
@@ -302,12 +368,16 @@ export default {
         console.error("timeline not found");
       }
     },
+    triggerToast() {
+      //@ts-ignore
+      this.$refs.toastAuto.show();
+    },
   },
 };
 </script>
 
 <style scoped>
-.disabled {
+.disabled-class {
   pointer-events: none;
   opacity: 0.5;
 }

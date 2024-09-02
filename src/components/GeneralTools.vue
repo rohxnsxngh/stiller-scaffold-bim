@@ -5,7 +5,7 @@
         class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
         id="top-view"
       >
-        <i class="material-icons text-[#0084FF]">fullscreen</i>
+        <i class="material-icons text-[#0084FF]">fullscreen_exit</i>
       </div>
       <div><p class="text-xs text-center mt-2">Top View</p></div>
     </div>
@@ -41,7 +41,7 @@
         class="btn btn-md bg-[#355E3B] rounded-lg border-2 border-[#0BDA51]"
         id="move-geometry"
       >
-        <i class="material-symbols-outlined text-[#0BDA51]">drag_pan</i>
+        <i class="material-symbols-outlined text-[#0BDA51]">drag_click</i>
       </div>
       <div><p class="text-xs text-center mt-2">Move Building</p></div>
     </div>
@@ -54,6 +54,15 @@
       </div>
       <div><p class="text-xs text-center mt-2">Delete Building</p></div>
     </div>
+    <!-- <div class="flex flex-col mx-4">
+      <div
+        class="btn btn-md bg-[#592E00] rounded-lg border-2 border-[#FF8C00]"
+        id="rotate-geometry"
+      >
+        <i class="material-symbols-outlined text-[#FF8C00]">settings_backup_restore</i>
+      </div>
+      <div><p class="text-xs text-center mt-2">Rotate Blueprint</p></div>
+    </div> -->
     <div class="flex flex-col mx-4">
       <div
         class="btn btn-md bg-[#122A45] rounded-lg border-2 border-[#0084FF]"
@@ -63,5 +72,14 @@
       </div>
       <div><p class="text-xs text-center mt-2">Capture Scene</p></div>
     </div>
+    <!-- <div class="flex flex-col mx-4">
+      <div
+        class="btn btn-md bg-[#221F41] rounded-lg border-2 border-[#623CEA]"
+        id="free-pan"
+      >
+        <i class="material-symbols-outlined text-[#623CEA]">drag_pan</i>
+      </div>
+      <div><p class="text-xs text-center mt-2">Move Building</p></div>
+    </div> -->
   </div>
 </template>

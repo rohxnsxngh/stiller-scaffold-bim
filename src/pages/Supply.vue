@@ -3,39 +3,45 @@
     <div class="card-body p-2">
       <GeneralTools />
 
+      <div class="bg-[#24242F] rounded flex flex-row my-4">
+        <div>
+          <img
+            src="../assets/images/RoofSection/Info.svg"
+            alt="Clipboard"
+            class="w-12 mt-4 mx-2"
+          />
+        </div>
+        <div>
+          <p class="text-sm text-[#9E9E9E] m-4">
+            Tildekning vil automatisk dekke alle stillas-flater. Spesifisér selv
+            hvor mye du trenger om du ikke ønsker all stillas tildekket i
+            anbudet.
+          </p>
+        </div>
+      </div>
+
       <div class="mb-8">
-        <p class="text-sm mb-4 mt-8 font-semibold">Tildekking av stillas</p>
-        <button id="delete-sheeting" class="btn btn-sm mb-2 border-white text-white text-xs">Delete all</button>
+        <p class="text-sm mb-4 font-semibold">Tildekking av stillas</p>
+        <button
+          id="delete-sheeting"
+          class="btn btn-sm mb-2 border-white text-white text-xs"
+          @click="activeButton = null"
+        >
+          Fjern all tildekning
+        </button>
         <div class="grid grid-cols-3 gap-3">
           <div
-            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
-            id="cloth-sheet"
+            v-for="(button, index) in buttons"
+            :key="index"
+            :id="button.id"
+            :class="[
+              'btn btn-xl h-28 btn-outline',
+              { 'bg-[#23E6A1]': activeButton === index },
+            ]"
+            @click="setActive(index)"
           >
-            <img
-              src="../assets/images/SupplySection/Tablecloth.svg"
-              class="object-contain"
-            />
-            <p class="">Duk</p>
-          </div>
-          <div
-            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
-            id="tarp-sheet"
-          >
-            <img
-              src="../assets/images/SupplySection/Presenting.svg"
-              class="object-contain"
-            />
-            <p>Presenning</p>
-          </div>
-          <div
-            class="btn btn-xl h-28 btn-outline hover:bg-[#23E6A1]"
-            id="shrink-wrap-sheet"
-          >
-            <img
-              src="../assets/images/SupplySection/ShrinkPlastic.svg"
-              class="object-contain"
-            />
-            <p>Krympeplast</p>
+            <img :src="button.imgSrc" class="object-contain" />
+            <p>{{ button.label }}</p>
           </div>
         </div>
       </div>
@@ -76,8 +82,7 @@
         </div>
       </div> -->
 
-
-      <div class="">
+      <!-- <div class="">
         <label class="form-control w-full max-w-xs">
           <div class="label">
             <span class="label-text">Forankringstetthet</span>
@@ -93,7 +98,7 @@
             <span class="label-text-alt">Bottom Right label</span>
           </div>
         </label>
-      </div>
+      </div> -->
 
       <BillOfMaterialsModalComponent />
 
@@ -122,16 +127,51 @@
 <script lang="ts">
 import BillOfMaterialsModalComponent from "../components/BillOfMaterialsModalComponent.vue";
 import GeneralTools from "../components/GeneralTools.vue";
+import tableCloth from "../assets/images/SupplySection/Tablecloth.svg";
+import Presenning from "../assets/images/SupplySection/Presenting.svg";
+import Krympeplast from "../assets/images/SupplySection/ShrinkPlastic.svg";
 
 export default {
   components: {
     BillOfMaterialsModalComponent,
     GeneralTools,
   },
+  data() {
+    return {
+      activeButton: null,
+      buttons: [
+        {
+          imgSrc: tableCloth,
+          label: "Duk",
+          id: "cloth-sheet",
+        },
+        {
+          imgSrc: Presenning,
+          label: "Presenning",
+          id: "tarp-sheet",
+        },
+        {
+          imgSrc: Krympeplast,
+          label: "Krympeplast",
+          id: "shrink-wrap-sheet",
+        },
+      ],
+    };
+  },
   methods: {
+    setActive(index: any) {
+      this.activeButton = index;
+    },
     goToNextPage() {
       // @ts-ignore
-      const svgElement = document.getElementById("supply-svg");
+      const svgElement = document.getElementById("scaffold-svg");
+      const svgElementLine = document.getElementById("scaffold-svg-line");
+      if (svgElement && svgElementLine) {
+        svgElement.style.stroke = "#23E6A1";
+        svgElementLine.style.stroke = "#23E6A1";
+      } else {
+        console.error("timeline not found");
+      }
       if (svgElement) {
         svgElement.style.stroke = "#23E6A1";
       } else {
@@ -149,13 +189,25 @@ export default {
     goToPreviousPage() {
       // @ts-ignore
       window.setActiveSection("scaffold");
-      const svgElement = document.getElementById("scaffold-svg");
-      const svgElementCurrent = document.getElementById("supply-svg");
-      const svgElementLine = document.getElementById("scaffold-svg-line");
-      if (svgElement && svgElementLine && svgElementCurrent) {
+      // const svgElement = document.getElementById("scaffold-svg");
+      // const svgElementCurrent = document.getElementById("supply-svg");
+      // const svgElementLine = document.getElementById("scaffold-svg-line");
+      // if (svgElement && svgElementLine && svgElementCurrent) {
+      //   svgElement.style.stroke = "white";
+      //   svgElementLine.style.stroke = "white";
+      //   svgElementCurrent.style.stroke = "white";
+      // } else {
+      //   console.error("timeline not found");
+      // }
+      const svgElement = document.getElementById("roof-svg");
+      const svgElementLine = document.getElementById("roof-svg-line");
+      const svgElement2 = document.getElementById("scaffold-svg");
+      const svgElementLine2 = document.getElementById("scaffold-svg-line");
+      if (svgElement && svgElementLine && svgElement2 && svgElementLine2) {
         svgElement.style.stroke = "white";
         svgElementLine.style.stroke = "white";
-        svgElementCurrent.style.stroke = "white";
+        svgElement2.style.stroke = "white";
+        svgElementLine2.style.stroke = "white";
       } else {
         console.error("timeline not found");
       }
