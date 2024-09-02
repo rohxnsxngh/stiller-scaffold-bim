@@ -5,7 +5,6 @@ import {
   cameraDisableOrbitalFunctionality,
   cameraEnableOrbitalFunctionality,
   cameraEnablePanningFunctionality,
-  cameraPerspectiveView,
   cameraTopView,
   toggleCameraOrthographic,
   toggleCameraPerspective,

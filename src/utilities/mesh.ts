@@ -1987,7 +1987,6 @@ export function editBlueprint(scene: THREE.Scene, blueprint: THREE.Mesh) {
 
 export function rotateBlueprint(
   blueprint: any,
-  scene: THREE.Scene,
   angle: number
 ) {
   // 1. Calculate the center of the shape
