@@ -14,7 +14,11 @@
 ![alt text](./public/images/image148.png)
 
 **demo**: https://stiller-scaffold-bim-two.vercel.app/model
+
 **note:** this demo was created for a Norwegian company so much of the functionality has been labeled in Norwegian.
+
+**simpler english version demo:** https://scaffold-bim.vercel.app/model
+
 
 The envisioned scaffolding graphics application is designed to:
 1. **Allow users to define and modify building structures** by drawing measurements and extruding cubes or rectangles.
